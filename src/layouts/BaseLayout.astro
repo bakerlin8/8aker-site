@@ -245,6 +245,21 @@ footer{padding:36px 48px 44px;max-width:1180px;margin:0 auto;display:flex;justif
 .chapter-dots{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:13px;}
 .chapter-dot{width:5px;height:5px;border-radius:50%;background:var(--border);transition:background 0.4s,transform 0.4s;}
 .chapter-dot.active{background:var(--emerald);transform:scale(1.7);}
+.countdown-block{margin-top:40px;text-align:center;}
+.countdown-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.16em;color:var(--vermillion);text-transform:uppercase;}
+.countdown-label{font-size:12px;color:rgba(253,250,247,0.5);margin-top:6px;letter-spacing:0.03em;}
+.countdown-grid{display:flex;align-items:flex-start;justify-content:center;gap:10px;margin-top:18px;}
+.countdown-unit{display:flex;flex-direction:column;align-items:center;min-width:52px;}
+.countdown-num{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:clamp(28px,4.6vw,46px);color:var(--warm-white);line-height:1;font-variant-numeric:tabular-nums;}
+.countdown-num.countdown-secs{color:var(--vermillion);}
+@keyframes cdTick{0%{opacity:1;transform:translateY(0);}35%{opacity:0.45;transform:translateY(-3px);}100%{opacity:1;transform:translateY(0);}}
+.countdown-num.countdown-secs.tick{animation:cdTick 0.5s ease;}
+.countdown-unit-label{font-size:9.5px;letter-spacing:0.14em;color:rgba(253,250,247,0.4);margin-top:7px;text-transform:uppercase;}
+.countdown-sep{font-family:'JetBrains Mono',monospace;font-weight:300;font-size:clamp(28px,4.6vw,46px);color:rgba(253,250,247,0.2);line-height:1;padding-top:1px;}
+.countdown-progress-wrap{width:min(420px,78vw);height:2px;background:rgba(253,250,247,0.12);margin:22px auto 0;position:relative;overflow:hidden;border-radius:2px;}
+.countdown-progress-fill{height:100%;width:0%;background:linear-gradient(to right,var(--rose),var(--vermillion));transition:width 1s linear;}
+@media(max-width:600px){.countdown-grid{gap:6px;}.countdown-unit{min-width:42px;}}
+
 .hero-stats{display:flex;gap:48px;justify-content:center;margin-top:44px;padding-top:28px;border-top:1px solid rgba(253,250,247,0.15);}
 .hero-stat-num{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(30px,4vw,42px);color:var(--vermillion);line-height:1;}
 .hero-stat-label{font-size:10px;letter-spacing:0.12em;color:rgba(253,250,247,0.45);margin-top:8px;text-transform:uppercase;}
