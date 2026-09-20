@@ -1,28 +1,34 @@
 {
-  "closing_title_highlight": "獨一無二的你",
-  "closing_title_prefix": "五個方向持續累積",
-  "subscribe_desc": "訂閱不會解鎖更多內容——這裡永遠公開、永遠免費閱讀。訂閱單純是「我願意讓你走得更遠一點」的一份支持，讓這個累積可以走得更久。",
-  "bridge_line2_suffix": "，去 Dashboard。",
-  "hero_title_highlight": "站起來",
-  "bridge_line1_suffix": "。",
-  "bridge_line2_prefix": "想看",
-  "bridge_line1_prefix": "這裡是",
-  "about_lede": "「這裡不是我最厲害的成果，是我還在跌倒的第幾次。」",
-  "subscribe_title_suffix": "？",
-  "carousel_title_highlight": "中間會浮現獨一無二的你",
-  "subscribe_title_prefix": "想固定支持這裡的",
+  "hero_title_prefix": "七転び八起——",
+  "hero_title_highlight": "第八次站起來",
+  "hero_title_suffix": "之前的過程",
+  "hero_desc": "我在大阪蓋房子、學 AI、做小工具。往下捲，先看這五個方向。",
+
+  "carousel_title_prefix": "強化・放出・操作・具現・變化——",
+  "carousel_title_highlight": "持續累積之後，才浮現獨一無二的你",
+
+  "closing_title_prefix": "強化・放出・操作・具現・變化",
+  "closing_title_highlight": "才浮現獨一無二的你",
+  "closing_desc": "往下，是誠實的帳本跟最新的紀錄。",
+
   "proof_intro": "放這些不是想說自己很厲害，是想說——每個小工具背後，都有花的時間、省下的時間、跟一段可以直接複製的 prompt。這是誠實的帳本，不是行銷頁。",
+
+  "about_lede": "「這裡不是我最厲害的成果，是我還在跌倒的第幾次。」",
   "about_p1": "［ 待補：你的故事開場——建議先講一個具體的困境或轉折點，不用美化。例如剛到大阪時撞過的牆、第一次跟工務店談崩的經驗，或是一開始學 AI 時完全不知道從哪裡下手的挫折感。］",
-  "subscribe_price": "NT$150",
   "about_p2": "［ 待補：中段——怎麼開始靠「每天累積一點點」走出來，這段是「複利」敘事真正落地的地方，最好是具體事件，不是抽象講法。］",
   "about_p3": "［ 待補：現在——你正在做的事、這個網站想陪誰一起走。］",
-  "hero_desc": "我在大阪蓋房子、學 AI、做小工具。往下捲，先看這五個方向。",
+
+  "subscribe_title_prefix": "想固定支持這裡的",
   "subscribe_title_highlight": "更新",
-  "carousel_title_prefix": "五個方向持續累積，",
+  "subscribe_title_suffix": "？",
+  "subscribe_desc": "訂閱不會解鎖更多內容——這裡永遠公開、永遠免費閱讀。訂閱單純是「我願意讓你走得更遠一點」的一份支持，讓這個累積可以走得更久。",
+  "subscribe_price": "NT$150",
   "subscribe_url": "https://buy.stripe.com/5kQ00i1Vfg6BdmecUc1Jm01",
-  "closing_desc": "往下，是誠實的帳本跟最新的紀錄。",
+
+  "bridge_line1_prefix": "這裡是",
   "bridge_line1_highlight": "安靜的日記",
-  "hero_title_suffix": "之前的過",
+  "bridge_line1_suffix": "。",
+  "bridge_line2_prefix": "想看",
   "bridge_line2_highlight": "活的成果",
-  "hero_title_prefix": "七転び八起——"
+  "bridge_line2_suffix": "，去 Dashboard。"
 }
