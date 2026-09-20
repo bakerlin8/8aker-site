@@ -14,6 +14,6 @@ export const collections = {
   strengthen: defineCollection({ type: 'content', schema: pillarSchema }),  // 強化 — 運動與健康
   emit:       defineCollection({ type: 'content', schema: pillarSchema }),  // 放出 — 輸出與分享
   operate:    defineCollection({ type: 'content', schema: pillarSchema }),  // 操作 — AI 學習筆記
-  conjure:    defineCollection({ type: 'content', schema: pillarSchema }),  // 具現化 — 從無到有的建置
+  conjure:    defineCollection({ type: 'content', schema: pillarSchema }),  // 具現 — 從無到有的建置
   transmute:  defineCollection({ type: 'content', schema: pillarSchema }),  // 變化 — 心境筆記
 };
