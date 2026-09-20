@@ -22,6 +22,10 @@ collections:
           - { label: "序章｜標題強調字", name: "hero_title_highlight", widget: "string" }
           - { label: "序章｜標題後段", name: "hero_title_suffix", widget: "string" }
           - { label: "序章｜說明文字", name: "hero_desc", widget: "text" }
+          - { label: "倒數計時｜小標題", name: "countdown_eyebrow", widget: "string" }
+          - { label: "倒數計時｜標籤文字", name: "countdown_label", widget: "string" }
+          - { label: "倒數計時｜起算時間（ISO 格式）", name: "countdown_start", widget: "string" }
+          - { label: "倒數計時｜目標時間（ISO 格式）", name: "countdown_target", widget: "string" }
           - { label: "五柱區｜標題前段", name: "carousel_title_prefix", widget: "string" }
           - { label: "五柱區｜標題強調字", name: "carousel_title_highlight", widget: "string" }
           - { label: "結尾章｜標題前段", name: "closing_title_prefix", widget: "string" }
