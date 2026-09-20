@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8AKER Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Serif+TC:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#241419; --ink-soft:#3d2530; --ink-mute:#7a5b64; --ink-ghost:#b79ba2;
+  --parchment:#f1e9e6; --cream:#f8f1ee; --warm-white:#fdf8f6;
+  --emerald:#6b1f2f; --emerald-deep:#3d0f1a; --emerald-pale:#e3c3c9;
+  --rose:#b8935a; --rose-pale:#ecdcc0;
+  --vermillion:#d4a24c; --vermillion-pale:#f2e0bb;
+  --border:rgba(36,20,25,0.12); --border-soft:rgba(36,20,25,0.07);
+  --ok:#3d6b4a; --err:#a83b3b;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:var(--cream);color:var(--ink);font-family:'Noto Serif TC',serif;font-weight:400;line-height:1.75;min-height:100vh;}
+button{font-family:inherit;cursor:pointer;}
+input,textarea,select{font-family:inherit;}
+::selection{background:var(--emerald-pale);}
+
+/* ── layout shell ── */
+.app{display:none;min-height:100vh;grid-template-columns:240px 1fr;}
+.app.visible{display:grid;}
+@media(max-width:820px){.app{grid-template-columns:1fr;}}
+
+/* ── sidebar ── */
+.sidebar{background:var(--emerald-deep);color:var(--warm-white);padding:28px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-brand{display:flex;align-items:center;gap:10px;margin-bottom:36px;}
+.sidebar-brand-icon{width:22px;height:22px;flex-shrink:0;}
+.sidebar-brand-text{font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:0.14em;}
+.sidebar-brand-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--rose);opacity:0.8;margin-top:2px;}
+.nav-group{margin-bottom:26px;}
+.nav-group-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.16em;color:rgba(253,250,247,0.4);text-transform:uppercase;margin-bottom:10px;padding:0 10px;}
+.nav-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:3px;font-size:13.5px;color:rgba(253,250,247,0.75);text-decoration:none;cursor:pointer;transition:background 0.2s,color 0.2s;margin-bottom:2px;}
+.nav-item:hover{background:rgba(253,250,247,0.06);color:var(--warm-white);}
+.nav-item.active{background:rgba(253,250,247,0.1);color:var(--warm-white);}
+.nav-item .count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--rose);}
+.sidebar-footer{margin-top:auto;padding-top:18px;border-top:1px solid rgba(253,250,247,0.12);}
+.sidebar-user{font-size:11.5px;color:rgba(253,250,247,0.5);margin-bottom:10px;word-break:break-all;}
+.sidebar-btn{width:100%;background:none;border:1px solid rgba(253,250,247,0.2);color:rgba(253,250,247,0.7);font-size:11px;letter-spacing:0.06em;padding:9px 0;border-radius:3px;transition:all 0.2s;}
+.sidebar-btn:hover{border-color:rgba(253,250,247,0.4);color:var(--warm-white);}
+.legacy-link{display:block;margin-top:8px;font-size:10.5px;color:rgba(253,250,247,0.35);text-align:center;text-decoration:none;}
+.legacy-link:hover{color:rgba(253,250,247,0.6);}
+
+/* ── main content ── */
+.main{padding:44px 56px;max-width:920px;}
+@media(max-width:700px){.main{padding:28px 20px;}}
+.view{display:none;animation:fadeUp 0.4s cubic-bezier(0.16,1,0.3,1);}
+.view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+.page-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--rose);text-transform:uppercase;margin-bottom:10px;}
+.page-title{font-family:'Noto Serif TC',serif;font-weight:500;font-size:clamp(22px,2.8vw,30px);color:var(--ink);margin-bottom:6px;}
+.page-sub{font-size:13px;color:var(--ink-ghost);margin-bottom:32px;}
+
+/* ── form elements ── */
+.field{margin-bottom:22px;}
+.field-label{display:block;font-size:12px;letter-spacing:0.04em;color:var(--ink-mute);margin-bottom:7px;font-weight:500;}
+.field-hint{font-size:11px;color:var(--ink-ghost);margin-top:5px;}
+.field input[type=text],.field input[type=date],.field textarea{
+  width:100%;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;
+  padding:11px 13px;font-size:13.5px;color:var(--ink);transition:border-color 0.2s;
+}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--emerald);}
+.field textarea{resize:vertical;line-height:1.7;}
+.field textarea.mono{font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+.field-checkbox{display:flex;align-items:center;gap:9px;}
+.field-checkbox input{width:16px;height:16px;accent-color:var(--emerald);}
+.field-checkbox label{font-size:13px;color:var(--ink-soft);}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;}
+.tag-chip{display:flex;align-items:center;gap:6px;background:var(--emerald-pale);color:var(--emerald-deep);font-size:11px;padding:5px 10px;border-radius:20px;}
+.tag-chip button{background:none;border:none;color:var(--emerald-deep);opacity:0.6;font-size:13px;line-height:1;}
+.tag-chip button:hover{opacity:1;}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:0.04em;padding:11px 24px;border-radius:3px;border:none;transition:all 0.2s;}
+.btn-primary{background:var(--emerald-deep);color:var(--warm-white);}
+.btn-primary:hover{background:var(--emerald);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--ink-mute);}
+.btn-ghost:hover{border-color:var(--ink-mute);color:var(--ink);}
+.btn-danger{background:none;border:1px solid var(--err);color:var(--err);}
+.btn-danger:hover{background:var(--err);color:var(--warm-white);}
+.btn-row{display:flex;gap:12px;margin-top:36px;padding-top:24px;border-top:1px solid var(--border-soft);align-items:center;}
+.btn-row .spacer{flex:1;}
+
+/* ── article list ── */
+.list-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 4px;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:padding-left 0.25s;}
+.list-row:hover{padding-left:10px;}
+.list-row-main{min-width:0;}
+.list-row-title{font-size:14.5px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-row-meta{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-ghost);margin-top:4px;display:flex;gap:10px;align-items:center;}
+.badge-draft{background:var(--vermillion-pale);color:#8a5a10;font-size:9.5px;padding:2px 7px;border-radius:10px;letter-spacing:0.04em;}
+.list-row-arrow{color:var(--ink-ghost);flex-shrink:0;}
+.empty-state{padding:50px 0;text-align:center;color:var(--ink-ghost);font-size:13px;}
+
+/* ── login screen ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--emerald-deep);}
+.login-card{text-align:center;padding:48px 40px;max-width:360px;}
+.login-mark{width:44px;height:44px;margin:0 auto 20px;}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:26px;letter-spacing:0.1em;color:var(--warm-white);margin-bottom:8px;}
+.login-sub{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.16em;color:rgba(253,250,247,0.4);margin-bottom:36px;text-transform:uppercase;}
+.login-btn{display:inline-flex;align-items:center;gap:10px;background:var(--warm-white);color:var(--emerald-deep);padding:13px 30px;border-radius:3px;border:none;font-size:13px;letter-spacing:0.04em;transition:transform 0.2s;}
+.login-btn:hover{transform:translateY(-1px);}
+.login-note{margin-top:22px;font-size:11px;color:rgba(253,250,247,0.35);}
+.login-note a{color:rgba(253,250,247,0.55);}
+
+/* ── loading / toast ── */
+.loader-wrap{display:flex;align-items:center;justify-content:center;padding:80px 0;color:var(--ink-ghost);font-size:12.5px;letter-spacing:0.04em;}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--emerald);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:10px;}
+.toast{background:var(--ink);color:var(--warm-white);padding:13px 20px;border-radius:4px;font-size:12.5px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.25);animation:toastIn 0.3s cubic-bezier(0.16,1,0.3,1);}
+.toast.ok{border-left:3px solid var(--ok);}
+.toast.err{border-left:3px solid var(--err);}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <svg class="login-mark" viewBox="0 0 24 24" fill="none"><path d="M4 18 L4 9 L12 4 L20 9 L20 18" stroke="#fdf8f6" stroke-width="1.1"/><path d="M4 18 L20 18" stroke="#fdf8f6" stroke-width="1.1"/><path d="M8 18 L8 12 L12 9.5 L16 12 L16 18" stroke="#b8935a" stroke-width="0.9"/></svg>
+    <div class="login-title">8AKER Studio</div>
+    <div class="login-sub">內容編輯後台</div>
+    <button class="login-btn" id="loginBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      使用 GitHub 登入
+    </button>
+    <div class="login-note">用舊版後台？<a href="/admin/">前往 /admin</a></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg class="sidebar-brand-icon" viewBox="0 0 24 24" fill="none"><path d="M4 18 L4 9 L12 4 L20 9 L20 18" stroke="#fdf8f6" stroke-width="1.2"/><path d="M4 18 L20 18" stroke="#fdf8f6" stroke-width="1.2"/><path d="M8 18 L8 12 L12 9.5 L16 12 L16 18" stroke="#b8935a" stroke-width="1"/></svg>
+      <div>
+        <div class="sidebar-brand-text">8AKER</div>
+        <div class="sidebar-brand-sub">STUDIO</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">網站</div>
+      <div class="nav-item" data-view="home">首頁文案</div>
+      <div class="nav-item" data-view="proof">複利證明牆</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">五根柱子</div>
+      <div class="nav-item" data-view="pillar" data-pillar="strengthen">強化・運動與健康 <span class="count" id="count-strengthen"></span></div>
+      <div class="nav-item" data-view="pillar" data-pillar="emit">放出・輸出與分享 <span class="count" id="count-emit"></span></div>
+      <div class="nav-item" data-view="pillar" data-pillar="operate">操作・AI 學習筆記 <span class="count" id="count-operate"></span></div>
+      <div class="nav-item" data-view="pillar" data-pillar="conjure">具現化・從無到有 <span class="count" id="count-conjure"></span></div>
+      <div class="nav-item" data-view="pillar" data-pillar="transmute">變化・心境筆記 <span class="count" id="count-transmute"></span></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="sidebarUser"></div>
+      <button class="sidebar-btn" id="logoutBtn">登出</button>
+      <a href="/" target="_blank" class="legacy-link">↗ 查看正式網站</a>
+      <a href="/admin/" class="legacy-link">舊版後台（備用）</a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- HOME COPY -->
+    <section class="view" id="view-home">
+      <div class="page-eyebrow">Site Copy</div>
+      <div class="page-title">首頁文案</div>
+      <div class="page-sub">編輯首頁上會顯示的所有文字區塊</div>
+      <div id="homeForm"></div>
+    </section>
+
+    <!-- PROOF CARDS -->
+    <section class="view" id="view-proof">
+      <div class="page-eyebrow">Proof Wall</div>
+      <div class="page-title">複利證明牆卡片</div>
+      <div class="page-sub">首頁上那三張成果卡片</div>
+      <div id="proofForm"></div>
+    </section>
+
+    <!-- PILLAR ARTICLE LIST -->
+    <section class="view" id="view-pillar">
+      <div class="page-eyebrow" id="pillarEyebrow">Pillar</div>
+      <div class="page-title" id="pillarTitle"></div>
+      <div class="page-sub" id="pillarSub"></div>
+      <button class="btn btn-primary" id="newArticleBtn" style="margin-bottom:28px;">＋ 新增文章</button>
+      <div id="articleList"></div>
+    </section>
+
+    <!-- ARTICLE EDITOR -->
+    <section class="view" id="view-article">
+      <div class="page-eyebrow" id="articleEyebrow">Article</div>
+      <div class="page-title" id="articleModeTitle">編輯文章</div>
+      <div id="articleForm"></div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ══════════════════════════ CONFIG ══════════════════════════ */
+const REPO_OWNER = 'bakerlin8';
+const REPO_NAME = '8aker-site';
+const BRANCH = 'main';
+const API = 'https://api.github.com';
+
+const PILLARS = {
+  strengthen: { title: '運動與健康', jp: '強化' },
+  emit:       { title: '輸出與分享', jp: '放出' },
+  operate:    { title: 'AI 學習筆記', jp: '操作' },
+  conjure:    { title: '從無到有的建置', jp: '具現化' },
+  transmute:  { title: '心境筆記', jp: '變化' },
+};
+
+/* ══════════════════════════ AUTH ══════════════════════════ */
+function getToken(){ return sessionStorage.getItem('gh_token'); }
+function setToken(t){ sessionStorage.setItem('gh_token', t); }
+function clearToken(){ sessionStorage.removeItem('gh_token'); }
+
+(function initAuth(){
+  const hash = window.location.hash;
+  if (hash.startsWith('#gh_token=')) {
+    setToken(hash.replace('#gh_token=', ''));
+    history.replaceState(null, '', window.location.pathname);
+  }
+})();
+
+document.getElementById('loginBtn').addEventListener('click', () => {
+  window.location.href = '/api/studio_auth';
+});
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  clearToken();
+  window.location.reload();
+});
+
+/* ══════════════════════════ GITHUB API HELPERS ══════════════════════════ */
+async function ghFetch(path, opts = {}) {
+  const res = await fetch(`${API}${path}`, {
+    ...opts,
+    headers: {
+      Authorization: `token ${getToken()}`,
+      Accept: 'application/vnd.github+json',
+      ...(opts.headers || {}),
+    },
+  });
+  if (res.status === 401) { clearToken(); window.location.reload(); throw new Error('unauthorized'); }
+  return res;
+}
+
+async function ghGetUser() {
+  const res = await ghFetch('/user');
+  if (!res.ok) throw new Error('user fetch failed');
+  return res.json();
+}
+
+async function ghGetFile(path) {
+  const res = await ghFetch(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`);
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`get ${path} failed`);
+  const data = await res.json();
+  return { content: decodeURIComponent(escape(atob(data.content.replace(/\n/g, '')))), sha: data.sha };
+}
+
+async function ghListDir(path) {
+  const res = await ghFetch(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${BRANCH}`);
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`list ${path} failed`);
+  return res.json();
+}
+
+async function ghPutFile(path, content, sha, message) {
+  const body = {
+    message,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: BRANCH,
+  };
+  if (sha) body.sha = sha;
+  const res = await ghFetch(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || `save ${path} failed`); }
+  return res.json();
+}
+
+async function ghDeleteFile(path, sha, message) {
+  const res = await ghFetch(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, sha, branch: BRANCH }),
+  });
+  if (!res.ok) throw new Error(`delete ${path} failed`);
+}
+
+/* ══════════════════════════ TOASTS ══════════════════════════ */
+function toast(msg, type = 'ok') {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+/* ══════════════════════════ FRONTMATTER (articles) ══════════════════════════ */
+function parseFrontmatter(raw) {
+  const m = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, body: raw };
+  const fm = {};
+  m[1].split('\n').forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    let val = line.slice(idx + 1).trim();
+    if (key === 'tags') {
+      const arr = val.match(/\[(.*)\]/);
+      fm.tags = arr ? arr[1].split(',').map(s => s.replace(/["']/g, '').trim()).filter(Boolean) : [];
+    } else if (key === 'draft') {
+      fm.draft = val === 'true';
+    } else {
+      fm[key] = val.replace(/^"|"$/g, '');
+    }
+  });
+  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: fm.draft || false, body: m[2].trim() };
+}
+
+function serializeFrontmatter(fm) {
+  const tagsStr = '[' + fm.tags.map(t => `"${t}"`).join(', ') + ']';
+  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.draft}\n---\n\n${fm.body}\n`;
+}
+
+function slugify(title) {
+  return title.toLowerCase().trim()
+    .replace(/[^\w\u4e00-\u9fff\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .slice(0, 60) || 'untitled-' + Date.now();
+}
+
+/* ══════════════════════════ NAV / ROUTER ══════════════════════════ */
+const views = ['home', 'proof', 'pillar', 'article'];
+let currentPillar = null;
+let currentArticle = null; // { path, sha, isNew }
+
+function showView(name) {
+  views.forEach(v => document.getElementById(`view-${v}`).classList.toggle('active', v === name));
+  document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+    const match = el.dataset.view === name && (name !== 'pillar' || el.dataset.pillar === currentPillar);
+    el.classList.toggle('active', match);
+  });
+}
+
+document.querySelectorAll('.nav-item[data-view="home"]').forEach(el => el.addEventListener('click', () => loadHome()));
+document.querySelectorAll('.nav-item[data-view="proof"]').forEach(el => el.addEventListener('click', () => loadProof()));
+document.querySelectorAll('.nav-item[data-pillar]').forEach(el => {
+  el.addEventListener('click', () => loadPillar(el.dataset.pillar));
+});
+
+/* ══════════════════════════ HOME COPY VIEW ══════════════════════════ */
+const HOME_FIELDS = [
+  ['hero_title_prefix', '序章｜標題前段', 'text'], ['hero_title_highlight', '序章｜標題強調字', 'text'], ['hero_title_suffix', '序章｜標題後段', 'text'],
+  ['hero_desc', '序章｜說明文字', 'area'],
+  ['carousel_title_prefix', '五柱區｜標題前段', 'text'], ['carousel_title_highlight', '五柱區｜標題強調字', 'text'],
+  ['closing_title_prefix', '結尾章｜標題前段', 'text'], ['closing_title_highlight', '結尾章｜標題強調字', 'text'], ['closing_desc', '結尾章｜說明文字', 'area'],
+  ['proof_intro', '複利證明牆｜引言', 'area'],
+  ['about_lede', '關於我｜開場金句', 'area'], ['about_p1', '關於我｜第一段', 'area'], ['about_p2', '關於我｜第二段', 'area'], ['about_p3', '關於我｜第三段', 'area'],
+  ['subscribe_title_prefix', '訂閱區｜標題前段', 'text'], ['subscribe_title_highlight', '訂閱區｜標題強調字', 'text'], ['subscribe_title_suffix', '訂閱區｜標題後段', 'text'],
+  ['subscribe_desc', '訂閱區｜說明文字', 'area'], ['subscribe_price', '訂閱區｜價格', 'text'], ['subscribe_url', '訂閱區｜Stripe 連結', 'text'],
+  ['bridge_line1_prefix', 'Dashboard 導引｜第一行前段', 'text'], ['bridge_line1_highlight', 'Dashboard 導引｜第一行強調字', 'text'], ['bridge_line1_suffix', 'Dashboard 導引｜第一行後段', 'text'],
+  ['bridge_line2_prefix', 'Dashboard 導引｜第二行前段', 'text'], ['bridge_line2_highlight', 'Dashboard 導引｜第二行強調字', 'text'], ['bridge_line2_suffix', 'Dashboard 導引｜第二行後段', 'text'],
+];
+
+async function loadHome() {
+  showView('home');
+  const form = document.getElementById('homeForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const file = await ghGetFile('src/data/site-copy.json');
+  const data = JSON.parse(file.content);
+  form.innerHTML = '';
+  HOME_FIELDS.forEach(([key, label, type]) => {
+    const field = document.createElement('div');
+    field.className = 'field';
+    field.innerHTML = `<label class="field-label">${label}</label>` +
+      (type === 'area'
+        ? `<textarea rows="2" data-key="${key}">${escapeHtml(data[key] || '')}</textarea>`
+        : `<input type="text" data-key="${key}" value="${escapeAttr(data[key] || '')}">`);
+    form.appendChild(field);
+  });
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row';
+  btnRow.innerHTML = `<button class="btn btn-primary" id="saveHomeBtn">儲存變更</button>`;
+  form.appendChild(btnRow);
+
+  document.getElementById('saveHomeBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveHomeBtn');
+    btn.disabled = true; btn.textContent = '儲存中…';
+    try {
+      const updated = { ...data };
+      form.querySelectorAll('[data-key]').forEach(el => { updated[el.dataset.key] = el.value; });
+      const result = await ghPutFile('src/data/site-copy.json', JSON.stringify(updated, null, 2) + '\n', file.sha, 'Update homepage copy via Studio');
+      file.sha = result.content.sha;
+      toast('已儲存，網站將在約一分鐘內更新');
+    } catch (e) { toast('儲存失敗：' + e.message, 'err'); }
+    btn.disabled = false; btn.textContent = '儲存變更';
+  });
+}
+
+/* ══════════════════════════ PROOF CARDS VIEW ══════════════════════════ */
+async function loadProof() {
+  showView('proof');
+  const form = document.getElementById('proofForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const file = await ghGetFile('src/data/proof-cards.json');
+  const data = JSON.parse(file.content);
+  form.innerHTML = '';
+
+  data.cards.forEach((card, i) => {
+    const block = document.createElement('div');
+    block.style.cssText = 'border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;';
+    block.innerHTML = `
+      <div class="field-label" style="margin-bottom:14px;">卡片 ${i + 1}</div>
+      <div class="field"><label class="field-label">數字</label><input type="text" data-idx="${i}" data-key="stat" value="${escapeAttr(card.stat)}"></div>
+      <div class="field"><label class="field-label">單位</label><input type="text" data-idx="${i}" data-key="unit" value="${escapeAttr(card.unit)}"></div>
+      <div class="field"><label class="field-label">標題</label><input type="text" data-idx="${i}" data-key="title" value="${escapeAttr(card.title)}"></div>
+      <div class="field"><label class="field-label">備註</label><input type="text" data-idx="${i}" data-key="meta" value="${escapeAttr(card.meta)}"></div>
+      <div class="field"><label class="field-label">截圖區文字（尚無截圖時顯示）</label><input type="text" data-idx="${i}" data-key="shot_label" value="${escapeAttr(card.shot_label)}"></div>
+    `;
+    form.appendChild(block);
+  });
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'btn-row';
+  btnRow.innerHTML = `<button class="btn btn-primary" id="saveProofBtn">儲存變更</button>`;
+  form.appendChild(btnRow);
+
+  document.getElementById('saveProofBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveProofBtn');
+    btn.disabled = true; btn.textContent = '儲存中…';
+    try {
+      form.querySelectorAll('[data-idx]').forEach(el => {
+        data.cards[+el.dataset.idx][el.dataset.key] = el.value;
+      });
+      const result = await ghPutFile('src/data/proof-cards.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update proof cards via Studio');
+      file.sha = result.content.sha;
+      toast('已儲存，網站將在約一分鐘內更新');
+    } catch (e) { toast('儲存失敗：' + e.message, 'err'); }
+    btn.disabled = false; btn.textContent = '儲存變更';
+  });
+}
+
+/* ══════════════════════════ PILLAR ARTICLE LIST ══════════════════════════ */
+async function loadPillar(slug) {
+  currentPillar = slug;
+  showView('pillar');
+  const meta = PILLARS[slug];
+  document.getElementById('pillarEyebrow').textContent = `Pillar · ${meta.jp}`;
+  document.getElementById('pillarTitle').textContent = meta.title;
+  document.getElementById('pillarSub').textContent = `src/content/${slug}`;
+  const list = document.getElementById('articleList');
+  list.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+
+  const files = await ghListDir(`src/content/${slug}`);
+  const mdFiles = files.filter(f => f.name.endsWith('.md'));
+
+  if (mdFiles.length === 0) {
+    list.innerHTML = '<div class="empty-state">還沒有文章</div>';
+  } else {
+    const entries = await Promise.all(mdFiles.map(async f => {
+      const file = await ghGetFile(f.path);
+      const fm = parseFrontmatter(file.content);
+      return { ...fm, path: f.path, sha: f.sha };
+    }));
+    entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    list.innerHTML = '';
+    entries.forEach(entry => {
+      const row = document.createElement('div');
+      row.className = 'list-row';
+      row.innerHTML = `
+        <div class="list-row-main">
+          <div class="list-row-title">${escapeHtml(entry.title || '（無標題）')}</div>
+          <div class="list-row-meta">${entry.date || ''} ${entry.draft ? '<span class="badge-draft">草稿</span>' : ''}</div>
+        </div>
+        <div class="list-row-arrow">→</div>
+      `;
+      row.addEventListener('click', () => editArticle(slug, entry.path));
+      list.appendChild(row);
+    });
+  }
+}
+
+document.getElementById('newArticleBtn').addEventListener('click', () => newArticle());
+
+/* ══════════════════════════ ARTICLE EDITOR ══════════════════════════ */
+function newArticle() {
+  currentArticle = { path: null, sha: null, isNew: true };
+  renderArticleForm({ title: '', date: new Date().toISOString().slice(0, 10), excerpt: '', tags: [], draft: true, body: '' });
+}
+
+async function editArticle(slug, path) {
+  currentPillar = slug;
+  currentArticle = { path, sha: null, isNew: false };
+  showView('article');
+  document.getElementById('articleForm').innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const file = await ghGetFile(path);
+  currentArticle.sha = file.sha;
+  renderArticleForm(parseFrontmatter(file.content));
+}
+
+function renderArticleForm(fm) {
+  showView('article');
+  document.getElementById('articleEyebrow').textContent = `Pillar · ${PILLARS[currentPillar].jp}`;
+  document.getElementById('articleModeTitle').textContent = currentArticle.isNew ? '新增文章' : '編輯文章';
+  const form = document.getElementById('articleForm');
+
+  form.innerHTML = `
+    <div class="field"><label class="field-label">標題</label><input type="text" id="f-title" value="${escapeAttr(fm.title)}"></div>
+    <div class="field"><label class="field-label">日期</label><input type="date" id="f-date" value="${escapeAttr(fm.date)}"></div>
+    <div class="field"><label class="field-label">摘要</label><textarea id="f-excerpt" rows="2">${escapeHtml(fm.excerpt)}</textarea></div>
+    <div class="field">
+      <label class="field-label">標籤（按 Enter 新增）</label>
+      <input type="text" id="f-tag-input" placeholder="輸入標籤後按 Enter">
+      <div class="tag-row" id="f-tags"></div>
+    </div>
+    <div class="field field-checkbox"><input type="checkbox" id="f-draft" ${fm.draft ? 'checked' : ''}><label for="f-draft">先存草稿（不公開顯示）</label></div>
+    <div class="field">
+      <label class="field-label">正文（Markdown）</label>
+      <textarea id="f-body" class="mono" rows="16">${escapeHtml(fm.body)}</textarea>
+      <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="saveArticleBtn">${currentArticle.isNew ? '建立文章' : '儲存變更'}</button>
+      <button class="btn btn-ghost" id="backToListBtn">返回列表</button>
+      <div class="spacer"></div>
+      ${currentArticle.isNew ? '' : '<button class="btn btn-danger" id="deleteArticleBtn">刪除文章</button>'}
+    </div>
+  `;
+
+  let tags = [...fm.tags];
+  const tagsWrap = document.getElementById('f-tags');
+  function renderTags() {
+    tagsWrap.innerHTML = '';
+    tags.forEach((t, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `<span>${escapeHtml(t)}</span><button data-i="${i}">×</button>`;
+      chip.querySelector('button').addEventListener('click', () => { tags.splice(i, 1); renderTags(); });
+      tagsWrap.appendChild(chip);
+    });
+  }
+  renderTags();
+  document.getElementById('f-tag-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+      e.preventDefault();
+      tags.push(e.target.value.trim());
+      e.target.value = '';
+      renderTags();
+    }
+  });
+
+  document.getElementById('backToListBtn').addEventListener('click', () => loadPillar(currentPillar));
+
+  document.getElementById('saveArticleBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveArticleBtn');
+    btn.disabled = true; btn.textContent = '儲存中…';
+    try {
+      const newFm = {
+        title: document.getElementById('f-title').value.trim(),
+        date: document.getElementById('f-date').value,
+        excerpt: document.getElementById('f-excerpt').value.trim(),
+        tags,
+        draft: document.getElementById('f-draft').checked,
+        body: document.getElementById('f-body').value,
+      };
+      const content = serializeFrontmatter(newFm);
+      const path = currentArticle.isNew
+        ? `src/content/${currentPillar}/${slugify(newFm.title)}.md`
+        : currentArticle.path;
+      const result = await ghPutFile(path, content, currentArticle.sha, currentArticle.isNew ? `Create article via Studio: ${newFm.title}` : `Update article via Studio: ${newFm.title}`);
+      currentArticle.sha = result.content.sha;
+      currentArticle.path = path;
+      currentArticle.isNew = false;
+      toast('已儲存，網站將在約一分鐘內更新');
+      document.getElementById('articleModeTitle').textContent = '編輯文章';
+      btn.textContent = '儲存變更';
+      const deleteBtnExists = document.getElementById('deleteArticleBtn');
+      if (!deleteBtnExists) {
+        const dbtn = document.createElement('button');
+        dbtn.className = 'btn btn-danger'; dbtn.id = 'deleteArticleBtn'; dbtn.textContent = '刪除文章';
+        dbtn.addEventListener('click', deleteCurrentArticle);
+        document.querySelector('.btn-row').appendChild(dbtn);
+      }
+    } catch (e) { toast('儲存失敗：' + e.message, 'err'); }
+    btn.disabled = false;
+    if (btn.textContent === '儲存中…') btn.textContent = '儲存變更';
+  });
+
+  const delBtn = document.getElementById('deleteArticleBtn');
+  if (delBtn) delBtn.addEventListener('click', deleteCurrentArticle);
+}
+
+async function deleteCurrentArticle() {
+  if (!confirm('確定要刪除這篇文章嗎？這個動作無法復原。')) return;
+  try {
+    await ghDeleteFile(currentArticle.path, currentArticle.sha, `Delete article via Studio`);
+    toast('已刪除');
+    loadPillar(currentPillar);
+  } catch (e) { toast('刪除失敗：' + e.message, 'err'); }
+}
+
+/* ══════════════════════════ UTIL ══════════════════════════ */
+function escapeHtml(s) { return (s || '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+function escapeAttr(s) { return (s || '').replace(/"/g, '&quot;'); }
+
+/* ══════════════════════════ BOOT ══════════════════════════ */
+async function boot() {
+  if (!getToken()) {
+    document.getElementById('loginScreen').style.display = 'flex';
+    return;
+  }
+  try {
+    const user = await ghGetUser();
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    document.getElementById('sidebarUser').textContent = `${user.login} 已登入`;
+
+    // populate article counts in sidebar (best-effort, non-blocking)
+    Object.keys(PILLARS).forEach(async slug => {
+      try {
+        const files = await ghListDir(`src/content/${slug}`);
+        const n = files.filter(f => f.name.endsWith('.md')).length;
+        document.getElementById(`count-${slug}`).textContent = n;
+      } catch (e) {}
+    });
+
+    loadHome();
+  } catch (e) {
+    document.getElementById('loginScreen').style.display = 'flex';
+  }
+}
+boot();
+</script>
+</body>
+</html>
