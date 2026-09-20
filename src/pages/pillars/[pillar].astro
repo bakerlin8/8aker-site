@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteNav from '../../components/SiteNav.astro';
+import { pillars, pillarBySlug } from '../../data/pillars';
+
+export async function getStaticPaths() {
+  return pillars.map((p) => ({ params: { pillar: p.slug } }));
+}
+
+const { pillar } = Astro.params;
+const meta = pillarBySlug(pillar!)!;
+const entries = (await getCollection(meta.slug as any, ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const fmtDate = (d: Date) =>
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+---
+<BaseLayout title={`${meta.title} · 8AKER`}>
+  <SiteNav />
+
+  <section class="hero" style="padding-bottom:60px;">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <div class="hero-eyebrow-text">PILLAR · {meta.index} · {meta.type}</div>
+    </div>
+    <h1 class="hero-title" style="font-size:clamp(30px,4vw,48px);">{meta.title}</h1>
+    <p class="hero-story" style="margin-top:16px;">{meta.desc}</p>
+  </section>
+
+  <section class="notes-section" style="padding-top:0;">
+    <div class="rule-labeled" style="margin-bottom:32px;">
+      <span class="rule-tag">共 {entries.length} {meta.unit}</span>
+    </div>
+
+    {entries.length === 0 && (
+      <p style="color:var(--ink-ghost);font-size:13px;padding:40px 0;">
+        這根柱子還沒有文章——第一篇正在路上。
+      </p>
+    )}
+
+    {entries.map((entry) => (
+      <a
+        href={`/pillars/${meta.slug}/${entry.slug}`}
+        class="note-row"
+        style="text-decoration:none;color:inherit;"
+      >
+        <div class="note-date">{fmtDate(entry.data.date)}</div>
+        <div class="note-body">
+          <div class="note-title">{entry.data.title}</div>
+          {entry.data.excerpt && <div class="note-excerpt">{entry.data.excerpt}</div>}
+        </div>
+        <div class="note-arrow">→</div>
+      </a>
+    ))}
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-mark">8AKER</div>
+      <div class="footer-tag">七転び八起 · the diary before the eighth rise</div>
+    </div>
+    <div class="footer-links">
+      <a href="/">回首頁</a>
+      <a href="/#pillars">支柱</a>
+    </div>
+    <div class="footer-copy">© 2026 8AKER · Osaka, Japan</div>
+  </footer>
+</BaseLayout>

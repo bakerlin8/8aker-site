@@ -1,0 +1,25 @@
+{
+  "cards": [
+    {
+      "stat": "—",
+      "unit": "小時完成",
+      "title": "Personal Dashboard 從零到上線",
+      "meta": "省下 — 小時／月 · 附完整 Prompt",
+      "shot_label": "［ 待補：成果截圖 01 ］"
+    },
+    {
+      "stat": "—",
+      "unit": "小時完成",
+      "title": "待補：第二個成果小工具",
+      "meta": "省下 — 小時／月 · 附完整 Prompt",
+      "shot_label": "［ 待補：成果截圖 02 ］"
+    },
+    {
+      "stat": "—",
+      "unit": "小時完成",
+      "title": "待補：第三個成果小工具",
+      "meta": "省下 — 小時／月 · 附完整 Prompt",
+      "shot_label": "［ 待補：成果截圖 03 ］"
+    }
+  ]
+}
