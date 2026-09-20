@@ -21,6 +21,18 @@ const totalCount = allArticles.length;
 const pillarCount = pillars.length;
 
 const pillarLabel = (slug: string) => pillars.find((p) => p.slug === slug)?.title ?? '';
+
+const pillarCards = [
+  { idx: 0, num: '01', type: '強化', kanji: '強', titleHtml: '運動與<em>健康</em>', jp: '体を鍛える、積み重ねの記録', desc: '每天讓身體這個本來就有的東西，變得更可靠一點。', href: '/pillars/strengthen' },
+  { idx: 1, num: '02', type: '放出', kanji: '放', titleHtml: '輸出與<em>分享</em>', jp: '発信する、届く言葉の記録', desc: '把學到的東西往外送，讓它影響到你觸碰不到的人。', href: '/pillars/emit' },
+  { idx: 2, num: '03', type: '操作', kanji: '操', titleHtml: 'AI <em>學習筆記</em>', jp: '実際に使えた、机上ではない記録', desc: '這個我真的用過、真的省了時間的紀錄。', href: '/pillars/operate' },
+  { idx: 3, num: '04', type: '具現', kanji: '具', titleHtml: '從無到有的<em>建置</em>', jp: '仲間と共に、ゼロから作り上げる', desc: '還在路上，但已經有一些具體的成果可以分享。', href: '/pillars/conjure' },
+  { idx: 4, num: '05', type: '變化', kanji: '變', titleHtml: '<em>心境</em>筆記', jp: '揺れ動く心、その時々の記録', desc: '誠實記下當下的狀態，跟現在跟以前不一樣的地方。', href: '/pillars/transmute' },
+];
+// Flank the real cards with clones of the opposite ends so the track can be scrolled/dragged
+// past card 1 or card 5 without hitting a dead stop — the JS below snaps clone→real silently.
+const loopCards = [...pillarCards.slice(-2), ...pillarCards, ...pillarCards.slice(0, 2)];
+const CLONE_HEAD = 2;
 const fmtDate = (d: Date) =>
   `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 ---
@@ -89,54 +101,16 @@ const fmtDate = (d: Date) =>
       <h2 class="carousel-title">{copy.carousel_title_prefix}<span class="highlight-mark" id="carouselHighlight">{copy.carousel_title_highlight}</span></h2>
     </div>
     <div class="carousel-track" id="carouselTrack">
-      <div class="carousel-spacer"></div>
-
-      <div class="pillar-card" data-idx="0">
-        <div class="pillar-card-kanji">強</div>
-        <div class="pillar-card-index">PILLAR · 01 · 強化</div>
-        <div class="pillar-card-title">運動與<em>健康</em></div>
-        <div class="pillar-card-jp">体を鍛える、積み重ねの記録</div>
-        <div class="pillar-card-desc">每天讓身體這個本來就有的東西，變得更可靠一點。</div>
-        <a href="/pillars/strengthen" class="chapter-link">閱讀這個支柱的文章 →</a>
-      </div>
-
-      <div class="pillar-card" data-idx="1">
-        <div class="pillar-card-kanji">放</div>
-        <div class="pillar-card-index">PILLAR · 02 · 放出</div>
-        <div class="pillar-card-title">輸出與<em>分享</em></div>
-        <div class="pillar-card-jp">発信する、届く言葉の記録</div>
-        <div class="pillar-card-desc">把學到的東西往外送，讓它影響到你觸碰不到的人。</div>
-        <a href="/pillars/emit" class="chapter-link">閱讀這個支柱的文章 →</a>
-      </div>
-
-      <div class="pillar-card" data-idx="2">
-        <div class="pillar-card-kanji">操</div>
-        <div class="pillar-card-index">PILLAR · 03 · 操作</div>
-        <div class="pillar-card-title">AI <em>學習筆記</em></div>
-        <div class="pillar-card-jp">実際に使えた、机上ではない記録</div>
-        <div class="pillar-card-desc">這個我真的用過、真的省了時間的紀錄。</div>
-        <a href="/pillars/operate" class="chapter-link">閱讀這個支柱的文章 →</a>
-      </div>
-
-      <div class="pillar-card" data-idx="3">
-        <div class="pillar-card-kanji">具</div>
-        <div class="pillar-card-index">PILLAR · 04 · 具現</div>
-        <div class="pillar-card-title">從無到有的<em>建置</em></div>
-        <div class="pillar-card-jp">仲間と共に、ゼロから作り上げる</div>
-        <div class="pillar-card-desc">還在路上，但已經有一些具體的成果可以分享。</div>
-        <a href="/pillars/conjure" class="chapter-link">閱讀這個支柱的文章 →</a>
-      </div>
-
-      <div class="pillar-card" data-idx="4">
-        <div class="pillar-card-kanji">變</div>
-        <div class="pillar-card-index">PILLAR · 05 · 變化</div>
-        <div class="pillar-card-title"><em>心境</em>筆記</div>
-        <div class="pillar-card-jp">揺れ動く心、その時々の記録</div>
-        <div class="pillar-card-desc">誠實記下當下的狀態，跟現在跟以前不一樣的地方。</div>
-        <a href="/pillars/transmute" class="chapter-link">閱讀這個支柱的文章 →</a>
-      </div>
-
-      <div class="carousel-spacer"></div>
+      {loopCards.map((c, i) => (
+        <div class:list={["pillar-card", (i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) && "is-clone"]} data-real-idx={c.idx} aria-hidden={(i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) ? "true" : "false"}>
+          <div class="pillar-card-tab">{c.num} · {c.type}</div>
+          <div class="pillar-card-kanji">{c.kanji}</div>
+          <div class="pillar-card-title" set:html={c.titleHtml} />
+          <div class="pillar-card-jp">{c.jp}</div>
+          <div class="pillar-card-desc">{c.desc}</div>
+          <a href={c.href} class="chapter-link" tabindex={(i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) ? "-1" : "0"}>閱讀這個支柱的文章 →</a>
+        </div>
+      ))}
     </div>
 
     <div class="carousel-controls">
@@ -445,51 +419,80 @@ const fmtDate = (d: Date) =>
 })();
 
 
-// PILLAR CAROUSEL — swipe/drag/wheel horizontal scroll with dots + center-focus fade
+// PILLAR CAROUSEL — true infinite loop via clone-and-snap: the track holds 2 cloned
+// cards at each end (real 4,5,1,2,3,4,5,1,2), so drag/swipe/wheel/buttons can always
+// move past card 1 or 5. Once the scroll settles on a clone, we silently (no animation)
+// snap the scroll position to the matching real card — invisible to the user.
 (function(){
   const track = document.getElementById('carouselTrack');
   if(!track) return;
-  const cards = [...track.querySelectorAll('.pillar-card')];
+  const allCards = [...track.querySelectorAll('.pillar-card')];
+  const realCards = allCards.filter(c => !c.classList.contains('is-clone'));
   const dotsWrap = document.getElementById('carouselDots');
   const prevBtn = document.getElementById('carouselPrev');
   const nextBtn = document.getElementById('carouselNext');
 
-  cards.forEach((_,i)=>{
+  realCards.forEach((_,i)=>{
     const d = document.createElement('div');
     d.className='dot';
-    d.addEventListener('click', ()=> scrollToCard(i));
+    d.addEventListener('click', ()=> scrollToEl(realCards[i], true));
     dotsWrap.appendChild(d);
   });
   const dots = [...dotsWrap.querySelectorAll('.dot')];
 
-  function scrollToCard(i){
-    cards[i].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  function scrollToEl(el, smooth){
+    const target = el.offsetLeft - (track.clientWidth - el.clientWidth) / 2;
+    track.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
   }
 
-  function updateCentered(){
+  function findRealTwin(realIdx){
+    return realCards.find(c => c.dataset.realIdx === realIdx);
+  }
+
+  function centeredCard(){
     const trackRect = track.getBoundingClientRect();
     const center = trackRect.left + trackRect.width/2;
-    let closest = 0, closestDist = Infinity;
-    cards.forEach((card,i)=>{
+    let closest = allCards[0], closestDist = Infinity;
+    allCards.forEach(card=>{
       const r = card.getBoundingClientRect();
-      const cardCenter = r.left + r.width/2;
-      const dist = Math.abs(cardCenter - center);
+      const dist = Math.abs((r.left + r.width/2) - center);
       card.classList.toggle('centered', dist < r.width*0.55);
-      if(dist < closestDist){ closestDist = dist; closest = i; }
+      if(dist < closestDist){ closestDist = dist; closest = card; }
     });
-    dots.forEach((d,i)=> d.classList.toggle('active', i===closest));
+    return closest;
   }
-  track.addEventListener('scroll', ()=> requestAnimationFrame(updateCentered), {passive:true});
-  window.addEventListener('resize', updateCentered);
-  updateCentered();
+
+  function updateDots(realIdx){
+    dots.forEach((d,i)=> d.classList.toggle('active', realCards[i].dataset.realIdx === realIdx));
+  }
+
+  let settleTimer = null;
+  function onScroll(){
+    const card = centeredCard();
+    updateDots(card.dataset.realIdx);
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(()=>{
+      if(card.classList.contains('is-clone')){
+        const twin = findRealTwin(card.dataset.realIdx);
+        if(twin) scrollToEl(twin, false); // instant, no animation — invisible seam
+      }
+    }, 110);
+  }
+  track.addEventListener('scroll', ()=> requestAnimationFrame(onScroll), {passive:true});
+  window.addEventListener('resize', ()=> scrollToEl(realCards[0], false));
+
+  // start centered on the first real card, no animation
+  scrollToEl(realCards[0], false);
+  updateDots(realCards[0].dataset.realIdx);
+  realCards[0].classList.add('centered');
 
   prevBtn.addEventListener('click', ()=>{
-    const active = dots.findIndex(d=>d.classList.contains('active'));
-    scrollToCard((active-1+cards.length)%cards.length); // wraps: 0 → last
+    const idx = allCards.indexOf(centeredCard());
+    scrollToEl(allCards[Math.max(0, idx - 1)], true);
   });
   nextBtn.addEventListener('click', ()=>{
-    const active = dots.findIndex(d=>d.classList.contains('active'));
-    scrollToCard((active+1)%cards.length); // wraps: last → 0
+    const idx = allCards.indexOf(centeredCard());
+    scrollToEl(allCards[Math.min(allCards.length - 1, idx + 1)], true);
   });
 
   // vertical wheel over the carousel moves it horizontally (desktop convenience)
