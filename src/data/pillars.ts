@@ -7,7 +7,7 @@ export type PillarSlug = 'strengthen' | 'emit' | 'operate' | 'conjure' | 'transm
 export interface PillarMeta {
   slug: PillarSlug;
   index: string;        // "01".."05"
-  type: string;         // 強化 / 放出 / 操作 / 具現化 / 變化
+  type: string;         // 強化 / 放出 / 操作 / 具現 / 變化
   title: string;        // display title, e.g. 運動與健康
   titleJp: string;      // small Japanese subtitle line
   desc: string;         // the paragraph description
@@ -57,7 +57,7 @@ export const pillars: PillarMeta[] = [
   {
     slug: 'conjure',
     index: '04',
-    type: '具現化',
+    type: '具現',
     title: '從無到有的建置',
     titleJp: '仲間と共に、ゼロから作り上げる',
     desc: '跟夥伴一起創業，協助從零開始建置一間公司的過程——還在路上，但已經有一些具體的成果可以分享。',
