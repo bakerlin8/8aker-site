@@ -103,7 +103,7 @@ collections:
       - { label: "正文", name: "body", widget: "markdown" }
 
   - name: "conjure"
-    label: "具現化・從無到有的建置"
+    label: "具現・從無到有的建置"
     folder: "src/content/conjure"
     create: true
     slug: "{{slug}}"
