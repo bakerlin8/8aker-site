@@ -79,6 +79,7 @@ const fmtDate = (d: Date) =>
   <section class="chapter" id="ch0" data-idx="0">
     <canvas id="inkSplash" class="ink-splash-canvas"></canvas>
     <div class="chapter-mark">序 · PROLOGUE</div>
+    <div class="chapter-numeral"><div class="chapter-numeral-kanji">序</div><div class="chapter-numeral-label">PROLOGUE</div></div>
     <div class="chapter-content">
       <div class="chapter-title">{copy.hero_title_prefix}<br><em>{copy.hero_title_highlight}</em>{copy.hero_title_suffix}</div>
       <div class="chapter-desc">{copy.hero_desc}</div>
@@ -133,6 +134,7 @@ const fmtDate = (d: Date) =>
 
   <section class="chapter" id="ch6" data-idx="6" style="height:70vh;">
     <div class="chapter-mark">結 · 接下來</div>
+    <div class="chapter-numeral"><div class="chapter-numeral-kanji">結</div><div class="chapter-numeral-label">NEXT</div></div>
     <div class="chapter-content">
       <div class="chapter-title">{copy.closing_title_prefix}<br><em>{copy.closing_title_highlight}</em></div>
       <div class="chapter-desc" style="margin-top:14px;">{copy.closing_desc}</div>
@@ -569,9 +571,13 @@ const fmtDate = (d: Date) =>
   const obs = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       if(e.isIntersecting && e.intersectionRatio>0.5){
-        e.target.classList.add('in-view');
         const idx = +e.target.dataset.idx;
         dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
+        // double rAF: guarantees the browser has painted the pale starting
+        // state at least once before we flip to in-view — otherwise a chapter
+        // that's visible immediately on load (like ch0) never shows the
+        // color-settle transition, it just appears already-settled.
+        requestAnimationFrame(()=> requestAnimationFrame(()=> e.target.classList.add('in-view')));
       }
     });
   },{threshold:[0.5]});
