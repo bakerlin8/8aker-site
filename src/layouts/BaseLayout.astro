@@ -232,6 +232,15 @@ footer{padding:36px 48px 44px;max-width:1180px;margin:0 auto;display:flex;justif
 .chapter{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 8vw;text-align:center;}
 .chapter-mark{position:absolute;top:36px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--ink-ghost);opacity:0;transition:opacity 1.1s ease;}
 .chapter.in-view .chapter-mark{opacity:1;}
+
+/* giant kanji + vertical English label, edge-anchored — eigamura.com-style layered numeral */
+.chapter-numeral{position:absolute;left:clamp(18px,4vw,56px);top:50%;transform:translateY(-50%);display:flex;align-items:flex-end;gap:14px;z-index:2;opacity:0;transition:opacity 1.4s cubic-bezier(0.16,1,0.3,1) 0.3s;}
+.chapter.in-view .chapter-numeral{opacity:1;}
+.chapter-numeral-kanji{font-family:'Noto Serif JP',serif;font-weight:300;font-size:clamp(48px,8vw,88px);line-height:0.8;color:var(--ink-ghost);}
+.chapter-numeral-label{writing-mode:vertical-rl;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.3em;color:var(--ink-ghost);padding-bottom:6px;}
+#ch0 .chapter-numeral-kanji,#ch0 .chapter-numeral-label{color:rgba(253,250,247,0.3);}
+@media(max-width:700px){.chapter-numeral{display:none;}}
+@media(min-width:701px){.chapter-mark{display:none;}}
 .chapter-content{opacity:0;transition:opacity 1.3s cubic-bezier(0.16,1,0.3,1);max-width:640px;}
 .chapter.in-view .chapter-content{opacity:1;}
 .chapter-jp-side{position:absolute;right:6vw;top:50%;transform:translateY(-50%);font-family:'Noto Serif JP',serif;font-weight:300;font-size:13px;color:var(--rose);letter-spacing:0.35em;writing-mode:vertical-rl;opacity:0;transition:opacity 1.6s ease 0.3s;}
