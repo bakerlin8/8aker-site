@@ -232,13 +232,18 @@ footer{padding:36px 48px 44px;max-width:1180px;margin:0 auto;display:flex;justif
 .chapter{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 8vw;text-align:center;}
 .chapter-mark{position:absolute;top:36px;left:0;right:0;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--ink-ghost);opacity:0;transition:opacity 1.1s ease;}
 .chapter.in-view .chapter-mark{opacity:1;}
-.chapter-content{opacity:0;transform:translateY(26px);transition:opacity 1.3s cubic-bezier(0.16,1,0.3,1),transform 1.3s cubic-bezier(0.16,1,0.3,1);max-width:640px;}
-.chapter.in-view .chapter-content{opacity:1;transform:none;}
+.chapter-content{opacity:0;transition:opacity 1.3s cubic-bezier(0.16,1,0.3,1);max-width:640px;}
+.chapter.in-view .chapter-content{opacity:1;}
 .chapter-jp-side{position:absolute;right:6vw;top:50%;transform:translateY(-50%);font-family:'Noto Serif JP',serif;font-weight:300;font-size:13px;color:var(--rose);letter-spacing:0.35em;writing-mode:vertical-rl;opacity:0;transition:opacity 1.6s ease 0.3s;}
 .chapter.in-view .chapter-jp-side{opacity:0.6;}
-.chapter-title{font-family:'Noto Serif TC',serif;font-weight:500;font-size:clamp(28px,4.2vw,52px);line-height:1.6;letter-spacing:0.02em;color:var(--ink);}
-.chapter-title em{font-style:normal;color:var(--emerald);font-weight:600;}
-.chapter-desc{margin-top:26px;font-size:14px;color:var(--ink-mute);line-height:2.1;letter-spacing:0.02em;}
+.chapter-title{font-family:'Noto Serif TC',serif;font-weight:500;font-size:clamp(28px,4.2vw,52px);line-height:1.6;letter-spacing:0.02em;
+  color:var(--parchment);transition:color 1.6s cubic-bezier(0.16,1,0.3,1) 0.1s;}
+.chapter.in-view .chapter-title{color:var(--ink);}
+.chapter-title em{font-style:normal;color:var(--parchment);font-weight:600;transition:color 1.6s cubic-bezier(0.16,1,0.3,1) 0.1s;}
+.chapter.in-view .chapter-title em{color:var(--emerald);}
+.chapter-desc{margin-top:26px;font-size:14px;color:var(--parchment);line-height:2.1;letter-spacing:0.02em;
+  transition:color 1.6s cubic-bezier(0.16,1,0.3,1) 0.22s;}
+.chapter.in-view .chapter-desc{color:var(--ink-mute);}
 .chapter-kanji-huge{position:absolute;font-size:44vh;font-family:'Noto Serif JP',serif;font-weight:300;color:var(--emerald);opacity:0.045;right:-2vw;bottom:-6vh;pointer-events:none;line-height:1;}
 .chapter-link{display:inline-block;margin-top:22px;font-size:11px;letter-spacing:0.1em;color:var(--emerald);border-bottom:1px solid var(--emerald-pale);padding-bottom:2px;text-decoration:none;opacity:0;transition:opacity 1.3s ease 0.5s;}
 .chapter.in-view .chapter-link{opacity:1;}
@@ -268,12 +273,22 @@ footer{padding:36px 48px 44px;max-width:1180px;margin:0 auto;display:flex;justif
 .ink-splash-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 #ch0 .chapter-mark,#ch0 .chapter-content{position:relative;z-index:2;}
 @media(prefers-reduced-motion:reduce){.ink-splash-canvas{display:none;}}
-#ch0 .chapter-title{color:var(--warm-white);}
-#ch0 .chapter-desc{color:rgba(253,250,247,0.5);}
+#ch0 .chapter-title{color:var(--emerald-deep);}
+#ch0.in-view .chapter-title{color:var(--warm-white);}
+#ch0 .chapter-title em{color:var(--emerald-deep);}
+#ch0.in-view .chapter-title em{color:var(--vermillion);}
+#ch0 .chapter-desc{color:var(--emerald-deep);}
+#ch0.in-view .chapter-desc{color:rgba(253,250,247,0.5);}
 #ch0 .chapter-mark{color:rgba(253,250,247,0.4);}
 #ch6{background:var(--cream);}
 @media(prefers-reduced-motion:reduce){
   .chapter-content,.chapter-mark,.chapter-jp-side,.chapter-link{opacity:1!important;transform:none!important;}
+  .chapter-title{color:var(--ink)!important;}
+  .chapter-title em{color:var(--emerald)!important;}
+  .chapter-desc{color:var(--ink-mute)!important;}
+  #ch0 .chapter-title{color:var(--warm-white)!important;}
+  #ch0 .chapter-title em{color:var(--vermillion)!important;}
+  #ch0 .chapter-desc{color:rgba(253,250,247,0.5)!important;}
 }
 @media(max-width:700px){
   .chapter-jp-side{display:none;}
