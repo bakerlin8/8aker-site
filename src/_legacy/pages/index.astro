@@ -1,0 +1,589 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { pillars } from '../data/pillars';
+import copy from '../data/site-copy.json';
+import proof from '../data/proof-cards.json';
+
+const collectionEntries = await Promise.all(
+  pillars.map(async (p) => {
+    const entries = await getCollection(p.slug, ({ data }) => !data.draft);
+    return { slug: p.slug, entries };
+  })
+);
+
+const allArticles = collectionEntries.flatMap(({ slug, entries }) =>
+  entries.map((e) => ({ pillarSlug: slug, ...e }))
+);
+allArticles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const latest = allArticles.slice(0, 5);
+const totalCount = allArticles.length;
+const pillarCount = pillars.length;
+
+const pillarLabel = (slug: string) => pillars.find((p) => p.slug === slug)?.title ?? '';
+
+const pillarCards = [
+  { idx: 0, num: '01', type: '強化', kanji: '強', titleHtml: '運動與<em>健康</em>', jp: '体を鍛える、積み重ねの記録', desc: '每天讓身體這個本來就有的東西，變得更可靠一點。', href: '/pillars/strengthen' },
+  { idx: 1, num: '02', type: '放出', kanji: '放', titleHtml: '輸出與<em>分享</em>', jp: '発信する、届く言葉の記録', desc: '把學到的東西往外送，讓它影響到你觸碰不到的人。', href: '/pillars/emit' },
+  { idx: 2, num: '03', type: '操作', kanji: '操', titleHtml: 'AI <em>學習筆記</em>', jp: '実際に使えた、机上ではない記録', desc: '這個我真的用過、真的省了時間的紀錄。', href: '/pillars/operate' },
+  { idx: 3, num: '04', type: '具現', kanji: '具', titleHtml: '從無到有的<em>建置</em>', jp: '仲間と共に、ゼロから作り上げる', desc: '還在路上，但已經有一些具體的成果可以分享。', href: '/pillars/conjure' },
+  { idx: 4, num: '05', type: '變化', kanji: '變', titleHtml: '<em>心境</em>筆記', jp: '揺れ動く心、その時々の記録', desc: '誠實記下當下的狀態，跟現在跟以前不一樣的地方。', href: '/pillars/transmute' },
+];
+// Flank the real cards with clones of the opposite ends so the track can be scrolled/dragged
+// past card 1 or card 5 without hitting a dead stop — the JS below snaps clone→real silently.
+const loopCards = [...pillarCards.slice(-2), ...pillarCards, ...pillarCards.slice(0, 2)];
+const CLONE_HEAD = 2;
+const fmtDate = (d: Date) =>
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+---
+
+<BaseLayout title="8AKER — 七転び八起">
+<div class="masthead">8AKER · VOL. 01 / 2026 · <b>七転び八起</b> — the diary before the eighth rise</div>
+
+<nav>
+  <a href="#" class="nav-mark">
+    <span class="nav-mark-icon">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 18 L4 9 L12 4 L20 9 L20 18" stroke="#2d6a4f" stroke-width="1.3"/><path d="M4 18 L20 18" stroke="#2d6a4f" stroke-width="1.3"/><path d="M8 18 L8 12 L12 9.5 L16 12 L16 18" stroke="#d4a5a0" stroke-width="1"/></svg>
+    </span>
+    <span class="nav-mark-text">8AKER</span>
+  </a>
+  <ul class="nav-links-desktop">
+    <li><a href="#pillars">強・放・操・具・變</a></li>
+    <li><a href="#proof">複利證明牆</a></li>
+    <li><a href="#notes">最新筆記</a></li>
+    <li><a href="#about">關於我</a></li>
+  </ul>
+  <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="menuPanel">
+    <span class="menu-toggle-text">MENU</span>
+    <span class="menu-toggle-icon"><span></span><span></span></span>
+  </button>
+</nav>
+
+<div class="menu-panel" id="menuPanel">
+  <div class="menu-panel-inner">
+    <ol class="menu-list">
+      <li><a href="#pillars" data-menu-link><span class="menu-num">01</span><span class="menu-label">強・放・操・具・變</span></a></li>
+      <li><a href="#proof" data-menu-link><span class="menu-num">02</span><span class="menu-label">複利證明牆</span></a></li>
+      <li><a href="#notes" data-menu-link><span class="menu-num">03</span><span class="menu-label">最新筆記</span></a></li>
+      <li><a href="#about" data-menu-link><span class="menu-num">04</span><span class="menu-label">關於我</span></a></li>
+    </ol>
+  </div>
+</div>
+
+<!-- HERO -->
+
+
+<div class="chapter-dots" id="chDots"></div>
+<div class="chapters-wrap">
+
+  <section class="chapter" id="ch0" data-idx="0">
+    <canvas id="inkSplash" class="ink-splash-canvas"></canvas>
+    <div class="chapter-mark">序 · PROLOGUE</div>
+    <div class="chapter-numeral"><div class="chapter-numeral-kanji">序</div><div class="chapter-numeral-label">PROLOGUE</div></div>
+    <div class="chapter-content">
+      <div class="chapter-title">{copy.hero_title_prefix}<br><em>{copy.hero_title_highlight}</em>{copy.hero_title_suffix}</div>
+      <div class="chapter-desc">{copy.hero_desc}</div>
+
+      <div class="countdown-block">
+        <div class="countdown-eyebrow">{copy.countdown_eyebrow}</div>
+        <div class="countdown-label">{copy.countdown_label}</div>
+        <div class="countdown-grid" id="countdownGrid" data-start={copy.countdown_start} data-target={copy.countdown_target}>
+          <div class="countdown-unit"><div class="countdown-num" id="cdDays">—</div><div class="countdown-unit-label">天</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="cdHours">—</div><div class="countdown-unit-label">時</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num" id="cdMins">—</div><div class="countdown-unit-label">分</div></div>
+          <div class="countdown-sep">:</div>
+          <div class="countdown-unit"><div class="countdown-num countdown-secs" id="cdSecs">—</div><div class="countdown-unit-label">秒</div></div>
+        </div>
+        <div class="countdown-progress-wrap"><div class="countdown-progress-fill" id="countdownFill"></div></div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">{pillarCount}</div><div class="hero-stat-label">累積方向</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">{totalCount}</div><div class="hero-stat-label">篇累積文章</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="daysSince">—</div><div class="hero-stat-label">天持續記錄</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pillar-carousel-section" id="pillars">
+    <div class="carousel-header reveal">
+      <div class="carousel-eyebrow">STRUCTURE · 撐起這裡的骨架</div>
+      <h2 class="carousel-title">{copy.carousel_title_prefix}<span class="highlight-mark" id="carouselHighlight">{copy.carousel_title_highlight}</span></h2>
+    </div>
+    <div class="carousel-track" id="carouselTrack">
+      {loopCards.map((c, i) => (
+        <div class:list={["pillar-card", (i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) && "is-clone"]} data-real-idx={c.idx} aria-hidden={(i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) ? "true" : "false"}>
+          <div class="pillar-card-tab">{c.num} · {c.type}</div>
+          <div class="pillar-card-kanji">{c.kanji}</div>
+          <div class="pillar-card-title" set:html={c.titleHtml} />
+          <div class="pillar-card-jp">{c.jp}</div>
+          <div class="pillar-card-desc">{c.desc}</div>
+          <a href={c.href} class="chapter-link" tabindex={(i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) ? "-1" : "0"}>閱讀這個支柱的文章 →</a>
+        </div>
+      ))}
+    </div>
+
+    <div class="carousel-controls">
+      <button class="carousel-arrow" id="carouselPrev" aria-label="上一個">←</button>
+      <div class="carousel-dots" id="carouselDots"></div>
+      <button class="carousel-arrow" id="carouselNext" aria-label="下一個">→</button>
+    </div>
+  </section>
+
+  <section class="chapter" id="ch6" data-idx="6" style="height:70vh;">
+    <div class="chapter-mark">結 · 接下來</div>
+    <div class="chapter-numeral"><div class="chapter-numeral-kanji">結</div><div class="chapter-numeral-label">NEXT</div></div>
+    <div class="chapter-content">
+      <div class="chapter-title">{copy.closing_title_prefix}<br><em>{copy.closing_title_highlight}</em></div>
+      <div class="chapter-desc" style="margin-top:14px;">{copy.closing_desc}</div>
+    </div>
+  </section>
+
+</div>
+
+<!-- COMPOUND PROOF WALL -->
+<section class="proof-section" id="proof">
+  <div class="section-head reveal">
+    <div>
+      <span class="section-tag">Proof, Not Promise</span>
+      <h2 class="section-title">複利<em>證明牆</em></h2>
+    </div>
+  </div>
+  <div class="proof-intro">
+    <p>{copy.proof_intro}</p>
+  </div>
+
+  <div class="proof-grid">
+    {proof.cards.map((card, i) => (
+      <div class:list={["proof-card", "reveal", i > 0 && `reveal-d${Math.min(i, 3)}`]}>
+        <div class="proof-shot">
+          <div class="proof-shot-placeholder">{card.shot_label}</div>
+          <div class="proof-fig">FIG. {String(i + 2).padStart(2, '0')}</div>
+        </div>
+        <div class="proof-body">
+          <div class="proof-stat-hero"><span class="proof-stat-hero-num">{card.stat}</span><span class="proof-stat-hero-label">{card.unit}</span></div>
+          <div class="proof-title">{card.title}</div>
+          <div class="proof-meta">{card.meta}</div>
+          <a href="#" class="proof-cta">看完整 Prompt →</a>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<!-- LATEST NOTES -->
+<section class="notes-section" id="notes">
+  <div class="notes-heading-top">
+    <div>
+      <span class="section-tag">Journal</span>
+      <h2 class="section-title">最新<em>筆記</em></h2>
+    </div>
+    <a href="#" class="notes-viewall">查看全部 →</a>
+  </div>
+  <div class="rule-labeled rule-accent" style="margin-bottom:28px;">
+    <span class="rule-tag">共 {totalCount} 篇 · 持續更新中</span>
+  </div>
+
+  {latest.length === 0 && (
+    <p style="color:var(--ink-ghost);font-size:13px;padding:20px 0;">還沒有文章——第一篇正在路上。</p>
+  )}
+
+  {latest.map((note, i) => (
+    <a href={`/pillars/${note.pillarSlug}/${note.slug}`} class:list={["note-row", "reveal", i > 0 && `reveal-d${Math.min(i, 3)}`]} style="text-decoration:none;color:inherit;display:grid;">
+      <div class="note-date">{fmtDate(note.data.date)}</div>
+      <div class="note-body">
+        <span class="note-cat">{pillarLabel(note.pillarSlug)}</span>
+        <div class="note-title">{note.data.title}</div>
+        {note.data.excerpt && <div class="note-excerpt">{note.data.excerpt}</div>}
+      </div>
+      <div class="note-arrow">→</div>
+    </a>
+  ))}
+</section>
+
+<!-- ABOUT — first person, vulnerable -->
+<section class="about-section" id="about">
+  <div class="section-head reveal">
+    <div>
+      <span class="section-tag">About</span>
+      <h2 class="section-title">我在<em>記錄</em>的，是這件事</h2>
+    </div>
+  </div>
+  <div class="about-grid reveal" style="margin-top:28px;">
+    <div>
+      <div class="about-portrait">
+        <div class="about-portrait-mark">［ 待補：<br>本人照片 ］</div>
+      </div>
+      <div class="about-fig">FIG. 05 — BAKER LIN, OSAKA</div>
+    </div>
+    <div class="about-text">
+      <p class="lede">{copy.about_lede}</p>
+      <p>{copy.about_p1}</p>
+      <p>{copy.about_p2}</p>
+      <p>{copy.about_p3}</p>
+      <a href="#" class="about-cta">讀完整故事 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT / SUBSCRIBE -->
+<section class="subscribe-section">
+  <div class="subscribe-card reveal">
+    <div class="subscribe-kanji">起</div>
+    <div class="subscribe-eyebrow">Support · 持續走到第八次</div>
+    <h3 class="subscribe-title">{copy.subscribe_title_prefix}<em>{copy.subscribe_title_highlight}</em>{copy.subscribe_title_suffix}</h3>
+    <p class="subscribe-desc">{copy.subscribe_desc}</p>
+    <div class="subscribe-row">
+      <div class="subscribe-price"><span class="subscribe-price-num">{copy.subscribe_price}</span><span class="subscribe-price-unit">／月</span></div>
+      <a href={copy.subscribe_url} class="subscribe-btn" target="_blank" rel="noopener">前往訂閱 →</a>
+    </div>
+  </div>
+</section>
+
+<div class="footer-rule">
+  <div class="rule-labeled rule-accent"><span class="rule-tag">七転び八起 · Nanakorobi Yaoki</span></div>
+</div>
+
+<footer>
+  <div class="footer-left">
+    <div class="footer-mark">8AKER</div>
+    <div class="footer-tag">七転び八起 · the diary before the eighth rise</div>
+  </div>
+  <div class="footer-links">
+    <a href="#pillars">強・放・操・具・變</a>
+    <a href="#proof">複利證明</a>
+    <a href="#notes">最新筆記</a>
+  </div>
+  <div class="footer-copy">© 2026 8AKER · Osaka, Japan</div>
+</footer>
+<script is:inline>
+
+// MENU — toggle the panel, close on link click or outside click
+(function(){
+  const btn = document.getElementById('menuToggle');
+  const panel = document.getElementById('menuPanel');
+  if(!btn || !panel) return;
+  function setOpen(open){
+    btn.setAttribute('aria-expanded', open ? 'true':'false');
+    panel.classList.toggle('open', open);
+  }
+  btn.addEventListener('click', ()=> setOpen(btn.getAttribute('aria-expanded')!=='true'));
+  panel.querySelectorAll('[data-menu-link]').forEach(a=>a.addEventListener('click', ()=> setOpen(false)));
+  document.addEventListener('click', (e)=>{
+    if(!panel.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
+})();
+
+// PILLAR CARD TILT + GLOW — mouse-tracked 3D tilt with a soft glow that follows the cursor
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced) return;
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  if(coarse) return; // skip on touch devices
+  document.querySelectorAll('.column').forEach(col=>{
+    const inner = col.querySelector('.column-inner');
+    if(!inner) return;
+    col.addEventListener('mousemove', (e)=>{
+      const r = col.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;   // 0..1
+      const py = (e.clientY - r.top) / r.height;    // 0..1
+      const rotY = (px - 0.5) * 6;   // max 3deg each side
+      const rotX = (0.5 - py) * 6;
+      inner.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      col.style.setProperty('--gx', (px*100).toFixed(1)+'%');
+      col.style.setProperty('--gy', (py*100).toFixed(1)+'%');
+    });
+    col.addEventListener('mouseleave', ()=>{
+      inner.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+  });
+})();
+
+// SCROLL REVEAL — fade+rise up as sections enter the viewport
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const items = document.querySelectorAll('.reveal');
+  if(reduced){ items.forEach(el=>el.classList.add('visible')); return; }
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  },{threshold:0.15, rootMargin:'0px 0px -40px 0px'});
+  items.forEach(el=>obs.observe(el));
+})();
+
+// INK SPLASH — blooming ink blobs behind the prologue chapter
+(function(){
+  const cv = document.getElementById('inkSplash');
+  if(!cv) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduced) return;
+  const ctx = cv.getContext('2d');
+  let W,H,dpr;
+  function resize(){
+    dpr = Math.min(devicePixelRatio||1,2);
+    const rect = cv.parentElement.getBoundingClientRect();
+    W = cv.width = rect.width*dpr; H = cv.height = rect.height*dpr;
+    cv.style.width = rect.width+'px'; cv.style.height = rect.height+'px';
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  const colors = ['rgba(212,162,76,ALPHA)','rgba(107,31,47,ALPHA)','rgba(184,147,90,ALPHA)'];
+  function makeBlob(){
+    const points = 10 + Math.floor(Math.random()*4);
+    const angles = Array.from({length:points},(_,i)=> (i/points)*Math.PI*2);
+    const noise = angles.map(()=> 0.6+Math.random()*0.6);
+    return {
+      x: Math.random()*W, y: Math.random()*H,
+      baseR: (Math.min(W,H))*(0.09+Math.random()*0.08),
+      angles, noise,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      life: 0, maxLife: 3.5+Math.random()*2.5,
+      phase: Math.random()*Math.PI*2,
+    };
+  }
+  let blobs = Array.from({length:5}, makeBlob);
+  let last = performance.now();
+  let running = true;
+
+  function drawBlob(b, t){
+    const growth = Math.min(1, b.life / (b.maxLife*0.4));
+    const fade = b.life > b.maxLife*0.6 ? 1-((b.life-b.maxLife*0.6)/(b.maxLife*0.4)) : 1;
+    const alpha = Math.max(0, 0.5*growth*fade);
+    const r = b.baseR * (0.5+0.5*growth);
+    ctx.beginPath();
+    b.angles.forEach((a,i)=>{
+      const wobble = 1 + Math.sin(t*0.0007 + b.phase + i)*0.09*b.noise[i];
+      const rad = r * b.noise[i] * wobble;
+      const x = b.x + Math.cos(a)*rad, y = b.y + Math.sin(a)*rad;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = b.color.replace('ALPHA', alpha.toFixed(3));
+    ctx.filter = 'blur(' + (30*dpr) + 'px)';
+    ctx.fill();
+  }
+
+  function loop(t){
+    if(!running) return;
+    const dt = (t-last)/1000; last = t;
+    ctx.clearRect(0,0,W,H);
+    blobs.forEach(b=>{
+      b.life += dt;
+      drawBlob(b,t);
+      if(b.life > b.maxLife){ Object.assign(b, makeBlob()); }
+    });
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // pause when the chapter is off-screen to save battery/CPU
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      running = e.isIntersecting;
+      if(running){ last = performance.now(); requestAnimationFrame(loop); }
+    });
+  },{threshold:0.05});
+  obs.observe(cv.parentElement);
+})();
+
+// COUNTDOWN — live, to-the-second countdown toward the target date, with an
+// elapsed-time progress line and a small per-second pulse on the seconds digit
+// so the passing of time is actually visible, not just numbers changing.
+(function(){
+  const grid = document.getElementById('countdownGrid');
+  if(!grid) return;
+  const start = new Date(grid.dataset.start).getTime();
+  const target = new Date(grid.dataset.target).getTime();
+  const total = target - start;
+  const dEl = document.getElementById('cdDays');
+  const hEl = document.getElementById('cdHours');
+  const mEl = document.getElementById('cdMins');
+  const sEl = document.getElementById('cdSecs');
+  const fill = document.getElementById('countdownFill');
+  const pad = (n) => String(n).padStart(2, '0');
+
+  function tick(){
+    const now = Date.now();
+    let diff = target - now;
+    if(diff < 0) diff = 0;
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    const secs = Math.floor((diff % 60000) / 1000);
+    dEl.textContent = days;
+    hEl.textContent = pad(hours);
+    mEl.textContent = pad(mins);
+    sEl.textContent = pad(secs);
+    if(fill && total > 0){
+      const elapsed = Math.min(1, Math.max(0, (now - start) / total));
+      fill.style.width = (elapsed * 100).toFixed(3) + '%';
+    }
+    sEl.classList.remove('tick');
+    void sEl.offsetWidth; // force reflow so the animation can restart every second
+    sEl.classList.add('tick');
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
+// HERO STATS — live "days since" counter
+(function(){
+  const el = document.getElementById('daysSince');
+  if(!el) return;
+  const start = new Date('2026-09-01');
+  const days = Math.max(0, Math.floor((Date.now()-start)/86400000));
+  el.textContent = days;
+})();
+
+// HIGHLIGHT MARKER — draws in once each marked phrase scrolls into view
+(function(){
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const marks = document.querySelectorAll('.highlight-mark');
+  if(!marks.length) return;
+  if(reduced){ marks.forEach(m=>m.classList.add('active')); return; }
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('active');
+        obs.unobserve(entry.target);
+      }
+    });
+  },{threshold:0.6});
+  marks.forEach(m=>obs.observe(m));
+})();
+
+
+// PILLAR CAROUSEL — true infinite loop via clone-and-snap: the track holds 2 cloned
+// cards at each end (real 4,5,1,2,3,4,5,1,2), so drag/swipe/wheel/buttons can always
+// move past card 1 or 5. Once the scroll settles on a clone, we silently (no animation)
+// snap the scroll position to the matching real card — invisible to the user.
+(function(){
+  const track = document.getElementById('carouselTrack');
+  if(!track) return;
+  const allCards = [...track.querySelectorAll('.pillar-card')];
+  const realCards = allCards.filter(c => !c.classList.contains('is-clone'));
+  const dotsWrap = document.getElementById('carouselDots');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+
+  realCards.forEach((_,i)=>{
+    const d = document.createElement('div');
+    d.className='dot';
+    d.addEventListener('click', ()=> scrollToEl(realCards[i], true));
+    dotsWrap.appendChild(d);
+  });
+  const dots = [...dotsWrap.querySelectorAll('.dot')];
+
+  function scrollToEl(el, smooth){
+    const target = el.offsetLeft - (track.clientWidth - el.clientWidth) / 2;
+    track.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+  }
+
+  function findRealTwin(realIdx){
+    return realCards.find(c => c.dataset.realIdx === realIdx);
+  }
+
+  function centeredCard(){
+    const trackRect = track.getBoundingClientRect();
+    const center = trackRect.left + trackRect.width/2;
+    let closest = allCards[0], closestDist = Infinity;
+    allCards.forEach(card=>{
+      const r = card.getBoundingClientRect();
+      const dist = Math.abs((r.left + r.width/2) - center);
+      card.classList.toggle('centered', dist < r.width*0.55);
+      if(dist < closestDist){ closestDist = dist; closest = card; }
+    });
+    return closest;
+  }
+
+  function updateDots(realIdx){
+    dots.forEach((d,i)=> d.classList.toggle('active', realCards[i].dataset.realIdx === realIdx));
+  }
+
+  let settleTimer = null;
+  function onScroll(){
+    const card = centeredCard();
+    updateDots(card.dataset.realIdx);
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(()=>{
+      if(card.classList.contains('is-clone')){
+        const twin = findRealTwin(card.dataset.realIdx);
+        if(twin) scrollToEl(twin, false); // instant, no animation — invisible seam
+      }
+    }, 110);
+  }
+  track.addEventListener('scroll', ()=> requestAnimationFrame(onScroll), {passive:true});
+  window.addEventListener('resize', ()=> scrollToEl(realCards[0], false));
+
+  // start centered on the first real card, no animation
+  scrollToEl(realCards[0], false);
+  updateDots(realCards[0].dataset.realIdx);
+  realCards[0].classList.add('centered');
+
+  prevBtn.addEventListener('click', ()=>{
+    const idx = allCards.indexOf(centeredCard());
+    scrollToEl(allCards[Math.max(0, idx - 1)], true);
+  });
+  nextBtn.addEventListener('click', ()=>{
+    const idx = allCards.indexOf(centeredCard());
+    scrollToEl(allCards[Math.min(allCards.length - 1, idx + 1)], true);
+  });
+
+  // vertical wheel over the carousel moves it horizontally (desktop convenience)
+  track.addEventListener('wheel', (e)=>{
+    if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
+      e.preventDefault();
+      track.scrollLeft += e.deltaY;
+    }
+  }, {passive:false});
+
+  // click-and-drag for mouse users
+  let isDown=false, startX=0, startScroll=0;
+  track.addEventListener('mousedown', (e)=>{
+    isDown=true; track.classList.add('grabbing');
+    startX = e.pageX; startScroll = track.scrollLeft;
+  });
+  window.addEventListener('mouseup', ()=>{ isDown=false; track.classList.remove('grabbing'); });
+  window.addEventListener('mousemove', (e)=>{
+    if(!isDown) return;
+    track.scrollLeft = startScroll - (e.pageX - startX);
+  });
+})();
+
+// CINEMATIC CHAPTERS — reveal + side-dot nav
+(function(){
+  const chapters = document.querySelectorAll('.chapter');
+  const dotsWrap = document.getElementById('chDots');
+  if(!chapters.length || !dotsWrap) return;
+  chapters.forEach(()=>{
+    const d = document.createElement('div');
+    d.className='chapter-dot';
+    dotsWrap.appendChild(d);
+  });
+  const dots = document.querySelectorAll('.chapter-dot');
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting && e.intersectionRatio>0.5){
+        const idx = +e.target.dataset.idx;
+        dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
+        // double rAF: guarantees the browser has painted the pale starting
+        // state at least once before we flip to in-view — otherwise a chapter
+        // that's visible immediately on load (like ch0) never shows the
+        // color-settle transition, it just appears already-settled.
+        requestAnimationFrame(()=> requestAnimationFrame(()=> e.target.classList.add('in-view')));
+      }
+    });
+  },{threshold:[0.5]});
+  chapters.forEach(ch=>obs.observe(ch));
+})();
+
+
+</script>
+</BaseLayout>

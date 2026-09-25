@@ -1,0 +1,164 @@
+{
+  "volume": {
+    "date": "2027-10-02",
+    "title": "第一卷・十二話收錄・40 歲發售",
+    "summary": "十二話收成一本。倒數計時和年輪指向的，就是這一天——40 歲，人生的第一卷。"
+  },
+  "arcs": [
+    {
+      "name": "起步篇",
+      "from": 0,
+      "to": 2
+    },
+    {
+      "name": "習慣篇",
+      "from": 3,
+      "to": 5
+    },
+    {
+      "name": "半年篇",
+      "from": 6,
+      "to": 8
+    },
+    {
+      "name": "衝刺篇",
+      "from": 9,
+      "to": 11
+    }
+  ],
+  "chapters": [
+    {
+      "no": 0,
+      "date": "2026-10-02",
+      "title": "新連載：39 歲，從零開始",
+      "summary": "",
+      "plan": [
+        {
+          "dir": "conjure",
+          "text": "8AKER0 正式版上線，後台換新"
+        },
+        {
+          "dir": "strengthen",
+          "text": "身體紀錄每天自動同步開通"
+        },
+        {
+          "dir": "transmute",
+          "text": "寫下這一卷想畫成什麼樣子"
+        }
+      ],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 1,
+      "date": "2026-11-02",
+      "title": "把每天的分鏡變成習慣",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 2,
+      "date": "2026-12-02",
+      "title": "寫作節奏穩定下來",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 3,
+      "date": "2027-01-02",
+      "title": "年末回顧與新年計畫",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 4,
+      "date": "2027-02-02",
+      "title": "第一季總結",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 5,
+      "date": "2027-03-02",
+      "title": "語言輸出的第一個成果",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 6,
+      "date": "2027-04-02",
+      "title": "AI 工作流整理成教材",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 7,
+      "date": "2027-05-02",
+      "title": "半年：五角形長圓了嗎",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 8,
+      "date": "2027-06-02",
+      "title": "身體數據的半年對照",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 9,
+      "date": "2027-07-02",
+      "title": "一個能賣的小工具",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 10,
+      "date": "2027-08-02",
+      "title": "夏天的具現",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    },
+    {
+      "no": 11,
+      "date": "2027-09-02",
+      "title": "最後衝刺",
+      "summary": "",
+      "plan": [],
+      "keep": [],
+      "letgo": [],
+      "on_break": false
+    }
+  ]
+}

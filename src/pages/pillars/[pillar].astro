@@ -1,69 +1,75 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SiteNav from '../../components/SiteNav.astro';
 import { pillars, pillarBySlug } from '../../data/pillars';
 
 export async function getStaticPaths() {
   return pillars.map((p) => ({ params: { pillar: p.slug } }));
 }
-
 const { pillar } = Astro.params;
 const meta = pillarBySlug(pillar!)!;
-const entries = (await getCollection(meta.slug as any, ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+const entries = (await getCollection(meta.slug as any, ({ data }: any) => !data.draft)).sort(
+  (a: any, b: any) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-const fmtDate = (d: Date) =>
-  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
+const others = pillars.filter((p) => p.slug !== meta.slug);
 ---
-<BaseLayout title={`${meta.title} · 8AKER`}>
-  <SiteNav />
-
-  <section class="hero" style="padding-bottom:60px;">
-    <div class="hero-eyebrow">
-      <div class="hero-eyebrow-line"></div>
-      <div class="hero-eyebrow-text">PILLAR · {meta.index} · {meta.type}</div>
+<BaseLayout title={`${meta.type}・${meta.title} — 8AKER0`} description={meta.desc}>
+<style is:global>
+.ph{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 80% 20%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 72px;}
+.ph-in{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:end;}
+.ph .crumb{font-size:13px;color:#86707A;}
+.ph .crumb a{border-bottom:1px solid rgba(239,229,214,.15);transition:color .3s,border-color .3s;}
+.ph .crumb a:hover{color:#EFE5D6;border-color:#D4A24C;}
+.ph h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,5vw,60px);line-height:1.3;margin-top:10px;}
+.ph .jp{font-family:var(--jp);color:#86707A;margin-top:4px;}
+.ph .d{color:#B9A89E;max-width:34em;margin-top:16px;}
+.ph .big{font-family:var(--jp);font-weight:300;font-size:clamp(140px,20vw,240px);line-height:.85;color:var(--dc);}
+.ph .count{font-size:13px;color:#B9A89E;margin-top:22px;}
+.ph .count b{font-family:var(--serif);font-weight:500;font-size:20px;color:#EFE5D6;margin:0 4px;}
+.list-sec{padding:72px 40px 96px;}
+.list-in{max-width:1160px;margin:0 auto;}
+.arow{display:grid;grid-template-columns:110px minmax(0,1fr) 24px;gap:24px;padding:24px 0;border-bottom:1px solid var(--line);align-items:baseline;transition:padding .45s var(--ease);}
+.arow:first-child{border-top:1px solid var(--line);}
+.arow time{font-size:13px;color:var(--ash);}
+.arow h2{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.5;transition:color .3s;}
+.arow p{font-size:14px;color:var(--bone-2);margin-top:4px;}
+.arow .tags{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.arow .tags span{font-size:12px;padding:1px 9px;border:1px solid var(--line);color:var(--ash);}
+.arow .arrow{color:var(--gold);opacity:0;transform:translateX(-8px);transition:opacity .35s,transform .45s var(--ease);}
+.arow:hover{padding-left:10px;}
+.arow:hover h2{color:var(--gold);}
+.arow:hover .arrow{opacity:1;transform:none;}
+.empty{padding:40px 0;color:var(--ash);}
+.others{display:flex;gap:10px;flex-wrap:wrap;margin-top:56px;padding-top:24px;border-top:1px solid var(--line);align-items:center;font-size:13px;color:var(--ash);}
+.others a{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--line);color:var(--bone);transition:border-color .3s,transform .35s var(--ease);}
+.others a b{font-family:var(--jp);font-weight:400;color:var(--dc);}
+.others a:hover{border-color:var(--dc);transform:translateY(-2px);}
+@media(max-width:700px){.ph{padding:120px 20px 56px;}.ph-in{grid-template-columns:1fr;}.ph .big{order:-1;font-size:120px;}.list-sec{padding:48px 20px 72px;}.arow{grid-template-columns:1fr;gap:4px;}.arow .arrow{display:none;}}
+</style>
+<section class="ph" style={`--dc:var(--c-${meta.slug})`}>
+  <div class="ph-in">
+    <div>
+      <p class="crumb rv"><a href="/#five">五個方向</a>　／　{meta.type}</p>
+      <h1 class="rv" style="--i:1">{meta.title}</h1>
+      <p class="jp rv" style="--i:2" lang="ja">{meta.titleJp}</p>
+      <p class="d rv" style="--i:3">{meta.desc}</p>
+      <p class="count rv" style="--i:4">共<b>{entries.length}</b>{meta.unit}</p>
     </div>
-    <h1 class="hero-title" style="font-size:clamp(30px,4vw,48px);">{meta.title}</h1>
-    <p class="hero-story" style="margin-top:16px;">{meta.desc}</p>
-  </section>
-
-  <section class="notes-section" style="padding-top:0;">
-    <div class="rule-labeled" style="margin-bottom:32px;">
-      <span class="rule-tag">共 {entries.length} {meta.unit}</span>
-    </div>
-
-    {entries.length === 0 && (
-      <p style="color:var(--ink-ghost);font-size:13px;padding:40px 0;">
-        這根柱子還沒有文章——第一篇正在路上。
-      </p>
-    )}
-
-    {entries.map((entry) => (
-      <a
-        href={`/pillars/${meta.slug}/${entry.slug}`}
-        class="note-row"
-        style="text-decoration:none;color:inherit;"
-      >
-        <div class="note-date">{fmtDate(entry.data.date)}</div>
-        <div class="note-body">
-          <div class="note-title">{entry.data.title}</div>
-          {entry.data.excerpt && <div class="note-excerpt">{entry.data.excerpt}</div>}
-        </div>
-        <div class="note-arrow">→</div>
+    <div class="big" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
+  </div>
+</section>
+<section class="list-sec band-light" style="background:var(--night);color:var(--bone)">
+  <div class="list-in">
+    {entries.length === 0 && <p class="empty">這個方向還沒有文章，第一篇可以從今天開始。</p>}
+    {entries.map((e: any, i: number) => (
+      <a class="arow rv" style={`--i:${Math.min(i, 8)}`} href={`/pillars/${meta.slug}/${e.slug}`}>
+        <time>{dot(e.data.date)}</time>
+        <div><h2>{e.data.title}</h2>{e.data.excerpt && <p>{e.data.excerpt}</p>}{e.data.tags?.length > 0 && <div class="tags">{e.data.tags.map((t: string) => <span>{t}</span>)}</div>}</div>
+        <span class="arrow" aria-hidden="true">→</span>
       </a>
     ))}
-  </section>
-
-  <footer>
-    <div class="footer-left">
-      <div class="footer-mark">8AKER</div>
-      <div class="footer-tag">七転び八起 · the diary before the eighth rise</div>
-    </div>
-    <div class="footer-links">
-      <a href="/">回首頁</a>
-      <a href="/#pillars">強・放・操・具・變</a>
-    </div>
-    <div class="footer-copy">© 2026 8AKER · Osaka, Japan</div>
-  </footer>
+    <div class="others"><span>其他方向</span>{others.map((p) => <a href={`/pillars/${p.slug}`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}</a>)}</div>
+  </div>
+</section>
 </BaseLayout>

@@ -18,54 +18,54 @@ collections:
         label: "首頁文案"
         name: "homepage"
         fields:
-          - { label: "序章｜標題前段", name: "hero_title_prefix", widget: "string" }
-          - { label: "序章｜標題強調字", name: "hero_title_highlight", widget: "string" }
-          - { label: "序章｜標題後段", name: "hero_title_suffix", widget: "string" }
-          - { label: "序章｜說明文字", name: "hero_desc", widget: "text" }
-          - { label: "倒數計時｜小標題", name: "countdown_eyebrow", widget: "string" }
-          - { label: "倒數計時｜標籤文字", name: "countdown_label", widget: "string" }
-          - { label: "倒數計時｜起算時間（ISO 格式）", name: "countdown_start", widget: "string" }
-          - { label: "倒數計時｜目標時間（ISO 格式）", name: "countdown_target", widget: "string" }
-          - { label: "五柱區｜標題前段", name: "carousel_title_prefix", widget: "string" }
-          - { label: "五柱區｜標題強調字", name: "carousel_title_highlight", widget: "string" }
-          - { label: "結尾章｜標題前段", name: "closing_title_prefix", widget: "string" }
-          - { label: "結尾章｜標題強調字", name: "closing_title_highlight", widget: "string" }
-          - { label: "結尾章｜說明文字", name: "closing_desc", widget: "text" }
-          - { label: "複利證明牆｜引言", name: "proof_intro", widget: "text" }
-          - { label: "關於我｜開場金句", name: "about_lede", widget: "text" }
-          - { label: "關於我｜第一段（困境／開場）", name: "about_p1", widget: "text" }
-          - { label: "關於我｜第二段（複利轉折）", name: "about_p2", widget: "text" }
-          - { label: "關於我｜第三段（現在）", name: "about_p3", widget: "text" }
-          - { label: "訂閱區｜標題前段", name: "subscribe_title_prefix", widget: "string" }
-          - { label: "訂閱區｜標題強調字", name: "subscribe_title_highlight", widget: "string" }
-          - { label: "訂閱區｜標題後段", name: "subscribe_title_suffix", widget: "string" }
-          - { label: "訂閱區｜說明文字", name: "subscribe_desc", widget: "text" }
-          - { label: "訂閱區｜價格（例：NT$150）", name: "subscribe_price", widget: "string" }
-          - { label: "訂閱區｜Stripe 連結", name: "subscribe_url", widget: "string" }
-          - { label: "Dashboard 導引｜第一行前段", name: "bridge_line1_prefix", widget: "string" }
-          - { label: "Dashboard 導引｜第一行強調字", name: "bridge_line1_highlight", widget: "string" }
-          - { label: "Dashboard 導引｜第一行後段", name: "bridge_line1_suffix", widget: "string" }
-          - { label: "Dashboard 導引｜第二行前段", name: "bridge_line2_prefix", widget: "string" }
-          - { label: "Dashboard 導引｜第二行強調字", name: "bridge_line2_highlight", widget: "string" }
-          - { label: "Dashboard 導引｜第二行後段", name: "bridge_line2_suffix", widget: "string" }
+          - { label: "座右銘第一行", name: "motto_line1", widget: "string" }
+          - { label: "座右銘第二行", name: "motto_line2", widget: "string" }
+          - { label: "座右銘說明", name: "hero_lede", widget: "text" }
+          - { label: "倒數標籤", name: "countdown_label", widget: "string" }
+          - { label: "累積帳起算日", name: "countdown_start", widget: "string" }
+          - { label: "第一卷發售日", name: "countdown_target", widget: "string" }
+          - { label: "今日稽古標題", name: "board_title", widget: "string" }
+          - { label: "累積帳標籤", name: "ledger_label", widget: "string" }
+          - { label: "五個方向小標", name: "five_sub", widget: "string" }
+          - { label: "五個方向標題", name: "five_title", widget: "string" }
+          - { label: "連載小標", name: "chapters_sub", widget: "string" }
+          - { label: "連載標題", name: "chapters_title", widget: "string" }
+          - { label: "身體小標", name: "body_sub", widget: "string" }
+          - { label: "身體標題", name: "body_title", widget: "string" }
+          - { label: "成果小標", name: "works_sub", widget: "string" }
+          - { label: "成果標題", name: "works_title", widget: "string" }
+          - { label: "筆記小標", name: "journal_sub", widget: "string" }
+          - { label: "筆記標題", name: "journal_title", widget: "string" }
+          - { label: "關於小標", name: "about_meta", widget: "string" }
+          - { label: "關於名字", name: "about_name", widget: "string" }
+          - { label: "關於開場", name: "about_lede", widget: "text" }
+          - { label: "關於第一段", name: "about_p1", widget: "text" }
+          - { label: "關於第二段", name: "about_p2", widget: "text" }
+          - { label: "訂閱標題", name: "subscribe_title", widget: "string" }
+          - { label: "訂閱說明", name: "subscribe_desc", widget: "text" }
+          - { label: "訂閱價格", name: "subscribe_price", widget: "string" }
+          - { label: "Stripe 連結", name: "subscribe_url", widget: "string" }
+          - { label: "網站名稱", name: "site_name", widget: "string" }
+          - { label: "生日", name: "birth_date", widget: "string" }
 
-  - name: "proof"
-    label: "複利證明牆卡片"
+  - name: "works"
+    label: "成果"
     files:
-      - file: "src/data/proof-cards.json"
-        label: "三張卡片"
-        name: "proofcards"
+      - file: "src/data/works.json"
+        label: "成果卡片"
+        name: "works"
         fields:
-          - label: "卡片列表"
-            name: "cards"
+          - label: "成果"
+            name: "works"
             widget: "list"
             summary: "{{title}}"
             fields:
-              - { label: "數字（例：12）", name: "stat", widget: "string" }
-              - { label: "單位（例：小時完成）", name: "unit", widget: "string" }
-              - { label: "標題", name: "title", widget: "string" }
-              - { label: "備註（例：省下 3 小時／月）", name: "meta", widget: "string" }
-              - { label: "截圖區文字（尚無截圖時顯示）", name: "shot_label", widget: "string" }
+              - { label: "方向", name: "dir", widget: "select", options: ["strengthen","emit","operate","conjure","transmute"] }
+              - { label: "年月", name: "date", widget: "string" }
+              - { label: "名稱", name: "title", widget: "string" }
+              - { label: "說明", name: "desc", widget: "text" }
+              - { label: "花費小時", name: "spent", widget: "string" }
+              - { label: "每月省下", name: "saved", widget: "string" }
 
   - name: "strengthen"
     label: "強化・運動與健康"

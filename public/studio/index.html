@@ -149,7 +149,8 @@ input,textarea,select{font-family:inherit;}
     <div class="nav-group">
       <div class="nav-group-label">網站</div>
       <div class="nav-item" data-view="home">首頁文案</div>
-      <div class="nav-item" data-view="proof">複利證明牆</div>
+      <div class="nav-item" data-view="chapters">連載・每月一話</div>
+      <div class="nav-item" data-view="works">成果</div>
     </div>
 
     <div class="nav-group">
@@ -179,12 +180,20 @@ input,textarea,select{font-family:inherit;}
       <div id="homeForm"></div>
     </section>
 
-    <!-- PROOF CARDS -->
-    <section class="view" id="view-proof">
-      <div class="page-eyebrow">Proof Wall</div>
-      <div class="page-title">複利證明牆卡片</div>
-      <div class="page-sub">首頁上那三張成果卡片</div>
-      <div id="proofForm"></div>
+    <!-- CHAPTERS -->
+    <section class="view" id="view-chapters">
+      <div class="page-eyebrow">Chapters</div>
+      <div class="page-title">連載・每月一話</div>
+      <div class="page-sub">每月 2 號刊出一話；刊出後填「留下的」和「放下的」</div>
+      <div id="chaptersForm"></div>
+    </section>
+
+    <!-- WORKS -->
+    <section class="view" id="view-works">
+      <div class="page-eyebrow">Works</div>
+      <div class="page-title">成果</div>
+      <div class="page-sub">首頁「肆」區塊的作品卡片，可新增、刪除、調整順序</div>
+      <div id="worksForm"></div>
     </section>
 
     <!-- PILLAR ARTICLE LIST -->
@@ -349,7 +358,7 @@ function slugify(title) {
 }
 
 /* ══════════════════════════ NAV / ROUTER ══════════════════════════ */
-const views = ['home', 'proof', 'pillar', 'article'];
+const views = ['home', 'chapters', 'works', 'pillar', 'article'];
 let currentPillar = null;
 let currentArticle = null; // { path, sha, isNew }
 
@@ -362,25 +371,28 @@ function showView(name) {
 }
 
 document.querySelectorAll('.nav-item[data-view="home"]').forEach(el => el.addEventListener('click', () => loadHome()));
-document.querySelectorAll('.nav-item[data-view="proof"]').forEach(el => el.addEventListener('click', () => loadProof()));
+document.querySelectorAll('.nav-item[data-view="chapters"]').forEach(el => el.addEventListener('click', () => loadChapters()));
+document.querySelectorAll('.nav-item[data-view="works"]').forEach(el => el.addEventListener('click', () => loadWorks()));
 document.querySelectorAll('.nav-item[data-pillar]').forEach(el => {
   el.addEventListener('click', () => loadPillar(el.dataset.pillar));
 });
 
 /* ══════════════════════════ HOME COPY VIEW ══════════════════════════ */
 const HOME_FIELDS = [
-  ['hero_title_prefix', '序章｜標題前段', 'text'], ['hero_title_highlight', '序章｜標題強調字', 'text'], ['hero_title_suffix', '序章｜標題後段', 'text'],
-  ['hero_desc', '序章｜說明文字', 'area'],
-  ['countdown_eyebrow', '倒數計時｜小標題', 'text'], ['countdown_label', '倒數計時｜標籤文字', 'text'],
-  ['countdown_start', '倒數計時｜起算時間（ISO 格式）', 'text'], ['countdown_target', '倒數計時｜目標時間（ISO 格式）', 'text'],
-  ['carousel_title_prefix', '五柱區｜標題前段', 'text'], ['carousel_title_highlight', '五柱區｜標題強調字', 'text'],
-  ['closing_title_prefix', '結尾章｜標題前段', 'text'], ['closing_title_highlight', '結尾章｜標題強調字', 'text'], ['closing_desc', '結尾章｜說明文字', 'area'],
-  ['proof_intro', '複利證明牆｜引言', 'area'],
-  ['about_lede', '關於我｜開場金句', 'area'], ['about_p1', '關於我｜第一段', 'area'], ['about_p2', '關於我｜第二段', 'area'], ['about_p3', '關於我｜第三段', 'area'],
-  ['subscribe_title_prefix', '訂閱區｜標題前段', 'text'], ['subscribe_title_highlight', '訂閱區｜標題強調字', 'text'], ['subscribe_title_suffix', '訂閱區｜標題後段', 'text'],
-  ['subscribe_desc', '訂閱區｜說明文字', 'area'], ['subscribe_price', '訂閱區｜價格', 'text'], ['subscribe_url', '訂閱區｜Stripe 連結', 'text'],
-  ['bridge_line1_prefix', 'Dashboard 導引｜第一行前段', 'text'], ['bridge_line1_highlight', 'Dashboard 導引｜第一行強調字', 'text'], ['bridge_line1_suffix', 'Dashboard 導引｜第一行後段', 'text'],
-  ['bridge_line2_prefix', 'Dashboard 導引｜第二行前段', 'text'], ['bridge_line2_highlight', 'Dashboard 導引｜第二行強調字', 'text'], ['bridge_line2_suffix', 'Dashboard 導引｜第二行後段', 'text'],
+  ['motto_line1', '首頁｜座右銘第一行', 'text'], ['motto_line2', '首頁｜座右銘第二行', 'text'],
+  ['hero_lede', '首頁｜座右銘下面的說明', 'area'],
+  ['countdown_label', '倒數｜標籤文字', 'text'],
+  ['countdown_start', '倒數｜累積帳起算日（ISO 格式）', 'text'], ['countdown_target', '倒數｜第一卷發售日（ISO 格式）', 'text'],
+  ['board_title', '今日稽古｜標題', 'text'], ['ledger_label', '累積帳｜標籤', 'text'],
+  ['five_sub', '壱 五個方向｜小標', 'text'], ['five_title', '壱 五個方向｜標題', 'text'],
+  ['chapters_sub', '弐 連載｜小標', 'text'], ['chapters_title', '弐 連載｜標題', 'text'],
+  ['body_sub', '参 身體｜小標', 'text'], ['body_title', '参 身體｜標題', 'text'],
+  ['works_sub', '肆 成果｜小標', 'text'], ['works_title', '肆 成果｜標題', 'text'],
+  ['journal_sub', '伍 筆記｜小標', 'text'], ['journal_title', '伍 筆記｜標題', 'text'],
+  ['about_meta', '陸 關於｜小標', 'text'], ['about_name', '陸 關於｜名字', 'text'],
+  ['about_lede', '陸 關於｜開場', 'area'], ['about_p1', '陸 關於｜第一段', 'area'], ['about_p2', '陸 關於｜第二段', 'area'],
+  ['subscribe_title', '訂閱｜標題', 'text'], ['subscribe_desc', '訂閱｜說明', 'area'],
+  ['subscribe_price', '訂閱｜價格', 'text'], ['subscribe_url', '訂閱｜Stripe 連結', 'text'],
 ];
 
 async function loadHome() {
@@ -418,47 +430,94 @@ async function loadHome() {
   });
 }
 
-/* ══════════════════════════ PROOF CARDS VIEW ══════════════════════════ */
-async function loadProof() {
-  showView('proof');
-  const form = document.getElementById('proofForm');
+/* ══════════════════════════ CHAPTERS VIEW ══════════════════════════ */
+const DIR_BY_KANJI = { '強': 'strengthen', '放': 'emit', '操': 'operate', '具': 'conjure', '變': 'transmute' };
+const KANJI_BY_DIR = Object.fromEntries(Object.entries(DIR_BY_KANJI).map(([k, v]) => [v, k]));
+async function loadChapters(pick) {
+  showView('chapters');
+  const form = document.getElementById('chaptersForm');
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
-  const file = await ghGetFile('src/data/proof-cards.json');
+  const file = await ghGetFile('src/data/chapters.json');
   const data = JSON.parse(file.content);
-  form.innerHTML = '';
-
-  data.cards.forEach((card, i) => {
-    const block = document.createElement('div');
-    block.style.cssText = 'border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;';
-    block.innerHTML = `
-      <div class="field-label" style="margin-bottom:14px;">卡片 ${i + 1}</div>
-      <div class="field"><label class="field-label">數字</label><input type="text" data-idx="${i}" data-key="stat" value="${escapeAttr(card.stat)}"></div>
-      <div class="field"><label class="field-label">單位</label><input type="text" data-idx="${i}" data-key="unit" value="${escapeAttr(card.unit)}"></div>
-      <div class="field"><label class="field-label">標題</label><input type="text" data-idx="${i}" data-key="title" value="${escapeAttr(card.title)}"></div>
-      <div class="field"><label class="field-label">備註</label><input type="text" data-idx="${i}" data-key="meta" value="${escapeAttr(card.meta)}"></div>
-      <div class="field"><label class="field-label">截圖區文字（尚無截圖時顯示）</label><input type="text" data-idx="${i}" data-key="shot_label" value="${escapeAttr(card.shot_label)}"></div>
-    `;
-    form.appendChild(block);
-  });
-
-  const btnRow = document.createElement('div');
-  btnRow.className = 'btn-row';
-  btnRow.innerHTML = `<button class="btn btn-primary" id="saveProofBtn">儲存變更</button>`;
-  form.appendChild(btnRow);
-
-  document.getElementById('saveProofBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('saveProofBtn');
-    btn.disabled = true; btn.textContent = '儲存中…';
+  const now = Date.now();
+  const nextIdx = data.chapters.findIndex(c => new Date(c.date + 'T00:00:00+09:00').getTime() >= now);
+  let cur = pick ?? (nextIdx > 0 ? nextIdx - 1 : 0);
+  const planToText = arr => (arr || []).map(x => (x.dir ? KANJI_BY_DIR[x.dir] + ' ' : '') + x.text).join('\n');
+  const textToPlan = t => t.split('\n').map(s => s.trim()).filter(Boolean).map(s => DIR_BY_KANJI[s[0]] && s[1] === ' ' ? { dir: DIR_BY_KANJI[s[0]], text: s.slice(2).trim() } : { text: s });
+  const lines = t => t.split('\n').map(s => s.trim()).filter(Boolean);
+  function render() {
+    const c = data.chapters[cur];
+    form.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px;">${data.chapters.map((x, i) =>
+        `<button class="btn ${i === cur ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px" data-pick="${i}">第 ${x.no} 話</button>`).join('')}</div>
+      <div class="field"><label class="field-label">第 ${c.no} 話・標題</label><input type="text" id="c-title" value="${escapeAttr(c.title)}"></div>
+      <div class="field"><label class="field-label">刊出日</label><input type="date" id="c-date" value="${escapeAttr(c.date)}"></div>
+      <div class="field field-checkbox"><input type="checkbox" id="c-break" ${c.on_break ? 'checked' : ''}><label for="c-break">這個月休載</label></div>
+      <div class="field"><label class="field-label">預計刊出的內容（刊出前顯示）</label><textarea id="c-plan" rows="3">${escapeHtml(planToText(c.plan))}</textarea><div class="field-hint">一行一項。開頭加「強 」「放 」「操 」「具 」「變 」（後面空一格）會標上方向顏色。</div></div>
+      <div class="field"><label class="field-label">這一話的摘要（刊出後顯示）</label><textarea id="c-summary" rows="3">${escapeHtml(c.summary || '')}</textarea></div>
+      <div class="field"><label class="field-label">這一話留下的</label><textarea id="c-keep" rows="3">${escapeHtml((c.keep || []).join('\n'))}</textarea><div class="field-hint">一行一項：做出來的東西、數字、學到的事。</div></div>
+      <div class="field"><label class="field-label">這一話放下的</label><textarea id="c-letgo" rows="3">${escapeHtml((c.letgo || []).join('\n'))}</textarea><div class="field-hint">一行一項：沒做成的、卡住的、要翻篇的心情。</div></div>
+      <div class="btn-row"><button class="btn btn-primary" id="saveChBtn">儲存第 ${c.no} 話</button></div>`;
+    form.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => { collect(); cur = +b.dataset.pick; render(); }));
+    document.getElementById('saveChBtn').addEventListener('click', save);
+  }
+  function collect() {
+    const c = data.chapters[cur]; if (!document.getElementById('c-title')) return;
+    c.title = document.getElementById('c-title').value.trim();
+    c.date = document.getElementById('c-date').value || c.date;
+    c.on_break = document.getElementById('c-break').checked;
+    c.plan = textToPlan(document.getElementById('c-plan').value);
+    c.summary = document.getElementById('c-summary').value.trim();
+    c.keep = lines(document.getElementById('c-keep').value);
+    c.letgo = lines(document.getElementById('c-letgo').value);
+  }
+  async function save() {
+    const btn = document.getElementById('saveChBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = '儲存中…';
     try {
-      form.querySelectorAll('[data-idx]').forEach(el => {
-        data.cards[+el.dataset.idx][el.dataset.key] = el.value;
-      });
-      const result = await ghPutFile('src/data/proof-cards.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update proof cards via Studio');
+      collect();
+      const result = await ghPutFile('src/data/chapters.json', JSON.stringify(data, null, 2) + '\n', file.sha, `Update chapter ${data.chapters[cur].no} via Studio`);
       file.sha = result.content.sha;
       toast('已儲存，網站將在約一分鐘內更新');
     } catch (e) { toast('儲存失敗：' + e.message, 'err'); }
-    btn.disabled = false; btn.textContent = '儲存變更';
-  });
+    btn.disabled = false; btn.textContent = label;
+  }
+  render();
+}
+
+/* ══════════════════════════ WORKS VIEW ══════════════════════════ */
+async function loadWorks() {
+  showView('works');
+  const form = document.getElementById('worksForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const file = await ghGetFile('src/data/works.json');
+  const data = JSON.parse(file.content);
+  const dirOpts = sel => Object.entries(KANJI_BY_DIR).map(([d, k]) => `<option value="${d}" ${d === sel ? 'selected' : ''}>${k}・${PILLARS[d].jp}</option>`).join('');
+  function collect() {
+    form.querySelectorAll('[data-w]').forEach(el => { data.works[+el.dataset.w][el.dataset.key] = el.value; });
+  }
+  function render() {
+    form.innerHTML = data.works.map((w, i) => `
+      <div style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span class="field-label" style="margin:0">成果 ${i + 1}</span>
+          <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>上移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">移除</button></span></div>
+        <div class="field"><label class="field-label">方向</label><select data-w="${i}" data-key="dir" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)">${dirOpts(w.dir)}</select></div>
+        <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
+        <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
+        <div class="field"><label class="field-label">一句話說明</label><textarea rows="2" data-w="${i}" data-key="desc">${escapeHtml(w.desc)}</textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label class="field-label">花費小時</label><input type="text" data-w="${i}" data-key="spent" value="${escapeAttr(w.spent)}"></div>
+        <div class="field"><label class="field-label">每月省下（小時）</label><input type="text" data-w="${i}" data-key="saved" value="${escapeAttr(w.saved)}"></div></div>
+      </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addWork">＋ 新增一件成果</button><div class="spacer"></div><button class="btn btn-primary" id="saveWorks">儲存變更</button></div>`;
+    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定從首頁移除這件成果嗎？儲存後才會生效。')) return; collect(); data.works.splice(+b.dataset.del, 1); render(); }));
+    form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.works[i - 1], data.works[i]] = [data.works[i], data.works[i - 1]]; render(); }));
+    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.unshift({ dir: 'conjure', date: '', title: '', desc: '', spent: '—', saved: '—' }); render(); });
+    document.getElementById('saveWorks').addEventListener('click', async () => {
+      const btn = document.getElementById('saveWorks'); btn.disabled = true; btn.textContent = '儲存中…';
+      try { collect(); const r = await ghPutFile('src/data/works.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update works via Studio'); file.sha = r.content.sha; toast('已儲存，網站將在約一分鐘內更新'); }
+      catch (e) { toast('儲存失敗：' + e.message, 'err'); }
+      btn.disabled = false; btn.textContent = '儲存變更';
+    });
+  }
+  render();
 }
 
 /* ══════════════════════════ PILLAR ARTICLE LIST ══════════════════════════ */

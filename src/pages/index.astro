@@ -3,587 +3,556 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { pillars } from '../data/pillars';
 import copy from '../data/site-copy.json';
-import proof from '../data/proof-cards.json';
+import chapters from '../data/chapters.json';
+import worksData from '../data/works.json';
+import body from '../data/body.json';
 
-const collectionEntries = await Promise.all(
-  pillars.map(async (p) => {
-    const entries = await getCollection(p.slug, ({ data }) => !data.draft);
-    return { slug: p.slug, entries };
-  })
-);
+const all = (await Promise.all(
+  pillars.map(async (p) => (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).map((e: any) => ({ dir: p.slug, e })))
+)).flat();
+all.sort((a, b) => b.e.data.date.valueOf() - a.e.data.date.valueOf());
+const ymd = (d: Date) => d.toISOString().slice(0, 10);
+const dot = (d: Date) => ymd(d).replaceAll('-', '.');
+const counts = Object.fromEntries(pillars.map((p) => [p.slug, all.filter((a) => a.dir === p.slug).length]));
+const dan = (c: number) => (c >= 100 ? '四段' : c >= 60 ? '三段' : c >= 30 ? '二段' : c >= 10 ? '初段' : '見習');
+const MAX = 30;
 
-const allArticles = collectionEntries.flatMap(({ slug, entries }) =>
-  entries.map((e) => ({ pillarSlug: slug, ...e }))
-);
-allArticles.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const latest = allArticles.slice(0, 5);
-const totalCount = allArticles.length;
-const pillarCount = pillars.length;
+// pentagon geometry (viewBox centered on 0,0)
+const R = 150;
+const pt = (i: number, v: number) => { const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5; return [Math.cos(a) * R * v, Math.sin(a) * R * v]; };
+// the shape shows balance between directions, so it is scaled to the largest one
+const top = Math.max(1, ...Object.values(counts) as number[]);
+const val = (s: string) => 0.15 + (counts[s] / top) * 0.85;
+const shape = pillars.map((p, i) => pt(i, val(p.slug)).map((n) => n.toFixed(1)).join(',')).join(' ');
+const rings = [0.25, 0.5, 0.75, 1].map((l) => pillars.map((_, i) => pt(i, l).map((n) => n.toFixed(1)).join(',')).join(' '));
 
-const pillarLabel = (slug: string) => pillars.find((p) => p.slug === slug)?.title ?? '';
-
-const pillarCards = [
-  { idx: 0, num: '01', type: '強化', kanji: '強', titleHtml: '運動與<em>健康</em>', jp: '体を鍛える、積み重ねの記録', desc: '每天讓身體這個本來就有的東西，變得更可靠一點。', href: '/pillars/strengthen' },
-  { idx: 1, num: '02', type: '放出', kanji: '放', titleHtml: '輸出與<em>分享</em>', jp: '発信する、届く言葉の記録', desc: '把學到的東西往外送，讓它影響到你觸碰不到的人。', href: '/pillars/emit' },
-  { idx: 2, num: '03', type: '操作', kanji: '操', titleHtml: 'AI <em>學習筆記</em>', jp: '実際に使えた、机上ではない記録', desc: '這個我真的用過、真的省了時間的紀錄。', href: '/pillars/operate' },
-  { idx: 3, num: '04', type: '具現', kanji: '具', titleHtml: '從無到有的<em>建置</em>', jp: '仲間と共に、ゼロから作り上げる', desc: '還在路上，但已經有一些具體的成果可以分享。', href: '/pillars/conjure' },
-  { idx: 4, num: '05', type: '變化', kanji: '變', titleHtml: '<em>心境</em>筆記', jp: '揺れ動く心、その時々の記録', desc: '誠實記下當下的狀態，跟現在跟以前不一樣的地方。', href: '/pillars/transmute' },
-];
-// Flank the real cards with clones of the opposite ends so the track can be scrolled/dragged
-// past card 1 or card 5 without hitting a dead stop — the JS below snaps clone→real silently.
-const loopCards = [...pillarCards.slice(-2), ...pillarCards, ...pillarCards.slice(0, 2)];
-const CLONE_HEAD = 2;
-const fmtDate = (d: Date) =>
-  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+const journal = all.slice(0, 12);
+const pageData = {
+  dirs: pillars.map((p) => ({ id: p.slug, k: p.kanji, n: p.type })),
+  entries: all.map((a) => ({ date: ymd(a.e.data.date), dir: a.dir, t: a.e.data.title, url: `/pillars/${a.dir}/${a.e.slug}` })),
+  chapters, body,
+  start: copy.countdown_start, target: copy.countdown_target, birth: copy.birth_date,
+};
+const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 ---
+<BaseLayout>
+<style is:global>
+/* ── hero ── */
+.hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;background:radial-gradient(120% 80% at 70% 40%,#2A1520 0%,#1C0F14 60%);color:#EFE5D6;}
+#art{position:absolute;inset:0;width:100%;height:100%;}
+.hero-in{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:128px 40px 56px;}
+.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:64px;align-items:end;}
+.hero .rv{--d:0}
+h1.motto{font-family:var(--serif);font-weight:500;font-size:clamp(38px,5.6vw,72px);line-height:1.3;}
+h1.motto span{display:block;}
+h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
+.hero.in h1.motto .l2{color:#B9A89E;}
+.hero-lede{margin-top:20px;max-width:30em;color:#B9A89E;}
+.cd{margin-top:30px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.cd small{font-size:13px;color:#86707A;}
+.cd-days{font-family:var(--serif);font-size:56px;line-height:1;}
+.cd-clock{font-size:24px;display:inline-flex;}
+.cd-clock b{font-weight:400;color:#D4A24C;display:inline-block;}
+.cd-clock b.tick{animation:tick .45s var(--ease);}
+@keyframes tick{from{transform:translateY(-40%);opacity:0;}}
+.next-rel{display:inline-flex;gap:10px;align-items:baseline;margin-top:14px;font-size:13.5px;color:#B9A89E;border-bottom:1px solid rgba(239,229,214,.12);padding-bottom:3px;transition:color .3s,border-color .3s,gap .4s var(--ease);}
+.next-rel b{font-weight:400;color:#D4A24C;}
+.next-rel:hover{color:#EFE5D6;border-color:#D4A24C;gap:14px;}
+.board{background:rgba(38,20,27,.72);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(239,229,214,.12);padding:24px 24px 20px;}
+.board-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.board-head h2{font-family:var(--serif);font-weight:500;font-size:17px;}
+.board-head small,.board-foot{font-size:12.5px;color:#86707A;}
+.brow{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid rgba(239,229,214,.1);transition:padding .35s var(--ease);}
+.brow:last-of-type{border-bottom:0;}
+.brow:hover{padding-left:6px;}
+.brow .k{font-family:var(--jp);font-size:17px;color:var(--dc);text-align:center;}
+.brow p{font-size:14px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.brow p small{display:block;font-size:12px;color:#86707A;}
+.brow.todo p{color:#86707A;}
+.brow .st{font-size:12px;color:#86707A;}
+.brow.done .st{color:var(--dc);}
+.board-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;color:#B9A89E;}
+.pips{display:flex;gap:4px;}
+.pips i{width:18px;height:3px;background:rgba(239,229,214,.12);transition:background .6s var(--ease);}
+.pips i.on{background:#D4A24C;}
+.ledger-block{margin-top:48px;}
+.ledger-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-size:13px;color:#B9A89E;margin-bottom:12px;}
+.ledger-top b{font-family:var(--serif);font-weight:500;color:#EFE5D6;font-size:16px;}
+.ledger-wrap{overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none;}
+.ledger-wrap::-webkit-scrollbar{display:none;}
+.months{--cs:12px;display:grid;grid-auto-flow:column;grid-auto-columns:var(--cs);column-gap:3px;font-size:11.5px;color:#86707A;margin-bottom:6px;width:max-content;}
+.months span{white-space:nowrap;}
+.ledger{--cs:12px;display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,var(--cs));grid-auto-columns:var(--cs);gap:3px;width:max-content;}
+.cell{width:var(--cs);height:var(--cs);border:1px solid rgba(239,229,214,.1);transition:transform .25s var(--ease),box-shadow .25s;opacity:0;animation:cellIn .5s var(--ease) forwards;animation-delay:calc(var(--c) * 4ms + .6s);}
+@keyframes cellIn{to{opacity:1;}}
+.cell.future{border-color:rgba(239,229,214,.05);}
+.cell.done{border:0;}
+.cell.done:hover,.cell.today:hover{transform:scale(1.7);box-shadow:0 0 0 3px rgba(28,15,20,.8);position:relative;z-index:2;}
+.cell.today{border:1.5px solid #D4A24C;animation:cellIn .5s var(--ease) forwards,breathe 2.6s ease-in-out 1.2s infinite;animation-delay:calc(var(--c) * 4ms + .6s),1.2s;}
+@keyframes breathe{50%{box-shadow:0 0 0 4px rgba(212,162,76,.2);}}
+.legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:12.5px;color:#B9A89E;}
+.legend i{display:inline-block;width:9px;height:9px;margin-right:7px;}
+.tip{position:fixed;z-index:80;pointer-events:none;background:#EFE5D6;color:#1C0F14;font-size:12.5px;padding:7px 11px;line-height:1.55;max-width:260px;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .2s var(--ease);}
+.tip.on{opacity:1;transform:none;}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:36px;}.hero-in{padding:104px 20px 48px;}}
 
-<BaseLayout title="8AKER — 七転び八起">
-<div class="masthead">8AKER · VOL. 01 / 2026 · <b>七転び八起</b> — the diary before the eighth rise</div>
+/* ── 壱 five directions ── */
+.dirs{display:grid;grid-template-columns:380px minmax(0,1fr);gap:56px;margin-top:40px;align-items:start;}
+.penta svg{width:100%;height:auto;overflow:visible;}
+.penta .grow{transform:scale(.001);transition:transform 1.4s var(--ease) .3s;}
+.in .penta .grow{transform:none;}
+.shape{fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.5;}
+.axis{font-family:var(--jp);font-size:21px;fill:var(--bone-2);cursor:pointer;transition:fill .3s;}
+.axis:hover,.axis.on{fill:var(--gold);}
+.idx{display:flex;flex-direction:column;border-top:1px solid var(--line);}
+.idx button{display:grid;grid-template-columns:48px minmax(0,1fr) 110px 52px;gap:14px;align-items:center;padding:13px 6px;border-bottom:1px solid var(--line);text-align:left;transition:background .3s,padding .4s var(--ease);}
+.idx button:hover{background:var(--night-2);}
+.idx button[aria-selected="true"]{background:var(--night-2);padding-left:16px;}
+.idx .k{font-family:var(--jp);font-size:30px;line-height:1;color:var(--ash);transition:color .3s,transform .5s var(--ease);display:inline-block;}
+.idx button:hover .k{transform:rotate(-6deg) scale(1.08);}
+.idx button[aria-selected="true"] .k,.idx button:hover .k{color:var(--dc);}
+.idx .n{font-size:15px;}
+.idx .n small{display:block;font-size:12px;color:var(--ash);}
+.idx .bar{height:3px;background:var(--line);position:relative;overflow:hidden;}
+.idx .bar i{position:absolute;inset:0 auto 0 0;background:var(--dc);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease);}
+.in .idx .bar i{transform:scaleX(1);}
+.idx .dan{font-family:var(--serif);font-size:13.5px;text-align:right;}
+.detail{position:relative;margin-top:28px;min-height:230px;overflow:hidden;}
+.detail[hidden]{display:none;}
+.detail .big{position:absolute;right:-8px;top:-30px;font-family:var(--jp);font-weight:300;font-size:220px;line-height:1;color:var(--dc);opacity:.09;pointer-events:none;animation:bigIn .9s var(--ease);}
+@keyframes bigIn{from{opacity:0;transform:translateX(24px);}}
+.detail>*:not(.big){animation:detIn .6s var(--ease) both;}
+.detail>*:nth-child(3){animation-delay:.05s}.detail>*:nth-child(4){animation-delay:.1s}.detail>*:nth-child(5){animation-delay:.15s}
+@keyframes detIn{from{opacity:0;transform:translateY(6px);}}
+.detail h3{font-family:var(--serif);font-weight:500;font-size:24px;}
+.detail .jp{font-family:var(--jp);font-size:13.5px;color:var(--ash);}
+.detail .d{margin-top:12px;color:var(--bone-2);max-width:32em;}
+.detail .es{margin-top:18px;}
+.detail .es a{display:flex;gap:18px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;transition:padding .35s var(--ease);}
+.detail .es a:hover{padding-left:8px;}
+.detail .es a:hover span{color:var(--gold);}
+.detail .es time{color:var(--ash);font-size:13px;min-width:84px;}
+.dir-note{font-size:12.5px;color:var(--ash);margin-top:14px;}
+@media(max-width:960px){.dirs{grid-template-columns:1fr;}.penta svg{max-width:340px;margin:0 auto;display:block;}.idx button{grid-template-columns:40px minmax(0,1fr) 70px 48px;}.detail .big{font-size:150px;}}
 
-<nav>
-  <a href="#" class="nav-mark">
-    <span class="nav-mark-icon">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M4 18 L4 9 L12 4 L20 9 L20 18" stroke="#2d6a4f" stroke-width="1.3"/><path d="M4 18 L20 18" stroke="#2d6a4f" stroke-width="1.3"/><path d="M8 18 L8 12 L12 9.5 L16 12 L16 18" stroke="#d4a5a0" stroke-width="1"/></svg>
-    </span>
-    <span class="nav-mark-text">8AKER</span>
-  </a>
-  <ul class="nav-links-desktop">
-    <li><a href="#pillars">強・放・操・具・變</a></li>
-    <li><a href="#proof">複利證明牆</a></li>
-    <li><a href="#notes">最新筆記</a></li>
-    <li><a href="#about">關於我</a></li>
-  </ul>
-  <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="menuPanel">
-    <span class="menu-toggle-text">MENU</span>
-    <span class="menu-toggle-icon"><span></span><span></span></span>
-  </button>
-</nav>
+/* ── 弐 連載 ── */
+.mv-toggle{display:inline-flex;margin-top:28px;border:1px solid var(--line);}
+.mv-toggle button{font-size:13px;padding:5px 16px;color:var(--bone-2);transition:background .3s,color .3s;}
+.mv-toggle button:hover{color:var(--bone);}
+.mv-toggle button[aria-pressed="true"]{background:var(--bone);color:var(--night);}
+.track-wrap{overflow-x:auto;margin-top:28px;padding:8px 2px 4px;scrollbar-width:none;}
+.track-wrap::-webkit-scrollbar{display:none;}
+.track{list-style:none;display:grid;grid-template-columns:repeat(13,minmax(64px,1fr));min-width:860px;position:relative;}
+.track::before{content:'';position:absolute;left:32px;right:32px;top:15px;height:1px;background:var(--line);}
+.track .fill{position:absolute;left:32px;top:15px;height:1px;background:var(--gold);transform-origin:left;transform:scaleX(0);transition:transform 1.6s var(--ease) .4s;}
+.in .track .fill{transform:scaleX(1);}
+.track li{position:relative;display:flex;justify-content:center;}
+.node{display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 2px 6px;}
+.dot{width:14px;height:14px;border-radius:50%;border:1px solid var(--ash);background:var(--night);margin:8px 0;transition:transform .35s var(--ease),box-shadow .35s;}
+.node:hover .dot{transform:scale(1.3);box-shadow:0 0 0 5px var(--gold-soft);}
+.node.done .dot{background:var(--gold);border-color:var(--gold);}
+.node.break .dot{background:repeating-linear-gradient(45deg,var(--ash) 0 2px,transparent 2px 4px);}
+.node.next .dot{border:1.5px solid var(--gold);animation:breathe 2.6s ease-in-out infinite;}
+.node.final .dot{width:30px;height:30px;margin:0;display:grid;place-items:center;font-size:14px;color:var(--gold);border-color:var(--gold);font-family:var(--jp);}
+.node .d{font-size:12px;color:var(--ash);font-variant-numeric:tabular-nums;}
+.node .r{font-size:12.5px;color:var(--bone-2);white-space:nowrap;transition:color .3s;}
+.node:hover .r,.node[aria-current="true"] .r{color:var(--gold);}
+.node[aria-current="true"] .dot{transform:scale(1.25);}
+.mdetail{margin-top:26px;border-top:1px solid var(--line);padding-top:26px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;}
+.mdetail>*{animation:detIn .6s var(--ease) both;}
+.mdetail .tag{font-size:12.5px;color:var(--ash);}
+.mdetail .tag b{font-weight:400;color:var(--gold);margin-right:8px;}
+.mdetail h3{font-family:var(--serif);font-weight:500;font-size:24px;margin-top:4px;line-height:1.45;}
+.mdetail p{color:var(--bone-2);margin-top:10px;max-width:32em;}
+.mdetail h4{font-family:var(--serif);font-weight:500;font-size:14px;color:var(--gold);margin-top:18px;}
+.mdetail ul{list-style:none;margin-top:6px;}
+.mdetail li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;}
+.mdetail li .k{font-family:var(--jp);color:var(--dc,var(--ash));}
+.mnums div{padding:12px 0;border-bottom:1px solid var(--line);}
+.mnums b{display:block;font-size:28px;font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;}
+.mnums small{font-size:12.5px;color:var(--ash);}
+.ygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-top:28px;padding:1px 0 0 1px;}
+.ycard{background:var(--night);border:1px solid var(--line);margin:-1px 0 0 -1px;padding:18px 18px 16px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:150px;transition:background .3s,transform .4s var(--ease);position:relative;}
+.ycard:hover{background:var(--night-2);z-index:1;transform:translateY(-3px);}
+.ycard .n{font-size:12.5px;color:var(--ash);}
+.ycard h4{font-family:var(--serif);font-weight:500;font-size:16px;line-height:1.5;}
+.ycard .s{margin-top:auto;font-size:12.5px;color:var(--ash);}
+.ycard.done .s{color:var(--gold);}
+.ycard.next{background:var(--gold-soft);}
+.ycard.final{background:var(--night-3);}
+.ycard.final h4{color:var(--gold);}
+@media(max-width:860px){.mdetail{grid-template-columns:1fr;gap:20px;}}
 
-<div class="menu-panel" id="menuPanel">
-  <div class="menu-panel-inner">
-    <ol class="menu-list">
-      <li><a href="#pillars" data-menu-link><span class="menu-num">01</span><span class="menu-label">強・放・操・具・變</span></a></li>
-      <li><a href="#proof" data-menu-link><span class="menu-num">02</span><span class="menu-label">複利證明牆</span></a></li>
-      <li><a href="#notes" data-menu-link><span class="menu-num">03</span><span class="menu-label">最新筆記</span></a></li>
-      <li><a href="#about" data-menu-link><span class="menu-num">04</span><span class="menu-label">關於我</span></a></li>
-    </ol>
-  </div>
-</div>
+/* ── 参 body ── */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);margin-top:40px;border:1px solid var(--line);}
+.step{padding:20px;border-right:1px solid var(--line);transition:background .3s;}
+.step:hover{background:var(--night-2);}
+.step:last-child{border-right:0;}
+.step time{font-size:12.5px;color:var(--ash);}
+.step h3{font-family:var(--serif);font-weight:500;font-size:16px;margin-top:4px;}
+.step p{font-size:13px;color:var(--bone-2);margin-top:6px;line-height:1.7;}
+.step.now{background:var(--gold-soft);}
+.step.now h3{color:var(--gold);}
+@media(max-width:780px){.pipe{grid-template-columns:1fr 1fr;}.step:nth-child(2){border-right:0;}.step:nth-child(-n+2){border-bottom:1px solid var(--line);}}
+.body-row{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;margin-top:32px;}
+.spark{border:1px solid var(--line);padding:22px;}
+.spark svg{width:100%;height:auto;display:block;}
+.spark .ln{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.6s var(--ease) forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+.spark-top{display:flex;justify-content:space-between;font-size:13px;color:var(--bone-2);margin-bottom:10px;gap:10px;flex-wrap:wrap;}
+.tabs{display:flex;gap:4px;}
+.tabs button{font-size:12.5px;padding:2px 10px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
+.tabs button:hover{border-color:var(--bone-2);}
+.tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
+.metrics div{padding:14px 0;border-bottom:1px solid var(--line);}
+.metrics b{font-size:30px;font-weight:300;display:block;line-height:1.1;}
+.metrics small{font-size:12.5px;color:var(--ash);}
+.demo{font-size:12px;color:var(--ash);margin-top:12px;}
+@media(max-width:900px){.body-row{grid-template-columns:1fr;}}
 
-<!-- HERO -->
+/* ── 肆 works ── */
+.strip{display:flex;gap:20px;overflow-x:auto;margin-top:36px;padding:10px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--ash) transparent;}
+.work{flex:0 0 min(380px,82vw);scroll-snap-align:start;background:var(--night-2);border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;min-height:250px;position:relative;overflow:hidden;transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease);}
+.work::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--dc);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);}
+.work::after{content:attr(data-k);position:absolute;right:-6px;bottom:-26px;font-family:var(--jp);font-weight:300;font-size:150px;line-height:1;color:var(--dc);opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none;}
+.work:hover{transform:translateY(-6px);border-color:rgba(239,229,214,.2);box-shadow:0 18px 40px -20px rgba(0,0,0,.6);}
+.work:hover::before{transform:scaleX(1);}
+.work:hover::after{opacity:.1;transform:none;}
+.work .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ash);}
+.work .meta span:first-child{color:var(--dc);}
+.work h3{font-family:var(--serif);font-weight:500;font-size:20px;margin-top:18px;line-height:1.45;}
+.work p{font-size:13.5px;color:var(--bone-2);margin-top:8px;}
+.work .nums{display:flex;gap:24px;margin-top:auto;padding-top:20px;}
+.work .nums b{display:block;font-size:24px;font-weight:300;}
+.work .nums small{font-size:11.5px;color:var(--ash);}
 
+/* ── 伍 journal ── */
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:28px;}
+.chip{font-size:13px;padding:4px 14px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
+.chip:hover{border-color:var(--bone-2);color:var(--bone);}
+.chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
+.jlist{margin-top:10px;}
+.jrow{display:grid;grid-template-columns:96px 36px minmax(0,1fr) 24px;gap:18px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline;transition:opacity .4s,padding .4s var(--ease);}
+.jrow[hidden]{display:none;}
+.jrow time{font-size:13px;color:var(--ash);}
+.jrow .k{font-family:var(--jp);font-size:19px;color:var(--dc);width:32px;height:32px;display:grid;place-items:center;border-radius:50%;transition:background .35s,color .35s;}
+.jrow h3{font-family:var(--serif);font-weight:500;font-size:17px;transition:color .3s,transform .45s var(--ease);}
+.jrow p{font-size:13.5px;color:var(--bone-2);}
+.jrow .arrow{color:var(--gold);opacity:0;transform:translateX(-8px);transition:opacity .35s,transform .45s var(--ease);}
+.jrow:hover .k{background:var(--dc);color:var(--night);}
+.jrow:hover h3{color:var(--gold);transform:translateX(4px);}
+.jrow:hover .arrow{opacity:1;transform:none;}
+.jempty{padding:20px 0;color:var(--ash);}
+@media(max-width:640px){.jrow{grid-template-columns:1fr;gap:2px;}.jrow .arrow{display:none;}}
 
-<div class="chapter-dots" id="chDots"></div>
-<div class="chapters-wrap">
+/* ── 陸 about ── */
+.about{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;margin-top:36px;}
+.about .q{font-family:var(--serif);font-size:22px;line-height:1.7;}
+.about p{color:var(--bone-2);margin-top:14px;max-width:32em;}
+.motto-card{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--serif);font-size:18px;color:var(--bone);}
+.motto-card small{display:block;font-family:var(--sans);font-size:13px;color:var(--ash);margin-top:4px;}
+.support{background:#EFE5D6;color:#1C0F14;padding:28px;align-self:start;transition:transform .5s var(--ease),box-shadow .5s var(--ease);}
+.support:hover{transform:translateY(-4px);box-shadow:0 20px 40px -20px rgba(0,0,0,.6);}
+.support h3{font-family:var(--serif);font-weight:500;font-size:18px;}
+.support p{font-size:13.5px;color:#5B4B4E;margin-top:8px;}
+.support .r{display:flex;align-items:baseline;gap:10px;margin-top:18px;flex-wrap:wrap;}
+.support .r b{font-size:30px;font-weight:400;}
+.btn-ink{position:relative;overflow:hidden;margin-left:auto;background:#1C0F14;color:#EFE5D6;padding:10px 20px;font-size:13.5px;transition:background .3s;}
+.btn-ink::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(212,162,76,.35),transparent);transform:skewX(-20deg);transition:left .7s var(--ease);}
+.btn-ink:hover{background:#3D0F1A;}
+.btn-ink:hover::after{left:120%;}
+@media(max-width:900px){.about{grid-template-columns:1fr;}}
+</style>
 
-  <section class="chapter" id="ch0" data-idx="0">
-    <canvas id="inkSplash" class="ink-splash-canvas"></canvas>
-    <div class="chapter-mark">序 · PROLOGUE</div>
-    <div class="chapter-numeral"><div class="chapter-numeral-kanji">序</div><div class="chapter-numeral-label">PROLOGUE</div></div>
-    <div class="chapter-content">
-      <div class="chapter-title">{copy.hero_title_prefix}<br><em>{copy.hero_title_highlight}</em>{copy.hero_title_suffix}</div>
-      <div class="chapter-desc">{copy.hero_desc}</div>
-
-      <div class="countdown-block">
-        <div class="countdown-eyebrow">{copy.countdown_eyebrow}</div>
-        <div class="countdown-label">{copy.countdown_label}</div>
-        <div class="countdown-grid" id="countdownGrid" data-start={copy.countdown_start} data-target={copy.countdown_target}>
-          <div class="countdown-unit"><div class="countdown-num" id="cdDays">—</div><div class="countdown-unit-label">天</div></div>
-          <div class="countdown-sep">:</div>
-          <div class="countdown-unit"><div class="countdown-num" id="cdHours">—</div><div class="countdown-unit-label">時</div></div>
-          <div class="countdown-sep">:</div>
-          <div class="countdown-unit"><div class="countdown-num" id="cdMins">—</div><div class="countdown-unit-label">分</div></div>
-          <div class="countdown-sep">:</div>
-          <div class="countdown-unit"><div class="countdown-num countdown-secs" id="cdSecs">—</div><div class="countdown-unit-label">秒</div></div>
-        </div>
-        <div class="countdown-progress-wrap"><div class="countdown-progress-fill" id="countdownFill"></div></div>
+<section class="hero" aria-labelledby="motto">
+  <canvas id="art" aria-hidden="true"></canvas>
+  <div class="hero-in">
+    <div class="hero-grid">
+      <div>
+        <h1 class="motto rv" id="motto" style="--i:0"><span>{copy.motto_line1}</span><span class="l2">{copy.motto_line2}</span></h1>
+        <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>
+        <div class="cd rv" style="--i:3"><small>{copy.countdown_label}</small><span class="cd-days num" id="cdD">—</span><small>天</small><span class="cd-clock num" id="cdC">00:00:<b>00</b></span></div>
+        <a class="next-rel rv" style="--i:4" href="#chapters" id="nextRel">&nbsp;</a>
       </div>
-
-      <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">{pillarCount}</div><div class="hero-stat-label">累積方向</div></div>
-        <div class="hero-stat"><div class="hero-stat-num">{totalCount}</div><div class="hero-stat-label">篇累積文章</div></div>
-        <div class="hero-stat"><div class="hero-stat-num" id="daysSince">—</div><div class="hero-stat-label">天持續記錄</div></div>
-      </div>
+      <aside class="board rv" style="--i:3" aria-labelledby="bd-h">
+        <div class="board-head"><h2 id="bd-h">{copy.board_title}</h2><small id="todayStr"></small></div>
+        <div id="board"></div>
+        <div class="board-foot"><span id="boardSum"></span><span class="pips" id="pips" aria-hidden="true"></span></div>
+      </aside>
     </div>
-  </section>
-
-  <section class="pillar-carousel-section" id="pillars">
-    <div class="carousel-header reveal">
-      <div class="carousel-eyebrow">STRUCTURE · 撐起這裡的骨架</div>
-      <h2 class="carousel-title">{copy.carousel_title_prefix}<span class="highlight-mark" id="carouselHighlight">{copy.carousel_title_highlight}</span></h2>
+    <div class="ledger-block rv" style="--i:5">
+      <div class="ledger-top"><span>{copy.ledger_label}</span><span>已記 <b id="doneCount">0</b> 天，共 <b id="totalDays">—</b> 天</span></div>
+      <div class="ledger-wrap"><div class="months" id="months" aria-hidden="true"></div><div class="ledger" id="ledger" role="img"></div></div>
+      <div class="legend">{pillars.map((p) => <span><i style={`background:var(--c-${p.slug})`}></i>{p.type}</span>)}</div>
     </div>
-    <div class="carousel-track" id="carouselTrack">
-      {loopCards.map((c, i) => (
-        <div class:list={["pillar-card", (i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) && "is-clone"]} data-real-idx={c.idx} aria-hidden={(i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) ? "true" : "false"}>
-          <div class="pillar-card-tab">{c.num} · {c.type}</div>
-          <div class="pillar-card-kanji">{c.kanji}</div>
-          <div class="pillar-card-title" set:html={c.titleHtml} />
-          <div class="pillar-card-jp">{c.jp}</div>
-          <div class="pillar-card-desc">{c.desc}</div>
-          <a href={c.href} class="chapter-link" tabindex={(i < CLONE_HEAD || i >= loopCards.length - CLONE_HEAD) ? "-1" : "0"}>閱讀這個支柱的文章 →</a>
-        </div>
-      ))}
-    </div>
-
-    <div class="carousel-controls">
-      <button class="carousel-arrow" id="carouselPrev" aria-label="上一個">←</button>
-      <div class="carousel-dots" id="carouselDots"></div>
-      <button class="carousel-arrow" id="carouselNext" aria-label="下一個">→</button>
-    </div>
-  </section>
-
-  <section class="chapter" id="ch6" data-idx="6" style="height:70vh;">
-    <div class="chapter-mark">結 · 接下來</div>
-    <div class="chapter-numeral"><div class="chapter-numeral-kanji">結</div><div class="chapter-numeral-label">NEXT</div></div>
-    <div class="chapter-content">
-      <div class="chapter-title">{copy.closing_title_prefix}<br><em>{copy.closing_title_highlight}</em></div>
-      <div class="chapter-desc" style="margin-top:14px;">{copy.closing_desc}</div>
-    </div>
-  </section>
-
-</div>
-
-<!-- COMPOUND PROOF WALL -->
-<section class="proof-section" id="proof">
-  <div class="section-head reveal">
-    <div>
-      <span class="section-tag">Proof, Not Promise</span>
-      <h2 class="section-title">複利<em>證明牆</em></h2>
-    </div>
-  </div>
-  <div class="proof-intro">
-    <p>{copy.proof_intro}</p>
-  </div>
-
-  <div class="proof-grid">
-    {proof.cards.map((card, i) => (
-      <div class:list={["proof-card", "reveal", i > 0 && `reveal-d${Math.min(i, 3)}`]}>
-        <div class="proof-shot">
-          <div class="proof-shot-placeholder">{card.shot_label}</div>
-          <div class="proof-fig">FIG. {String(i + 2).padStart(2, '0')}</div>
-        </div>
-        <div class="proof-body">
-          <div class="proof-stat-hero"><span class="proof-stat-hero-num">{card.stat}</span><span class="proof-stat-hero-label">{card.unit}</span></div>
-          <div class="proof-title">{card.title}</div>
-          <div class="proof-meta">{card.meta}</div>
-          <a href="#" class="proof-cta">看完整 Prompt →</a>
-        </div>
-      </div>
-    ))}
   </div>
 </section>
 
-<!-- LATEST NOTES -->
-<section class="notes-section" id="notes">
-  <div class="notes-heading-top">
+<section class="sec band-light" id="five" aria-labelledby="five-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Directions</span></div>
     <div>
-      <span class="section-tag">Journal</span>
-      <h2 class="section-title">最新<em>筆記</em></h2>
-    </div>
-    <a href="#" class="notes-viewall">查看全部 →</a>
-  </div>
-  <div class="rule-labeled rule-accent" style="margin-bottom:28px;">
-    <span class="rule-tag">共 {totalCount} 篇 · 持續更新中</span>
-  </div>
-
-  {latest.length === 0 && (
-    <p style="color:var(--ink-ghost);font-size:13px;padding:20px 0;">還沒有文章——第一篇正在路上。</p>
-  )}
-
-  {latest.map((note, i) => (
-    <a href={`/pillars/${note.pillarSlug}/${note.slug}`} class:list={["note-row", "reveal", i > 0 && `reveal-d${Math.min(i, 3)}`]} style="text-decoration:none;color:inherit;display:grid;">
-      <div class="note-date">{fmtDate(note.data.date)}</div>
-      <div class="note-body">
-        <span class="note-cat">{pillarLabel(note.pillarSlug)}</span>
-        <div class="note-title">{note.data.title}</div>
-        {note.data.excerpt && <div class="note-excerpt">{note.data.excerpt}</div>}
+      <div class="sec-head"><p class="sub rv">{copy.five_sub}</p><h2 id="five-h" class="rv" style="--i:1">{copy.five_title}</h2></div>
+      <div class="dirs">
+        <div class="penta rv" style="--i:2">
+          <svg id="penta" viewBox="-190 -190 380 380" role="img" aria-label="五個方向的累積雷達圖">
+            {rings.map((r) => <polygon points={r} fill="none" style="stroke:var(--line)" />)}
+            {pillars.map((_, i) => { const [x, y] = pt(i, 1); return <line x1="0" y1="0" x2={x.toFixed(1)} y2={y.toFixed(1)} style="stroke:var(--line)" />; })}
+            <g class="grow"><polygon class="shape" points={shape} />
+              {pillars.map((p, i) => { const [x, y] = pt(i, val(p.slug)); return <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="4.5" style={`fill:var(--c-${p.slug})`} />; })}</g>
+            {pillars.map((p, i) => { const [x, y] = pt(i, 1.2); return <text class="axis" data-i={i} x={x.toFixed(1)} y={(y + 7).toFixed(1)} text-anchor="middle">{p.kanji}</text>; })}
+          </svg>
+        </div>
+        <div>
+          <div class="idx" role="tablist" aria-label="五個方向" id="idx">
+            {pillars.map((p, i) => (
+              <button role="tab" id={`tab-${p.slug}`} aria-controls={`panel-${p.slug}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} style={`--dc:var(--c-${p.slug})`} class="rv" data-i={i}>
+                <span class="k" style={`view-transition-name:k-${p.slug}`}>{p.kanji}</span><span class="n">{p.type}<small>{p.title}・{counts[p.slug]} 篇</small></span>
+                <span class="bar" aria-hidden="true"><i style={`width:${Math.min(100, (counts[p.slug] / MAX) * 100)}%`}></i></span><span class="dan">{dan(counts[p.slug])}</span>
+              </button>
+            ))}
+          </div>
+          {pillars.map((p, i) => {
+            const es = all.filter((a) => a.dir === p.slug).slice(0, 3);
+            return (
+              <div class="detail" role="tabpanel" id={`panel-${p.slug}`} aria-labelledby={`tab-${p.slug}`} hidden={i !== 0} style={`--dc:var(--c-${p.slug})`}>
+                <div class="big" aria-hidden="true">{p.kanji}</div>
+                <h3>{p.title}</h3><p class="jp" lang="ja">{p.titleJp}</p><p class="d">{p.desc}</p>
+                <div class="es">{es.map((a) => <a href={`/pillars/${p.slug}/${a.e.slug}`}><time>{dot(a.e.data.date)}</time><span>{a.e.data.title}</span></a>)}<a href={`/pillars/${p.slug}`}><time></time><span>看「{p.type}」全部文章</span></a></div>
+              </div>
+            );
+          })}
+          <p class="dir-note">段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
+        </div>
       </div>
-      <div class="note-arrow">→</div>
-    </a>
-  ))}
-</section>
-
-<!-- ABOUT — first person, vulnerable -->
-<section class="about-section" id="about">
-  <div class="section-head reveal">
-    <div>
-      <span class="section-tag">About</span>
-      <h2 class="section-title">我在<em>記錄</em>的，是這件事</h2>
     </div>
   </div>
-  <div class="about-grid reveal" style="margin-top:28px;">
+</section>
+
+<section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">弐</span><span class="sl"></span><span class="se">Chapters</span></div>
     <div>
-      <div class="about-portrait">
-        <div class="about-portrait-mark">［ 待補：<br>本人照片 ］</div>
+      <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
+      <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="toc">第一卷目次</button></div>
+      <div id="vOne"><div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><div class="mdetail" id="mdetail" aria-live="polite"></div></div>
+      <div id="vToc" hidden><div class="ygrid" id="ygrid"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band-light" id="body" aria-labelledby="body-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Body</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.body_sub}</p><h2 id="body-h" class="rv" style="--i:1">{copy.body_title}</h2></div>
+      <div class="pipe" role="list">
+        <div class="step rv" style="--i:2" role="listitem"><time>06:00</time><h3>收進資料</h3><p>Apple Health 把 Strava 運動和 OMRON 體組成一起送來。</p></div>
+        <div class="step rv" style="--i:3" role="listitem"><time>06:02</time><h3>寫成草稿</h3><p>整理成本週訓練、體脂趨勢、一段觀察。</p></div>
+        <div class="step now rv" style="--i:4" role="listitem"><time>每天</time><h3>等巴確認</h3><p>在後台看過、改過，才決定公開哪些數字。</p></div>
+        <div class="step rv" style="--i:5" role="listitem"><time>確認後</time><h3>公開發布</h3><p>文章進「強化」，帳上這一天被填上。</p></div>
       </div>
-      <div class="about-fig">FIG. 05 — BAKER LIN, OSAKA</div>
-    </div>
-    <div class="about-text">
-      <p class="lede">{copy.about_lede}</p>
-      <p>{copy.about_p1}</p>
-      <p>{copy.about_p2}</p>
-      <p>{copy.about_p3}</p>
-      <a href="#" class="about-cta">讀完整故事 →</a>
-    </div>
-  </div>
-</section>
-
-<!-- SUPPORT / SUBSCRIBE -->
-<section class="subscribe-section">
-  <div class="subscribe-card reveal">
-    <div class="subscribe-kanji">起</div>
-    <div class="subscribe-eyebrow">Support · 持續走到第八次</div>
-    <h3 class="subscribe-title">{copy.subscribe_title_prefix}<em>{copy.subscribe_title_highlight}</em>{copy.subscribe_title_suffix}</h3>
-    <p class="subscribe-desc">{copy.subscribe_desc}</p>
-    <div class="subscribe-row">
-      <div class="subscribe-price"><span class="subscribe-price-num">{copy.subscribe_price}</span><span class="subscribe-price-unit">／月</span></div>
-      <a href={copy.subscribe_url} class="subscribe-btn" target="_blank" rel="noopener">前往訂閱 →</a>
+      <div class="body-row">
+        <div class="spark rv" style="--i:3">
+          <div class="spark-top"><span id="sparkLabel"></span><div class="tabs" role="group" aria-label="切換指標"><button aria-pressed="true" data-m="mins">訓練</button><button aria-pressed="false" data-m="fat">體脂</button><button aria-pressed="false" data-m="weight">體重</button></div></div>
+          <svg id="spark" viewBox="0 0 600 180" role="img" aria-label="近 12 週身體指標趨勢"></svg>
+        </div>
+        <div class="metrics rv" style="--i:4">
+          <div><b class="num">{body.stats.week_minutes}</b><small>本週訓練分鐘</small></div>
+          <div><b class="num">{body.stats.fat_change}</b><small>體脂 12 週變化（百分點）</small></div>
+          <div><b class="num">{body.stats.streak}</b><small>連續紀錄天數</small></div>
+          {body.sample && <p class="demo">{body.note}</p>}
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="footer-rule">
-  <div class="rule-labeled rule-accent"><span class="rule-tag">七転び八起 · Nanakorobi Yaoki</span></div>
-</div>
+<section class="sec" id="works" aria-labelledby="works-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Works</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
+      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
+        {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div></article>
+        ); })}
+      </div>
+    </div>
+  </div>
+</section>
 
-<footer>
-  <div class="footer-left">
-    <div class="footer-mark">8AKER</div>
-    <div class="footer-tag">七転び八起 · the diary before the eighth rise</div>
+<section class="sec band-light" id="journal" aria-labelledby="j-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Journal</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
+      <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
+        <button class="chip" data-f="all" aria-pressed="true">全部</button>
+        {pillars.map((p) => <button class="chip" data-f={p.slug} aria-pressed="false">{p.type}</button>)}
+      </div>
+      <div class="jlist" id="jlist">
+        {journal.map((a, i) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
+          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} href={`/pillars/${a.dir}/${a.e.slug}`}>
+            <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
+            <div><h3>{a.e.data.title}</h3>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div><span class="arrow" aria-hidden="true">→</span>
+          </a>
+        ); })}
+        <p class="jempty" id="jempty" hidden>這個方向還沒有文章。</p>
+      </div>
+    </div>
   </div>
-  <div class="footer-links">
-    <a href="#pillars">強・放・操・具・變</a>
-    <a href="#proof">複利證明</a>
-    <a href="#notes">最新筆記</a>
+</section>
+
+<section class="sec band-wine" id="about" aria-labelledby="a-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">陸</span><span class="sl"></span><span class="se">About</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
+      <div class="about">
+        <div>
+          <p class="q rv" style="--i:2">{copy.about_lede}</p>
+          <p class="rv" style="--i:3">{copy.about_p1}</p>
+          <p class="rv" style="--i:4">{copy.about_p2}</p>
+          <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
+        </div>
+        <aside class="support rv" style="--i:4" id="support">
+          <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
+          <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
+        </aside>
+      </div>
+    </div>
   </div>
-  <div class="footer-copy">© 2026 8AKER · Osaka, Japan</div>
-</footer>
+</section>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<script type="application/json" id="page-data" set:html={json}></script>
+
 <script is:inline>
-
-// MENU — toggle the panel, close on link click or outside click
 (function(){
-  const btn = document.getElementById('menuToggle');
-  const panel = document.getElementById('menuPanel');
-  if(!btn || !panel) return;
-  function setOpen(open){
-    btn.setAttribute('aria-expanded', open ? 'true':'false');
-    panel.classList.toggle('open', open);
-  }
-  btn.addEventListener('click', ()=> setOpen(btn.getAttribute('aria-expanded')!=='true'));
-  panel.querySelectorAll('[data-menu-link]').forEach(a=>a.addEventListener('click', ()=> setOpen(false)));
-  document.addEventListener('click', (e)=>{
-    if(!panel.contains(e.target) && !btn.contains(e.target)) setOpen(false);
-  });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') setOpen(false); });
+var D=JSON.parse(document.getElementById('page-data').textContent);
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+var DAY=864e5,pad=function(n){return String(n).padStart(2,'0');};
+var START=new Date(D.start).getTime(),TARGET=new Date(D.target).getTime();
+var jst=function(t){return new Date(t+9*3600e3).toISOString().slice(0,10);};
+var dirOf=function(id){for(var i=0;i<D.dirs.length;i++)if(D.dirs[i].id===id)return D.dirs[i];return D.dirs[0];};
+var col=function(id){return 'var(--c-'+id+')';};
+var hero=document.querySelector('.hero');
+requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList.add('in');hero.querySelectorAll('.rv').forEach(function(r){r.classList.add('in');});});});
+
+/* countdown — the seconds digit rolls in each tick */
+(function(){var d=document.getElementById('cdD'),c=document.getElementById('cdC');
+  function t(){var r=Math.max(0,TARGET-Date.now());d.textContent=Math.floor(r/DAY);
+    c.innerHTML=pad(Math.floor(r%DAY/36e5))+':'+pad(Math.floor(r%36e5/6e4))+':<b class="'+(RM?'':'tick')+'">'+pad(Math.floor(r%6e4/1e3))+'</b>';}
+  t();setInterval(t,1000);})();
+
+/* read-only board: what was actually written today */
+(function(){var today=jst(Date.now()),n=new Date(Date.now()+9*3600e3);
+  document.getElementById('todayStr').textContent=(n.getUTCMonth()+1)+' 月 '+n.getUTCDate()+' 日';
+  var done=0,html='',pips='';
+  D.dirs.forEach(function(d){var e=D.entries.filter(function(x){return x.dir===d.id&&x.date===today;})[0];
+    if(e)done++;
+    html+='<div class="brow '+(e?'done':'todo')+'" style="--dc:'+col(d.id)+'"><span class="k" aria-hidden="true">'+d.k+'</span><p>'+(e?e.t.replace(/</g,'&lt;'):d.n)+'<small>'+(e?d.n:'今天還沒記')+'</small></p><span class="st">'+(e?'完成':'—')+'</span></div>';
+    pips+='<i class="'+(e?'on':'')+'"></i>';});
+  document.getElementById('board').innerHTML=html;document.getElementById('pips').innerHTML=pips;
+  document.getElementById('boardSum').textContent='今天完成 '+done+'／'+D.dirs.length;})();
+
+/* ledger: one cell a day, coloured by what was written */
+(function(){var total=Math.round((TARGET-START)/DAY),ti=Math.floor((Date.now()-START)/DAY);
+  var logs={};D.entries.forEach(function(e){if(!logs[e.date])logs[e.date]=e;});
+  var L=document.getElementById('ledger'),M=document.getElementById('months'),tip=document.getElementById('tip'),done=0,h='',mh='',lm=-1;
+  for(var i=0;i<total;i++){var key=jst(START+i*DAY),e=logs[key],lab=key.replace(/-/g,'.');
+    if(i%7===0){var m=+key.slice(5,7);mh+='<span>'+(m!==lm?m+'月':'')+'</span>';lm=m;}
+    var st='style="--c:'+i+(e&&i<=ti?';background:'+col(e.dir):'')+'"';
+    if(e&&i<=ti){done++;h+='<a class="cell done" href="'+e.url+'" '+st+' data-tip="'+lab+'　'+dirOf(e.dir).n+'<br>'+e.t.replace(/"/g,'&quot;').replace(/</g,'&lt;')+'" aria-label="'+lab+' '+e.t.replace(/"/g,'&quot;')+'" tabindex="-1"></a>';}
+    else if(i===ti)h+='<div class="cell today" '+st+' data-tip="'+lab+'　今天"></div>';
+    else if(i>ti)h+='<div class="cell future" '+st+'></div>';
+    else h+='<div class="cell" '+st+' data-tip="'+lab+'　空白的一天"></div>';}
+  L.innerHTML=h;M.innerHTML=mh;document.getElementById('doneCount').textContent=done;document.getElementById('totalDays').textContent=total;
+  L.setAttribute('aria-label','一年 '+total+' 天的累積帳，目前已記 '+done+' 天');
+  var w=L.parentElement,cols=Math.ceil(total/7);
+  function size(){var cs=Math.max(10,Math.min(22,Math.floor((w.clientWidth-(cols-1)*3)/cols)));L.style.setProperty('--cs',cs+'px');M.style.setProperty('--cs',cs+'px');w.scrollLeft=Math.max(0,Math.floor(ti/7)*(cs+3)-40);}
+  size();addEventListener('resize',size);
+  L.addEventListener('mouseover',function(ev){var c=ev.target.closest('[data-tip]');if(!c){tip.classList.remove('on');return;}var r=c.getBoundingClientRect();tip.innerHTML=c.dataset.tip;tip.classList.add('on');tip.style.left=Math.min(innerWidth-270,Math.max(8,r.left-20))+'px';tip.style.top=(r.top-56)+'px';});
+  L.addEventListener('mouseleave',function(){tip.classList.remove('on');});})();
+
+/* age rings: one ring a year, current ring drawn to the fraction of the year */
+(function(){var cv=document.getElementById('art');if(!cv)return;var ctx=cv.getContext('2d'),W,H,dpr,run=true,last=performance.now(),t=0,raf;
+  var b=D.birth.split('-').map(Number),bd=function(y){return new Date(y+'-'+pad(b[1])+'-'+pad(b[2])+'T00:00:00+09:00').getTime();};
+  var now=Date.now(),y=new Date(now+9*3600e3).getUTCFullYear();if(bd(y)>now)y--;
+  var full=y-b[0],frac=(now-bd(y))/(bd(y+1)-bd(y)),total=Math.max(40,full+1);
+  var rnd=function(a,c){return a+Math.random()*(c-a);},seed=[rnd(0,6.28),rnd(0,6.28),rnd(0,6.28)],acc=0,rr=[0];
+  for(var i=1;i<=total;i++){acc+=rnd(.75,1.3);rr.push(acc);}
+  function rs(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.parentElement.getBoundingClientRect();W=cv.width=r.width*dpr;H=cv.height=r.height*dpr;}
+  rs();addEventListener('resize',rs);
+  var cx=function(){return W*(W>900*dpr?.66:.62);},cy=function(){return H*(W>900*dpr?.4:.32);},mn=function(){return Math.min(W,H);};
+  function shape(i,a){var f=rr[i]/acc;return mn()*(.02+f*.36)*(1+.045*Math.sin(a*3+seed[0])+.028*Math.sin(a*5+seed[1]+f*2.2)+.014*Math.sin(a*11+seed[2]+f*4));}
+  function ring(i,p,rot){var N=180;ctx.beginPath();for(var j=0;j<=N*p;j++){var a=-Math.PI/2+j/N*Math.PI*2+rot,r=shape(i,a),x=cx()+Math.cos(a)*r,yy=cy()+Math.sin(a)*r;j?ctx.lineTo(x,yy):ctx.moveTo(x,yy);}ctx.stroke();}
+  function frame(dt){t+=dt;ctx.clearRect(0,0,W,H);var rot=t*.006,g=Math.min(1,t/5);
+    for(var i=1;i<=full;i++){var f=i/full;ctx.strokeStyle='rgba(212,162,76,'+(.06+.26*f*f).toFixed(3)+')';ctx.lineWidth=(.7+.4*f)*dpr;ring(i,Math.min(1,g*1.4),rot);}
+    ctx.strokeStyle='rgba(236,196,118,.9)';ctx.lineWidth=1.7*dpr;ctx.shadowColor='rgba(212,162,76,.6)';ctx.shadowBlur=(6+3*Math.sin(t*1.3))*dpr;ring(full+1,frac*g,rot);ctx.shadowBlur=0;
+    ctx.setLineDash([2*dpr,7*dpr]);ctx.strokeStyle='rgba(239,229,214,.22)';ctx.lineWidth=dpr;for(var k=full+2;k<=total;k++)ring(k,1,rot);ctx.setLineDash([]);}
+  function loop(ts){if(!run)return;var dt=Math.min(.05,(ts-last)/1e3);last=ts;frame(dt);raf=requestAnimationFrame(loop);}
+  if(RM){t=6;frame(0);return;}
+  raf=requestAnimationFrame(loop);
+  new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;if(run){last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv.parentElement);})();
+
+/* five directions: index + pentagon share one selection, arrow keys loop */
+(function(){var I=document.getElementById('idx'),tabs=[].slice.call(I.querySelectorAll('[role=tab]')),S=document.getElementById('penta');
+  function sel(i,focus){i=(i+tabs.length)%tabs.length;tabs.forEach(function(t,j){t.setAttribute('aria-selected',j===i);t.tabIndex=j===i?0:-1;document.getElementById(t.getAttribute('aria-controls')).hidden=j!==i;});
+    if(focus)tabs[i].focus();S.querySelectorAll('.axis').forEach(function(a,j){a.classList.toggle('on',j===i);});}
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(i);});});
+  I.addEventListener('keydown',function(e){var i=tabs.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();sel(i+1,true);}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();sel(i-1,true);}});
+  S.addEventListener('click',function(e){var a=e.target.closest('.axis');if(a)sel(+a.dataset.i);});
+  sel(0);})();
+
+/* 連載: 第 0 話 … 第 11 話 → 第一卷 */
+(function(){var C=D.chapters,now=Date.now(),T=function(d){return new Date(d+'T00:00:00+09:00').getTime();};
+  var list=C.chapters.map(function(c){return Object.assign({},c);});list.push(Object.assign({final:true,no:12},C.volume));
+  var nextIdx=list.findIndex(function(r){return T(r.date)>=now;});if(nextIdx<0)nextIdx=list.length;
+  list.forEach(function(r,i){r.days=Math.floor((T(r.date)-now)/DAY);r.state=i<nextIdx?(r.on_break?'break':'done'):i===nextIdx?'next':'future';
+    var a=(C.arcs||[]).filter(function(a){return !r.final&&r.no>=a.from&&r.no<=a.to;})[0];r.arc=a?a.name:'';});
+  var md=function(r){return (+r.date.slice(5,7))+'.'+r.date.slice(8);},label=function(r){return r.final?'第一卷':'第 '+r.no+' 話';};
+  var esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');};
+  var nr=list[Math.min(nextIdx,list.length-1)];
+  document.getElementById('nextRel').innerHTML=(nr.no===0?'新連載・':'連載中・')+label(nr)+'・'+(+nr.date.slice(5,7))+' 月 '+(+nr.date.slice(8))+' 日刊出 <b>'+(nr.days<=0?'今天':nr.days+' 天後')+'</b>';
+  var Tr=document.getElementById('track'),Md=document.getElementById('mdetail');
+  Tr.innerHTML=list.map(function(r,i){return '<li><button class="node '+r.state+(r.final?' final':'')+'" data-i="'+i+'" aria-label="'+label(r)+'，'+md(r)+'"><span class="dot">'+(r.final?'巻':'')+'</span><span class="r">'+label(r)+'</span><span class="d">'+md(r)+'</span></button></li>';}).join('')
+    +'<span class="fill" style="width:calc((100% - 64px) * '+Math.max(0,nextIdx-.5)/(list.length-1)+')"></span>';
+  function items(arr,withDir){return '<ul>'+arr.map(function(x){var d=withDir&&x.dir?dirOf(x.dir):null;return '<li'+(d?' style="--dc:'+col(d.id)+'"':'')+'><span class="k">'+(d?d.k:'・')+'</span><span>'+esc(x.text||x)+'</span></li>';}).join('')+'</ul>';}
+  function show(i){var r=list[i];Tr.querySelectorAll('.node').forEach(function(n){n.setAttribute('aria-current',+n.dataset.i===i);});
+    var st={done:'<b>已刊出</b>',break:'<b>休載</b>',next:'<b>製作中</b>還有 '+r.days+' 天',future:'還有 '+r.days+' 天'}[r.state]+(r.arc?'・'+r.arc:'');
+    var b='';
+    if(r.state==='done'||r.state==='break'){b+=r.summary?'<p>'+esc(r.summary)+'</p>':'';b+=(r.keep&&r.keep.length)?'<h4>這一話留下的</h4>'+items(r.keep):'';b+=(r.letgo&&r.letgo.length)?'<h4>這一話放下的</h4>'+items(r.letgo):'';if(!b)b='<p>'+(r.state==='break'?'這個月休載。':'這一話的內容整理中。')+'</p>';}
+    else if(r.final)b='<p>'+esc(r.summary)+'</p>';
+    else if(r.plan&&r.plan.length)b='<p>這一話預計刊出的內容：</p>'+items(r.plan,true);
+    else b='<p>這一話還在畫分鏡，刊出當天公開。</p>';
+    var cnt=function(){var y=r.date,prev=i>0?list[i-1].date:'0000-00-00';return D.entries.filter(function(e){return e.date>prev&&e.date<=y;}).length;};
+    Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+'</div><div class="mnums"><div><b>'+(r.state==='done'?cnt():'—')+'</b><small>這一話的文章</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
+  Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
+  show(Math.min(nextIdx,list.length-1));
+  requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n)w.scrollLeft=Math.max(0,n.offsetLeft-80);});
+  var Y=document.getElementById('ygrid');
+  Y.innerHTML=list.map(function(r,i){var s={done:'已刊出',break:'休載',next:'製作中・'+r.days+' 天後',future:r.days+' 天後'}[r.state];return '<button class="ycard '+r.state+(r.final?' final':'')+'" data-i="'+i+'"><span class="n">'+label(r)+'・'+md(r)+(r.arc?'・'+r.arc:'')+'</span><h4>'+esc(r.title)+'</h4><span class="s">'+s+'</span></button>';}).join('');
+  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V2=document.getElementById('vToc');
+  function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V2.hidden=v!=='toc';}
+  MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});
+  Y.addEventListener('click',function(e){var c=e.target.closest('.ycard');if(c){view('one');show(+c.dataset.i);}});})();
+
+/* body spark: the line draws itself when shown */
+(function(){var data={mins:['近 12 週・每週訓練分鐘',D.body.weeks.mins],fat:['近 12 週・體脂（%）',D.body.weeks.fat],weight:['近 12 週・體重（kg）',D.body.weeks.weight]};
+  var S=document.getElementById('spark'),L=document.getElementById('sparkLabel');
+  function draw(k){var v=data[k][1],mn=Math.min.apply(0,v),mx=Math.max.apply(0,v),W=600,H=180,p=16,st=(W-p*2)/(v.length-1);
+    var y=function(x){return H-p-(x-mn)/((mx-mn)||1)*(H-p*2);},pts=v.map(function(x,i){return (p+i*st)+','+y(x);}).join(' ');
+    S.innerHTML='<polygon points="'+p+','+(H-p)+' '+pts+' '+(W-p)+','+(H-p)+'" style="fill:var(--gold-soft)"/><polyline class="ln" points="'+pts+'" fill="none" style="stroke:var(--gold)" stroke-width="2"/><circle cx="'+(W-p)+'" cy="'+y(v[v.length-1])+'" r="4.5" style="fill:var(--gold)"/><text x="'+(W-p)+'" y="'+(y(v[v.length-1])-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+v[v.length-1]+'</text>';L.textContent=data[k][0];}
+  document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});draw(b.dataset.m);});
+  var sec=document.getElementById('body'),drawn=false;new IntersectionObserver(function(es,o){if(es[0].isIntersecting&&!drawn){drawn=true;draw('mins');o.disconnect();}},{threshold:.2}).observe(sec);})();
+
+/* journal filter */
+(function(){var F=document.getElementById('filters'),rows=[].slice.call(document.querySelectorAll('.jrow')),E=document.getElementById('jempty');
+  F.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;var f=b.dataset.f,n=0;
+    F.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===b);});
+    rows.forEach(function(r){var on=f==='all'||r.dataset.dir===f;r.hidden=!on;if(on)n++;});E.hidden=n>0;});})();
 })();
-
-// PILLAR CARD TILT + GLOW — mouse-tracked 3D tilt with a soft glow that follows the cursor
-(function(){
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduced) return;
-  const coarse = window.matchMedia('(pointer: coarse)').matches;
-  if(coarse) return; // skip on touch devices
-  document.querySelectorAll('.column').forEach(col=>{
-    const inner = col.querySelector('.column-inner');
-    if(!inner) return;
-    col.addEventListener('mousemove', (e)=>{
-      const r = col.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width;   // 0..1
-      const py = (e.clientY - r.top) / r.height;    // 0..1
-      const rotY = (px - 0.5) * 6;   // max 3deg each side
-      const rotX = (0.5 - py) * 6;
-      inner.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-      col.style.setProperty('--gx', (px*100).toFixed(1)+'%');
-      col.style.setProperty('--gy', (py*100).toFixed(1)+'%');
-    });
-    col.addEventListener('mouseleave', ()=>{
-      inner.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    });
-  });
-})();
-
-// SCROLL REVEAL — fade+rise up as sections enter the viewport
-(function(){
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const items = document.querySelectorAll('.reveal');
-  if(reduced){ items.forEach(el=>el.classList.add('visible')); return; }
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('visible');
-        obs.unobserve(entry.target);
-      }
-    });
-  },{threshold:0.15, rootMargin:'0px 0px -40px 0px'});
-  items.forEach(el=>obs.observe(el));
-})();
-
-// INK SPLASH — blooming ink blobs behind the prologue chapter
-(function(){
-  const cv = document.getElementById('inkSplash');
-  if(!cv) return;
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduced) return;
-  const ctx = cv.getContext('2d');
-  let W,H,dpr;
-  function resize(){
-    dpr = Math.min(devicePixelRatio||1,2);
-    const rect = cv.parentElement.getBoundingClientRect();
-    W = cv.width = rect.width*dpr; H = cv.height = rect.height*dpr;
-    cv.style.width = rect.width+'px'; cv.style.height = rect.height+'px';
-  }
-  resize(); window.addEventListener('resize', resize);
-
-  const colors = ['rgba(212,162,76,ALPHA)','rgba(107,31,47,ALPHA)','rgba(184,147,90,ALPHA)'];
-  function makeBlob(){
-    const points = 10 + Math.floor(Math.random()*4);
-    const angles = Array.from({length:points},(_,i)=> (i/points)*Math.PI*2);
-    const noise = angles.map(()=> 0.6+Math.random()*0.6);
-    return {
-      x: Math.random()*W, y: Math.random()*H,
-      baseR: (Math.min(W,H))*(0.09+Math.random()*0.08),
-      angles, noise,
-      color: colors[Math.floor(Math.random()*colors.length)],
-      life: 0, maxLife: 3.5+Math.random()*2.5,
-      phase: Math.random()*Math.PI*2,
-    };
-  }
-  let blobs = Array.from({length:5}, makeBlob);
-  let last = performance.now();
-  let running = true;
-
-  function drawBlob(b, t){
-    const growth = Math.min(1, b.life / (b.maxLife*0.4));
-    const fade = b.life > b.maxLife*0.6 ? 1-((b.life-b.maxLife*0.6)/(b.maxLife*0.4)) : 1;
-    const alpha = Math.max(0, 0.5*growth*fade);
-    const r = b.baseR * (0.5+0.5*growth);
-    ctx.beginPath();
-    b.angles.forEach((a,i)=>{
-      const wobble = 1 + Math.sin(t*0.0007 + b.phase + i)*0.09*b.noise[i];
-      const rad = r * b.noise[i] * wobble;
-      const x = b.x + Math.cos(a)*rad, y = b.y + Math.sin(a)*rad;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
-    });
-    ctx.closePath();
-    ctx.fillStyle = b.color.replace('ALPHA', alpha.toFixed(3));
-    ctx.filter = 'blur(' + (30*dpr) + 'px)';
-    ctx.fill();
-  }
-
-  function loop(t){
-    if(!running) return;
-    const dt = (t-last)/1000; last = t;
-    ctx.clearRect(0,0,W,H);
-    blobs.forEach(b=>{
-      b.life += dt;
-      drawBlob(b,t);
-      if(b.life > b.maxLife){ Object.assign(b, makeBlob()); }
-    });
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-
-  // pause when the chapter is off-screen to save battery/CPU
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      running = e.isIntersecting;
-      if(running){ last = performance.now(); requestAnimationFrame(loop); }
-    });
-  },{threshold:0.05});
-  obs.observe(cv.parentElement);
-})();
-
-// COUNTDOWN — live, to-the-second countdown toward the target date, with an
-// elapsed-time progress line and a small per-second pulse on the seconds digit
-// so the passing of time is actually visible, not just numbers changing.
-(function(){
-  const grid = document.getElementById('countdownGrid');
-  if(!grid) return;
-  const start = new Date(grid.dataset.start).getTime();
-  const target = new Date(grid.dataset.target).getTime();
-  const total = target - start;
-  const dEl = document.getElementById('cdDays');
-  const hEl = document.getElementById('cdHours');
-  const mEl = document.getElementById('cdMins');
-  const sEl = document.getElementById('cdSecs');
-  const fill = document.getElementById('countdownFill');
-  const pad = (n) => String(n).padStart(2, '0');
-
-  function tick(){
-    const now = Date.now();
-    let diff = target - now;
-    if(diff < 0) diff = 0;
-    const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
-    const mins = Math.floor((diff % 3600000) / 60000);
-    const secs = Math.floor((diff % 60000) / 1000);
-    dEl.textContent = days;
-    hEl.textContent = pad(hours);
-    mEl.textContent = pad(mins);
-    sEl.textContent = pad(secs);
-    if(fill && total > 0){
-      const elapsed = Math.min(1, Math.max(0, (now - start) / total));
-      fill.style.width = (elapsed * 100).toFixed(3) + '%';
-    }
-    sEl.classList.remove('tick');
-    void sEl.offsetWidth; // force reflow so the animation can restart every second
-    sEl.classList.add('tick');
-  }
-  tick();
-  setInterval(tick, 1000);
-})();
-
-// HERO STATS — live "days since" counter
-(function(){
-  const el = document.getElementById('daysSince');
-  if(!el) return;
-  const start = new Date('2026-09-01');
-  const days = Math.max(0, Math.floor((Date.now()-start)/86400000));
-  el.textContent = days;
-})();
-
-// HIGHLIGHT MARKER — draws in once each marked phrase scrolls into view
-(function(){
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const marks = document.querySelectorAll('.highlight-mark');
-  if(!marks.length) return;
-  if(reduced){ marks.forEach(m=>m.classList.add('active')); return; }
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('active');
-        obs.unobserve(entry.target);
-      }
-    });
-  },{threshold:0.6});
-  marks.forEach(m=>obs.observe(m));
-})();
-
-
-// PILLAR CAROUSEL — true infinite loop via clone-and-snap: the track holds 2 cloned
-// cards at each end (real 4,5,1,2,3,4,5,1,2), so drag/swipe/wheel/buttons can always
-// move past card 1 or 5. Once the scroll settles on a clone, we silently (no animation)
-// snap the scroll position to the matching real card — invisible to the user.
-(function(){
-  const track = document.getElementById('carouselTrack');
-  if(!track) return;
-  const allCards = [...track.querySelectorAll('.pillar-card')];
-  const realCards = allCards.filter(c => !c.classList.contains('is-clone'));
-  const dotsWrap = document.getElementById('carouselDots');
-  const prevBtn = document.getElementById('carouselPrev');
-  const nextBtn = document.getElementById('carouselNext');
-
-  realCards.forEach((_,i)=>{
-    const d = document.createElement('div');
-    d.className='dot';
-    d.addEventListener('click', ()=> scrollToEl(realCards[i], true));
-    dotsWrap.appendChild(d);
-  });
-  const dots = [...dotsWrap.querySelectorAll('.dot')];
-
-  function scrollToEl(el, smooth){
-    const target = el.offsetLeft - (track.clientWidth - el.clientWidth) / 2;
-    track.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
-  }
-
-  function findRealTwin(realIdx){
-    return realCards.find(c => c.dataset.realIdx === realIdx);
-  }
-
-  function centeredCard(){
-    const trackRect = track.getBoundingClientRect();
-    const center = trackRect.left + trackRect.width/2;
-    let closest = allCards[0], closestDist = Infinity;
-    allCards.forEach(card=>{
-      const r = card.getBoundingClientRect();
-      const dist = Math.abs((r.left + r.width/2) - center);
-      card.classList.toggle('centered', dist < r.width*0.55);
-      if(dist < closestDist){ closestDist = dist; closest = card; }
-    });
-    return closest;
-  }
-
-  function updateDots(realIdx){
-    dots.forEach((d,i)=> d.classList.toggle('active', realCards[i].dataset.realIdx === realIdx));
-  }
-
-  let settleTimer = null;
-  function onScroll(){
-    const card = centeredCard();
-    updateDots(card.dataset.realIdx);
-    clearTimeout(settleTimer);
-    settleTimer = setTimeout(()=>{
-      if(card.classList.contains('is-clone')){
-        const twin = findRealTwin(card.dataset.realIdx);
-        if(twin) scrollToEl(twin, false); // instant, no animation — invisible seam
-      }
-    }, 110);
-  }
-  track.addEventListener('scroll', ()=> requestAnimationFrame(onScroll), {passive:true});
-  window.addEventListener('resize', ()=> scrollToEl(realCards[0], false));
-
-  // start centered on the first real card, no animation
-  scrollToEl(realCards[0], false);
-  updateDots(realCards[0].dataset.realIdx);
-  realCards[0].classList.add('centered');
-
-  prevBtn.addEventListener('click', ()=>{
-    const idx = allCards.indexOf(centeredCard());
-    scrollToEl(allCards[Math.max(0, idx - 1)], true);
-  });
-  nextBtn.addEventListener('click', ()=>{
-    const idx = allCards.indexOf(centeredCard());
-    scrollToEl(allCards[Math.min(allCards.length - 1, idx + 1)], true);
-  });
-
-  // vertical wheel over the carousel moves it horizontally (desktop convenience)
-  track.addEventListener('wheel', (e)=>{
-    if(Math.abs(e.deltaY) > Math.abs(e.deltaX)){
-      e.preventDefault();
-      track.scrollLeft += e.deltaY;
-    }
-  }, {passive:false});
-
-  // click-and-drag for mouse users
-  let isDown=false, startX=0, startScroll=0;
-  track.addEventListener('mousedown', (e)=>{
-    isDown=true; track.classList.add('grabbing');
-    startX = e.pageX; startScroll = track.scrollLeft;
-  });
-  window.addEventListener('mouseup', ()=>{ isDown=false; track.classList.remove('grabbing'); });
-  window.addEventListener('mousemove', (e)=>{
-    if(!isDown) return;
-    track.scrollLeft = startScroll - (e.pageX - startX);
-  });
-})();
-
-// CINEMATIC CHAPTERS — reveal + side-dot nav
-(function(){
-  const chapters = document.querySelectorAll('.chapter');
-  const dotsWrap = document.getElementById('chDots');
-  if(!chapters.length || !dotsWrap) return;
-  chapters.forEach(()=>{
-    const d = document.createElement('div');
-    d.className='chapter-dot';
-    dotsWrap.appendChild(d);
-  });
-  const dots = document.querySelectorAll('.chapter-dot');
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting && e.intersectionRatio>0.5){
-        const idx = +e.target.dataset.idx;
-        dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
-        // double rAF: guarantees the browser has painted the pale starting
-        // state at least once before we flip to in-view — otherwise a chapter
-        // that's visible immediately on load (like ch0) never shows the
-        // color-settle transition, it just appears already-settled.
-        requestAnimationFrame(()=> requestAnimationFrame(()=> e.target.classList.add('in-view')));
-      }
-    });
-  },{threshold:[0.5]});
-  chapters.forEach(ch=>obs.observe(ch));
-})();
-
-
 </script>
 </BaseLayout>

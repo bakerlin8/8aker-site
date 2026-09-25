@@ -1,0 +1,80 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SiteNav from '../../../components/SiteNav.astro';
+import { pillars, pillarBySlug } from '../../../data/pillars';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const p of pillars) {
+    const entries = await getCollection(p.slug as any);
+    for (const entry of entries) {
+      paths.push({ params: { pillar: p.slug, slug: entry.slug }, props: { entry } });
+    }
+  }
+  return paths;
+}
+
+const { pillar } = Astro.params;
+const { entry } = Astro.props as any;
+const meta = pillarBySlug(pillar!)!;
+const { Content } = await render(entry);
+const fmtDate = (d: Date) =>
+  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+---
+<BaseLayout title={`${entry.data.title} · 8AKER`}>
+  <SiteNav />
+
+  <article style="max-width:720px;margin:0 auto;padding:80px 48px 140px;">
+    <div class="hero-eyebrow" style="margin-bottom:24px;">
+      <div class="hero-eyebrow-line"></div>
+      <div class="hero-eyebrow-text">{meta.type} · {meta.title}</div>
+    </div>
+
+    <h1 style="font-family:'Noto Serif TC',serif;font-weight:500;font-size:clamp(26px,3.6vw,38px);line-height:1.5;color:var(--ink);">
+      {entry.data.title}
+    </h1>
+
+    <div style="display:flex;align-items:center;gap:16px;margin-top:20px;padding-bottom:20px;border-bottom:1px solid var(--border);">
+      <span class="note-date">{fmtDate(entry.data.date)}</span>
+      {entry.data.tags && entry.data.tags.map((t: string) => <span class="col-tag">{t}</span>)}
+    </div>
+
+    <div class="article-body" style="margin-top:40px;font-size:15px;line-height:2.1;color:var(--ink-soft);">
+      <Content />
+    </div>
+
+    <div class="rule-labeled" style="margin-top:64px;">
+      <span class="rule-tag">END · {meta.type}</span>
+    </div>
+
+    <a href={`/pillars/${meta.slug}`} class="col-link" style="display:inline-block;margin-top:24px;">
+      ← 回到「{meta.title}」全部文章
+    </a>
+  </article>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-mark">8AKER</div>
+      <div class="footer-tag">七転び八起 · the diary before the eighth rise</div>
+    </div>
+    <div class="footer-links">
+      <a href="/">回首頁</a>
+    </div>
+    <div class="footer-copy">© 2026 8AKER · Osaka, Japan</div>
+  </footer>
+
+  <style is:global>
+    .article-body h2 {
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 500;
+      font-size: 21px;
+      color: var(--emerald-deep);
+      margin: 36px 0 14px;
+    }
+    .article-body p { margin-bottom: 18px; }
+    .article-body strong { color: var(--emerald-deep); font-weight: 600; }
+    .article-body ul, .article-body ol { margin: 0 0 18px 22px; }
+    .article-body li { margin-bottom: 6px; }
+  </style>
+</BaseLayout>

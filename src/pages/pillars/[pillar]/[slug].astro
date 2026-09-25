@@ -1,80 +1,78 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import SiteNav from '../../../components/SiteNav.astro';
 import { pillars, pillarBySlug } from '../../../data/pillars';
 
 export async function getStaticPaths() {
-  const paths = [];
+  const paths: any[] = [];
   for (const p of pillars) {
-    const entries = await getCollection(p.slug as any);
-    for (const entry of entries) {
-      paths.push({ params: { pillar: p.slug, slug: entry.slug }, props: { entry } });
-    }
+    const entries = (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).sort((a: any, b: any) => a.data.date.valueOf() - b.data.date.valueOf());
+    entries.forEach((entry: any, i: number) => paths.push({ params: { pillar: p.slug, slug: entry.slug }, props: { entry, prev: entries[i - 1] ?? null, next: entries[i + 1] ?? null } }));
   }
   return paths;
 }
-
 const { pillar } = Astro.params;
-const { entry } = Astro.props as any;
+const { entry, prev, next } = Astro.props as any;
 const meta = pillarBySlug(pillar!)!;
 const { Content } = await render(entry);
-const fmtDate = (d: Date) =>
-  `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 ---
-<BaseLayout title={`${entry.data.title} · 8AKER`}>
-  <SiteNav />
-
-  <article style="max-width:720px;margin:0 auto;padding:80px 48px 140px;">
-    <div class="hero-eyebrow" style="margin-bottom:24px;">
-      <div class="hero-eyebrow-line"></div>
-      <div class="hero-eyebrow-text">{meta.type} · {meta.title}</div>
-    </div>
-
-    <h1 style="font-family:'Noto Serif TC',serif;font-weight:500;font-size:clamp(26px,3.6vw,38px);line-height:1.5;color:var(--ink);">
-      {entry.data.title}
-    </h1>
-
-    <div style="display:flex;align-items:center;gap:16px;margin-top:20px;padding-bottom:20px;border-bottom:1px solid var(--border);">
-      <span class="note-date">{fmtDate(entry.data.date)}</span>
-      {entry.data.tags && entry.data.tags.map((t: string) => <span class="col-tag">{t}</span>)}
-    </div>
-
-    <div class="article-body" style="margin-top:40px;font-size:15px;line-height:2.1;color:var(--ink-soft);">
-      <Content />
-    </div>
-
-    <div class="rule-labeled" style="margin-top:64px;">
-      <span class="rule-tag">END · {meta.type}</span>
-    </div>
-
-    <a href={`/pillars/${meta.slug}`} class="col-link" style="display:inline-block;margin-top:24px;">
-      ← 回到「{meta.title}」全部文章
-    </a>
-  </article>
-
-  <footer>
-    <div class="footer-left">
-      <div class="footer-mark">8AKER</div>
-      <div class="footer-tag">七転び八起 · the diary before the eighth rise</div>
-    </div>
-    <div class="footer-links">
-      <a href="/">回首頁</a>
-    </div>
-    <div class="footer-copy">© 2026 8AKER · Osaka, Japan</div>
-  </footer>
-
-  <style is:global>
-    .article-body h2 {
-      font-family: 'Noto Serif TC', serif;
-      font-weight: 500;
-      font-size: 21px;
-      color: var(--emerald-deep);
-      margin: 36px 0 14px;
-    }
-    .article-body p { margin-bottom: 18px; }
-    .article-body strong { color: var(--emerald-deep); font-weight: 600; }
-    .article-body ul, .article-body ol { margin: 0 0 18px 22px; }
-    .article-body li { margin-bottom: 6px; }
-  </style>
+<BaseLayout title={`${entry.data.title} — 8AKER0`} description={entry.data.excerpt ?? meta.desc}>
+<style is:global>
+.ah{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 64px;}
+.ah-in{max-width:760px;margin:0 auto;position:relative;}
+.ah .k{position:absolute;right:-40px;top:-60px;font-family:var(--jp);font-weight:300;font-size:220px;line-height:1;color:var(--dc);opacity:.12;pointer-events:none;}
+.ah .crumb{font-size:13px;color:#86707A;display:flex;gap:10px;flex-wrap:wrap;}
+.ah .crumb a{border-bottom:1px solid rgba(239,229,214,.15);transition:color .3s,border-color .3s;}
+.ah .crumb a:hover{color:#EFE5D6;border-color:#D4A24C;}
+.ah h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.2vw,44px);line-height:1.45;margin-top:14px;}
+.ah .meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:18px;font-size:13px;color:#B9A89E;}
+.ah .meta span{padding:1px 9px;border:1px solid rgba(239,229,214,.15);font-size:12px;}
+.read{padding:64px 40px 96px;background:var(--night);color:var(--bone);}
+.read-in{max-width:720px;margin:0 auto;}
+.prose{font-family:var(--serif);font-size:17px;line-height:2.05;color:var(--bone);}
+.prose>*{animation:detIn2 .8s var(--ease) both;}
+.prose>*:nth-child(2){animation-delay:.05s}.prose>*:nth-child(3){animation-delay:.1s}.prose>*:nth-child(4){animation-delay:.15s}
+@keyframes detIn2{from{opacity:0;filter:blur(4px);transform:translateY(6px);}}
+.prose p{margin:0 0 1.3em;}
+.prose h2{font-weight:500;font-size:23px;margin:2.2em 0 .8em;padding-top:.6em;border-top:1px solid var(--line);}
+.prose h3{font-weight:500;font-size:19px;margin:1.8em 0 .6em;}
+.prose strong{font-weight:700;background:linear-gradient(transparent 62%,var(--gold-soft) 62%);}
+.prose a{color:var(--gold);border-bottom:1px solid currentColor;}
+.prose ul,.prose ol{margin:0 0 1.3em 1.4em;}
+.prose li{margin-bottom:.4em;}
+.prose blockquote{margin:1.6em 0;padding-left:20px;border-left:2px solid var(--gold);color:var(--bone-2);}
+.prose img{max-width:100%;height:auto;display:block;margin:1.6em 0;}
+.prose code{font-size:.88em;background:var(--night-2);padding:.1em .4em;}
+.prose pre{overflow-x:auto;background:var(--night-2);padding:16px;margin:0 0 1.3em;font-size:14px;line-height:1.7;}
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:64px;border:1px solid var(--line);}
+.pn a,.pn span{padding:20px;min-height:96px;display:flex;flex-direction:column;gap:6px;transition:background .3s;}
+.pn a:hover{background:var(--night-2);}
+.pn small{font-size:12.5px;color:var(--ash);}
+.pn b{font-family:var(--serif);font-weight:500;font-size:15px;line-height:1.5;transition:color .3s;}
+.pn a:hover b{color:var(--gold);}
+.pn .nx{text-align:right;border-left:1px solid var(--line);}
+.back{display:inline-block;margin-top:28px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s;}
+.back:hover{color:var(--bone);border-color:var(--gold);}
+@media(max-width:700px){.ah{padding:120px 20px 48px;}.ah .k{font-size:150px;right:-20px;}.read{padding:44px 20px 72px;}.prose{font-size:16px;}}
+@media(prefers-reduced-motion:reduce){.prose>*{animation:none;}}
+</style>
+<header class="ah" style={`--dc:var(--c-${meta.slug})`}>
+  <div class="ah-in">
+    <div class="k" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
+    <p class="crumb rv"><a href="/#five">五個方向</a>／<a href={`/pillars/${meta.slug}`}>{meta.type}・{meta.title}</a></p>
+    <h1 class="rv" style="--i:1">{entry.data.title}</h1>
+    <div class="meta rv" style="--i:2"><time>{dot(entry.data.date)}</time>{entry.data.tags?.map((t: string) => <span>{t}</span>)}</div>
+  </div>
+</header>
+<article class="read band-light">
+  <div class="read-in">
+    <div class="prose"><Content /></div>
+    <nav class="pn" aria-label="同方向的上一篇與下一篇">
+      {prev ? <a href={`/pillars/${meta.slug}/${prev.slug}`}><small>← 上一篇</small><b>{prev.data.title}</b></a> : <span><small>← 上一篇</small><b style="color:var(--ash)">這是第一篇</b></span>}
+      {next ? <a class="nx" href={`/pillars/${meta.slug}/${next.slug}`}><small>下一篇 →</small><b>{next.data.title}</b></a> : <span class="nx"><small>下一篇 →</small><b style="color:var(--ash)">還沒寫</b></span>}
+    </nav>
+    <a class="back" href={`/pillars/${meta.slug}`}>回到「{meta.type}」全部文章</a>
+  </div>
+</article>
 </BaseLayout>
