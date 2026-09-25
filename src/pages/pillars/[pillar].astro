@@ -14,7 +14,7 @@ const entries = (await getCollection(meta.slug as any, ({ data }: any) => !data.
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const others = pillars.filter((p) => p.slug !== meta.slug);
 ---
-<BaseLayout title={`${meta.type}・${meta.title} — 8AKER0`} description={meta.desc}>
+<BaseLayout title={`${meta.type}・${meta.title} — 8AKER零`} description={meta.desc}>
 <style is:global>
 .ph{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 80% 20%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 72px;}
 .ph-in{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:end;}

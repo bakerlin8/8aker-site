@@ -17,7 +17,7 @@ const meta = pillarBySlug(pillar!)!;
 const { Content } = await render(entry);
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 ---
-<BaseLayout title={`${entry.data.title} — 8AKER0`} description={entry.data.excerpt ?? meta.desc}>
+<BaseLayout title={`${entry.data.title} — 8AKER零`} description={entry.data.excerpt ?? meta.desc}>
 <style is:global>
 .ah{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 64px;}
 .ah-in{max-width:760px;margin:0 auto;position:relative;}
