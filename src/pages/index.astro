@@ -216,6 +216,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .metrics div{padding:14px 0;border-bottom:1px solid var(--line);}
 .metrics b{font-size:30px;font-weight:300;display:block;line-height:1.1;}
 .metrics small{font-size:12.5px;color:var(--ash);}
+.strava{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 16px;border:1px solid #FC4C02;color:#FC4C02;font-size:13.5px;transition:background .3s,color .3s,gap .4s var(--ease);}
+.strava:hover{background:#FC4C02;color:#fff;gap:12px;}
 .demo{font-size:12px;color:var(--ash);margin-top:12px;}
 @media(max-width:900px){.body-row{grid-template-columns:1fr;}}
 
@@ -340,9 +342,45 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<section class="sec band-light" id="body" aria-labelledby="body-h">
+<section class="sec" id="works" aria-labelledby="works-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Body</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Works</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
+      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
+        {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div></article>
+        ); })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band-light" id="journal" aria-labelledby="j-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Journal</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
+      <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
+        <button class="chip" data-f="all" aria-pressed="true">全部</button>
+        {pillars.map((p) => <button class="chip" data-f={p.slug} aria-pressed="false">{p.type}</button>)}
+      </div>
+      <div class="jlist" id="jlist">
+        {journal.map((a, i) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
+          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} href={`/pillars/${a.dir}/${a.e.slug}`}>
+            <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
+            <div><h3>{a.e.data.title}</h3>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div><span class="arrow" aria-hidden="true">→</span>
+          </a>
+        ); })}
+        <p class="jempty" id="jempty" hidden>這個方向還沒有文章。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="body" aria-labelledby="body-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Body</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.body_sub}</p><h2 id="body-h" class="rv" style="--i:1">{copy.body_title}</h2></div>
       <div class="pipe" role="list">
@@ -361,43 +399,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           <div><b class="num">{body.stats.fat_change}</b><small>體脂 12 週變化（百分點）</small></div>
           <div><b class="num">{body.stats.streak}</b><small>連續紀錄天數</small></div>
           {body.sample && <p class="demo">{body.note}</p>}
+          <a class="strava" href="https://www.strava.com/athletes/103942910" target="_blank" rel="noopener">在 Strava 追蹤我<span aria-hidden="true">↗</span></a>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="works" aria-labelledby="works-h">
-  <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Works</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
-      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
-        {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div></article>
-        ); })}
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec band-light" id="journal" aria-labelledby="j-h">
-  <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Journal</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
-      <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
-        <button class="chip" data-f="all" aria-pressed="true">全部</button>
-        {pillars.map((p) => <button class="chip" data-f={p.slug} aria-pressed="false">{p.type}</button>)}
-      </div>
-      <div class="jlist" id="jlist">
-        {journal.map((a, i) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
-          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} href={`/pillars/${a.dir}/${a.e.slug}`}>
-            <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
-            <div><h3>{a.e.data.title}</h3>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div><span class="arrow" aria-hidden="true">→</span>
-          </a>
-        ); })}
-        <p class="jempty" id="jempty" hidden>這個方向還沒有文章。</p>
       </div>
     </div>
   </div>
