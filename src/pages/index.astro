@@ -467,7 +467,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     if(!wide())return;
     var ox=Math.cos(a),oy=Math.sin(a),x1=x+ox*12*dpr,y1=yy+oy*12*dpr,x2=x+ox*38*dpr,y2=yy+oy*38*dpr;
     ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle='rgba(239,229,214,.5)';ctx.lineWidth=dpr;ctx.stroke();
-    var age=(full+(Date.now()-bd(y))/(bd(y+1)-bd(y))).toFixed(5);
+    var age=(full+(Date.now()-bd(y))/(bd(y+1)-bd(y))).toFixed(3);
     ctx.font=(12*dpr)+'px "Noto Sans TC",system-ui,sans-serif';ctx.fillStyle='rgba(239,229,214,.88)';ctx.textAlign=ox>=0?'left':'right';ctx.textBaseline='middle';
     ctx.fillText('今　'+age+' 歲',x2+(ox>=0?6:-6)*dpr,y2);}
   function loop(ts){if(!run)return;var dt=Math.min(.05,(ts-last)/1e3);last=ts;frame(dt);raf=requestAnimationFrame(loop);}
