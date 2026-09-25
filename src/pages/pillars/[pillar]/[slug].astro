@@ -60,7 +60,7 @@ const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 <header class="ah" style={`--dc:var(--c-${meta.slug})`}>
   <div class="ah-in">
     <div class="k" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
-    <p class="crumb rv"><a href="/#five">五個方向</a>／<a href={`/pillars/${meta.slug}`}>{meta.type}・{meta.title}</a></p>
+    <p class="crumb rv"><a href="/#five">能力值儀表</a>／<a href={`/pillars/${meta.slug}`}>{meta.type}・{meta.title}</a></p>
     <h1 class="rv" style="--i:1">{entry.data.title}</h1>
     <div class="meta rv" style="--i:2"><time>{dot(entry.data.date)}</time>{entry.data.tags?.map((t: string) => <span>{t}</span>)}</div>
   </div>

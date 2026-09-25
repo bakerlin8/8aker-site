@@ -291,7 +291,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 <section class="sec band-light" id="five" aria-labelledby="five-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Directions</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Status</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.five_sub}</p><h2 id="five-h" class="rv" style="--i:1">{copy.five_title}</h2></div>
       <div class="dirs">
@@ -342,23 +342,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<section class="sec" id="works" aria-labelledby="works-h">
-  <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Works</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
-      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
-        {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div></article>
-        ); })}
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="sec band-light" id="journal" aria-labelledby="j-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Journal</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Journal</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
       <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
@@ -378,7 +364,21 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<section class="sec" id="body" aria-labelledby="body-h">
+<section class="sec" id="works" aria-labelledby="works-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Works</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
+      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
+        {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div></article>
+        ); })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band-light" id="body" aria-labelledby="body-h">
   <div class="sec-grid">
     <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Body</span></div>
     <div>
@@ -408,7 +408,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 <section class="sec band-wine" id="about" aria-labelledby="a-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">陸</span><span class="sl"></span><span class="se">About</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">陸</span><span class="sl"></span><span class="se">Hello</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
       <div class="about">
