@@ -38,10 +38,10 @@ const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 <BaseLayout>
 <style is:global>
 /* ── hero ── */
-.hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;background:radial-gradient(120% 80% at 70% 40%,#2A1520 0%,#1C0F14 60%);color:#EFE5D6;}
+.hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;align-items:center;background:radial-gradient(120% 80% at 70% 40%,#2A1520 0%,#1C0F14 60%);color:#EFE5D6;}
 #art{position:absolute;inset:0;width:100%;height:100%;}
-.hero-in{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:128px 40px 56px;}
-.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:64px;align-items:end;}
+.hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:120px 40px 80px;}
+.hero-grid{max-width:660px;}
 .hero .rv{--d:0}
 h1.motto{font-family:var(--serif);font-weight:500;font-size:clamp(38px,5.6vw,72px);line-height:1.3;}
 h1.motto span{display:block;}
@@ -94,7 +94,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .legend i{display:inline-block;width:9px;height:9px;margin-right:7px;}
 .tip{position:fixed;z-index:80;pointer-events:none;background:#EFE5D6;color:#1C0F14;font-size:12.5px;padding:7px 11px;line-height:1.55;max-width:260px;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .2s var(--ease);}
 .tip.on{opacity:1;transform:none;}
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:36px;}.hero-in{padding:104px 20px 48px;}}
+@media(max-width:900px){.hero-in{padding:104px 20px 64px;}}
 
 /* ── 壱 five directions ── */
 .dirs{display:grid;grid-template-columns:380px minmax(0,1fr);gap:56px;margin-top:40px;align-items:start;}
@@ -168,6 +168,15 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .mdetail ul{list-style:none;margin-top:6px;}
 .mdetail li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;}
 .mdetail li .k{font-family:var(--jp);color:var(--dc,var(--ash));}
+.tally{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:22px;border:1px solid var(--line);background:var(--line);}
+.tally div{background:var(--night);padding:12px 8px 10px;text-align:center;transition:background .3s,transform .4s var(--ease);}
+.tally div:hover{background:var(--night-2);transform:translateY(-2px);}
+.tally .k{font-family:var(--jp);font-size:22px;line-height:1;color:var(--dc);display:block;}
+.tally b{display:block;font-weight:300;font-size:22px;line-height:1.2;margin-top:6px;font-variant-numeric:tabular-nums;}
+.tally small{font-size:11.5px;color:var(--ash);}
+.tally div.zero .k{opacity:.35;} .tally div.zero b{color:var(--ash);}
+.tally-h{font-family:var(--serif);font-weight:500;font-size:14px;color:var(--gold);margin-top:22px;}
+.tally-h span{font-family:var(--sans);font-weight:300;font-size:12.5px;color:var(--ash);margin-left:8px;}
 .mnums div{padding:12px 0;border-bottom:1px solid var(--line);}
 .mnums b{display:block;font-size:28px;font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;}
 .mnums small{font-size:12.5px;color:var(--ash);}
@@ -274,16 +283,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         <div class="cd rv" style="--i:3"><small>{copy.countdown_label}</small><span class="cd-days num" id="cdD">—</span><small>天</small><span class="cd-clock num" id="cdC">00:00:<b>00</b></span></div>
         <a class="next-rel rv" style="--i:4" href="#chapters" id="nextRel">&nbsp;</a>
       </div>
-      <aside class="board rv" style="--i:3" aria-labelledby="bd-h">
-        <div class="board-head"><h2 id="bd-h">{copy.board_title}</h2><small id="todayStr"></small></div>
-        <div id="board"></div>
-        <div class="board-foot"><span id="boardSum"></span><span class="pips" id="pips" aria-hidden="true"></span></div>
-      </aside>
-    </div>
-    <div class="ledger-block rv" style="--i:5">
-      <div class="ledger-top"><span>{copy.ledger_label}</span><span>已記 <b id="doneCount">0</b> 天，共 <b id="totalDays">—</b> 天</span></div>
-      <div class="ledger-wrap"><div class="months" id="months" aria-hidden="true"></div><div class="ledger" id="ledger" role="img"></div></div>
-      <div class="legend">{pillars.map((p) => <span><i style={`background:var(--c-${p.slug})`}></i>{p.type}</span>)}</div>
     </div>
   </div>
 </section>
@@ -425,7 +424,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<div class="tip" id="tip" role="tooltip"></div>
 <script type="application/json" id="page-data" set:html={json}></script>
 
 <script is:inline>
@@ -445,36 +443,6 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function t(){var r=Math.max(0,TARGET-Date.now());d.textContent=Math.floor(r/DAY);
     c.innerHTML=pad(Math.floor(r%DAY/36e5))+':'+pad(Math.floor(r%36e5/6e4))+':<b class="'+(RM?'':'tick')+'">'+pad(Math.floor(r%6e4/1e3))+'</b>';}
   t();setInterval(t,1000);})();
-
-/* read-only board: what was actually written today */
-(function(){var today=jst(Date.now()),n=new Date(Date.now()+9*3600e3);
-  document.getElementById('todayStr').textContent=(n.getUTCMonth()+1)+' 月 '+n.getUTCDate()+' 日';
-  var done=0,html='',pips='';
-  D.dirs.forEach(function(d){var e=D.entries.filter(function(x){return x.dir===d.id&&x.date===today;})[0];
-    if(e)done++;
-    html+='<div class="brow '+(e?'done':'todo')+'" style="--dc:'+col(d.id)+'"><span class="k" aria-hidden="true">'+d.k+'</span><p>'+(e?e.t.replace(/</g,'&lt;'):d.n)+'<small>'+(e?d.n:'今天還沒記')+'</small></p><span class="st">'+(e?'完成':'—')+'</span></div>';
-    pips+='<i class="'+(e?'on':'')+'"></i>';});
-  document.getElementById('board').innerHTML=html;document.getElementById('pips').innerHTML=pips;
-  document.getElementById('boardSum').textContent='今天完成 '+done+'／'+D.dirs.length;})();
-
-/* ledger: one cell a day, coloured by what was written */
-(function(){var total=Math.round((TARGET-START)/DAY),ti=Math.floor((Date.now()-START)/DAY);
-  var logs={};D.entries.forEach(function(e){if(!logs[e.date])logs[e.date]=e;});
-  var L=document.getElementById('ledger'),M=document.getElementById('months'),tip=document.getElementById('tip'),done=0,h='',mh='',lm=-1;
-  for(var i=0;i<total;i++){var key=jst(START+i*DAY),e=logs[key],lab=key.replace(/-/g,'.');
-    if(i%7===0){var m=+key.slice(5,7);mh+='<span>'+(m!==lm?m+'月':'')+'</span>';lm=m;}
-    var st='style="--c:'+i+(e&&i<=ti?';background:'+col(e.dir):'')+'"';
-    if(e&&i<=ti){done++;h+='<a class="cell done" href="'+e.url+'" '+st+' data-tip="'+lab+'　'+dirOf(e.dir).n+'<br>'+e.t.replace(/"/g,'&quot;').replace(/</g,'&lt;')+'" aria-label="'+lab+' '+e.t.replace(/"/g,'&quot;')+'" tabindex="-1"></a>';}
-    else if(i===ti)h+='<div class="cell today" '+st+' data-tip="'+lab+'　今天"></div>';
-    else if(i>ti)h+='<div class="cell future" '+st+'></div>';
-    else h+='<div class="cell" '+st+' data-tip="'+lab+'　空白的一天"></div>';}
-  L.innerHTML=h;M.innerHTML=mh;document.getElementById('doneCount').textContent=done;document.getElementById('totalDays').textContent=total;
-  L.setAttribute('aria-label','一年 '+total+' 天的累積帳，目前已記 '+done+' 天');
-  var w=L.parentElement,cols=Math.ceil(total/7);
-  function size(){var cs=Math.max(10,Math.min(22,Math.floor((w.clientWidth-(cols-1)*3)/cols)));L.style.setProperty('--cs',cs+'px');M.style.setProperty('--cs',cs+'px');w.scrollLeft=Math.max(0,Math.floor(ti/7)*(cs+3)-40);}
-  size();addEventListener('resize',size);
-  L.addEventListener('mouseover',function(ev){var c=ev.target.closest('[data-tip]');if(!c){tip.classList.remove('on');return;}var r=c.getBoundingClientRect();tip.innerHTML=c.dataset.tip;tip.classList.add('on');tip.style.left=Math.min(innerWidth-270,Math.max(8,r.left-20))+'px';tip.style.top=(r.top-56)+'px';});
-  L.addEventListener('mouseleave',function(){tip.classList.remove('on');});})();
 
 /* age rings: one ring a year, current ring drawn to the fraction of the year */
 (function(){var cv=document.getElementById('art');if(!cv)return;var ctx=cv.getContext('2d'),W,H,dpr,run=true,last=performance.now(),t=0,raf;
@@ -527,8 +495,10 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     else if(r.final)b='<p>'+esc(r.summary)+'</p>';
     else if(r.plan&&r.plan.length)b='<p>這一話預計刊出的內容：</p>'+items(r.plan,true);
     else b='<p>這一話還在畫分鏡，刊出當天公開。</p>';
-    var cnt=function(){var y=r.date,prev=i>0?list[i-1].date:'0000-00-00';return D.entries.filter(function(e){return e.date>prev&&e.date<=y;}).length;};
-    Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+'</div><div class="mnums"><div><b>'+(r.state==='done'?cnt():'—')+'</b><small>這一話的文章</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
+    var from=i>0?list[i-1].date:D.start.slice(0,10),inRange=function(e){return (i>0?e.date>from:e.date>=from)&&e.date<=r.date;};
+    var es=D.entries.filter(inRange),total=es.length,showT=!r.final&&(r.state!=='future');
+    var tally=showT?'<p class="tally-h">'+(r.state==='next'?'這一話目前累積':'這一話累積')+'<span>'+from.slice(5).replace('-','.')+' – '+md(r)+'</span></p><div class="tally">'+D.dirs.map(function(d){var n=es.filter(function(e){return e.dir===d.id;}).length;return '<div class="'+(n?'':'zero')+'" style="--dc:'+col(d.id)+'"><span class="k">'+d.k+'</span><b>'+n+'</b><small>'+d.n+'</small></div>';}).join('')+'</div>':'';
+    Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+tally+'</div><div class="mnums"><div><b>'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
   requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n)w.scrollLeft=Math.max(0,n.offsetLeft-80);});
