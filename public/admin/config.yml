@@ -4,6 +4,7 @@ backend:
   branch: main
   base_url: https://8aker0.com
   auth_endpoint: api/auth
+  auth_scope: public_repo
 
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"

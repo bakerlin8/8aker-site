@@ -1,25 +1,10 @@
+import { finishAuth, errorPage, SITE } from './_lib.js';
 export default async function handler(req, res) {
-  const { code } = req.query;
-  const clientId = process.env.OAUTH_CLIENT_ID;
-  const clientSecret = process.env.OAUTH_CLIENT_SECRET;
-
   try {
-    const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code }),
-    });
-    const tokenData = await tokenRes.json();
-
-    if (tokenData.error) {
-      res.status(400).send(`OAuth error: ${tokenData.error_description || tokenData.error}`);
-      return;
-    }
-
-    // Hand the token to the studio page via the URL fragment (never sent to the server on the next request).
-    res.writeHead(302, { Location: `/studio/#gh_token=${tokenData.access_token}` });
+    const r = await finishAuth(req, res);
+    if (r.error) return errorPage(res, r.status, r.error);
+    // Token travels in the URL fragment, which browsers never send to any server.
+    res.writeHead(302, { Location: `${SITE}/studio/#gh_token=${r.token}` });
     res.end();
-  } catch (err) {
-    res.status(500).send('OAuth callback failed: ' + err.message);
-  }
+  } catch (e) { errorPage(res, 500, '登入時發生錯誤，請稍後再試。'); }
 }

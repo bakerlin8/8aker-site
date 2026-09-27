@@ -1,7 +1,20 @@
 ---
 import copy from '../data/site-copy.json';
-export interface Props { title?: string; description?: string; }
-const { title = `${copy.site_name} — ${copy.motto_line1}${copy.motto_line2}`, description = copy.hero_lede } = Astro.props;
+export interface Props { title?: string; description?: string; schema?: any[]; type?: string; }
+const { title = `${copy.site_name} — ${copy.motto_line1}${copy.motto_line2}`, description = copy.hero_lede, schema = [], type = 'website' } = Astro.props;
+const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname, SITE + '/').href;
+// Site-wide identity: the same person and site on every page, so search and AI engines can connect them.
+const person = {
+  '@type': 'Person', '@id': `${SITE}/#person`,
+  name: '林子翔', alternateName: ['Baker Lin', '巴', copy.site_name],
+  url: `${SITE}/`, homeLocation: { '@type': 'Place', name: '大阪, 日本' },
+  knowsLanguage: ['zh-Hant', 'ja', 'en'],
+  knowsAbout: ['日本不動產', '民宿營運', '室內佈置', 'AI 工具', '跑步與運動'],
+  sameAs: ['https://www.strava.com/athletes/103942910'],
+};
+const website = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: copy.site_name, description: copy.hero_lede, inLanguage: 'zh-Hant-TW', publisher: { '@id': `${SITE}/#person` } };
+const jsonld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [website, person, ...schema] }).replace(/</g, '\\u003c');
 const path = Astro.url.pathname;
 const isHome = path === '/' || path === '';
 const nav = [
@@ -20,8 +33,15 @@ const nav = [
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content={description}>
-<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? "https://8aker0.com").href}>
-<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? "https://8aker0.com").href}>
+<link rel="canonical" href={canonical}>
+<meta property="og:url" content={canonical}>
+<meta property="og:type" content={type}>
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<script type="application/ld+json" set:html={jsonld}></script>
+<script defer src="/_vercel/insights/script.js"></script>
 <meta property="og:site_name" content={copy.site_name}>
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
