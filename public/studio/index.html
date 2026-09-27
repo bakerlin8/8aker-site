@@ -798,7 +798,7 @@ async function loadBody() {
         <div class="hb-checks">
           <label><input type="checkbox" id="hb-w"> 文章裡寫出體重數字（不勾：只寫上升／下降）</label>
           <label><input type="checkbox" id="hb-f"> 文章裡寫出體脂數字（不勾：只寫上升／下降）</label>
-          <label><input type="checkbox" id="hb-home"> 首頁圖表顯示體重、體脂的每週平均</label>
+          <label><input type="checkbox" id="hb-home" ${data.public_show_values ? 'checked' : ''}> 首頁圖表顯示體重、體脂的每週平均（勾選後立即生效）</label>
         </div>
         <div class="field"><label class="field-label">今天的觀察（可空白）</label><textarea id="hb-note" rows="3" placeholder="一兩句就好：身體的感覺、睡眠、想調整的地方"></textarea></div>
         <label class="field-label">預覽</label><div class="hb-preview" id="hb-prev"></div>
@@ -824,6 +824,10 @@ async function loadBody() {
         <div class="btn-row"><button class="btn btn-ghost" id="hb-rotate">產生新的傳送金鑰</button></div>
       </div>`;
     bindStrava(() => loadBody());
+    document.getElementById('hb-home').addEventListener('change', async (e) => {
+      try { await healthApi('POST', { action: 'set_public', value: e.target.checked }); data.public_show_values = e.target.checked; toast(e.target.checked ? '首頁會顯示體重、體脂趨勢（約 5 分鐘內更新）' : '首頁已隱藏體重、體脂'); }
+      catch (err) { e.target.checked = !e.target.checked; toast('設定失敗：' + err.message, 'err'); }
+    });
     const upd = () => { document.getElementById('hb-prev').textContent = buildBodyMarkdown(d, { weight: hbW.checked, fat: hbF.checked }, document.getElementById('hb-note').value); };
     const hbW = document.getElementById('hb-w'), hbF = document.getElementById('hb-f');
     [hbW, hbF, document.getElementById('hb-note')].forEach((el) => el.addEventListener('input', upd)); upd();

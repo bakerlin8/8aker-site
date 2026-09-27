@@ -16,8 +16,6 @@ const dot = (d: Date) => ymd(d).replaceAll('-', '.');
 const counts = Object.fromEntries(pillars.map((p) => [p.slug, all.filter((a) => a.dir === p.slug).length]));
 const dan = (c: number) => (c >= 100 ? '四段' : c >= 60 ? '三段' : c >= 30 ? '二段' : c >= 10 ? '初段' : '見習');
 const MAX = 30;
-// weight/fat values appear on the homepage only if chosen in Studio (the demo data always shows them)
-const showBodyValues = (body as any).sample || (body as any).show_values === true;
 
 // pentagon geometry (viewBox centered on 0,0)
 const R = 150;
@@ -196,34 +194,51 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .ycard.final h4{color:var(--gold);}
 @media(max-width:860px){.mdetail{grid-template-columns:1fr;gap:20px;}}
 
-/* ── 参 body ── */
-.pipe{display:grid;grid-template-columns:repeat(4,1fr);margin-top:40px;border:1px solid var(--line);}
-.step{padding:20px;border-right:1px solid var(--line);transition:background .3s;}
-.step:hover{background:var(--night-2);}
-.step:last-child{border-right:0;}
-.step time{font-size:12.5px;color:var(--ash);}
-.step h3{font-family:var(--serif);font-weight:500;font-size:16px;margin-top:4px;}
-.step p{font-size:13px;color:var(--bone-2);margin-top:6px;line-height:1.7;}
-.step.now{background:var(--gold-soft);}
-.step.now h3{color:var(--gold);}
-@media(max-width:780px){.pipe{grid-template-columns:1fr 1fr;}.step:nth-child(2){border-right:0;}.step:nth-child(-n+2){border-bottom:1px solid var(--line);}}
-.body-row{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;margin-top:32px;}
-.spark{border:1px solid var(--line);padding:22px;}
-.spark svg{width:100%;height:auto;display:block;}
-.spark .ln{stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 1.6s var(--ease) forwards;}
+/* ── 伍 body ── */
+.blive{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--ash);}
+.blive i{width:7px;height:7px;border-radius:50%;background:#5E9C6A;box-shadow:0 0 0 0 rgba(94,156,106,.5);animation:livePulse 2.4s ease-out infinite;}
+.blive.stale i{background:var(--ash);animation:none;}
+@keyframes livePulse{70%{box-shadow:0 0 0 7px rgba(94,156,106,0);}100%{box-shadow:0 0 0 0 rgba(94,156,106,0);}}
+.bstats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:26px;background:var(--line);border:1px solid var(--line);}
+.bstat{background:var(--night);padding:18px 20px 16px;transition:background .3s;}
+.bstat:hover{background:var(--night-2);}
+.bstat b{display:block;font-family:var(--serif);font-weight:500;font-size:34px;line-height:1.1;color:var(--bone);}
+.bstat small{font-size:12.5px;color:var(--ash);}
+.bstat b.up{color:var(--c-strengthen);} .bstat b.down{color:var(--c-conjure);}
+.bmain{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;margin-top:28px;align-items:start;}
+.bchart{border:1px solid var(--line);padding:20px 22px 14px;background:var(--night);}
+.bchart svg{width:100%;height:auto;display:block;overflow:visible;}
+.bchart-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--bone-2);margin-bottom:10px;gap:10px;flex-wrap:wrap;}
+.bchart .bar{transition:opacity .3s;}
+.bchart .bar:hover{opacity:.75;}
+.bchart .ln{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 1.6s var(--ease) forwards;}
+.bchart .grow{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);animation:growUp .9s var(--ease) forwards;animation-delay:calc(var(--k) * 40ms);}
+@keyframes growUp{to{transform:scaleY(1);}}
 @keyframes draw{to{stroke-dashoffset:0;}}
-.spark-top{display:flex;justify-content:space-between;font-size:13px;color:var(--bone-2);margin-bottom:10px;gap:10px;flex-wrap:wrap;}
 .tabs{display:flex;gap:4px;}
 .tabs button{font-size:12.5px;padding:2px 10px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
 .tabs button:hover{border-color:var(--bone-2);}
 .tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
-.metrics div{padding:14px 0;border-bottom:1px solid var(--line);}
-.metrics b{font-size:30px;font-weight:300;display:block;line-height:1.1;}
-.metrics small{font-size:12.5px;color:var(--ash);}
-.strava{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 16px;border:1px solid #FC4C02;color:#FC4C02;font-size:13.5px;transition:background .3s,color .3s,gap .4s var(--ease);}
+.brecent h3,.bsrc h3{font-family:var(--serif);font-weight:500;font-size:16px;}
+.brecent ol{list-style:none;margin-top:10px;}
+.brecent li{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);font-size:14px;transition:padding .35s var(--ease);}
+.brecent li:hover{padding-left:6px;}
+.brecent li time{font-size:12.5px;color:var(--ash);font-variant-numeric:tabular-nums;}
+.brecent li small{font-size:12.5px;color:var(--bone-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.brecent li.empty{display:block;color:var(--ash);font-size:13px;}
+.strava{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:9px 16px;border:1px solid #FC4C02;color:#C73D00;font-size:13.5px;transition:background .3s,color .3s,gap .4s var(--ease);}
 .strava:hover{background:#FC4C02;color:#fff;gap:12px;}
-.demo{font-size:12px;color:var(--ash);margin-top:12px;}
-@media(max-width:900px){.body-row{grid-template-columns:1fr;}}
+.bsrc{margin-top:40px;padding-top:28px;border-top:1px solid var(--line);}
+.flow{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:18px;counter-reset:f;}
+.flow li{position:relative;padding-top:14px;border-top:2px solid var(--line);}
+.flow li:not(:last-child)::after{content:'→';position:absolute;right:-22px;top:-13px;color:var(--ash);font-size:14px;}
+.flow li.now{border-top-color:var(--gold);}
+.flow .tag{font-size:11.5px;letter-spacing:.08em;color:var(--ash);}
+.flow b{display:block;font-family:var(--serif);font-weight:500;font-size:16px;margin-top:4px;}
+.flow em{display:block;font-style:normal;font-size:13px;color:var(--gold);margin-top:2px;}
+.flow p{font-size:13px;color:var(--bone-2);margin-top:8px;line-height:1.75;}
+@media(max-width:960px){.bmain{grid-template-columns:1fr;}.bstats{grid-template-columns:repeat(2,1fr);}.flow{grid-template-columns:1fr 1fr;row-gap:24px;}.flow li:nth-child(2)::after{display:none;}}
+@media(max-width:560px){.flow{grid-template-columns:1fr;}.flow li::after{display:none;}.bstat b{font-size:28px;}}
 
 /* ── 肆 works ── */
 .strip{display:flex;gap:20px;overflow-x:auto;margin-top:36px;padding:10px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--ash) transparent;}
@@ -387,24 +402,35 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Body</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.body_sub}</p><h2 id="body-h" class="rv" style="--i:1">{copy.body_title}</h2></div>
-      <div class="pipe" role="list">
-        <div class="step rv" style="--i:2" role="listitem"><time>06:00</time><h3>收進資料</h3><p>Apple Health 把 Strava 運動和 OMRON 體組成一起送來。</p></div>
-        <div class="step rv" style="--i:3" role="listitem"><time>06:02</time><h3>寫成草稿</h3><p>整理成本週訓練、體脂趨勢、一段觀察。</p></div>
-        <div class="step now rv" style="--i:4" role="listitem"><time>每天</time><h3>等巴確認</h3><p>在後台看過、改過，才決定公開哪些數字。</p></div>
-        <div class="step rv" style="--i:5" role="listitem"><time>確認後</time><h3>公開發布</h3><p>文章進「強化」，帳上這一天被填上。</p></div>
+      <p class="blive rv" style="--i:2"><i aria-hidden="true"></i><span id="bdLive">讀取最新資料中…</span></p>
+
+      <div class="bstats" role="list">
+        <div class="bstat rv" style="--i:2" role="listitem"><b class="num" id="bsMin">—</b><small>本週訓練（分鐘）</small></div>
+        <div class="bstat rv" style="--i:3" role="listitem"><b class="num" id="bsN">—</b><small>本週運動（次）</small></div>
+        <div class="bstat rv" style="--i:4" role="listitem"><b class="num" id="bsFat">—</b><small>體脂 12 週變化</small></div>
+        <div class="bstat rv" style="--i:5" role="listitem"><b class="num" id="bsScale">—</b><small>最近一次量體脂</small></div>
       </div>
-      <div class="body-row">
-        <div class="spark rv" style="--i:3">
-          <div class="spark-top"><span id="sparkLabel"></span>{showBodyValues ? <div class="tabs" role="group" aria-label="切換指標"><button aria-pressed="true" data-m="mins">訓練</button><button aria-pressed="false" data-m="fat">體脂</button><button aria-pressed="false" data-m="weight">體重</button></div> : <div class="tabs" hidden></div>}</div>
-          <svg id="spark" viewBox="0 0 600 180" role="img" aria-label="近 12 週身體指標趨勢"></svg>
+
+      <div class="bmain">
+        <div class="bchart rv" style="--i:3">
+          <div class="bchart-top"><span id="sparkLabel">近 12 週・每週訓練分鐘</span><div class="tabs" id="bTabs" role="group" aria-label="切換指標"></div></div>
+          <svg id="spark" viewBox="0 0 600 200" role="img" aria-label="近 12 週身體指標趨勢"></svg>
         </div>
-        <div class="metrics rv" style="--i:4">
-          <div><b class="num">{body.stats.week_minutes}</b><small>本週訓練分鐘</small></div>
-          <div><b class="num">{body.stats.fat_change}</b><small>體脂 12 週變化（百分點）</small></div>
-          <div><b class="num">{body.stats.streak}</b><small>連續紀錄天數</small></div>
-          {body.sample && <p class="demo">{body.note}</p>}
+        <div class="brecent rv" style="--i:4">
+          <h3>最近的運動</h3>
+          <ol id="bsRecent"><li class="empty">讀取中…</li></ol>
           <a class="strava" href="https://www.strava.com/athletes/103942910" target="_blank" rel="noopener">在 Strava 一起運動<span aria-hidden="true">↗</span></a>
         </div>
+      </div>
+
+      <div class="bsrc">
+        <h3 class="rv" style="--i:2">這些數字是怎麼來的</h3>
+        <ol class="flow">
+          <li class="rv" style="--i:3"><span class="tag">來源一</span><b>運動</b><em>Strava</em><p>跑步、跳舞、訓練都用 Strava 記錄，網站直接讀取，約每 6 小時更新。</p></li>
+          <li class="rv" style="--i:4"><span class="tag">來源二</span><b>體重・體脂</b><em>OMRON 體組成計</em><p>量完自動存進 iPhone「健康」，每晚 23:30 由捷徑送到網站。</p></li>
+          <li class="rv" style="--i:5"><span class="tag">保存</span><b>私人資料庫</b><em>原始數字不公開</em><p>每一筆紀錄只存在這裡，這一頁看到的是彙總後的趨勢。</p></li>
+          <li class="now rv" style="--i:6"><span class="tag">公開</span><b>確認後才寫成文章</b><em>由巴決定</em><p>要寫進「強化」的文章，公開哪些數字，都由我看過再決定。</p></li>
+        </ol>
       </div>
     </div>
   </div>
@@ -526,14 +552,62 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});
   Y.addEventListener('click',function(e){var c=e.target.closest('.ycard');if(c){view('one');show(+c.dataset.i);}});})();
 
-/* body spark: the line draws itself when shown */
-(function(){var data={mins:['近 12 週・每週訓練分鐘',D.body.weeks.mins],fat:['近 12 週・體脂（%）',D.body.weeks.fat],weight:['近 12 週・體重（kg）',D.body.weeks.weight]};
-  var S=document.getElementById('spark'),L=document.getElementById('sparkLabel');
-  function draw(k){var v=data[k][1],mn=Math.min.apply(0,v),mx=Math.max.apply(0,v),W=600,H=180,p=16,st=(W-p*2)/(v.length-1);
-    var y=function(x){return H-p-(x-mn)/((mx-mn)||1)*(H-p*2);},pts=v.map(function(x,i){return (p+i*st)+','+y(x);}).join(' ');
-    S.innerHTML='<polygon points="'+p+','+(H-p)+' '+pts+' '+(W-p)+','+(H-p)+'" style="fill:var(--gold-soft)"/><polyline class="ln" points="'+pts+'" fill="none" style="stroke:var(--gold)" stroke-width="2"/><circle cx="'+(W-p)+'" cy="'+y(v[v.length-1])+'" r="4.5" style="fill:var(--gold)"/><text x="'+(W-p)+'" y="'+(y(v[v.length-1])-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+v[v.length-1]+'</text>';L.textContent=data[k][0];}
-  document.querySelector('.tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});draw(b.dataset.m);});
-  var sec=document.getElementById('body'),drawn=false;new IntersectionObserver(function(es,o){if(es[0].isIntersecting&&!drawn){drawn=true;draw('mins');o.disconnect();}},{threshold:.2}).observe(sec);})();
+/* body: live summary from the private database's public endpoint; static file as fallback */
+(function(){
+  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/health-public';
+  var S=document.getElementById('spark'),L=document.getElementById('sparkLabel'),TB=document.getElementById('bTabs'),live=document.getElementById('bdLive');
+  var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');};
+  var ago=function(iso){if(!iso)return null;var m=Math.round((Date.now()-new Date(iso).getTime())/6e4);return m<60?Math.max(1,m)+' 分鐘前':m<1440?Math.round(m/60)+' 小時前':Math.round(m/1440)+' 天前';};
+  var series={},labels=[],drawn=false,current='mins';
+  var META={mins:['近 12 週・每週訓練分鐘','分'],fat:['近 12 週・體脂（%）','%'],weight:['近 12 週・體重（kg）','kg']};
+  function draw(k){
+    var v=series[k]||[],W=Math.max(300,Math.min(640,Math.round(S.getBoundingClientRect().width)||600)),H=W<480?220:200,pl=8,pr=8,pt=18,pb=26,cw=(W-pl-pr)/Math.max(1,v.length);
+    var nums=v.filter(function(x){return x!=null;}); if(!nums.length){S.innerHTML='<text x="300" y="100" text-anchor="middle" style="fill:var(--ash)" font-size="13">資料累積中</text>';L.textContent=META[k][0];return;}
+    var mx=Math.max.apply(0,nums),mn=k==='mins'?0:Math.min.apply(0,nums),rg=(mx-mn)||1;
+    var y=function(x){return pt+(H-pt-pb)*(1-(x-mn)/rg);},g='';
+    for(var i=0;i<4;i++){var gy=pt+(H-pt-pb)*i/3;g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+gy+'" y2="'+gy+'" style="stroke:var(--line)"/>';}
+    var xl=labels.map(function(t,i){return (i%3===2||i===labels.length-1)?'<text x="'+(pl+cw*i+cw/2)+'" y="'+(H-6)+'" text-anchor="middle" style="fill:var(--ash)" font-size="11">'+esc(t)+'</text>':'';}).join('');
+    var body='';
+    if(k==='mins'){
+      body=v.map(function(x,i){var bh=Math.max(x?2:0,(H-pt-pb)-(y(x||0)-pt)),bx=pl+cw*i+cw*.18,last=i===v.length-1;
+        return '<g class="grow" style="--k:'+i+'"><rect class="bar" x="'+bx+'" y="'+(H-pb-bh)+'" width="'+(cw*.64)+'" height="'+bh+'" style="fill:'+(last?'var(--gold)':'var(--gold-soft)')+';stroke:var(--gold);stroke-width:'+(last?0:1)+'"><title>'+esc(labels[i])+' 那一週：'+(x||0)+' 分鐘</title></rect></g>';}).join('');
+      var lx=pl+cw*(v.length-1)+cw/2; body+='<text x="'+lx+'" y="'+(y(v[v.length-1]||0)-8)+'" text-anchor="middle" style="fill:var(--bone)" font-size="13">'+(v[v.length-1]||0)+'</text>';
+    }else{
+      var pts=v.map(function(x,i){return x==null?null:(pl+cw*i+cw/2)+','+y(x);}).filter(Boolean).join(' ');
+      body='<polyline class="ln" points="'+pts+'" fill="none" style="stroke:var(--gold)" stroke-width="2"/>';
+      var last=v[v.length-1];if(last!=null){var cx=pl+cw*(v.length-1)+cw/2;body+='<circle cx="'+cx+'" cy="'+y(last)+'" r="4.5" style="fill:var(--gold)"/><text x="'+cx+'" y="'+(y(last)-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+last+'</text>';}
+    }
+    S.setAttribute('viewBox','0 0 '+W+' '+H);S.innerHTML=g+body+xl;L.textContent=META[k][0];current=k;
+  }
+  function tabs(keys){
+    if(keys.length<2){TB.innerHTML='';return;}
+    var names={mins:'訓練',fat:'體脂',weight:'體重'};
+    TB.innerHTML=keys.map(function(k){return '<button aria-pressed="'+(k===current)+'" data-m="'+k+'">'+names[k]+'</button>';}).join('');
+  }
+  var rz;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){if(labels.length&&drawn)draw(current);},200);});
+  TB.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(TB.children,function(x){x.setAttribute('aria-pressed',x===b);});draw(b.dataset.m);});
+  function render(d,isLive){
+    series={mins:d.weeks.mins};if(d.weeks.fat)series.fat=d.weeks.fat;if(d.weeks.weight)series.weight=d.weeks.weight;
+    labels=d.weeks.labels||[];
+    var st=d.stats||{};
+    document.getElementById('bsMin').textContent=st.week_minutes!=null?st.week_minutes:'—';
+    document.getElementById('bsN').textContent=st.week_sessions!=null?st.week_sessions:'—';
+    var f=document.getElementById('bsFat');
+    if(st.fat_change==null){f.textContent='累積中';f.style.fontSize='22px';}
+    else{f.textContent=(st.fat_change>0?'+':st.fat_change<0?'−':'±')+Math.abs(st.fat_change).toFixed(1);f.className='num '+(st.fat_change>0?'up':st.fat_change<0?'down':'');}
+    document.getElementById('bsScale').textContent=d.scale_last_day?d.scale_last_day.slice(5).replace('-','.'):'—';
+    var R=document.getElementById('bsRecent');
+    R.innerHTML=(d.recent&&d.recent.length)?d.recent.map(function(r){return '<li><time>'+esc(r.date.slice(5).replace('-','.'))+'</time><span>'+esc(r.name)+'</span><small>'+r.min+' 分'+(r.km?'・'+r.km+' km':'')+'</small></li>';}).join(''):'<li class="empty">最近還沒有運動紀錄。</li>';
+    tabs(Object.keys(series));
+    if(isLive){var a=ago(d.updated_at),s=ago(d.strava_synced_at);live.textContent='自動同步中'+(a?'・最新資料 '+a:'')+(s?'・Strava '+s+'同步':'');}
+    else{live.parentElement.classList.add('stale');live.textContent='暫時讀不到即時資料，顯示的是上次發布時的數字';}
+    if(drawn)draw('mins');
+  }
+  var sec=document.getElementById('body'),want=false;
+  new IntersectionObserver(function(es,o){if(es[0].isIntersecting){want=true;drawn=true;o.disconnect();if(labels.length)draw('mins');}},{threshold:.15}).observe(sec);
+  var fallback=function(){var b=D.body;render({weeks:{mins:b.weeks.mins,labels:[],fat:(b.sample||b.show_values)?b.weeks.fat:null,weight:(b.sample||b.show_values)?b.weeks.weight:null},stats:{week_minutes:b.stats.week_minutes,week_sessions:null,fat_change:null},recent:[]},false);if(want)draw('mins');};
+  fetch(API,{mode:'cors'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){if(d.error)throw 0;render(d,true);if(want)draw('mins');}).catch(fallback);
+})();
 
 /* journal filter */
 (function(){var F=document.getElementById('filters'),rows=[].slice.call(document.querySelectorAll('.jrow')),E=document.getElementById('jempty');
