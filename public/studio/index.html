@@ -734,7 +734,7 @@ async function deleteCurrentArticle() {
 
 /* ══════════════════════════ BODY DATA VIEW ══════════════════════════ */
 // Set once the private Supabase project exists. Raw health data never goes to GitHub; only approved articles do.
-const HEALTH_BASE = '';
+const HEALTH_BASE = 'https://gsaqrjovipnfiedvjaeb.supabase.co';
 async function healthApi(method, body, qs = '') {
   const r = await fetch(`${HEALTH_BASE}/functions/v1/health-studio${qs}`, {
     method, headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined,
