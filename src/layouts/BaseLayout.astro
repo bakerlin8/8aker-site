@@ -20,6 +20,9 @@ const nav = [
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content={description}>
+<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? "https://8aker0.com").href}>
+<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? "https://8aker0.com").href}>
+<meta property="og:site_name" content={copy.site_name}>
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta name="theme-color" content="#1C0F14">

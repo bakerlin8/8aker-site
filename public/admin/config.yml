@@ -2,7 +2,7 @@ backend:
   name: github
   repo: bakerlin8/8aker-site
   branch: main
-  base_url: https://8aker-site.vercel.app
+  base_url: https://8aker0.com
   auth_endpoint: api/auth
 
 media_folder: "public/images/uploads"

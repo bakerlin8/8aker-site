@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://8aker.vercel.app',
+  site: 'https://8aker0.com',
   output: 'static',
 });
