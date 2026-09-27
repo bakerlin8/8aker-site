@@ -790,11 +790,11 @@ async function loadBody() {
         <table class="hb-table"><thead><tr><th>日期</th><th>運動</th><th>體重</th><th>體脂</th><th></th></tr></thead><tbody>
         ${data.recent.map((r) => `<tr class="pick ${r.day === d.day ? 'sel' : ''}" data-day="${r.day}"><td>${r.day.slice(5).replace('-', '.')}</td><td>${r.mins ? `${r.mins} 分・${r.workouts.map((w) => escapeHtml(w.name)).join('、')}` : '—'}</td><td>${r.weight ?? '—'}</td><td>${r.fat != null ? r.fat + '%' : '—'}</td><td>${r.published ? '<span class="hb-tag done">已發布</span>' : ''}</td></tr>`).join('')}
         </tbody></table>
-        ${data.has_data ? '' : '<p class="hb-note" style="margin-top:10px">還沒收到任何資料。照下面 ③ 設定好 Health Auto Export 後，隔天就會出現。</p>'}
+        ${data.has_data ? '' : '<p class="hb-note" style="margin-top:10px">還沒收到任何資料。照下面 ③ 設定好 iPhone 捷徑後，按一次執行就會出現。</p>'}
       </div>
       <div class="hb-card">
-        <h3>③ Health Auto Export 設定</h3>
-        <p class="hb-note">在 iPhone 的 Health Auto Export → Automations → 新增 REST API，貼上下面的網址，Header 加一組 <b>x-8aker-key</b>。</p>
+        <h3>③ iPhone 捷徑設定</h3>
+        <p class="hb-note">在 iPhone「捷徑」的「取得 URL 內容」動作裡，貼上下面的網址，標頭加一組 <b>x-8aker-key</b>。</p>
         <div class="hb-code"><code>${ingest}</code><button class="btn btn-ghost" data-copy="${ingest}">複製網址</button></div>
         <p class="hb-note">傳送金鑰只會在產生的當下顯示一次；換新的之後，舊的立刻失效。</p>
         <div id="hb-keybox"></div>
@@ -809,7 +809,7 @@ async function loadBody() {
       if (!confirm('產生新金鑰後，iPhone 上的舊金鑰會立刻失效，要繼續嗎？')) return;
       try { const r = await healthApi('POST', { action: 'rotate_key' });
         document.getElementById('hb-keybox').innerHTML = `<div class="hb-key">${escapeHtml(r.key)}</div><button class="btn btn-ghost" data-copy="${escapeAttr(r.key)}">複製金鑰</button>`;
-        document.querySelector('#hb-keybox [data-copy]').addEventListener('click', () => { navigator.clipboard.writeText(r.key); toast('已複製，請貼到 Health Auto Export'); });
+        document.querySelector('#hb-keybox [data-copy]').addEventListener('click', () => { navigator.clipboard.writeText(r.key); toast('已複製，請貼到捷徑的標頭'); });
       } catch (e) { toast('產生失敗：' + e.message, 'err'); }
     });
     document.getElementById('hb-pub').addEventListener('click', async () => {
