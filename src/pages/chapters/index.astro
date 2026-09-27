@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { chapterList, stateLabel } from '../../data/chapter-utils';
+import copy from '../../data/site-copy.json';
+const { list, volume } = chapterList();
+const dot = (d: string) => d.replaceAll('-', '.');
+const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
+const schema = [
+  { '@type': 'CreativeWorkSeries', name: `${copy.site_name}・${copy.chapters_title}`, description: copy.chapters_sub, url: `${SITE}/chapters/`, inLanguage: 'zh-Hant-TW', author: { '@id': `${SITE}/#person` },
+    hasPart: list.map((c) => ({ '@type': 'Article', headline: `${c.label}　${c.title}`, url: `${SITE}/chapters/${c.no}/`, datePublished: `${c.date}T00:00:00+09:00` })) },
+];
+---
+<BaseLayout title={`第一卷目次・${copy.chapters_title} — ${copy.site_name}`} description={copy.chapters_sub} schema={schema}>
+<style is:global>
+.toch{background:radial-gradient(110% 90% at 85% 10%,#3D0F1A 0%,#1C0F14 70%);color:#EFE5D6;padding:150px 40px 56px;}
+.toch-in{max-width:1160px;margin:0 auto;}
+.toch .crumb{font-size:13px;color:#86707A;}
+.toch .crumb a{border-bottom:1px solid rgba(239,229,214,.15);}
+.toch h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,52px);margin-top:12px;}
+.toch p{color:#B9A89E;margin-top:10px;}
+.tocb{padding:48px 40px 96px;background:var(--night);color:var(--bone);}
+.tocb-in{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));padding:1px 0 0 1px;}
+.tc{border:1px solid var(--line);margin:-1px 0 0 -1px;padding:20px;display:flex;flex-direction:column;gap:6px;min-height:160px;transition:background .3s,transform .4s var(--ease);position:relative;background:var(--night);}
+.tc:hover{background:var(--night-2);transform:translateY(-3px);z-index:1;}
+.tc .n{font-size:12.5px;color:var(--ash);}
+.tc h2{font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.5;}
+.tc .s{margin-top:auto;font-size:12.5px;color:var(--ash);}
+.tc.done .s,.tc.next .s{color:var(--gold);}
+.tc.next{background:var(--gold-soft);}
+.tc.vol{background:var(--night-3);}
+.tc.vol h2{color:var(--gold);}
+@media(max-width:700px){.toch{padding:120px 20px 40px;}.tocb{padding:32px 20px 72px;}}
+</style>
+<header class="toch"><div class="toch-in">
+  <p class="crumb rv"><a href="/#chapters">{copy.chapters_title}</a></p>
+  <h1 class="rv" style="--i:1">第一卷目次</h1>
+  <p class="rv" style="--i:2">{copy.chapters_sub}</p>
+</div></header>
+<section class="tocb band-light"><div class="tocb-in">
+  {list.map((c: any, i: number) => (
+    <a class:list={['tc', 'rv', c.state]} style={`--i:${Math.min(i, 8)}`} href={`/chapters/${c.no}/`}>
+      <span class="n">{c.label}・{dot(c.date)}{c.arc && `・${c.arc}`}</span><h2>{c.title}</h2><span class="s">{stateLabel[c.state]}</span>
+    </a>
+  ))}
+  <div class="tc vol rv"><span class="n">第一卷・{dot(volume.date)}</span><h2>{volume.title}</h2><span class="s">{volume.summary}</span></div>
+</div></section>
+</BaseLayout>

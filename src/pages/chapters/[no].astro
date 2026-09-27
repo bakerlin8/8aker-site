@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { chapterList, articlesBetween, stateLabel, dirOf } from '../../data/chapter-utils';
+import copy from '../../data/site-copy.json';
+
+export async function getStaticPaths() {
+  return chapterList().list.map((c) => ({ params: { no: String(c.no) } }));
+}
+const { list, volume } = chapterList();
+const i = list.findIndex((c) => String(c.no) === Astro.params.no);
+const c: any = list[i];
+const prev = list[i - 1], next = list[i + 1];
+const start = i === 0 ? copy.countdown_start.slice(0, 10) : c.from;
+const arts = await articlesBetween(start, c.date, i === 0);
+const dot = (d: string) => d.replaceAll('-', '.');
+const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
+const url = `${SITE}/chapters/${c.no}/`;
+const published = c.state === 'done' || c.state === 'break';
+const desc = c.summary || (published ? `${copy.chapters_title}：${c.label}「${c.title}」` : `${c.label}「${c.title}」預定 ${dot(c.date)} 刊出。`);
+const schema = [
+  { '@type': 'Article', '@id': `${url}#chapter`, headline: `${c.label}　${c.title}`, description: desc, datePublished: `${c.date}T00:00:00+09:00`, inLanguage: 'zh-Hant-TW', author: { '@id': `${SITE}/#person` }, isPartOf: { '@type': 'CreativeWorkSeries', name: `${copy.site_name}・${copy.chapters_title}`, url: `${SITE}/chapters/` }, position: c.no },
+  { '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首頁', item: `${SITE}/` },
+    { '@type': 'ListItem', position: 2, name: copy.chapters_title, item: `${SITE}/chapters/` },
+    { '@type': 'ListItem', position: 3, name: `${c.label}　${c.title}`, item: url } ] },
+];
+---
+<BaseLayout title={`${c.label}　${c.title} — ${copy.site_name}`} description={desc} schema={schema} type="article">
+<style is:global>
+.chh{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 85% 10%,#3D0F1A 0%,#1C0F14 70%);color:#EFE5D6;padding:150px 40px 64px;}
+.chh-in{max-width:760px;margin:0 auto;position:relative;}
+.chh .no{position:absolute;right:-30px;top:-70px;font-family:var(--latin);font-weight:500;font-size:240px;line-height:1;color:#D4A24C;opacity:.1;pointer-events:none;}
+.chh .crumb{font-size:13px;color:#86707A;}
+.chh .crumb a{border-bottom:1px solid rgba(239,229,214,.15);transition:color .3s,border-color .3s;}
+.chh .crumb a:hover{color:#EFE5D6;border-color:#D4A24C;}
+.chh h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.2vw,44px);line-height:1.45;margin-top:14px;}
+.chh h1 small{display:block;font-size:.5em;color:#D4A24C;letter-spacing:.1em;}
+.chh .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:#B9A89E;}
+.chh .meta span{padding:1px 10px;border:1px solid rgba(239,229,214,.15);}
+.chh .meta .st{border-color:#D4A24C;color:#D4A24C;}
+.chb{padding:56px 40px 96px;background:var(--night);color:var(--bone);}
+.chb-in{max-width:720px;margin:0 auto;}
+.chb .lead{font-family:var(--serif);font-size:18px;line-height:2;}
+.chb h2{font-family:var(--serif);font-weight:500;font-size:19px;color:var(--gold);margin:36px 0 10px;}
+.chb ul{list-style:none;}
+.chb li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;padding:11px 0;border-top:1px solid var(--line);font-size:15px;}
+.chb li .k{font-family:var(--jp);color:var(--dc,var(--ash));}
+.chb .arts a{display:grid;grid-template-columns:90px 28px minmax(0,1fr);gap:12px;padding:12px 0;border-top:1px solid var(--line);transition:padding .35s var(--ease);}
+.chb .arts a:hover{padding-left:8px;}
+.chb .arts a:hover span:last-child{color:var(--gold);}
+.chb .arts time{font-size:13px;color:var(--ash);}
+.chb .arts .k{font-family:var(--jp);color:var(--dc);}
+.chb .empty{color:var(--ash);margin-top:8px;}
+.pn{display:grid;grid-template-columns:1fr 1fr;margin-top:56px;border:1px solid var(--line);}
+.pn a,.pn span{padding:18px 20px;display:flex;flex-direction:column;gap:4px;transition:background .3s;}
+.pn a:hover{background:var(--night-2);}
+.pn small{font-size:12.5px;color:var(--ash);}
+.pn b{font-family:var(--serif);font-weight:500;font-size:15px;}
+.pn .nx{text-align:right;border-left:1px solid var(--line);}
+.toc-link{display:inline-block;margin-top:24px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);}
+.toc-link:hover{color:var(--bone);border-color:var(--gold);}
+@media(max-width:700px){.chh{padding:120px 20px 48px;}.chh .no{font-size:160px;right:-10px;}.chb{padding:40px 20px 72px;}}
+</style>
+<header class="chh">
+  <div class="chh-in">
+    <div class="no" aria-hidden="true">{c.no}</div>
+    <p class="crumb rv"><a href="/#chapters">{copy.chapters_title}</a>／<a href="/chapters/">第一卷目次</a></p>
+    <h1 class="rv" style="--i:1"><small>{c.label}</small>{c.title}</h1>
+    <div class="meta rv" style="--i:2"><span class="st">{stateLabel[c.state]}</span><span>{dot(c.date)} 刊出</span>{c.arc && <span>{c.arc}</span>}</div>
+  </div>
+</header>
+<article class="chb band-light">
+  <div class="chb-in">
+    {published ? (
+      <>
+        {c.summary ? <p class="lead">{c.summary}</p> : <p class="lead">{c.on_break ? '這個月休載。' : '這一話的內容整理中。'}</p>}
+        {c.keep?.length > 0 && <><h2>這一話留下的</h2><ul>{c.keep.map((x: string) => <li><span class="k">・</span><span>{x}</span></li>)}</ul></>}
+        {c.letgo?.length > 0 && <><h2>這一話放下的</h2><ul>{c.letgo.map((x: string) => <li><span class="k">・</span><span>{x}</span></li>)}</ul></>}
+      </>
+    ) : (
+      <>
+        <p class="lead">{c.label}預定 {dot(c.date)} 刊出。{c.plan?.length ? '這一話預計刊出的內容：' : '內容還在畫分鏡。'}</p>
+        {c.plan?.length > 0 && <ul>{c.plan.map((x: any) => { const d = dirOf(x.dir); return <li style={d ? `--dc:var(--c-${d.slug})` : ''}><span class="k">{d ? d.kanji : '・'}</span><span>{x.text}</span></li>; })}</ul>}
+      </>
+    )}
+    <h2>這一話期間的文章</h2>
+    {arts.length ? <div class="arts">{arts.map(({ p, e, d }: any) => <a href={`/pillars/${p.slug}/${e.slug}/`} style={`--dc:var(--c-${p.slug})`}><time>{dot(d)}</time><span class="k">{p.kanji}</span><span>{e.data.title}</span></a>)}</div> : <p class="empty">這段期間還沒有文章。</p>}
+    <nav class="pn" aria-label="上一話與下一話">
+      {prev ? <a href={`/chapters/${prev.no}/`}><small>← {prev.label}</small><b>{prev.title}</b></a> : <span><small>←</small><b style="color:var(--ash)">這是第一話</b></span>}
+      {next ? <a class="nx" href={`/chapters/${next.no}/`}><small>{next.label} →</small><b>{next.title}</b></a> : <a class="nx" href="/chapters/"><small>第一卷 →</small><b>{volume.title}</b></a>}
+    </nav>
+    <a class="toc-link" href="/chapters/">看第一卷目次</a>
+  </div>
+</article>
+</BaseLayout>

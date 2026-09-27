@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import copy from '../../data/site-copy.json';
+const updated = '2026.09.27';
+const contact = (copy as any).contact_email;
+---
+<BaseLayout title={`隱私權政策 — ${copy.site_name}`} description={`${copy.site_name} 如何處理造訪者的資料。`}>
+<style is:global>
+.pvh{background:radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 70%);color:#EFE5D6;padding:150px 40px 56px;}
+.pvh-in,.pvb-in{max-width:720px;margin:0 auto;}
+.pvh h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4vw,42px);}
+.pvh p{color:#B9A89E;margin-top:10px;font-size:14px;}
+.pvb{padding:48px 40px 96px;background:var(--night);color:var(--bone);}
+.pvb h2{font-family:var(--serif);font-weight:500;font-size:19px;margin:36px 0 10px;padding-top:24px;border-top:1px solid var(--line);}
+.pvb h2:first-child{margin-top:0;padding-top:0;border-top:0;}
+.pvb p,.pvb li{font-size:15px;line-height:2;color:var(--bone);}
+.pvb ul{margin:6px 0 0 1.3em;}
+.pvb .ja{margin-top:48px;padding:22px 24px;background:var(--night-2);font-family:var(--jp);font-size:14px;}
+.pvb .ja p{font-size:14px;}
+@media(max-width:700px){.pvh{padding:120px 20px 40px;}.pvb{padding:36px 20px 72px;}}
+</style>
+<header class="pvh"><div class="pvh-in"><h1 class="rv">隱私權政策</h1><p class="rv" style="--i:1">最後更新：{updated}</p></div></header>
+<article class="pvb band-light"><div class="pvb-in">
+  <h2>這個網站是誰在經營</h2>
+  <p>{copy.site_name}（8aker0.com）由林子翔（Baker Lin）個人經營，所在地為日本大阪。本政策說明你造訪這個網站時，會有哪些資料被記錄、用在哪裡。</p>
+
+  <h2>會記錄的資料</h2>
+  <ul>
+    <li><b>瀏覽統計</b>：使用 Vercel Web Analytics，只看「多少人看了哪些頁面、從哪裡來、用什麼裝置」這類匯總數字。不使用 cookie，不會追蹤你在其他網站的行為，也無法用來辨識你是誰。</li>
+    <li><b>主機紀錄</b>：網站主機 Vercel 為了安全與維運，會自動記錄連線的技術資訊（例如 IP 位址、瀏覽器類型、造訪時間）。</li>
+    <li><b>訂閱付款</b>：支持訂閱由 Stripe 處理，信用卡資料直接交給 Stripe，本網站不會接觸或保存。</li>
+    <li><b>需求表</b>：日後開放在日服務的需求表時，只會收集回覆你所需要的資料（例如姓名、聯絡方式、需求內容），屆時會在表單上另外說明。</li>
+  </ul>
+
+  <h2>不會做的事</h2>
+  <ul>
+    <li>不販售、不出租任何造訪者的資料。</li>
+    <li>除非法律要求，不會把資料提供給第三方。</li>
+    <li>不使用廣告追蹤或跨網站追蹤。</li>
+  </ul>
+
+  <h2>外部服務</h2>
+  <p>網站中有連到 Strava、Stripe 等外部服務的連結，點進去之後適用各服務自己的隱私權政策。網站使用 Google Fonts 顯示字體，瀏覽器載入字體時會連線到 Google 的伺服器。</p>
+
+  <h2>站長本人的身體紀錄</h2>
+  <p>「身體紀錄」區塊的數據是站長本人的健康資料，存放在私人資料庫中，只有站長本人確認過的內容才會公開成文章。這與造訪者的資料無關。</p>
+
+  <h2>你的權利</h2>
+  <p>如果你想查詢、更正或刪除與你有關的資料，{contact ? <>請寫信到 <a href={`mailto:${contact}`}>{contact}</a>。</> : <>請透過本網站日後公布的聯絡方式與我聯繫。</>}我會在合理的時間內回覆。</p>
+
+  <h2>政策更新</h2>
+  <p>本政策如有修改，會更新在這一頁，並修改上方的「最後更新」日期。</p>
+
+  <div class="ja" lang="ja">
+    <p><b>プライバシーポリシー（要約）</b></p>
+    <p>本サイト（8aker0.com）は林子翔（Baker Lin、大阪在住）が個人で運営しています。アクセス解析には Cookie を使用しない Vercel Web Analytics を利用し、個人を特定しない集計データのみを確認しています。サブスクリプションの決済は Stripe が処理し、本サイトはカード情報を保持しません。取得した情報を販売・第三者提供することはありません（法令に基づく場合を除く）。</p>
+  </div>
+</div></article>
+</BaseLayout>

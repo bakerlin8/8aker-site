@@ -17,6 +17,14 @@ const website = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`
 const jsonld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [website, person, ...schema] }).replace(/</g, '\\u003c');
 const path = Astro.url.pathname;
 const isHome = path === '/' || path === '';
+import { pillars } from '../data/pillars';
+// The Japanese serif and the Latin display face only draw a small, known set of characters
+// (section numerals, pillar kanji, Japanese subtitles, vertical English labels), so request just those glyphs.
+const glyphs = [...new Set([
+  '壱弐参肆伍陸序結巻零・、。', 'したことは残す。済んだことは手放す。',
+  ...pillars.flatMap((p) => [p.kanji, p.titleJp]),
+  'StatusChaptersJournalWorksBodyHelloDirections', '0123456789',
+].join(''))].join('');
 const nav = [
   { href: '/#five', label: '能力值儀表' },
   { href: '/#chapters', label: '39・連載中' },
@@ -48,7 +56,8 @@ const nav = [
 <meta name="theme-color" content="#1C0F14">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&family=Cormorant+Garamond:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
+<link href={`https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300&family=Cormorant+Garamond:wght@500&display=swap&text=${encodeURIComponent(glyphs)}`} rel="stylesheet">
 <style is:global>
 /* ── tokens: palette 二「酒と生成り」── */
 :root{
@@ -171,7 +180,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
 
 <main><slot /></main>
 
-<footer class="site-foot"><span>{copy.site_name}</span><span>大阪・2026</span><span>{copy.motto_line1}{copy.motto_line2}</span></footer>
+<footer class="site-foot"><span>{copy.site_name}</span><span>大阪・2026</span><a href="/privacy/">隱私權政策</a><span>{copy.motto_line1}{copy.motto_line2}</span></footer>
 
 <script is:inline>
 (function(){

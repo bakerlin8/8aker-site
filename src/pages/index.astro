@@ -16,6 +16,8 @@ const dot = (d: Date) => ymd(d).replaceAll('-', '.');
 const counts = Object.fromEntries(pillars.map((p) => [p.slug, all.filter((a) => a.dir === p.slug).length]));
 const dan = (c: number) => (c >= 100 ? '四段' : c >= 60 ? '三段' : c >= 30 ? '二段' : c >= 10 ? '初段' : '見習');
 const MAX = 30;
+// weight/fat values appear on the homepage only if chosen in Studio (the demo data always shows them)
+const showBodyValues = (body as any).sample || (body as any).show_values === true;
 
 // pentagon geometry (viewBox centered on 0,0)
 const R = 150;
@@ -177,6 +179,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .tally div.zero .k{opacity:.35;} .tally div.zero b{color:var(--ash);}
 .tally-h{font-family:var(--serif);font-weight:500;font-size:14px;color:var(--gold);margin-top:22px;}
 .tally-h span{font-family:var(--sans);font-weight:300;font-size:12.5px;color:var(--ash);margin-left:8px;}
+.ch-link{display:inline-block;margin-top:22px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s,padding .4s var(--ease);}
+.ch-link:hover{color:var(--bone);border-color:var(--gold);padding-left:6px;}
 .mnums div{padding:12px 0;border-bottom:1px solid var(--line);}
 .mnums b{display:block;font-size:28px;font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;}
 .mnums small{font-size:12.5px;color:var(--ash);}
@@ -391,7 +395,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
       <div class="body-row">
         <div class="spark rv" style="--i:3">
-          <div class="spark-top"><span id="sparkLabel"></span><div class="tabs" role="group" aria-label="切換指標"><button aria-pressed="true" data-m="mins">訓練</button><button aria-pressed="false" data-m="fat">體脂</button><button aria-pressed="false" data-m="weight">體重</button></div></div>
+          <div class="spark-top"><span id="sparkLabel"></span>{showBodyValues ? <div class="tabs" role="group" aria-label="切換指標"><button aria-pressed="true" data-m="mins">訓練</button><button aria-pressed="false" data-m="fat">體脂</button><button aria-pressed="false" data-m="weight">體重</button></div> : <div class="tabs" hidden></div>}</div>
           <svg id="spark" viewBox="0 0 600 180" role="img" aria-label="近 12 週身體指標趨勢"></svg>
         </div>
         <div class="metrics rv" style="--i:4">
@@ -511,7 +515,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var from=i>0?list[i-1].date:D.start.slice(0,10),inRange=function(e){return (i>0?e.date>from:e.date>=from)&&e.date<=r.date;};
     var es=D.entries.filter(inRange),total=es.length,showT=!r.final&&(r.state!=='future');
     var tally=showT?'<p class="tally-h">'+(r.state==='next'?'這一話目前累積':'這一話累積')+'<span>'+from.slice(5).replace('-','.')+' – '+md(r)+'</span></p><div class="tally">'+D.dirs.map(function(d){var n=es.filter(function(e){return e.dir===d.id;}).length;return '<div class="'+(n?'':'zero')+'" style="--dc:'+col(d.id)+'"><span class="k">'+d.k+'</span><b>'+n+'</b><small>'+d.n+'</small></div>';}).join('')+'</div>':'';
-    Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+tally+'</div><div class="mnums"><div><b>'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
+    Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+tally+'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a></div><div class="mnums"><div><b>'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
   requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n)w.scrollLeft=Math.max(0,n.offsetLeft-80);});

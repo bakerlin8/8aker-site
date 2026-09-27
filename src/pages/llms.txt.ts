@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import { pillars } from '../data/pillars';
 import copy from '../data/site-copy.json';
+import { chapterList } from '../data/chapter-utils';
 
 // A plain-text guide for AI assistants: who this is, what's here, and where the key pages are.
 export async function GET({ site }: { site: URL }) {
@@ -23,6 +24,8 @@ export async function GET({ site }: { site: URL }) {
     const entries = (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).sort((a: any, b: any) => b.data.date - a.data.date);
     for (const e of entries as any[]) lines.push(`- [${e.data.title}](${base}/pillars/${p.slug}/${e.slug}/)（${p.type}，${e.data.date.toISOString().slice(0, 10)}）${e.data.excerpt ? `: ${e.data.excerpt}` : ''}`);
   }
+  lines.push('', '## 連載（每月 2 日刊出一話）', `- [第一卷目次](${base}/chapters/)`);
+  for (const c of chapterList().list) lines.push(`- [${c.label}　${c.title}](${base}/chapters/${c.no}/)（${c.date}，${c.state === 'done' ? '已刊出' : c.state === 'break' ? '休載' : '預定'}）`);
   lines.push('', '## 關於作者', '- 姓名：林子翔（Baker Lin）', '- 所在地：日本大阪', '- 語言：繁體中文、日文、英文', `- Strava：https://www.strava.com/athletes/103942910`, '');
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 }
