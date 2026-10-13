@@ -6,6 +6,7 @@ import copy from '../data/site-copy.json';
 import chapters from '../data/chapters.json';
 import worksData from '../data/works.json';
 import dreams from '../data/dreams.json';
+import silhouette from '../data/silhouette.json';
 import services from '../data/services.json';
 
 const all = (await Promise.all(
@@ -29,6 +30,7 @@ const rings = [0.25, 0.5, 0.75, 1].map((l) => pillars.map((_, i) => pt(i, l).map
 
 const journal = all.slice(0, 12);
 const pageData = {
+  sil: silhouette.points,
   dirs: pillars.map((p) => ({ id: p.slug, k: p.kanji, n: p.type })),
   entries: all.map((a) => ({ date: ymd(a.e.data.date), dir: a.dir, t: a.e.data.title, url: `/pillars/${a.dir}/${a.e.slug}` })),
   chapters,
@@ -411,7 +413,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Chapters</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
-      <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="dream">分鏡表</button><button aria-pressed="false" data-v="toc">第一卷目次</button></div>
+      <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="dream">分鏡表</button></div>
       <div id="vOne">
         <div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p>
         <div class="story">
@@ -452,7 +454,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               </article>); })}
           </div></div>); }); })()}
       </div>
-      <div id="vToc" hidden><div class="ygrid" id="ygrid"></div></div>
     </div>
   </div>
 </section>
@@ -590,40 +591,58 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   t();setInterval(t,1000);})();
 
 /* age rings: one ring a year, current ring drawn to the fraction of the year */
-(function(){var cv=document.getElementById('art');if(!cv)return;var ctx=cv.getContext('2d'),W,H,dpr,run=true,last=performance.now(),t=0,raf;
+(function(){var cv=document.getElementById('art');if(!cv)return;var ctx=cv.getContext('2d'),W=0,H=0,dpr=1,run=true,last=0,t=0,raf=0,started=false;
   var b=D.birth.split('-').map(Number),bd=function(y){return new Date(y+'-'+pad(b[1])+'-'+pad(b[2])+'T00:00:00+09:00').getTime();};
   var now=Date.now(),y=new Date(now+9*3600e3).getUTCFullYear();if(bd(y)>now)y--;
   var full=y-b[0],frac=(now-bd(y))/(bd(y+1)-bd(y)),total=Math.max(40,full+1);
-  var rnd=function(a,c){return a+Math.random()*(c-a);},seed=[rnd(0,6.28),rnd(0,6.28),rnd(0,6.28)],acc=0,rr=[0];
+  var rnd=function(a,c){return a+Math.random()*(c-a);},seed=[rnd(0,6.28),rnd(0,6.28)],acc=0,rr=[0];
   for(var i=1;i<=total;i++){acc+=rnd(.75,1.3);rr.push(acc);}
-  function rs(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.parentElement.getBoundingClientRect();W=cv.width=r.width*dpr;H=cv.height=r.height*dpr;}
-  rs();addEventListener('resize',rs);
-  /* 手機：年輪放在文字下方剩餘空間的正中央，大小依剩餘空間縮放，不再被切到畫面外 */
-  var G={top:0,h:0};function measure(){var hg=cv.parentElement.querySelector('.hero-grid'),hr=cv.parentElement.getBoundingClientRect();if(!hg){G={top:H*.5,h:H*.5};return;}var b=(hg.getBoundingClientRect().bottom-hr.top+12)*dpr;G={top:b,h:Math.max(H-b,0)};}
-  measure();addEventListener('resize',measure);if(document.fonts)document.fonts.ready.then(measure);var gap=function(){return G;};
-  var wide=function(){return W>900*dpr;},cx=function(){return W*(wide()?.66:.5);},
-      cy=function(){if(wide())return H*.52;var g=gap();return g.h>220*dpr?g.top+g.h*.5:H*.72;},
-      mn=function(){if(wide())return Math.min(W,H);var g=gap(),s=g.h>220*dpr?Math.min(W*.96,g.h*.92):Math.min(W,H)*.9;return s*1.18;};
-  function shape(i,a){var f=rr[i]/acc;return mn()*(.02+f*.34)*(1+.045*Math.sin(a*3+seed[0])+.028*Math.sin(a*5+seed[1]+f*2.2)+.014*Math.sin(a*11+seed[2]+f*4));}
-  function ring(i,p,rot){var N=180;ctx.beginPath();for(var j=0;j<=N*p;j++){var a=-Math.PI/2+j/N*Math.PI*2+rot,r=shape(i,a),x=cx()+Math.cos(a)*r,yy=cy()+Math.sin(a)*r;j?ctx.lineTo(x,yy):ctx.moveTo(x,yy);}ctx.stroke();}
-  function frame(dt){t+=dt;ctx.clearRect(0,0,W,H);var rot=t*.006,g=Math.min(1,t/5);
-    for(var i=1;i<=full;i++){var f=i/full;ctx.strokeStyle='rgba(212,162,76,'+(.06+.26*f*f).toFixed(3)+')';ctx.lineWidth=(.7+.4*f)*dpr;ring(i,Math.min(1,g*1.4),rot);}
-    ctx.strokeStyle='rgba(236,196,118,.9)';ctx.lineWidth=1.7*dpr;ctx.shadowColor='rgba(212,162,76,.6)';ctx.shadowBlur=(6+3*Math.sin(t*1.3))*dpr;ring(full+1,frac*g,rot);ctx.shadowBlur=0;
-    ctx.setLineDash([2*dpr,7*dpr]);ctx.strokeStyle='rgba(239,229,214,.22)';ctx.lineWidth=dpr;for(var k=full+2;k<=total;k++)ring(k,1,rot);ctx.setLineDash([]);
-    if(g>.98)tip(-Math.PI/2+frac*Math.PI*2+rot);}
-  function tip(a){var r=shape(full+1,a),x=cx()+Math.cos(a)*r,yy=cy()+Math.sin(a)*r;
-    for(var k=0;k<3;k++){var ph=((t*.55)+k/3)%1;ctx.beginPath();ctx.arc(x,yy,(4+ph*28)*dpr,0,Math.PI*2);ctx.strokeStyle='rgba(236,196,118,'+((1-ph)*.55).toFixed(3)+')';ctx.lineWidth=dpr;ctx.stroke();}
-    ctx.beginPath();ctx.arc(x,yy,3.6*dpr,0,Math.PI*2);ctx.fillStyle='rgb(236,196,118)';ctx.shadowColor='rgba(212,162,76,.9)';ctx.shadowBlur=8*dpr;ctx.fill();ctx.shadowBlur=0;
-    if(!wide())return;
-    var ox=Math.cos(a),oy=Math.sin(a),x1=x+ox*12*dpr,y1=yy+oy*12*dpr,x2=x+ox*38*dpr,y2=yy+oy*38*dpr;
+  /* 年輪＝我的輪廓：內圈是圓（小時候），越往外越長成現在的樣子。輪廓點只算一次。 */
+  var SH=D.sil,N=SH.length,UX=[],UY=[],RD=[],rm=0;
+  for(var j=0;j<N;j++){var r0=Math.hypot(SH[j][0],SH[j][1])||1e-3;RD.push(r0);UX.push(SH[j][0]/r0);UY.push(SH[j][1]/r0);rm+=r0;}rm/=N;
+  var RX=[],RY=[];/* 每一圈的點（相對中心、未乘尺寸），預先算好 */
+  for(i=1;i<=total;i++){var f=rr[i]/acc,m=Math.min(1,Math.pow(f,1.6)),sc=.04+f*.96,xs=new Float32Array(N),ys=new Float32Array(N);
+    for(j=0;j<N;j++){var rad=((1-m)*rm+m*RD[j])*sc*(1+.012*Math.sin(j/N*6.283*5+seed[0]+f*3)+.006*Math.sin(j/N*6.283*11+seed[1]));xs[j]=UX[j]*rad;ys[j]=UY[j]*rad;}
+    RX[i]=xs;RY[i]=ys;}
+  var CX=0,CY=0,S=1,layer=null,future=null;
+  function geom(){var wide=W>900*dpr;var hg=cv.parentElement.querySelector('.hero-grid'),hr=cv.parentElement.getBoundingClientRect();
+    if(wide){S=Math.min(W*.3,H*.42);CX=W*.68;CY=H*.5+S*.1;return;}
+    var top=hg?(hg.getBoundingClientRect().bottom-hr.top+16)*dpr:H*.5,gh=Math.max(H-top,0);
+    if(gh>200*dpr){S=Math.min(W*.42,gh/1.7);CX=W*.5;CY=top+gh*.5+S*.1;}else{S=Math.min(W,H)*.34;CX=W*.5;CY=H*.7;}}
+  function path(c,i,p){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p));c.beginPath();c.moveTo(CX+xs[0]*S,CY+ys[0]*S);for(var j=1;j<=n;j++){var k=j%N;c.lineTo(CX+xs[k]*S,CY+ys[k]*S);}}
+  function mk(){var c=document.createElement('canvas');c.width=W;c.height=H;return c;}
+  /* 已長好的年輪與未來的虛線圈，畫一次存起來，之後每幀只貼圖 */
+  function bake(){layer=mk();var c=layer.getContext('2d');c.lineJoin='round';
+    for(var i=1;i<=full;i++){var f=i/full;c.strokeStyle='rgba(212,162,76,'+(.06+.26*f*f).toFixed(3)+')';c.lineWidth=(.7+.4*f)*dpr;path(c,i,1);c.closePath();c.stroke();}
+    future=mk();c=future.getContext('2d');c.setLineDash([2*dpr,7*dpr]);c.strokeStyle='rgba(239,229,214,.2)';c.lineWidth=dpr;for(var k=full+2;k<=total;k++){path(c,k,1);c.closePath();c.stroke();}}
+  function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
+    /* iOS 捲動時網址列伸縮只改高度：寬度沒變就不重建畫布 */
+    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();bake();return true;}
+  function frame(dt){t+=dt;var g=Math.min(1,t/4.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
+    if(e<1){ctx.save();ctx.beginPath();var oS=S;S=oS*(.05+e*1.02);path(ctx,total,1);S=oS;ctx.closePath();ctx.clip();ctx.drawImage(layer,0,0);ctx.restore();}else ctx.drawImage(layer,0,0);
+    ctx.globalAlpha=e;ctx.drawImage(future,0,0);ctx.globalAlpha=1;
+    var p=frac*e,br=.5+.5*Math.sin(t*1.3);ctx.lineJoin='round';
+    path(ctx,full+1,p);ctx.strokeStyle='rgba(212,162,76,'+(.10+.08*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
+    ctx.strokeStyle='rgba(236,196,118,.92)';ctx.lineWidth=1.7*dpr;ctx.stroke();
+    if(g>.98)tip(Math.floor(N*frac)%N);}
+  function tip(k){var x=CX+RX[full+1][k]*S,yy=CY+RY[full+1][k]*S;
+    for(var q=0;q<3;q++){var ph=((t*.55)+q/3)%1;ctx.beginPath();ctx.arc(x,yy,(4+ph*28)*dpr,0,6.2832);ctx.strokeStyle='rgba(236,196,118,'+((1-ph)*.55).toFixed(3)+')';ctx.lineWidth=dpr;ctx.stroke();}
+    ctx.beginPath();ctx.arc(x,yy,9*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.18)';ctx.fill();
+    ctx.beginPath();ctx.arc(x,yy,3.6*dpr,0,6.2832);ctx.fillStyle='rgb(236,196,118)';ctx.fill();
+    if(W<=900*dpr)return;
+    var dx=x-CX,dy=yy-CY,dl=Math.hypot(dx,dy)||1,ox=dx/dl,oy=dy/dl,x1=x+ox*12*dpr,y1=yy+oy*12*dpr,x2=x+ox*38*dpr,y2=yy+oy*38*dpr;
     ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle='rgba(239,229,214,.5)';ctx.lineWidth=dpr;ctx.stroke();
     var age=(full+(Date.now()-bd(y))/(bd(y+1)-bd(y))).toFixed(3);
     ctx.font=(12*dpr)+'px "Noto Sans TC",system-ui,sans-serif';ctx.fillStyle='rgba(239,229,214,.88)';ctx.textAlign=ox>=0?'left':'right';ctx.textBaseline='middle';
     ctx.fillText('今　'+age+' 歲',x2+(ox>=0?6:-6)*dpr,y2);}
-  function loop(ts){if(!run)return;var dt=Math.min(.05,(ts-last)/1e3);last=ts;frame(dt);raf=requestAnimationFrame(loop);}
-  if(RM){t=6;frame(0);return;}
-  raf=requestAnimationFrame(loop);
-  new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;if(run){last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv.parentElement);})();
+  function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;frame(dt);raf=requestAnimationFrame(loop);}
+  var rt=0;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(size(false)&&(RM||!run))frame(0);},150);});
+  function start(){if(started)return;started=true;size(true);
+    if(RM){t=9;frame(0);return;}
+    raf=requestAnimationFrame(loop);
+    new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;cancelAnimationFrame(raf);if(run){last=0;raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv.parentElement);}
+  /* 等字型與第一屏排好再開始長，避開開場最忙的那一秒 */
+  if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
 
 /* 連載: 第 0 話 … 第 11 話 → 第一卷 */
 (function(){var C=D.chapters,now=Date.now(),T=function(d){return new Date(d+'T00:00:00+09:00').getTime();};
@@ -666,13 +685,11 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
   requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n&&w.scrollWidth>w.clientWidth){var li=n.closest('li');w.scrollLeft=Math.max(0,li.offsetLeft-w.clientWidth/2+li.offsetWidth/2);}});
-  var Y=document.getElementById('ygrid');
-  Y.innerHTML=list.map(function(r,i){var s={done:'已刊出',break:'休載',next:'製作中・'+r.days+' 天後',future:r.days+' 天後'}[r.state];return '<button class="ycard '+r.state+(r.final?' final':'')+'" data-i="'+i+'"><span class="n">'+label(r)+'・'+md(r)+(r.arc?'・'+r.arc:'')+'</span><h4>'+esc(r.title)+'</h4><span class="s">'+s+'</span></button>';}).join('');
-  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V2=document.getElementById('vToc'),V3=document.getElementById('vDream');
-  function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V2.hidden=v!=='toc';V3.hidden=v!=='dream';}
+  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V3=document.getElementById('vDream');
+  function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V3.hidden=v!=='dream';}
   if(location.hash==='#dreams')view('dream');
   MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});
-  Y.addEventListener('click',function(e){var c=e.target.closest('.ycard');if(c){view('one');show(+c.dataset.i);}});})();
+})();
 
 
 /* 需求表：選服務 → 預先帶入；送出到私人收件匣 */
