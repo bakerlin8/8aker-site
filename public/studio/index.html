@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>8AKER零 Studio</title>
 <link rel="icon" href="/studio/icons/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/studio/icons/favicon-32.png">
@@ -169,13 +169,79 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .hb-preview{white-space:pre-wrap;font-size:13.5px;background:var(--parchment);padding:14px 16px;line-height:1.8;max-height:360px;overflow:auto;}
 .hb-checks{display:flex;flex-direction:column;gap:6px;margin:8px 0 14px;}
 .hb-checks label{display:flex;gap:8px;align-items:center;font-size:13.5px;}
+
+/* ── icons ── */
+.login-mark{width:72px;height:72px;border-radius:16px;display:block;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);}
+.sidebar-brand-icon{width:26px;height:26px;border-radius:6px;}
+.mbar{display:none;}
+.scrim{display:none;}
+
+/* ── 手機版：頂部列＋左側抽屜選單 ── */
+@media(max-width:820px){
+  .app.visible{display:block;}
+  .mbar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:40;
+    padding:calc(env(safe-area-inset-top,0px) + 6px) 12px 6px 6px;
+    background:rgba(242,231,225,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);}
+  .mbar-menu{width:44px;height:44px;background:none;border:0;position:relative;flex-shrink:0;}
+  .mbar-menu i{position:absolute;left:12px;right:12px;height:1.5px;background:var(--ink);border-radius:1px;}
+  .mbar-menu i:nth-child(1){top:15px}.mbar-menu i:nth-child(2){top:21px;right:18px}.mbar-menu i:nth-child(3){top:27px}
+  .mbar-title{flex:1;min-width:0;font-family:'Noto Serif TC',serif;font-weight:500;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mbar-icon{width:26px;height:26px;border-radius:6px;}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:min(300px,84vw);height:auto;z-index:60;
+    padding:calc(env(safe-area-inset-top,0px) + 24px) 16px calc(env(safe-area-inset-bottom,0px) + 20px);
+    transform:translateX(-102%);transition:transform .4s var(--ease);box-shadow:20px 0 40px -20px rgba(0,0,0,.5);}
+  .nav-open .sidebar{transform:none;}
+  .scrim{display:block;position:fixed;inset:0;z-index:55;background:rgba(28,15,20,.45);opacity:0;pointer-events:none;transition:opacity .3s;}
+  .nav-open .scrim{opacity:1;pointer-events:auto;}
+  .nav-open{overflow:hidden;}
+  .sidebar-brand{margin-bottom:26px;}
+  .nav-item{padding:12px 12px;font-size:15px;min-height:46px;}
+  .nav-group-label{font-size:10.5px;}
+  .sidebar .nav-item:hover{padding-left:12px;}
+  .sidebar-btn{padding:12px 0;font-size:13px;}
+  .legacy-link{font-size:12px;padding:6px 0;}
+  .main{padding:20px 16px calc(env(safe-area-inset-bottom,0px) + 40px);max-width:none;}
+  .page-eyebrow{display:none;}
+  .page-title{font-size:23px;}
+  .page-sub{margin-bottom:22px;}
+  /* iOS：字級小於 16px 的輸入框一點就會自動放大畫面 */
+  .field input[type=text],.field input[type=date],.field input[type=password],.field textarea,.field select,input,textarea,select{font-size:16px!important;}
+  .field input[type=text],.field input[type=date],.field input[type=password]{min-height:46px;}
+  .field-label{font-size:13px;}
+  .field-hint{font-size:12px;}
+  .field-checkbox input,.hb-checks input{width:20px;height:20px;flex-shrink:0;}
+  .hb-checks label{align-items:flex-start;line-height:1.6;}
+  .btn{min-height:44px;justify-content:center;font-size:14px;}
+  .btn-row{flex-wrap:wrap;gap:10px;margin-top:26px;}
+  .btn-row .btn-primary{flex:1 1 100%;}
+  .btn-row .spacer{display:none;}
+  #newArticleBtn{width:100%;}
+  .list-row{padding:16px 2px;}
+  .list-row:hover{padding-left:2px;}
+  .list-row-title{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.55;}
+  .list-row-meta{font-size:11.5px;flex-wrap:wrap;}
+  .tag-chip{font-size:12.5px;padding:7px 12px;}
+  .hb-card{padding:16px 14px;margin-bottom:16px;}
+  .hb-tablewrap{overflow-x:auto;margin:0 -14px;padding:0 14px;}
+  .hb-table{min-width:460px;}
+  .hb-table td,.hb-table th{white-space:nowrap;}
+  .hb-code code{min-width:0;flex-basis:100%;}
+  .hb-code .btn{flex:1;}
+  .hb-preview{font-size:14px;}
+  .toast-wrap{left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);}
+  .toast{font-size:14px;}
+  .login-card{padding:40px 28px;}
+  .login-btn{min-height:50px;font-size:15px;}
+}
+@media(max-width:820px){ [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;} }
 </style>
 </head>
 <body>
 
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
-    <svg class="login-mark" viewBox="0 0 24 24" fill="none"><path d="M4 18 L4 9 L12 4 L20 9 L20 18" stroke="#fdf8f6" stroke-width="1.1"/><path d="M4 18 L20 18" stroke="#fdf8f6" stroke-width="1.1"/><path d="M8 18 L8 12 L12 9.5 L16 12 L16 18" stroke="#b8935a" stroke-width="0.9"/></svg>
+    <img class="login-mark" src="/studio/icons/icon-192.png" alt="">
     <div class="login-title">8AKER零 Studio</div>
     <div class="login-sub">內容編輯後台</div>
     <button class="login-btn" id="loginBtn">
@@ -187,9 +253,15 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 </div>
 
 <div class="app" id="app">
-  <aside class="sidebar">
+  <header class="mbar" id="mbar">
+    <button class="mbar-menu" id="mMenu" aria-label="開啟選單" aria-expanded="false" aria-controls="sidebar"><i></i><i></i><i></i></button>
+    <div class="mbar-title" id="mTitle">首頁文案</div>
+    <img class="mbar-icon" src="/studio/icons/favicon-32.png" alt="">
+  </header>
+  <div class="scrim" id="scrim"></div>
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <svg class="sidebar-brand-icon" viewBox="0 0 24 24" fill="none"><path d="M4 18 L4 9 L12 4 L20 9 L20 18" stroke="#fdf8f6" stroke-width="1.2"/><path d="M4 18 L20 18" stroke="#fdf8f6" stroke-width="1.2"/><path d="M8 18 L8 12 L12 9.5 L16 12 L16 18" stroke="#b8935a" stroke-width="1"/></svg>
+      <img class="sidebar-brand-icon" src="/icons/favicon-32.png" alt="">
       <div>
         <div class="sidebar-brand-text">8AKER零</div>
         <div class="sidebar-brand-sub">STUDIO</div>
@@ -423,8 +495,22 @@ const views = ['home', 'chapters', 'works', 'body', 'pillar', 'article'];
 let currentPillar = null;
 let currentArticle = null; // { path, sha, isNew }
 
+function setNav(open) {
+  document.body.classList.toggle('nav-open', open);
+  const b = document.getElementById('mMenu'); if (b) { b.setAttribute('aria-expanded', open); b.setAttribute('aria-label', open ? '關閉選單' : '開啟選單'); }
+}
+document.getElementById('mMenu').addEventListener('click', () => setNav(!document.body.classList.contains('nav-open')));
+document.getElementById('scrim').addEventListener('click', () => setNav(false));
+addEventListener('keydown', e => { if (e.key === 'Escape') setNav(false); });
+function syncTitle(name) {
+  const v = document.getElementById(`view-${name}`), t = v && v.querySelector('.page-title');
+  const mt = document.getElementById('mTitle'); if (mt && t) mt.textContent = t.textContent || '8AKER零 Studio';
+}
 function showView(name) {
+  setNav(false);
+  window.scrollTo(0, 0);
   views.forEach(v => document.getElementById(`view-${v}`).classList.toggle('active', v === name));
+  requestAnimationFrame(() => syncTitle(name));
   document.querySelectorAll('.nav-item[data-view]').forEach(el => {
     const match = el.dataset.view === name && (name !== 'pillar' || el.dataset.pillar === currentPillar);
     el.classList.toggle('active', match);
@@ -588,7 +674,7 @@ async function loadPillar(slug) {
   showView('pillar');
   const meta = PILLARS[slug];
   document.getElementById('pillarEyebrow').textContent = `Pillar · ${meta.jp}`;
-  document.getElementById('pillarTitle').textContent = meta.title;
+  document.getElementById('pillarTitle').textContent = meta.title; syncTitle('pillar');
   document.getElementById('pillarSub').textContent = `src/content/${slug}`;
   const list = document.getElementById('articleList');
   list.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
@@ -643,7 +729,7 @@ async function editArticle(slug, path) {
 function renderArticleForm(fm) {
   showView('article');
   document.getElementById('articleEyebrow').textContent = `Pillar · ${PILLARS[currentPillar].jp}`;
-  document.getElementById('articleModeTitle').textContent = currentArticle.isNew ? '新增文章' : '編輯文章';
+  document.getElementById('articleModeTitle').textContent = currentArticle.isNew ? '新增文章' : '編輯文章'; syncTitle('article');
   const form = document.getElementById('articleForm');
 
   form.innerHTML = `
@@ -714,7 +800,7 @@ function renderArticleForm(fm) {
       currentArticle.path = path;
       currentArticle.isNew = false;
       toast('已儲存，網站將在約一分鐘內更新');
-      document.getElementById('articleModeTitle').textContent = '編輯文章';
+      document.getElementById('articleModeTitle').textContent = '編輯文章'; syncTitle('article');
       btn.textContent = '儲存變更';
       const deleteBtnExists = document.getElementById('deleteArticleBtn');
       if (!deleteBtnExists) {
@@ -815,9 +901,9 @@ async function loadBody() {
       </div>
       <div class="hb-card">
         <h3>② 最近 14 天（點一列切換草稿日期）</h3>
-        <table class="hb-table"><thead><tr><th>日期</th><th>運動</th><th>體重</th><th>體脂</th><th></th></tr></thead><tbody>
+        <div class="hb-tablewrap"><table class="hb-table"><thead><tr><th>日期</th><th>運動</th><th>體重</th><th>體脂</th><th></th></tr></thead><tbody>
         ${data.recent.map((r) => `<tr class="pick ${r.day === d.day ? 'sel' : ''}" data-day="${r.day}"><td>${r.day.slice(5).replace('-', '.')}</td><td>${r.mins ? `${r.mins} 分・${r.workouts.map((w) => escapeHtml(w.name)).join('、')}` : '—'}</td><td>${r.weight ?? '—'}</td><td>${r.fat != null ? r.fat + '%' : '—'}</td><td>${r.published ? '<span class="hb-tag done">已發布</span>' : ''}</td></tr>`).join('')}
-        </tbody></table>
+        </tbody></table></div>
         ${data.has_data ? '' : '<p class="hb-note" style="margin-top:10px">還沒收到任何資料。照下面 ③ 連接 Strava、④ 設定 iPhone 捷徑後就會出現。</p>'}
       </div>
       <div class="hb-card">
