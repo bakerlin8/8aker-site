@@ -705,12 +705,12 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 (function(){var F=document.getElementById('inquiry');if(!F)return;var M=document.getElementById('inqMsg'),SEL=F.querySelector('select[name=service]');
   document.addEventListener('click',function(e){var a=e.target.closest('[data-svc]');if(!a)return;var v=a.dataset.svc;if(v==='ai')v='ai';if([].some.call(SEL.options,function(o){return o.value===v;}))SEL.value=v;});
   F.addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(F),b={};fd.forEach(function(v,k){b[k]=String(v);});b.lang=navigator.language||'';
-    if(!b.name.trim()||!b.contact.trim()||b.message.trim().length<5){M.className='fmsg err';M.textContent='請填寫稱呼、聯絡方式和需求內容。';return;}
+    if(!b.name.trim()||!b.contact.trim()||b.message.trim().length<5){M.className='fmsg err';M.textContent='請填寫稱呼、聯絡方式和需求內容。';window.sfx&&sfx('error');return;}
     var btn=F.querySelector('button[type=submit]');btn.disabled=true;M.className='fmsg';M.textContent='送出中…';
     fetch('https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/inquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
       .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
-      .then(function(x){if(!x.ok)throw new Error(x.d&&x.d.error||'送出失敗');F.reset();M.className='fmsg ok';M.textContent='已收到，我們會在 2 個工作天內回覆你。';})
-      .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';})
+      .then(function(x){if(!x.ok)throw new Error(x.d&&x.d.error||'送出失敗');F.reset();M.className='fmsg ok';M.textContent='已收到，我們會在 2 個工作天內回覆你。';window.sfx&&sfx('success');})
+      .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
 
 /* journal filter */
