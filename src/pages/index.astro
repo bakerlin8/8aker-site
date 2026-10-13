@@ -16,6 +16,7 @@ all.sort((a, b) => b.e.data.date.valueOf() - a.e.data.date.valueOf());
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
 const dot = (d: Date) => ymd(d).replaceAll('-', '.');
 const counts = Object.fromEntries(pillars.map((p) => [p.slug, all.filter((a) => a.dir === p.slug).length]));
+const prog = (c: number) => { const T = [0, 10, 30, 60, 100]; if (c >= 100) return 100; const k = T.findIndex((t) => c < t); return Math.round(((c - T[k - 1]) / (T[k] - T[k - 1])) * 100); };
 const dan = (c: number) => (c >= 100 ? '四段' : c >= 60 ? '三段' : c >= 30 ? '二段' : c >= 10 ? '初段' : '見習');
 const MAX = 30;
 
@@ -106,29 +107,35 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 @media(max-width:900px){.hero{align-items:flex-start;}.hero-in{padding:112px 20px 64px;}}
 
 /* ── 壱 連載：五角形能力值 ── */
-.story{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:44px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px;align-items:start;}
+.story{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:44px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px;align-items:start;}
 .stat{background:var(--night-2);border:1px solid var(--line);padding:18px 18px 14px;}
 .stat .tabs{display:flex;gap:4px;}
 .stat .tabs button{font-size:12.5px;padding:3px 11px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
 .stat .tabs button:hover{border-color:var(--bone-2);}
 .stat .tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
 .stat-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--bone-2);}
-.penta{margin:6px auto 0;max-width:280px;}
+.pgrid{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr);gap:22px;align-items:center;margin-top:8px;}
+.penta{margin:0;max-width:210px;width:100%;}
 .penta svg{width:100%;height:auto;overflow:visible;display:block;}
 .penta .grow{transform:scale(.001);transition:transform 1.4s var(--ease) .3s;}
 .in .penta .grow{transform:none;}
 .shape{fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.5;transition:all .8s var(--ease);}
 .pdot{transition:cx .8s var(--ease),cy .8s var(--ease);}
-.axis{font-family:var(--jp);font-size:24px;fill:var(--bone-2);transition:fill .3s;}
+.axis{font-family:var(--jp);font-size:26px;fill:var(--bone-2);transition:fill .3s;}
 .penta a:hover .axis{fill:var(--gold);}
-.plegend{list-style:none;margin-top:6px;border-top:1px solid var(--line);}
-.plegend a{display:grid;grid-template-columns:30px minmax(0,1fr) auto 40px;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);transition:background .3s,padding .35s var(--ease);}
+
+.plegend{list-style:none;margin:0;}
+.plegend a{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);transition:background .3s,padding .35s var(--ease);}
+.plegend li:last-child a{border-bottom:0;}
 .plegend a:hover{background:var(--night-3);padding-left:8px;}
-.plegend .k{font-family:var(--jp);font-size:20px;color:var(--dc);text-align:center;}
-.plegend .n{font-size:14px;}
-.plegend .n small{font-size:11.5px;color:var(--ash);margin-left:6px;}
+.plegend .k{font-family:var(--jp);font-size:19px;color:var(--dc);text-align:center;}
+.plegend .n{font-size:14px;min-width:0;}
+.plegend .n small{display:block;font-size:11.5px;color:var(--ash);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.plegend .pbar{display:block;height:3px;background:var(--line);margin-top:6px;position:relative;overflow:hidden;}
+.plegend .pbar i{position:absolute;left:0;top:0;bottom:0;background:var(--dc);transition:width 1s var(--ease);}
+.plegend .nd{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;min-width:34px;}
 .plegend b{font-weight:300;font-size:18px;}
-.plegend .dan{font-family:var(--serif);font-size:12.5px;color:var(--bone-2);text-align:right;}
+.plegend .dan{font-family:var(--serif);font-size:11.5px;color:var(--bone-2);text-align:right;margin-top:2px;}
 .dir-note{font-size:11.5px;color:var(--ash);margin-top:10px;}
 @media(max-width:960px){.story{grid-template-columns:1fr;gap:28px;}}
 
@@ -363,6 +370,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .dgrid{grid-template-columns:1fr;}
   .stat .tabs button{padding:7px 12px;font-size:13px;}
   .stat{padding:14px 12px 12px;}
+  .pgrid{grid-template-columns:minmax(0,130px) minmax(0,1fr);gap:12px;}
+  .axis{font-size:30px;}
   .mdetail h3{font-size:21px;}
           .mnums b{font-size:22px;}
   .mnums small{font-size:11.5px;line-height:1.4;display:block;}
@@ -427,7 +436,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           <div class="mdetail" id="mdetail" aria-live="polite"></div>
           <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
             <div class="stat-top"><span id="pLabel">全卷累計</span><div class="tabs" id="pMode" role="group" aria-label="切換累計範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></div>
-            <div class="penta">
+            <div class="pgrid"><div class="penta">
               <svg id="penta" viewBox="-190 -190 380 380" role="img" aria-label="五個方向的累積雷達圖">
                 {rings.map((r) => <polygon points={r} fill="none" style="stroke:var(--line)" />)}
                 {pillars.map((_, i) => { const [x, y] = pt(i, 1); return <line x1="0" y1="0" x2={x.toFixed(1)} y2={y.toFixed(1)} style="stroke:var(--line)" />; })}
@@ -437,9 +446,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               </svg>
             </div>
             <ul class="plegend" id="pLegend">
-              {pillars.map((p) => <li style={`--dc:var(--c-${p.slug})`}><a href={`/pillars/${p.slug}`}><span class="k">{p.kanji}</span><span class="n">{p.type}<small>{p.title}</small></span><b class="num" data-d={p.slug}>{counts[p.slug]}</b><span class="dan" data-dan={p.slug}>{dan(counts[p.slug])}</span></a></li>)}
-            </ul>
-            <p class="dir-note">段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
+              {pillars.map((p) => <li style={`--dc:var(--c-${p.slug})`}><a href={`/pillars/${p.slug}`}><span class="k">{p.kanji}</span><span class="n">{p.type}<small>{p.title}</small><i class="pbar"><i data-bar={p.slug} style={`width:${prog(counts[p.slug])}%`}></i></i></span><span class="nd"><b class="num" data-d={p.slug}>{counts[p.slug]}</b><span class="dan" data-dan={p.slug}>{dan(counts[p.slug])}</span></span></a></li>)}
+            </ul></div>
+            <p class="dir-note" id="pNote">進度條＝離下一個段位還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
           </aside>
         </div>
       </div>
@@ -687,7 +696,9 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var pts=D.dirs.map(function(d,i){var v=.15+((c[d.id]||0)/top)*.85,a=-Math.PI/2+i*2*Math.PI/5;return [Math.cos(a)*150*v,Math.sin(a)*150*v];});
     PS.setAttribute('points',pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' '));
     PD.forEach(function(el,i){el.setAttribute('cx',pts[i][0].toFixed(1));el.setAttribute('cy',pts[i][1].toFixed(1));});
-    D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');});
+    var prog=function(n){var T=[0,10,30,60,100];if(n>=100)return 100;for(var k=1;k<T.length;k++)if(n<T[k])return Math.round((n-T[k-1])/(T[k]-T[k-1])*100);return 100;};
+    D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');document.querySelector('[data-bar="'+d.id+'"]').style.width=(m==='all'?prog(n):Math.round(n/top*100))+'%';});
+    var PN=document.getElementById('pNote');if(PN)PN.textContent=m==='all'?'進度條＝離下一個段位還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。':'進度條＝這一話各方向的比例。';
     PL.textContent=m==='all'?'全卷累計':(CUR?CUR.label:'這一話');
     PMB.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===m);});}
   PMB.addEventListener('click',function(e){var b=e.target.closest('button');if(b)penta(b.dataset.m);});

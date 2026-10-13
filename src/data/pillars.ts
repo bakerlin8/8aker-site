@@ -80,4 +80,8 @@ export const pillars: PillarMeta[] = [
   },
 ];
 
+// 副標（例：運動與健康）可在 Studio「首頁文案」修改，存在 site-copy.json 的 pillar_<slug>_title
+import siteCopy from './site-copy.json';
+for (const p of pillars) { const t = (siteCopy as any)[`pillar_${p.slug}_title`]; if (typeof t === 'string' && t.trim()) p.title = t.trim(); }
+
 export const pillarBySlug = (slug: string) => pillars.find(p => p.slug === slug);
