@@ -276,7 +276,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="nav-item" data-view="home">首頁文案</div>
       <div class="nav-item" data-view="inbox">需求收件匣 <span class="count" id="count-inbox"></span></div>
       <div class="nav-item" data-view="chapters">連載・每月一話</div>
-      <div class="nav-item" data-view="dreams">分鏡表</div>
+      <div class="nav-item" data-view="dreams">祈願所</div>
       <div class="nav-item" data-view="works">有點樣子（作品）</div>
       <div class="nav-item" data-view="services">服務與住宿</div>
       <div class="nav-item" data-view="body">身體紀錄 <span class="count" id="count-body"></span></div>
@@ -336,9 +336,9 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 
     <!-- DREAMS -->
     <section class="view" id="view-dreams">
-      <div class="page-eyebrow">Storyboard</div>
-      <div class="page-title">分鏡表</div>
-      <div class="page-sub">網站上以草稿紙呈現：想畫＝鉛筆構圖、作畫中＝依進度鋪上斜線、已刊出＝上墨蓋章。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#dreams" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
+      <div class="page-eyebrow">Kiganjo</div>
+      <div class="page-title">祈願所</div>
+      <div class="page-sub">今年要完成的事，網站上以直式手帳呈現、由左到右排列，每一件掛一塊繪馬。狀態：許願 → 進行中 → 已實現（繪馬蓋「叶」）。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#kiganjo" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
       <div id="dreamsForm"></div>
     </section>
 
@@ -703,7 +703,7 @@ async function loadWorks() {
     form.innerHTML = data.works.map((w, i) => `
       <div style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span class="field-label" style="margin:0">成果 ${i + 1}</span>
-          <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>上移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">移除</button></span></div>
+          <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">移除</button></span></div>
         <div class="field"><label class="field-label">方向</label><select data-w="${i}" data-key="dir" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)">${dirOpts(w.dir)}</select></div>
         <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
         <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
@@ -737,7 +737,7 @@ async function saveJson(path, data, sha, msg, btn) {
   finally { btn.disabled = false; btn.textContent = t; }
 }
 
-/* ══════════════════════════ 分鏡表 ══════════════════════════ */
+/* ══════════════════════════ 祈願所 ══════════════════════════ */
 async function loadDreams() {
   showView('dreams');
   const form = document.getElementById('dreamsForm');
@@ -753,33 +753,29 @@ async function loadDreams() {
       else it[k] = el.value; });
   }
   function render() {
-    form.innerHTML = `<div class="field"><label class="field-label">分鏡表開頭的一句話</label><input type="text" data-intro value="${escapeAttr(data.intro || '')}"></div>` +
+    form.innerHTML = `<div class="field"><label class="field-label">祈願所開頭的一句話</label><input type="text" data-intro value="${escapeAttr(data.intro || '')}"></div>` +
       data.items.map((d, i) => `
       <div class="hb-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="field-label" style="margin:0">第 ${i + 1} 格</span>
-          <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-up="${i}" ${i === 0 ? 'disabled' : ''}>上移</button><button class="btn btn-danger" data-del="${i}">移除</button></span></div>
-        <div class="field"><label class="field-label">想做的事（做完時能判斷「完成了」）</label><input type="text" data-d="${i}" data-key="title" value="${escapeAttr(d.title)}"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="field-label" style="margin:0">第 ${i + 1} 塊繪馬（網站上由左到右）</span>
+          <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" data-del="${i}">移除</button></span></div>
+        <div class="field"><label class="field-label">想完成的事（做完時能判斷「實現了」）</label><input type="text" data-d="${i}" data-key="title" value="${escapeAttr(d.title)}"></div>
         <div class="field"><label class="field-label">為什麼想做</label><textarea rows="2" data-d="${i}" data-key="why">${escapeHtml(d.why || '')}</textarea></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
-          <div class="field"><label class="field-label">方向</label><select data-d="${i}" data-key="dir" style="${SEL_STYLE}">${opt(dirs, d.dir)}</select></div>
-          <div class="field"><label class="field-label">期限</label><select data-d="${i}" data-key="horizon" style="${SEL_STYLE}">${opt([['vol1', '第一卷（40 歲前）'], ['someday', '總有一天']], d.horizon)}</select></div>
-          <div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt([['idea', '想畫'], ['doing', '作畫中'], ['done', '已刊出']], d.state)}</select></div>
-        </div>
+        <div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt([['idea', '許願'], ['doing', '進行中'], ['done', '已實現']], d.state)}</select></div>
         <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:12px">
-          <div class="field"><label class="field-label">鉛筆旁註（紅筆小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
-          <div class="field"><label class="field-label">作畫進度 %</label><input type="number" min="0" max="100" step="5" data-d="${i}" data-key="progress" value="${d.progress ?? ''}" placeholder="${d.state === 'doing' ? '30' : '—'}" ${d.state === 'doing' ? '' : 'disabled title="只有「作畫中」會顯示進度"'}></div>
+          <div class="field"><label class="field-label">旁註（紅色小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
+          <div class="field"><label class="field-label">進度 %</label><input type="number" min="0" max="100" step="5" data-d="${i}" data-key="progress" value="${d.progress ?? ''}" placeholder="${d.state === 'doing' ? '30' : '—'}" ${d.state === 'doing' ? '' : 'disabled title="只有「進行中」會顯示進度"'}></div>
         </div>
         <div class="field"><label class="field-label">需要幫忙（可空白，讀者可以從這裡聯絡你）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
         <div class="field"><label class="field-label">完成證據或相關連結（例：/chapters/3/）</label><input type="text" data-d="${i}" data-key="link" value="${escapeAttr(d.link || '')}"></div>
         <div class="field-checkbox"><input type="checkbox" id="dp${i}" data-d="${i}" data-key="public" ${d.public ? 'checked' : ''}><label for="dp${i}">公開在網站上</label></div>
-      </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 新增一格</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
-    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定移除這一格嗎？儲存後才會生效。')) return; collect(); data.items.splice(+b.dataset.del, 1); render(); }));
+      </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 掛一塊新繪馬</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
+    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定取下這塊繪馬嗎？儲存後才會生效。')) return; collect(); data.items.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.items[i - 1], data.items[i]] = [data.items[i], data.items[i - 1]]; render(); }));
     form.querySelectorAll('select[data-key="state"]').forEach(sel => sel.addEventListener('change', () => { collect(); render(); }));
-    document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.unshift({ id: 'd' + Date.now(), dir: 'conjure', title: '', why: '', horizon: 'vol1', state: 'idea', note: '', help: '', link: '', public: true }); render(); });
+    document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.push({ id: 'd' + Date.now(), dir: '', title: '', why: '', horizon: 'vol1', state: 'idea', note: '', help: '', link: '', public: true }); render(); });
     document.getElementById('saveDreams').addEventListener('click', async (e) => {
-      collect(); if (data.items.some(x => !x.title.trim())) { toast('有一格還沒填「想做的事」', 'err'); return; }
-      file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update storyboard via Studio', e.currentTarget);
+      collect(); if (data.items.some(x => !x.title.trim())) { toast('有一塊繪馬還沒填「想完成的事」', 'err'); return; }
+      file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update 祈願所 via Studio', e.currentTarget);
     });
   }
   render();
