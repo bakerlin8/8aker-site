@@ -249,8 +249,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.8 6C12.3 13.4 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.4 28.8c-.5-1.5-.8-3.1-.8-4.8s.3-3.3.8-4.8l-7.8-6C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.8-6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.7-3.9-13.6-9.6l-7.8 6C6.6 42.6 14.6 48 24 48z"/></svg>
       使用 Google 登入
     </button>
-    <button class="login-alt" id="loginBtn">改用 GitHub 登入（備用）</button>
-    <div class="login-note">用舊版後台？<a href="/admin/">前往 /admin</a></div>
+    <div class="login-note">只有網站主人的 Google 帳號可以登入</div>
   </div>
 </div>
 
@@ -293,7 +292,6 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <a href="/" target="_blank" class="legacy-link">↗ 查看正式網站</a>
       <a href="https://vercel.com/baker-lin-s-projects/8aker-site/analytics" target="_blank" rel="noopener" class="legacy-link">↗ 流量（Vercel Analytics）</a>
       <a href="https://search.google.com/search-console" target="_blank" rel="noopener" class="legacy-link">↗ 搜尋成效（Search Console）</a>
-      <a href="/admin/" class="legacy-link">舊版後台（備用）</a>
     </div>
   </aside>
 
@@ -372,19 +370,17 @@ function getToken(){ return sessionStorage.getItem('gh_token'); }
 function setToken(t){ sessionStorage.setItem('gh_token', t); }
 function clearToken(){ sessionStorage.removeItem('gh_token'); }
 
+clearToken();
 (function initAuth(){
   const hash = window.location.hash;
-  if (hash.startsWith('#gh_token=')) {
-    setToken(hash.replace('#gh_token=', ''));
-    history.replaceState(null, '', window.location.pathname);
-  }
+  // GitHub sign-in has been retired; never accept a token from the URL.
+  if (hash.startsWith('#gh_token=')) history.replaceState(null, '', window.location.pathname);
 })();
 
 // 登入方式：'google'（主要，伺服器代存檔）或 'github'（備用，舊做法）
 let MODE = null;
 let HEALTH = { token: null, exp: 0 };
 document.getElementById('googleBtn').addEventListener('click', () => { window.location.href = '/api/google_auth'; });
-document.getElementById('loginBtn').addEventListener('click', () => { window.location.href = '/api/studio_auth'; });
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   if (MODE === 'google') { try { await fetch('/api/studio_session', { method: 'DELETE', credentials: 'same-origin' }); } catch (e) {} }
   clearToken();
@@ -996,7 +992,6 @@ function escapeAttr(s) { return (s || '').replace(/"/g, '&quot;'); }
 async function boot() {
   const g = await googleSession();
   if (g) MODE = 'google';
-  else if (getToken()) MODE = 'github';
   else {
     document.getElementById('loginScreen').style.display = 'flex';
     return;

@@ -1,5 +1,5 @@
-// Studio-only API for body data. Every call must carry a Studio token: Google sign-in (s8.*, verified by 8aker0.com) or the owner's GitHub token.
-import { db, sha256, json, OWNER, SITE } from './shared.ts';
+// Studio-only API for body data. Every call must carry a Studio token: Google sign-in only (s8.*, verified by 8aker0.com).
+import { db, sha256, json, SITE } from './shared.ts';
 const STUDIO_EMAILS = ['nr.bater@gmail.com'];
 
 const CORS = { 'Access-Control-Allow-Origin': SITE, 'Access-Control-Allow-Headers': 'authorization, content-type', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', Vary: 'Origin' };
@@ -20,11 +20,8 @@ async function owner(req: Request) {
     const d = await v.json().catch(() => ({}));
     return d.ok === true && STUDIO_EMAILS.includes(String(d.email).toLowerCase());
   }
-  // Fallback: GitHub sign-in.
-  const r = await fetch('https://api.github.com/user', { headers: { Authorization: `Bearer ${t}`, 'User-Agent': '8aker0-health' } });
-  if (!r.ok) return false;
-  const u = await r.json();
-  return String(u.login).toLowerCase() === OWNER;
+  // GitHub sign-in was retired on 2026-10-13: nothing else is accepted.
+  return false;
 }
 
 
