@@ -215,20 +215,26 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 /* ── 肆 works ── */
 .strip{display:flex;gap:20px;overflow-x:auto;margin-top:36px;padding:10px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--ash) transparent;}
-.work{flex:0 0 min(380px,82vw);scroll-snap-align:start;background:var(--night-2);border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;min-height:250px;position:relative;overflow:hidden;transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease);}
+.work{flex:0 0 min(380px,82vw);gap:0;scroll-snap-align:start;background:var(--night-2);border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;min-height:250px;position:relative;overflow:hidden;transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease);}
 .work::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--dc);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);}
 .work::after{content:attr(data-k);position:absolute;right:-6px;bottom:-26px;font-family:var(--latin);font-weight:300;font-size:150px;line-height:1;color:var(--dc);opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none;}
 .work:hover{transform:translateY(-6px);border-color:rgba(239,229,214,.2);box-shadow:0 18px 40px -20px rgba(0,0,0,.6);}
 .work:hover::before{transform:scaleX(1);}
 .work:hover::after{opacity:.1;transform:none;}
-.work .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ash);}
-.work .meta span:first-child{color:var(--dc);}
-.work h3{font-family:var(--serif);font-weight:500;font-size:20px;margin-top:18px;line-height:1.45;}
+.work .meta{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.06em;color:var(--ash);}
+.work .meta span:first-child{color:var(--gold);}
+.work h3{font-family:var(--serif);font-weight:500;font-size:21px;margin-top:14px;line-height:1.45;color:#EBD3A8;}
 .work p{font-size:13.5px;color:var(--bone-2);margin-top:8px;}
-.work .wy{margin-top:14px;line-height:1.75;}
-.work .wy small{display:block;font-size:11.5px;letter-spacing:.12em;color:var(--dc);margin-bottom:2px;}
-.work .wy+.wy small{color:var(--gold);}
-.work .wsvc{margin-top:auto;padding-top:18px;}
+.work .wq{margin:16px 0 0;padding-left:14px;border-left:2px solid var(--ash);font-family:var(--serif);font-size:15px;line-height:1.8;}
+.work .wq small{display:block;font-family:var(--latin);font-size:12px;letter-spacing:.24em;margin-bottom:2px;}
+.work .wq.bf{color:var(--bone-2);border-left-color:rgba(134,112,122,.55);}
+.work .wq.bf small{color:var(--ash);}
+.work .wq.af{color:var(--bone);border-left-color:var(--gold);margin-bottom:20px;}
+.work .wq.af small{color:var(--gold);}
+.work .wfoot{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ash);position:relative;z-index:1;}
+.work .wfoot{margin-top:auto;}.work .wq.af+.wfoot,.work .wq.bf+.wfoot{margin-top:auto;}
+.work .wfoot .wsvc{color:var(--gold);padding:0;margin:0;}
+.work .wsvc:hover{text-decoration:underline;text-underline-offset:4px;}
 .work .nums{display:flex;gap:24px;margin-top:auto;padding-top:20px;}
 .work .nums b{display:block;font-size:24px;font-weight:300;}
 .work .nums small{font-size:11.5px;color:var(--ash);}
@@ -480,7 +486,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
       <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
         {worksData.works.map((w, i) => { return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}><div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><p class="wy"><small>為什麼做</small>{(w as any).why}</p>{(w as any).result && <p class="wy"><small>做出來之後</small>{(w as any).result}</p>}</> : <p>{w.desc}</p>}<a class="wsvc" href="#inquiry" data-svc={(w as any).service || 'other'}>你也有類似的狀況？聊聊 →</a></article>
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}><div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}<div class="wfoot"><span>你也是嗎？</span><a class="wsvc" href="#inquiry" data-svc={(w as any).service || 'other'}>聊聊 →</a></div></article>
         ); })}
       </div>
     </div>
