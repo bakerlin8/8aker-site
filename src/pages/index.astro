@@ -532,7 +532,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div>
       <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
       <div class="deck rv" style="--i:2" id="deck" tabindex="0" role="region" aria-roledescription="輪播" aria-label="作品唱盤：左右滑動或用方向鍵切換">
-        <div class="vinyl" aria-hidden="true"><span class="vlabel" id="vLabel">01</span></div>
         <div class="deck-stage" id="deckStage">
         {worksData.works.map((w, i) => { return (
           <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品 →</span>}</a>
@@ -714,49 +713,41 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
 
 
-/* 煙霧：整頁淡淡的細長煙絲（WebGL，固定在畫面上）。往下捲動時，煙會跟著往下竄；經過首頁年輪時會繞著年輪轉。切到別的分頁就暫停。 */
-(function(){var c=document.createElement('canvas');c.id='smoke';c.setAttribute('aria-hidden','true');document.body.appendChild(c);
-  var gl=c.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false});if(!gl){c.remove();return;}
-  var fs='precision mediump float;uniform vec2 r;uniform float t;uniform float sc;uniform vec2 rc;uniform float rs;'+
-  'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
-  'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}'+
-  'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+vec2(1.7,9.2);a*=.5;}return v;}'+
-  'float wisp(vec2 p,float T,float s,float pw){vec2 q=vec2(fbm(p*s+vec2(0.,T)),fbm(p*s+vec2(5.2,1.3-T*.7)));float f=fbm(p*s*.8+1.8*q+vec2(T*.3,T*.6));return pow(1.-abs(f*2.-1.),pw);}'+
-  'void main(){vec2 uv=gl_FragCoord.xy/r.y;float T=t*.045;vec2 c=rc*vec2(r.x/r.y,1.);vec2 d=uv-c;float L=length(d);'+
-  'float ang=.9*exp(-L/(rs*1.1))+T*.2*exp(-L/rs);float cs=cos(ang),sn=sin(ang);vec2 sw=c+vec2(cs*d.x-sn*d.y,sn*d.x+cs*d.y);'+
-  'vec2 p=vec2(sw.x*.75,sw.y*1.6+sc*1.6);'+
-  'float m=wisp(p,T,1.4,26.)+wisp(p*1.6+3.1,T*1.2,1.3,34.)*.7+wisp(p*.7+7.,T*.8,1.5,20.)*.4;'+
-  'm*=smoothstep(.3,.66,fbm(p*.45+vec2(T*.12,T*.2)));float aura=exp(-L/(rs*1.6));'+
-  'vec3 col=mix(vec3(.80,.58,.60),vec3(.92,.74,.44),clamp(.35+aura*.5,0.,1.));float a=clamp(m*(.1+.08*aura),0.,.16);gl_FragColor=vec4(col*a,a);}';
-  function sh(t,src){var o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);return gl.getShaderParameter(o,gl.COMPILE_STATUS)?o:null;}
-  var vs=sh(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'),fsh=sh(gl.FRAGMENT_SHADER,fs);if(!vs||!fsh){c.remove();return;}
-  var pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fsh);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){c.remove();return;}gl.useProgram(pr);
-  var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);var lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
-  var uR=gl.getUniformLocation(pr,'r'),uT=gl.getUniformLocation(pr,'t'),uS=gl.getUniformLocation(pr,'sc'),uC=gl.getUniformLocation(pr,'rc'),uRs=gl.getUniformLocation(pr,'rs');
-  var hero=document.querySelector('.hero'),W0=0,run=true,raf=0,t=0,last=0,odd=false,scr=scrollY,vel=0;
-  function size(){var k=innerWidth<900?.45:.55,w=Math.round(innerWidth*k);if(w===W0)return;W0=w;c.width=w;c.height=Math.round(innerHeight*k);gl.viewport(0,0,c.width,c.height);}
-  function draw(){var g=window.__ring||{x:.69,y:.55,r:.3},hr=hero?hero.getBoundingClientRect():{top:-9e4,height:1,left:0,width:innerWidth};
-    var ry=(hr.top+g.y*hr.height)/innerHeight,rx=(hr.left+g.x*hr.width)/innerWidth,rr=g.r*hr.height/innerHeight;
-    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(uR,c.width,c.height);gl.uniform1f(uT,t);gl.uniform1f(uS,scr/innerHeight);gl.uniform2f(uC,rx,1-ry);gl.uniform1f(uRs,rr);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);}
-  // 捲動時：煙跟著往下竄，捲得越快煙流得越快
-  addEventListener('scroll',function(){var y=scrollY;vel+=Math.abs(y-scr)/innerHeight;scr=y;},{passive:true});
-  function loop(ts){if(!run)return;var dt=last?Math.min(.1,(ts-last)/1e3):0;last=ts;t+=dt*6+vel*10;vel*=.85;odd=!odd;if(odd)draw();raf=requestAnimationFrame(loop);}
-  size();addEventListener('resize',size);
-  if(RM){t=40;draw();c.classList.add('on');return;}
-  setTimeout(function(){c.classList.add('on');},400);raf=requestAnimationFrame(loop);
+/* 一縷煙：一條細細的煙，從頁面底部往上延伸、慢慢飄動；往下捲動時，煙跟著延伸流動。Canvas 2D，切到別的分頁就暫停。 */
+(function(){var c=document.createElement('canvas');c.id='smoke';c.setAttribute('aria-hidden','true');document.body.appendChild(c);var x=c.getContext('2d');if(!x)return;
+  var W=0,H=0,d=1,t=0,last=0,raf=0,run=true,scr=scrollY,sv=scrollY;
+  function size(){d=Math.min(devicePixelRatio||1,1.5);var w=innerWidth,h=innerHeight;if(Math.round(w*d)===W&&Math.abs(Math.round(h*d)-H)<160*d)return;W=c.width=Math.round(w*d);H=c.height=Math.round(h*d);}
+  // 平滑起伏：幾個不同頻率的正弦疊加
+  function wave(y,ph){return Math.sin(y*.0042+ph*.9)*.55+Math.sin(y*.0091-ph*1.3+1.7)*.28+Math.sin(y*.019+ph*2.1+.4)*.12+Math.sin(y*.031-ph*2.7)*.05;}
+  function strand(off,amp,w,a,base,ph,spread){x.beginPath();var step=6*d,first=true;
+    for(var y=H+20*d;y>=-20*d;y-=step){var k=1-y/H,yy=(y/d+sv*.9),sx=base+wave(yy,ph+off)*amp*(.35+k*.9)+off*spread*k*k*W;
+      if(first){x.moveTo(sx,y);first=false;}else x.lineTo(sx,y);}
+    x.lineWidth=w*d;x.strokeStyle='rgba(222,190,170,'+a+')';x.stroke();}
+  function draw(){x.clearRect(0,0,W,H);var g=x.createLinearGradient(0,H,0,0);x.lineCap='round';x.lineJoin='round';
+    var base=W*(innerWidth<900?.82:.72),amp=Math.min(W*.09,120*d),ph=t*.18;
+    x.globalCompositeOperation='lighter';
+    strand(0,amp,14,.018,base,ph,0);strand(0,amp,6,.03,base,ph,0);
+    strand(.6,amp*1.1,2.2,.05,base,ph,.025);strand(-.8,amp*.9,1.6,.045,base,ph,.03);
+    strand(0,amp,1,.16,base,ph,0);
+    x.globalCompositeOperation='destination-in';g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.12,'rgba(0,0,0,1)');g.addColorStop(.8,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
+    x.globalCompositeOperation='source-over';}
+  addEventListener('scroll',function(){scr=scrollY;},{passive:true});
+  function loop(ts){if(!run)return;var dt=last?Math.min(.1,(ts-last)/1e3):0;last=ts;t+=dt;sv+=(scr-sv)*.08;draw();raf=requestAnimationFrame(loop);}
+  size();addEventListener('resize',function(){size();if(RM)draw();});
+  if(RM){draw();c.classList.add('on');return;}
+  setTimeout(function(){c.classList.add('on');},300);raf=requestAnimationFrame(loop);
   document.addEventListener('visibilitychange',function(){cancelAnimationFrame(raf);run=!document.hidden;if(run){last=0;raf=requestAnimationFrame(loop);}});
 })();
 
-
 /* 有點樣子：唱盤（目前那件在中間，其他沿著弧線轉到兩側；唱片從封套滑出、轉動） */
-(function(){var D=document.getElementById('deck');if(!D)return;var C=[].slice.call(D.querySelectorAll('.work')),T=[].slice.call(document.querySelectorAll('#wTicks [data-go]')),NOW=document.getElementById('wNow'),VL=document.getElementById('vLabel'),n=C.length,cur=0;
+(function(){var D=document.getElementById('deck');if(!D)return;var C=[].slice.call(D.querySelectorAll('.work')),T=[].slice.call(document.querySelectorAll('#wTicks [data-go]')),NOW=document.getElementById('wNow'),VL=null,n=C.length,cur=0;
   function pad(x){return (x<10?'0':'')+x;}
   function lay(){var mob=innerWidth<640;C.forEach(function(el,k){var d=k-cur,a=Math.abs(d),x=d*(mob?62:58),z=-a*(mob?220:180),ry=-d*(mob?32:26);
       el.style.transform='translateX('+x+'%) translateZ('+z+'px) rotateY('+ry+'deg)';el.style.opacity=a>3?0:(1-a*.28).toFixed(2);el.style.filter=a?'brightness(.6) saturate(.8)':'none';el.style.zIndex=100-a;el.style.pointerEvents=a>3?'none':'auto';
       el.classList.toggle('on',d===0);el.setAttribute('aria-hidden',d===0?'false':'true');el.tabIndex=d===0?0:-1;});
     T.forEach(function(b,k){b.setAttribute('aria-current',k===cur?'true':'false');});var t=T[cur];if(t&&t.scrollIntoView)t.parentElement.parentElement.scrollLeft=t.offsetLeft-60;
     NOW.textContent=pad(cur+1);if(VL)VL.textContent=pad(cur+1);}
-  function go(i){i=Math.max(0,Math.min(n-1,i));if(i===cur)return;cur=i;D.classList.add('switching');setTimeout(function(){D.classList.remove('switching');},450);lay();}
+  function go(i){i=Math.max(0,Math.min(n-1,i));if(i===cur)return;cur=i;lay();}
   document.getElementById('wPrev').addEventListener('click',function(){go(cur-1);});document.getElementById('wNext').addEventListener('click',function(){go(cur+1);});
   T.forEach(function(b){b.addEventListener('click',function(){go(+b.dataset.go);});});
   C.forEach(function(el,k){el.addEventListener('click',function(e){if(k!==cur){e.preventDefault();go(k);}});});
