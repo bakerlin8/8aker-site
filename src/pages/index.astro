@@ -54,8 +54,11 @@ const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 /* ── hero ── */
 .hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;align-items:center;background:radial-gradient(120% 80% at 70% 40%,#2A1520 0%,#1C0F14 60%);color:#EFE5D6;}
 #art{position:absolute;inset:0;width:100%;height:100%;}
-.hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:120px 40px 80px;}
-.hero-grid{max-width:660px;}
+.hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:110px 40px 26vh;}
+.hero-grid{max-width:780px;margin:0 auto;text-align:center;position:relative;}
+.hero-grid::before{content:'';position:absolute;left:50%;top:50%;width:130%;height:150%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(28,15,20,.62),rgba(28,15,20,0));z-index:-1;pointer-events:none;}
+.hero .hero-lede{margin-left:auto;margin-right:auto;}
+.hero .cd{justify-content:center;}
 .hero .rv{--d:0}
 h1.motto{font-family:var(--serif);font-weight:500;font-size:clamp(38px,5.6vw,72px);line-height:1.3;}
 h1.motto span{display:block;}
@@ -108,7 +111,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .legend i{display:inline-block;width:9px;height:9px;margin-right:7px;}
 .tip{position:fixed;z-index:80;pointer-events:none;background:#EFE5D6;color:#1C0F14;font-size:12.5px;padding:7px 11px;line-height:1.55;max-width:260px;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .2s var(--ease);}
 .tip.on{opacity:1;transform:none;}
-@media(max-width:900px){.hero{align-items:flex-start;}.hero-in{padding:112px 20px 64px;}}
+@media(max-width:900px){.hero{align-items:flex-start;}.hero-in{padding:104px 20px 46vh;}}
 
 /* ── 壱 連載：五角形能力值 ── */
 .story{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:44px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px;align-items:start;}
@@ -677,48 +680,48 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var rnd=function(a,c){return a+Math.random()*(c-a);},seed=[rnd(0,6.28),rnd(0,6.28)],acc=0,rr=[0];
   for(var i=1;i<=total;i++){acc+=rnd(.75,1.3);rr.push(acc);}
   /* 年輪「向光而長」：30 歲前在台灣，圍著同一個中心長；搬到日本後，年輪往東北（日本的方向）偏心生長。 */
-  var MOVE=D.move||30,N=240,LEAN=-0.62,RX=[],RY=[];
+  var MOVE=D.move||30,N=180,LEAN=-0.62,RX=[],RY=[];
   for(i=1;i<=total;i++){var f=rr[i]/acc,r=.03+f*.97,k=Math.max(0,i-MOVE)/10,ox=-.08+.088*k,oy=.05-.064*k,xs=new Float32Array(N),ys=new Float32Array(N);
     for(var j=0;j<N;j++){var t=-Math.PI/2+j/N*6.2832,w=1+.03*Math.sin(t*3+seed[0])+.018*Math.sin(t*5+seed[1]+f*2)+.009*Math.sin(t*11+f*4),bias=i>MOVE?1+.18*k*Math.cos(t-LEAN):1,rad=r*w*bias;
       xs[j]=ox+Math.cos(t)*rad;ys[j]=oy+Math.sin(t)*rad;}
     RX[i]=xs;RY[i]=ys;}
-  var CX=0,CY=0,S=1,layer=null,future=null;
-  function geom(){var wide=W>900*dpr;var hg=cv.parentElement.querySelector('.hero-grid'),hr=cv.parentElement.getBoundingClientRect();
-    var oy=0;if(wide){S=Math.min(W*.22,H*.32);CX=W*.69;CY=H*.55;return;}
-    var top=hg?(hg.getBoundingClientRect().bottom-hr.top+16)*dpr:H*.5,gh=Math.max(H-top,0);
-    if(gh>200*dpr){S=Math.min(W*.38,gh/2.25);CX=W*.5;CY=top+gh*.5+S*oy;}else{S=Math.min(W,H)*.34;CX=W*.5;CY=H*.7;}}
-  function path(c,i,p){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p));c.beginPath();c.moveTo(CX+xs[0]*S,CY+ys[0]*S);for(var j=1;j<=n;j++){var k=j%N;c.lineTo(CX+xs[k]*S,CY+ys[k]*S);}}
-  function mk(){var c=document.createElement('canvas');c.width=W;c.height=H;return c;}
-  /* 已長好的年輪與未來的虛線圈，畫一次存起來，之後每幀只貼圖 */
-  function bake(){layer=mk();var c=layer.getContext('2d');c.lineJoin='round';
-    /* 台灣的年＝淡玫瑰色，搬家那年加亮，日本的年＝金色 */
-    for(var i=1;i<=full;i++){var f,col,lw;
-      if(i<MOVE){f=i/MOVE;col='rgba(196,140,150,'+(.07+.27*f*f).toFixed(3)+')';lw=(.7+.3*f)*dpr;}
-      else if(i===MOVE){col='rgba(214,160,170,.7)';lw=1.4*dpr;}
-      else{f=(i-MOVE)/Math.max(1,full-MOVE);col='rgba(212,162,76,'+(.22+.4*f).toFixed(3)+')';lw=(.9+.3*f)*dpr;}
-      c.strokeStyle=col;c.lineWidth=lw;path(c,i,1);c.closePath();c.stroke();}
-    future=mk();c=future.getContext('2d');c.setLineDash([2*dpr,7*dpr]);c.strokeStyle='rgba(239,229,214,.2)';c.lineWidth=dpr;for(var k=full+2;k<=total;k++){path(c,k,1);c.closePath();c.stroke();}}
+  /* 3D 木頭切片：年輪刻在一片斜放、有厚度的木頭上，非常慢地轉；滑鼠移動時微微傾斜 */
+  var CX=0,CY=0,S=1,YAW=0,TILT=1.0,mx=0,my=0,smx=0,smy=0,TH=.13;
+  addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;},{passive:true});
+  function geom(){var wide=W>900*dpr;if(wide){S=Math.min(W*.34,H*.56);CX=W*.5;CY=H*.6;}else{S=Math.min(W*.42,H*.26);CX=W*.5;CY=H*.76;}}
+  var cY=1,sY=0,cT=1,sT=0;
+  function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
+  function path(c,i,p,z){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p)),a=P(xs[0],ys[0],z||0);c.beginPath();c.moveTo(a[0],a[1]);for(var j=1;j<=n;j++){var k=j%N;a=P(xs[k],ys[k],z||0);c.lineTo(a[0],a[1]);}}
+  function bake(){}
   function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
-    /* iOS 捲動時網址列伸縮只改高度：寬度沒變就不重建畫布 */
-    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();bake();window.__ring={x:CX/W,y:CY/H,r:S/H};return true;}
-  function frame(dt){t+=dt;var g=Math.min(1,t/4.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
-    if(e<1){ctx.save();ctx.beginPath();var oS=S;S=oS*(.05+e*1.02);path(ctx,total,1);S=oS;ctx.closePath();ctx.clip();ctx.drawImage(layer,0,0);ctx.restore();}else ctx.drawImage(layer,0,0);
-    ctx.globalAlpha=e;ctx.drawImage(future,0,0);ctx.globalAlpha=1;
-    var p=frac*e,br=.5+.5*Math.sin(t*1.3);ctx.lineJoin='round';
-    path(ctx,full+1,p);ctx.strokeStyle='rgba(212,162,76,'+(.10+.08*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
+    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();return true;}
+  function frame(dt){t+=dt;var g=Math.min(1,t/3.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
+    smx+=(mx-smx)*.05;smy+=(my-smy)*.05;YAW=-.35+t*.035+smx*.5;TILT=1.0+smy*.25;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
+    var oS=S;S=oS*(.55+.45*e);ctx.globalAlpha=e;ctx.lineJoin='round';
+    var o=full+1,xs=RX[o],ys=RY[o],j,a;
+    /* 側面（樹皮） */
+    ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
+    var gr=ctx.createLinearGradient(0,CY-S*.3,0,CY+S*.7);gr.addColorStop(0,'#3a2016');gr.addColorStop(1,'#1d0f0b');ctx.fillStyle=gr;ctx.fill();
+    for(j=0;j<N;j+=6){var a1=P(xs[j],ys[j],0),a2=P(xs[j],ys[j],-TH);ctx.beginPath();ctx.moveTo(a1[0],a1[1]);ctx.lineTo(a2[0],a2[1]);ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=dpr;ctx.stroke();}
+    /* 切面 */
+    path(ctx,o,1,0);ctx.closePath();var fg=ctx.createRadialGradient(CX,CY,0,CX,CY,S*1.1);fg.addColorStop(0,'rgba(58,26,30,.95)');fg.addColorStop(1,'rgba(40,18,22,.95)');ctx.fillStyle=fg;ctx.fill();
+    /* 台灣的年＝玫瑰色，搬家那年加亮，日本的年＝金色 */
+    for(var i=1;i<=full;i++){var f,col,lw;
+      if(i<MOVE){f=i/MOVE;col='rgba(196,140,150,'+(.07+.24*f*f).toFixed(3)+')';lw=(.7+.3*f)*dpr;}
+      else if(i===MOVE){col='rgba(214,160,170,.6)';lw=1.3*dpr;}
+      else{f=(i-MOVE)/Math.max(1,full-MOVE);col='rgba(212,162,76,'+(.2+.35*f).toFixed(3)+')';lw=(.9+.3*f)*dpr;}
+      ctx.strokeStyle=col;ctx.lineWidth=lw;path(ctx,i,1,0);ctx.closePath();ctx.stroke();}
+    var p=frac*e,br=.5+.5*Math.sin(t*1.3);
+    path(ctx,o,1,0);ctx.closePath();ctx.strokeStyle='rgba(236,196,118,.35)';ctx.lineWidth=dpr;ctx.stroke();
+    path(ctx,o,p,0);ctx.strokeStyle='rgba(212,162,76,'+(.10+.08*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
     ctx.strokeStyle='rgba(236,196,118,.92)';ctx.lineWidth=1.7*dpr;ctx.stroke();
-    if(g>.98)tip(Math.floor(N*frac)%N);}
-  function tip(k){var x=CX+RX[full+1][k]*S,yy=CY+RY[full+1][k]*S;
+    S=oS;ctx.globalAlpha=1;if(g>.98)tip(Math.floor(N*frac)%N);}
+  function tip(k){var a=P(RX[full+1][k],RY[full+1][k],0),x=a[0],yy=a[1];
     for(var q=0;q<3;q++){var ph=((t*.55)+q/3)%1;ctx.beginPath();ctx.arc(x,yy,(4+ph*28)*dpr,0,6.2832);ctx.strokeStyle='rgba(236,196,118,'+((1-ph)*.55).toFixed(3)+')';ctx.lineWidth=dpr;ctx.stroke();}
     ctx.beginPath();ctx.arc(x,yy,9*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.18)';ctx.fill();
-    ctx.beginPath();ctx.arc(x,yy,3.6*dpr,0,6.2832);ctx.fillStyle='rgb(236,196,118)';ctx.fill();
-    if(W<=900*dpr)return;
-    var dx=x-CX,dy=yy-CY,dl=Math.hypot(dx,dy)||1,ox=dx/dl,oy=dy/dl,x1=x+ox*12*dpr,y1=yy+oy*12*dpr,x2=x+ox*38*dpr,y2=yy+oy*38*dpr;
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle='rgba(239,229,214,.5)';ctx.lineWidth=dpr;ctx.stroke();
-    var age=(full+(Date.now()-bd(y))/(bd(y+1)-bd(y))).toFixed(3);
-    ctx.font=(12*dpr)+'px "Noto Sans TC",system-ui,sans-serif';ctx.fillStyle='rgba(239,229,214,.88)';ctx.textAlign=ox>=0?'left':'right';ctx.textBaseline='middle';
-    ctx.fillText('今　'+age+' 歲',x2+(ox>=0?6:-6)*dpr,y2);}
-  function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;frame(dt);raf=requestAnimationFrame(loop);}
+    ctx.beginPath();ctx.arc(x,yy,3.6*dpr,0,6.2832);ctx.fillStyle='rgb(236,196,118)';ctx.fill();}
+  /* 切片轉得很慢，每兩幀畫一次就夠順，省一半運算 */
+  var acc2=0,odd=false;function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;acc2+=dt;odd=!odd;if(odd){frame(acc2);acc2=0;}raf=requestAnimationFrame(loop);}
   var rt=0;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(size(false)&&(RM||!run))frame(0);},150);});
   function start(){if(started)return;started=true;size(true);
     if(RM){t=9;frame(0);return;}
