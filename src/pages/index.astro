@@ -493,7 +493,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         ))}
       </ol>
       <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
-      <div class="me-cta rv" style="--i:7">{igUrl && <a class="btn-gold2" href={igUrl} target="_blank" rel="noopener">在 Instagram 私訊我 @{igHandle} →</a>}<a class="ig-btn" href="#works">看我做過的東西 →</a></div>
+      <div class="me-cta rv" style="--i:7"><a class="btn-gold2" href="/chat/">有空聊聊 →</a><a class="ig-btn" href="#works">看我做過的東西 →</a></div>
     </div>
   </div>
 </section>
@@ -549,7 +549,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               <h4 set:html={tcy(d.title)} />
               {d.why && <p class="why" set:html={tcy(d.why)} />}
               {d.note && <p class="memo" set:html={'── ' + tcy(d.note)} />}
-              {d.help && <a class="help" href={igUrl || '#about'} target={igUrl ? '_blank' : undefined} rel="noopener" set:html={'需要幫忙：' + tcy(d.help)} />}
+              {d.help && <a class="help" href="/chat/" set:html={'需要幫忙：' + tcy(d.help)} />}
               {safeHref(d.link) && <a class="dlink" href={safeHref(d.link)}>{d.state === 'done' ? '看怎麼實現的' : '相關內容'}</a>}
               <span class="stv">{hasPg && <span class="pgb" style={`--pg:${pg}%`}><i></i></span>}{st}</span>
             </article>); })}
