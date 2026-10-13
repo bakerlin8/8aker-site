@@ -292,6 +292,80 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .btn-ink:hover{background:#3D0F1A;}
 .btn-ink:hover::after{left:120%;}
 @media(max-width:900px){.about{grid-template-columns:1fr;}}
+
+/* ── 手機版（≤640px）：版面收斂、觸控目標加大、橫向內容加提示 ── */
+@media(max-width:640px){
+  .hero-in{padding:96px 20px 32px;}
+  h1.motto{font-size:clamp(32px,9.4vw,40px);}
+  .hero-lede{font-size:14.5px;margin-top:16px;}
+  .cd{margin-top:22px;gap:10px;}
+  .cd-days{font-size:46px;}
+  .cd-clock{font-size:20px;}
+  .next-rel{min-height:44px;align-items:center;}
+
+  .dirs{gap:24px;margin-top:24px;}
+  .penta svg{max-width:270px;}
+  .axis{font-size:24px;}
+  .idx button{grid-template-columns:34px minmax(0,1fr) 52px 40px;gap:10px;padding:12px 4px;min-height:56px;}
+  .idx button[aria-selected="true"]{padding-left:10px;}
+  .idx .k{font-size:24px;}
+  .idx .dan{font-size:12.5px;}
+  .detail{min-height:0;}
+  .detail .big{font-size:120px;top:-14px;}
+  .detail h3{font-size:21px;}
+  .detail .es a{flex-direction:column;gap:2px;padding:12px 0;}
+  .detail .es time:empty{display:none;}
+
+  .mv-toggle{margin-top:22px;}
+  .mv-toggle button{padding:9px 18px;font-size:13.5px;}
+  .track-wrap{margin:20px -20px 0;padding:8px 20px 4px;scroll-snap-type:x proximity;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 20px,#000 calc(100% - 44px),transparent);
+            mask-image:linear-gradient(90deg,transparent 0,#000 20px,#000 calc(100% - 44px),transparent);}
+  .track{min-width:780px;grid-template-columns:repeat(13,minmax(58px,1fr));}
+  .track li{scroll-snap-align:center;}
+  .node{min-height:44px;}
+  .swipe-hint{display:block;}
+  .mdetail{gap:18px;padding-top:20px;}
+  .mdetail h3{font-size:21px;}
+  .tally div{padding:10px 2px 8px;}
+  .tally .k{font-size:18px;}
+  .tally b{font-size:19px;}
+  .tally small{font-size:11px;}
+  .mnums{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .mnums div{border-bottom:0;border-top:1px solid var(--line);}
+  .mnums b{font-size:22px;}
+  .mnums small{font-size:11.5px;line-height:1.4;display:block;}
+  .ygrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .ycard{min-height:118px;padding:14px 14px 12px;}
+  .ycard h4{font-size:14.5px;}
+
+  .filters{gap:8px;margin:22px -20px 0;padding:0 20px 4px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+  .filters::-webkit-scrollbar{display:none;}
+  .chip{flex:0 0 auto;}
+  .chip{padding:8px 14px;font-size:13.5px;}
+  .jrow{padding:16px 0;}
+  .jrow h3{font-size:16.5px;line-height:1.6;}
+
+  .strip{gap:14px;margin:28px -20px 0;padding:10px 20px 14px;scroll-padding-left:20px;}
+  .work{flex-basis:84vw;padding:22px;min-height:220px;}
+  .work h3{font-size:18px;}
+
+  .bstats{margin-top:20px;}
+  .bstat{padding:14px 14px 12px;}
+  .bstat b{font-size:26px;}
+  .bchart{padding:14px 14px 10px;}
+  .bchart-top{flex-direction:column;align-items:flex-start;}
+  .tabs button{padding:7px 14px;font-size:13px;}
+  .brecent li{grid-template-columns:44px minmax(0,1fr) auto;}
+  .strava{min-height:44px;}
+
+  .about{gap:32px;margin-top:24px;}
+  .about .q{font-size:19px;}
+  .support{padding:22px 20px;}
+  .support .r{gap:12px;}
+  .btn-ink{margin-left:0;width:100%;text-align:center;padding:13px 20px;}
+}
+.swipe-hint{display:none;font-size:12px;color:var(--ash);margin-top:8px;letter-spacing:.04em;}
 </style>
 
 <section class="hero" aria-labelledby="motto">
@@ -355,7 +429,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div>
       <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
       <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="toc">第一卷目次</button></div>
-      <div id="vOne"><div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><div class="mdetail" id="mdetail" aria-live="polite"></div></div>
+      <div id="vOne"><div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p><div class="mdetail" id="mdetail" aria-live="polite"></div></div>
       <div id="vToc" hidden><div class="ygrid" id="ygrid"></div></div>
     </div>
   </div>
@@ -486,7 +560,12 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   for(var i=1;i<=total;i++){acc+=rnd(.75,1.3);rr.push(acc);}
   function rs(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.parentElement.getBoundingClientRect();W=cv.width=r.width*dpr;H=cv.height=r.height*dpr;}
   rs();addEventListener('resize',rs);
-  var wide=function(){return W>900*dpr;},cx=function(){return W*(wide()?.66:.55);},cy=function(){return H*(wide()?.52:.74);},mn=function(){return Math.min(W,H)*(wide()?1:1.2);};
+  /* 手機：年輪放在文字下方剩餘空間的正中央，大小依剩餘空間縮放，不再被切到畫面外 */
+  var G={top:0,h:0};function measure(){var hg=cv.parentElement.querySelector('.hero-grid'),hr=cv.parentElement.getBoundingClientRect();if(!hg){G={top:H*.5,h:H*.5};return;}var b=(hg.getBoundingClientRect().bottom-hr.top+12)*dpr;G={top:b,h:Math.max(H-b,0)};}
+  measure();addEventListener('resize',measure);if(document.fonts)document.fonts.ready.then(measure);var gap=function(){return G;};
+  var wide=function(){return W>900*dpr;},cx=function(){return W*(wide()?.66:.5);},
+      cy=function(){if(wide())return H*.52;var g=gap();return g.h>220*dpr?g.top+g.h*.5:H*.72;},
+      mn=function(){if(wide())return Math.min(W,H);var g=gap(),s=g.h>220*dpr?Math.min(W*.96,g.h*.92):Math.min(W,H)*.9;return s*1.18;};
   function shape(i,a){var f=rr[i]/acc;return mn()*(.02+f*.34)*(1+.045*Math.sin(a*3+seed[0])+.028*Math.sin(a*5+seed[1]+f*2.2)+.014*Math.sin(a*11+seed[2]+f*4));}
   function ring(i,p,rot){var N=180;ctx.beginPath();for(var j=0;j<=N*p;j++){var a=-Math.PI/2+j/N*Math.PI*2+rot,r=shape(i,a),x=cx()+Math.cos(a)*r,yy=cy()+Math.sin(a)*r;j?ctx.lineTo(x,yy):ctx.moveTo(x,yy);}ctx.stroke();}
   function frame(dt){t+=dt;ctx.clearRect(0,0,W,H);var rot=t*.006,g=Math.min(1,t/5);
@@ -544,7 +623,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+tally+'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a></div><div class="mnums"><div><b>'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
-  requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n)w.scrollLeft=Math.max(0,n.offsetLeft-80);});
+  requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n&&w.scrollWidth>w.clientWidth){var li=n.closest('li');w.scrollLeft=Math.max(0,li.offsetLeft-w.clientWidth/2+li.offsetWidth/2);}});
   var Y=document.getElementById('ygrid');
   Y.innerHTML=list.map(function(r,i){var s={done:'已刊出',break:'休載',next:'製作中・'+r.days+' 天後',future:r.days+' 天後'}[r.state];return '<button class="ycard '+r.state+(r.final?' final':'')+'" data-i="'+i+'"><span class="n">'+label(r)+'・'+md(r)+(r.arc?'・'+r.arc:'')+'</span><h4>'+esc(r.title)+'</h4><span class="s">'+s+'</span></button>';}).join('');
   var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V2=document.getElementById('vToc');
