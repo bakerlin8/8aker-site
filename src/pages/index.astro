@@ -420,6 +420,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hats{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:34px;}
 .hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
 .hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
+.hitems{list-style:none;margin-top:10px;}
+.hitems li{position:relative;padding-left:14px;font-size:13.5px;color:var(--bone);line-height:1.9;}
+.hitems li::before{content:"";position:absolute;left:0;top:.85em;width:5px;height:1px;background:var(--gold);}
+.hprov{display:block;margin-top:10px;font-size:11.5px;letter-spacing:.06em;color:var(--ash);}
+.closing{padding-top:24px;}
+.closing .about.end{margin-top:0;}
 .hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
 .hat h3{font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.5;}
 .hat p{font-size:13.5px;color:var(--bone-2);margin-top:6px;line-height:1.8;}
@@ -481,11 +487,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
       <ol class="hats">
         {services.hats.map((h: any, i: number) => (
-          <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p><a href={h.link}>{h.help} →</a></div></li>
+          <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}{h.provider && <small class="hprov">{h.provider}</small>}</div></li>
         ))}
       </ol>
       <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
-      <div class="me-cta rv" style="--i:7"><a class="btn-gold2" href="#services">看我能幫你的事 →</a>{igUrl && <a class="ig-btn" href={igUrl} target="_blank" rel="noopener"><span aria-hidden="true">◎</span> IG 私訊我</a>}</div>
+      <div class="me-cta rv" style="--i:7">{igUrl && <a class="btn-gold2" href={igUrl} target="_blank" rel="noopener">在 Instagram 私訊我 @{igHandle} →</a>}<a class="ig-btn" href="#works">看我做過的東西 →</a></div>
     </div>
   </div>
 </section>
@@ -541,7 +547,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               <h4 set:html={tcy(d.title)} />
               {d.why && <p class="why" set:html={tcy(d.why)} />}
               {d.note && <p class="memo" set:html={'── ' + tcy(d.note)} />}
-              {d.help && <a class="help" href="#inquiry" data-svc="other" set:html={'需要幫忙：' + tcy(d.help)} />}
+              {d.help && <a class="help" href={igUrl || '#about'} target={igUrl ? '_blank' : undefined} rel="noopener" set:html={'需要幫忙：' + tcy(d.help)} />}
               {safeHref(d.link) && <a class="dlink" href={safeHref(d.link)}>{d.state === 'done' ? '看怎麼實現的' : '相關內容'}</a>}
               <span class="stv">{hasPg && <span class="pgb" style={`--pg:${pg}%`}><i></i></span>}{st}</span>
             </article>); })}
@@ -574,87 +580,17 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<section class="sec" id="services" aria-labelledby="s-h">
+<section class="sec closing" aria-label="支持這個連載">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Service</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.services_sub}</p><h2 id="s-h" class="rv" style="--i:1">{services.title}</h2></div>
-      <div class="svc">
-        <div class="scards">
-          {services.services.map((x: any, i: number) => (
-            <article class="scard rv" style={`--i:${i + 2}`} id={`svc-${x.id}`}>
-              <div class="s-top"><span class="prov">{x.provider}</span>{x.badge && <span class="badge">{x.badge}</span>}</div>
-              <h4>{x.name}<small lang="ja">{x.name_jp}</small></h4>
-              <p class="for">給：{x.for}</p>
-              <p class="sdesc">{x.desc}</p>
-              <ul class="sitems">{x.items.map((t: string) => <li>{t}</li>)}</ul>
-              {x.excludes.length > 0 && <p class="sex"><b>不包含</b>{x.excludes.join('、')}</p>}
-              {x.how && <p class="show"><b>怎麼開始</b>{x.how}</p>}
-              <div class="s-foot"><span class="price">{x.price}</span><span class="s-acts">{igUrl && <a class="ig-mini" href={igUrl} target="_blank" rel="noopener">IG 私訊</a>}<a class="btn-gold2" href="#inquiry" data-svc={x.id}>填寫需求 →</a></span></div>
-            </article>
-          ))}
-        </div>
-
-        <div class="faq rv">
-          <h3 class="svc-h2">常見問題</h3>
-          {services.faq.map((f: any) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
-        </div>
-
-        {stays.length > 0 && (
-          <div class="stays">
-            <h3 class="svc-h2">{services.stays_title}</h3><p class="stays-note">{services.stays_note}</p>
-            <div class="sgrid">{stays.map((st: any) => (
-              <a class="stay" href={st.url} target="_blank" rel="noopener">
-                {st.img && <img src={st.img} alt="" loading="lazy" />}
-                <div><h4>{st.name}</h4><p>{st.desc}</p>{st.rating && <small>★ {st.rating}</small>}</div><span class="go">在 Airbnb 查看空房 ↗</span>
-              </a>))}</div>
-          </div>
-        )}
-
-
-        <div class="contact rv">
-          <h3 class="svc-h2">{services.contact_title}</h3><p class="inq-note">{services.contact_note}</p>
-          {igUrl && <a class="ig-btn big" href={igUrl} target="_blank" rel="noopener"><span aria-hidden="true">◎</span> 在 Instagram 私訊我　@{igHandle}</a>}
-        </div>
-
-        <form class="inq rv" id="inquiry" novalidate>
-          <h3 class="svc-h2">{services.form_title}</h3>
-          <p class="inq-note">{services.form_note}</p>
-          <div class="frow">
-            <label>想詢問的服務<select name="service" required>
-              <option value="property">在日本置產陪跑（佰花堂）</option>
-              <option value="owner">海外屋主代管（佰花堂）</option>
-              <option value="omakase">大阪おまかせ導覽（佰花堂）</option>
-              <option value="interpret">單次隨行翻譯（佰花堂）</option>
-              <option value="ai">一人團隊 AI 工具（TRS Living Studio）</option>
-              <option value="other">其他・合作・祈願所的幫忙</option>
-            </select></label>
-            <label>怎麼稱呼你<input name="name" required maxlength="80" autocomplete="name"></label>
-          </div>
-          <div class="frow">
-            <label>聯絡方式<input name="contact" required maxlength="160" placeholder="Email 或 Instagram 帳號" autocomplete="email"></label>
-            <label>日期或期間<input name="dates" maxlength="120" placeholder="例如：2027 年 3 月下旬"></label>
-          </div>
-          <div class="frow">
-            <label>人數或物件概況<input name="people" maxlength="40" placeholder="例如：2 大 1 小／大阪市內 2LDK"></label>
-            <label>你從哪裡知道我？（選填）<select name="source"><option value="">—</option><option>朋友介紹</option><option>Instagram</option><option>LINE 群組</option><option>Facebook</option><option>搜尋</option><option>其他</option></select></label>
-          </div>
-                    <label>想請我們幫忙的事<textarea name="message" required maxlength="3000" rows="5" placeholder="越具體越好：想去的地方、在意的事、屋況或需要處理的狀況"></textarea></label>
-          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <p class="consent">送出即表示你同意我們依<a href="/privacy/">隱私權政策</a>使用這些資料回覆你。</p>
-          <div class="fsend"><button type="submit" class="btn-ink">送出需求</button><span class="fmsg" id="inqMsg" role="status"></span></div>
-        </form>
-
-        <div class="about end">
-          <div>
+    <div class="side" aria-hidden="true"></div>
+    <div class="about end">
+      <div>
           <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
-          </div>
+      </div>
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
           <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
         </aside>
-        </div>
-      </div>
     </div>
   </div>
 </section>
