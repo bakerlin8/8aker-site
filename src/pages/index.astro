@@ -140,7 +140,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .plegend b{font-weight:300;font-size:18px;}
 .plegend .dan{font-family:var(--serif);font-size:11.5px;color:var(--bone-2);text-align:right;margin-top:2px;}
 .dir-note{font-size:11.5px;color:var(--ash);margin-top:10px;}
-@media(max-width:960px){.story{grid-template-columns:1fr;gap:28px;}}
+@media(max-width:1360px){.story{grid-template-columns:1fr;gap:28px;}}
 
 /* ── 壱 祈願所：縦書き手帳 ── */
 .kg{margin-top:26px;position:relative;background:#F3EEE3;color:#2B2522;border-radius:3px;box-shadow:0 30px 50px -28px rgba(0,0,0,.85);
@@ -373,7 +373,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .dgrid{grid-template-columns:1fr;}
   .stat .tabs button{padding:7px 12px;font-size:13px;}
   .stat{padding:14px 12px 12px;}
-  .pgrid{grid-template-columns:minmax(0,130px) minmax(0,1fr);gap:12px;}
+  .pgrid{grid-template-columns:1fr;gap:8px;}.penta{max-width:200px;margin:0 auto;}
   .axis{font-size:30px;}
   .mdetail h3{font-size:21px;}
           .mnums b{font-size:22px;}
@@ -483,6 +483,34 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 @media(max-width:640px){.deck{height:540px;margin-left:-20px;margin-right:-20px;}.deck .work{top:60px;min-height:420px;}.vinyl{width:380px;height:380px;margin-left:-190px;top:80px;}.wnav{gap:10px;}}
 @media(prefers-reduced-motion:reduce){.vinyl{animation:none;}}
 
+/* ── 年輪：第一卷（每刊出一話長一圈） ── */
+.chwrap{display:grid;grid-template-columns:170px minmax(0,1fr);gap:32px;align-items:start;}
+.chring{margin:0;position:sticky;top:90px;}
+.chring svg{display:block;width:100%;height:auto;overflow:visible;}
+.chring figcaption{font-size:12px;color:var(--ash);text-align:center;margin-top:8px;letter-spacing:.06em;}
+.chring figcaption b{color:var(--gold);font-weight:400;}
+.cr{fill:none;cursor:pointer;transition:stroke .4s,stroke-width .3s,opacity .4s;}
+.cr-hit{fill:none;stroke:transparent;stroke-width:7;cursor:pointer;}
+.cr.done{stroke:var(--gold);stroke-width:1.3;opacity:.75;}
+.cr.break{stroke:var(--ash);stroke-width:1;stroke-dasharray:1.5 3;}
+.cr.next{stroke:var(--gold);stroke-width:1.6;stroke-dasharray:4 4;animation:crflow 6s linear infinite;}
+.cr.future{stroke:var(--line);stroke-width:1;}
+.cr.final{stroke-width:1.2;}
+.cr.final.future{stroke:rgba(212,162,76,.25);stroke-dasharray:2 5;}
+.cr.cur{stroke-width:2.6;opacity:1;}
+.cr.cur.future,.cr.cur.break{stroke:var(--bone-2);}
+.crg:hover .cr{stroke-width:2.4;opacity:1;}
+.crg:hover .cr.future{stroke:var(--bone-2);}
+.crcore{fill:var(--gold);pointer-events:none;}
+@keyframes crflow{to{stroke-dashoffset:-48;}}
+@media(max-width:960px){.chring{position:static;}}
+@media(max-width:640px){.chwrap{grid-template-columns:110px minmax(0,1fr);gap:16px;}.chring figcaption{font-size:11px;}}
+@media(prefers-reduced-motion:reduce){.cr.next{animation:none;}}
+/* ── 年輪：五個方向的段位小年輪 ── */
+.plegend a{grid-template-columns:26px minmax(0,1fr) 36px auto !important;}
+.dring{width:36px;height:36px;display:block;overflow:visible;}
+.dring circle{fill:none;}
+
 .swipe-hint{display:none;font-size:12px;color:var(--ash);margin-top:8px;letter-spacing:.04em;}
 </style>
 
@@ -556,7 +584,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div id="vOne">
         <div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p>
         <div class="story">
-          <div class="mdetail" id="mdetail" aria-live="polite"></div>
+          <div class="chwrap"><figure class="chring"><svg id="chRing" viewBox="-110 -110 220 220" role="group" aria-label="第一卷年輪：每刊出一話長出一圈，點一圈看那一話"></svg><figcaption id="chRingCap">第一卷年輪</figcaption></figure><div class="mdetail" id="mdetail" aria-live="polite"></div></div>
           <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
             <div class="stat-top"><span id="pLabel">全卷累計</span><div class="tabs" id="pMode" role="group" aria-label="切換累計範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></div>
             <div class="pgrid"><div class="penta">
@@ -569,9 +597,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               </svg>
             </div>
             <ul class="plegend" id="pLegend">
-              {pillars.map((p) => <li style={`--dc:var(--c-${p.slug})`}><a href={`/pillars/${p.slug}`}><span class="k">{p.kanji}</span><span class="n">{p.type}<small>{p.title}</small><i class="pbar"><i data-bar={p.slug} style={`width:${prog(counts[p.slug])}%`}></i></i></span><span class="nd"><b class="num" data-d={p.slug}>{counts[p.slug]}</b><span class="dan" data-dan={p.slug}>{dan(counts[p.slug])}</span></span></a></li>)}
+              {pillars.map((p) => <li style={`--dc:var(--c-${p.slug})`}><a href={`/pillars/${p.slug}`}><span class="k">{p.kanji}</span><span class="n">{p.type}<small>{p.title}</small></span><svg class="dring" data-ring={p.slug} viewBox="-16 -16 32 32" aria-hidden="true"></svg><span class="nd"><b class="num" data-d={p.slug}>{counts[p.slug]}</b><span class="dan" data-dan={p.slug}>{dan(counts[p.slug])}</span></span></a></li>)}
             </ul></div>
-            <p class="dir-note" id="pNote">進度條＝離下一個段位還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
+            <p class="dir-note" id="pNote">小年輪：每升一段長一圈，外圈的弧＝離下一段還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
           </aside>
         </div>
       </div>
@@ -746,8 +774,16 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var Tr=document.getElementById('track'),Md=document.getElementById('mdetail');
   Tr.innerHTML=list.map(function(r,i){return '<li><button class="node '+r.state+(r.final?' final':'')+'" data-i="'+i+'" aria-label="'+label(r)+'，'+md(r)+'"><span class="dot">'+(r.final?'巻':'')+'</span><span class="r">'+label(r)+'</span><span class="d">'+md(r)+'</span></button></li>';}).join('')
     +'<span class="fill" style="width:calc((100% - 64px) * '+Math.max(0,nextIdx-.5)/(list.length-1)+')"></span>';
+
+  /* 第一卷年輪：第 0 話在最內圈，第一卷是最外圈 */
+  var CR=document.getElementById('chRing'),CRC=document.getElementById('chRingCap'),NS='http://www.w3.org/2000/svg';
+  function wob(i){var pts=[],r=10+i*7.4;for(var j=0;j<=96;j++){var a=j/96*6.2832,w=1+.035*Math.sin(a*3+i*.9)+.02*Math.sin(a*5+i*1.7);pts.push((Math.cos(a)*r*w).toFixed(1)+','+(Math.sin(a)*r*w).toFixed(1));}return 'M'+pts.join(' L')+'Z';}
+  if(CR){var h='<circle class="crcore" r="3"/>';list.forEach(function(r,i){var d=wob(i);h+='<g class="crg" data-i="'+i+'" tabindex="0" role="button" aria-label="'+label(r)+'"><path class="cr-hit" d="'+d+'"/><path class="cr '+r.state+(r.final?' final':'')+'" d="'+d+'"/></g>';});CR.innerHTML=h;
+    var doneN=list.filter(function(r){return r.state==='done';}).length;CRC.innerHTML='第一卷年輪・已長出 <b>'+doneN+'</b> / '+list.length+' 圈';
+    CR.addEventListener('click',function(e){var g=e.target.closest('.crg');if(g)show(+g.dataset.i);});
+    CR.addEventListener('keydown',function(e){var g=e.target.closest('.crg');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();show(+g.dataset.i);}});}
   function items(arr,withDir){return '<ul>'+arr.map(function(x){var d=withDir&&x.dir?dirOf(x.dir):null;return '<li'+(d?' style="--dc:'+col(d.id)+'"':'')+'><span class="k">'+(d?d.k:'・')+'</span><span>'+esc(x.text||x)+'</span></li>';}).join('')+'</ul>';}
-  function show(i){var r=list[i];Tr.querySelectorAll('.node').forEach(function(n){n.setAttribute('aria-current',+n.dataset.i===i);});
+  function show(i){var r=list[i];Tr.querySelectorAll('.node').forEach(function(n){n.setAttribute('aria-current',+n.dataset.i===i);});if(CR)CR.querySelectorAll('.crg').forEach(function(g){g.querySelector('.cr').classList.toggle('cur',+g.dataset.i===i);});
     var st={done:'<b>已刊出</b>',break:'<b>休載</b>',next:'<b>製作中</b>還有 '+r.days+' 天',future:'還有 '+r.days+' 天'}[r.state]+(r.arc?'・'+r.arc:'');
     var b='';
     if(r.state==='done'||r.state==='break'){b+=r.summary?'<p>'+esc(r.summary)+'</p>':'';b+=(r.keep&&r.keep.length)?'<h4>這一話留下的</h4>'+items(r.keep):'';b+=(r.letgo&&r.letgo.length)?'<h4>這一話放下的</h4>'+items(r.letgo):'';if(!b)b='<p>'+(r.state==='break'?'這個月休載。':'這一話的內容整理中。')+'</p>';}
@@ -763,16 +799,25 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   /* 五角形：全卷累計 ↔ 這一話 */
   var PM='all',CUR=null,PS=document.getElementById('pShape'),PD=[].slice.call(document.querySelectorAll('#penta .pdot')),PL=document.getElementById('pLabel'),PMB=document.getElementById('pMode');
   var dan=function(c){return c>=100?'四段':c>=60?'三段':c>=30?'二段':c>=10?'初段':'見習';};
+
+  /* 段位小年輪：每升一段長一圈（見習 0 圈 → 四段 4 圈），最外面那條弧＝離下一段還差多少；「這一話」模式改顯示比例 */
+  function ring(el,n,ratio){if(!el)return;var T=[0,10,30,60,100],tiers=0;while(tiers<4&&n>=T[tiers+1])tiers++;var R=[4,7.5,11,14.5],h='<circle r="1.6" fill="currentColor"/>';
+    for(var gk=0;gk<4;gk++)h+='<circle r="'+R[gk]+'" stroke="currentColor" stroke-width=".8" opacity=".14"/>';
+    if(ratio===null){for(var k=0;k<tiers;k++)h+='<circle r="'+R[k]+'" stroke="currentColor" stroke-width="1.4" opacity="'+(.6+k*.12)+'"/>';
+      if(tiers<4){var r=R[tiers],c=2*Math.PI*r,f=(n-T[tiers])/(T[tiers+1]-T[tiers]);h+='<circle r="'+r+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="'+Math.max(1.5,c*f).toFixed(2)+' '+c.toFixed(2)+'" transform="rotate(-90)"/>';}}
+    else{var c2=2*Math.PI*14.5;h+='<circle r="14.5" stroke="currentColor" stroke-width="1" opacity=".18"/><circle r="14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="'+(c2*ratio).toFixed(2)+' '+c2.toFixed(2)+'" transform="rotate(-90)"/>';}
+    el.innerHTML=h;el.style.color='var(--dc)';}
   function penta(m){PM=m;var c=m==='all'?D.totals:(CUR?CUR.counts:D.totals),top=Math.max(1,Math.max.apply(null,D.dirs.map(function(d){return c[d.id]||0;})));
     var pts=D.dirs.map(function(d,i){var v=.15+((c[d.id]||0)/top)*.85,a=-Math.PI/2+i*2*Math.PI/5;return [Math.cos(a)*150*v,Math.sin(a)*150*v];});
     PS.setAttribute('points',pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' '));
     PD.forEach(function(el,i){el.setAttribute('cx',pts[i][0].toFixed(1));el.setAttribute('cy',pts[i][1].toFixed(1));});
     var prog=function(n){var T=[0,10,30,60,100];if(n>=100)return 100;for(var k=1;k<T.length;k++)if(n<T[k])return Math.round((n-T[k-1])/(T[k]-T[k-1])*100);return 100;};
-    D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');document.querySelector('[data-bar="'+d.id+'"]').style.width=(m==='all'?prog(n):Math.round(n/top*100))+'%';});
-    var PN=document.getElementById('pNote');if(PN)PN.textContent=m==='all'?'進度條＝離下一個段位還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。':'進度條＝這一話各方向的比例。';
+    D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');ring(document.querySelector('[data-ring="'+d.id+'"]'),n,m==='all'?null:n/top);});
+    var PN=document.getElementById('pNote');if(PN)PN.textContent=m==='all'?'小年輪：每升一段長一圈，外圈的弧＝離下一段還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。':'小年輪的弧＝這一話各方向的比例。';
     PL.textContent=m==='all'?'全卷累計':(CUR?CUR.label:'這一話');
     PMB.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===m);});}
   PMB.addEventListener('click',function(e){var b=e.target.closest('button');if(b)penta(b.dataset.m);});
+  D.dirs.forEach(function(d){ring(document.querySelector('[data-ring="'+d.id+'"]'),D.totals[d.id]||0,null);});
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
   requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n&&w.scrollWidth>w.clientWidth){var li=n.closest('li');w.scrollLeft=Math.max(0,li.offsetLeft-w.clientWidth/2+li.offsetWidth/2);}});
