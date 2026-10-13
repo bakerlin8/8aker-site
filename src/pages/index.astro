@@ -715,16 +715,21 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 
 /* 一縷煙：一條細細的煙，從頁面底部往上延伸、慢慢飄動；往下捲動時，煙跟著延伸流動。Canvas 2D，切到別的分頁就暫停。 */
 (function(){var c=document.createElement('canvas');c.id='smoke';c.setAttribute('aria-hidden','true');document.body.appendChild(c);var x=c.getContext('2d');if(!x)return;
-  var W=0,H=0,d=1,t=0,last=0,raf=0,run=true,scr=scrollY,sv=scrollY;
+  var W=0,H=0,d=1,t=0,last=0,raf=0,run=true,scr=scrollY,sv=scrollY,mx=null,my=0,mt=0,bF=null,bS=null,mY=0;
+  // 滑鼠：煙會被游標牽著走，靠近游標那一段跟得快、離越遠拖得越慢；3 秒沒動就慢慢飄回原位
+  addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX*d;my=e.clientY*d;mt=performance.now();},{passive:true});
+  document.addEventListener('mouseleave',function(){mt=0;});
   function size(){d=Math.min(devicePixelRatio||1,1.5);var w=innerWidth,h=innerHeight;if(Math.round(w*d)===W&&Math.abs(Math.round(h*d)-H)<160*d)return;W=c.width=Math.round(w*d);H=c.height=Math.round(h*d);}
   // 平滑起伏：幾個不同頻率的正弦疊加
   function wave(y,ph){return Math.sin(y*.0042+ph*.9)*.55+Math.sin(y*.0091-ph*1.3+1.7)*.28+Math.sin(y*.019+ph*2.1+.4)*.12+Math.sin(y*.031-ph*2.7)*.05;}
   function strand(off,amp,w,a,base,ph,spread){x.beginPath();var step=6*d,first=true;
-    for(var y=H+20*d;y>=-20*d;y-=step){var k=1-y/H,yy=(y/d+sv*.9),sx=base+wave(yy,ph+off)*amp*(.35+k*.9)+off*spread*k*k*W;
+    for(var y=H+20*d;y>=-20*d;y-=step){var k=1-y/H,yy=(y/d+sv*.9),q=(y-mY)/(H*.32),wgt=Math.exp(-q*q),bx=bS+(bF-bS)*wgt,sx=bx+wave(yy,ph+off)*amp*(.35+k*.9)+off*spread*k*k*W;
       if(first){x.moveTo(sx,y);first=false;}else x.lineTo(sx,y);}
     x.lineWidth=w*d;x.strokeStyle='rgba(222,190,170,'+a+')';x.stroke();}
   function draw(){x.clearRect(0,0,W,H);var g=x.createLinearGradient(0,H,0,0);x.lineCap='round';x.lineJoin='round';
-    var base=W*(innerWidth<900?.82:.72),amp=Math.min(W*.09,120*d),ph=t*.18;
+    var home=W*(innerWidth<900?.82:.72),active=mx!==null&&mt&&performance.now()-mt<3000,tx=active?mx:home;
+    if(bF===null){bF=bS=home;}bF+=(tx-bF)*.09;bS+=(tx-bS)*.025;mY+=((active?my:H*.5)-mY)*.08;
+    var base=bS,amp=Math.min(W*.09,120*d),ph=t*.18;
     x.globalCompositeOperation='lighter';
     strand(0,amp,14,.018,base,ph,0);strand(0,amp,6,.03,base,ph,0);
     strand(.6,amp*1.1,2.2,.05,base,ph,.025);strand(-.8,amp*.9,1.6,.045,base,ph,.03);
