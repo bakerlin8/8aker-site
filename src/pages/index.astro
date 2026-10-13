@@ -53,8 +53,6 @@ const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 /* ── hero ── */
 .hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;align-items:center;background:radial-gradient(120% 80% at 70% 40%,#2A1520 0%,#1C0F14 60%);color:#EFE5D6;}
 #art{position:absolute;inset:0;width:100%;height:100%;}
-#smoke{position:fixed;inset:0;width:100%;height:100%;z-index:30;pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity 2.4s var(--ease);}
-#smoke.on{opacity:1;}
 .hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:120px 40px 80px;}
 .hero-grid{max-width:660px;}
 .hero .rv{--d:0}
@@ -712,37 +710,6 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   /* 等字型與第一屏排好再開始長，避開開場最忙的那一秒 */
   if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
 
-
-/* 一縷煙：一條細細的煙，從頁面底部往上延伸、慢慢飄動；往下捲動時，煙跟著延伸流動。Canvas 2D，切到別的分頁就暫停。 */
-(function(){var c=document.createElement('canvas');c.id='smoke';c.setAttribute('aria-hidden','true');document.body.appendChild(c);var x=c.getContext('2d');if(!x)return;
-  var W=0,H=0,d=1,t=0,last=0,raf=0,run=true,scr=scrollY,sv=scrollY,mx=null,my=0,mt=0,bF=null,bS=null,mY=0;
-  // 滑鼠：煙會被游標牽著走，靠近游標那一段跟得快、離越遠拖得越慢；3 秒沒動就慢慢飄回原位
-  addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX*d;my=e.clientY*d;mt=performance.now();},{passive:true});
-  document.addEventListener('mouseleave',function(){mt=0;});
-  function size(){d=Math.min(devicePixelRatio||1,1.5);var w=innerWidth,h=innerHeight;if(Math.round(w*d)===W&&Math.abs(Math.round(h*d)-H)<160*d)return;W=c.width=Math.round(w*d);H=c.height=Math.round(h*d);}
-  // 平滑起伏：幾個不同頻率的正弦疊加
-  function wave(y,ph){return Math.sin(y*.0042+ph*.9)*.55+Math.sin(y*.0091-ph*1.3+1.7)*.28+Math.sin(y*.019+ph*2.1+.4)*.12+Math.sin(y*.031-ph*2.7)*.05;}
-  function strand(off,amp,w,a,base,ph,spread){x.beginPath();var step=6*d,first=true;
-    for(var y=H+20*d;y>=-20*d;y-=step){var k=1-y/H,yy=(y/d+sv*.9),q=(y-mY)/(H*.32),wgt=Math.exp(-q*q),bx=bS+(bF-bS)*wgt,sx=bx+wave(yy,ph+off)*amp*(.35+k*.9)+off*spread*k*k*W;
-      if(first){x.moveTo(sx,y);first=false;}else x.lineTo(sx,y);}
-    x.lineWidth=w*d;x.strokeStyle='rgba(222,190,170,'+a+')';x.stroke();}
-  function draw(){x.clearRect(0,0,W,H);var g=x.createLinearGradient(0,H,0,0);x.lineCap='round';x.lineJoin='round';
-    var home=W*(innerWidth<900?.82:.72),active=mx!==null&&mt&&performance.now()-mt<3000,tx=active?mx:home;
-    if(bF===null){bF=bS=home;}bF+=(tx-bF)*.09;bS+=(tx-bS)*.025;mY+=((active?my:H*.5)-mY)*.08;
-    var base=bS,amp=Math.min(W*.09,120*d),ph=t*.18;
-    x.globalCompositeOperation='lighter';
-    strand(0,amp,14,.018,base,ph,0);strand(0,amp,6,.03,base,ph,0);
-    strand(.6,amp*1.1,2.2,.05,base,ph,.025);strand(-.8,amp*.9,1.6,.045,base,ph,.03);
-    strand(0,amp,1,.16,base,ph,0);
-    x.globalCompositeOperation='destination-in';g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.12,'rgba(0,0,0,1)');g.addColorStop(.8,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,W,H);
-    x.globalCompositeOperation='source-over';}
-  addEventListener('scroll',function(){scr=scrollY;},{passive:true});
-  function loop(ts){if(!run)return;var dt=last?Math.min(.1,(ts-last)/1e3):0;last=ts;t+=dt;sv+=(scr-sv)*.08;draw();raf=requestAnimationFrame(loop);}
-  size();addEventListener('resize',function(){size();if(RM)draw();});
-  if(RM){draw();c.classList.add('on');return;}
-  setTimeout(function(){c.classList.add('on');},300);raf=requestAnimationFrame(loop);
-  document.addEventListener('visibilitychange',function(){cancelAnimationFrame(raf);run=!document.hidden;if(run){last=0;raf=requestAnimationFrame(loop);}});
-})();
 
 /* 有點樣子：唱盤（目前那件在中間，其他沿著弧線轉到兩側；唱片從封套滑出、轉動） */
 (function(){var D=document.getElementById('deck');if(!D)return;var C=[].slice.call(D.querySelectorAll('.work')),T=[].slice.call(document.querySelectorAll('#wTicks [data-go]')),NOW=document.getElementById('wNow'),VL=null,n=C.length,cur=0;
