@@ -5,7 +5,8 @@ import { pillars } from '../data/pillars';
 import copy from '../data/site-copy.json';
 import chapters from '../data/chapters.json';
 import worksData from '../data/works.json';
-import body from '../data/body.json';
+import dreams from '../data/dreams.json';
+import services from '../data/services.json';
 
 const all = (await Promise.all(
   pillars.map(async (p) => (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).map((e: any) => ({ dir: p.slug, e })))
@@ -30,9 +31,12 @@ const journal = all.slice(0, 12);
 const pageData = {
   dirs: pillars.map((p) => ({ id: p.slug, k: p.kanji, n: p.type })),
   entries: all.map((a) => ({ date: ymd(a.e.data.date), dir: a.dir, t: a.e.data.title, url: `/pillars/${a.dir}/${a.e.slug}` })),
-  chapters, body,
+  chapters,
+  totals: counts,
   start: copy.countdown_start, target: copy.countdown_target, birth: copy.birth_date,
 };
+const safeHref = (u: string) => (/^(\/(?!\/)|https:\/\/)/.test(u || '') ? u : '');
+const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url || '') && st.name).map((st) => ({ ...st, img: /^https:\/\//.test(st.img || '') ? st.img : '' }));
 const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 ---
 <BaseLayout>
@@ -96,44 +100,51 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .tip.on{opacity:1;transform:none;}
 @media(max-width:900px){.hero{align-items:flex-start;}.hero-in{padding:112px 20px 64px;}}
 
-/* ── 壱 five directions ── */
-.dirs{display:grid;grid-template-columns:380px minmax(0,1fr);gap:56px;margin-top:40px;align-items:start;}
-.penta svg{width:100%;height:auto;overflow:visible;}
+/* ── 壱 連載：五角形能力值 ── */
+.story{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:44px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px;align-items:start;}
+.stat{background:var(--night-2);border:1px solid var(--line);padding:18px 18px 14px;}
+.stat .tabs{display:flex;gap:4px;}
+.stat .tabs button{font-size:12.5px;padding:3px 11px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
+.stat .tabs button:hover{border-color:var(--bone-2);}
+.stat .tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
+.stat-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--bone-2);}
+.penta{margin:6px auto 0;max-width:280px;}
+.penta svg{width:100%;height:auto;overflow:visible;display:block;}
 .penta .grow{transform:scale(.001);transition:transform 1.4s var(--ease) .3s;}
 .in .penta .grow{transform:none;}
-.shape{fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.5;}
-.axis{font-family:var(--jp);font-size:21px;fill:var(--bone-2);cursor:pointer;transition:fill .3s;}
-.axis:hover,.axis.on{fill:var(--gold);}
-.idx{display:flex;flex-direction:column;border-top:1px solid var(--line);}
-.idx button{display:grid;grid-template-columns:48px minmax(0,1fr) 110px 52px;gap:14px;align-items:center;padding:13px 6px;border-bottom:1px solid var(--line);text-align:left;transition:background .3s,padding .4s var(--ease);}
-.idx button:hover{background:var(--night-2);}
-.idx button[aria-selected="true"]{background:var(--night-2);padding-left:16px;}
-.idx .k{font-family:var(--jp);font-size:30px;line-height:1;color:var(--ash);transition:color .3s,transform .5s var(--ease);display:inline-block;}
-.idx button:hover .k{transform:rotate(-6deg) scale(1.08);}
-.idx button[aria-selected="true"] .k,.idx button:hover .k{color:var(--dc);}
-.idx .n{font-size:15px;}
-.idx .n small{display:block;font-size:12px;color:var(--ash);}
-.idx .bar{height:3px;background:var(--line);position:relative;overflow:hidden;}
-.idx .bar i{position:absolute;inset:0 auto 0 0;background:var(--dc);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease);}
-.in .idx .bar i{transform:scaleX(1);}
-.idx .dan{font-family:var(--serif);font-size:13.5px;text-align:right;}
-.detail{position:relative;margin-top:28px;min-height:230px;overflow:hidden;}
-.detail[hidden]{display:none;}
-.detail .big{position:absolute;right:-8px;top:-30px;font-family:var(--jp);font-weight:300;font-size:220px;line-height:1;color:var(--dc);opacity:.09;pointer-events:none;animation:bigIn .9s var(--ease);}
-@keyframes bigIn{from{opacity:0;transform:translateX(24px);}}
-.detail>*:not(.big){animation:detIn .6s var(--ease) both;}
-.detail>*:nth-child(3){animation-delay:.05s}.detail>*:nth-child(4){animation-delay:.1s}.detail>*:nth-child(5){animation-delay:.15s}
-@keyframes detIn{from{opacity:0;transform:translateY(6px);}}
-.detail h3{font-family:var(--serif);font-weight:500;font-size:24px;}
-.detail .jp{font-family:var(--jp);font-size:13.5px;color:var(--ash);}
-.detail .d{margin-top:12px;color:var(--bone-2);max-width:32em;}
-.detail .es{margin-top:18px;}
-.detail .es a{display:flex;gap:18px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;transition:padding .35s var(--ease);}
-.detail .es a:hover{padding-left:8px;}
-.detail .es a:hover span{color:var(--gold);}
-.detail .es time{color:var(--ash);font-size:13px;min-width:84px;}
-.dir-note{font-size:12.5px;color:var(--ash);margin-top:14px;}
-@media(max-width:960px){.dirs{grid-template-columns:1fr;}.penta svg{max-width:340px;margin:0 auto;display:block;}.idx button{grid-template-columns:40px minmax(0,1fr) 70px 48px;}.detail .big{font-size:150px;}}
+.shape{fill:var(--gold-soft);stroke:var(--gold);stroke-width:1.5;transition:all .8s var(--ease);}
+.pdot{transition:cx .8s var(--ease),cy .8s var(--ease);}
+.axis{font-family:var(--jp);font-size:24px;fill:var(--bone-2);transition:fill .3s;}
+.penta a:hover .axis{fill:var(--gold);}
+.plegend{list-style:none;margin-top:6px;border-top:1px solid var(--line);}
+.plegend a{display:grid;grid-template-columns:30px minmax(0,1fr) auto 40px;gap:10px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);transition:background .3s,padding .35s var(--ease);}
+.plegend a:hover{background:var(--night-3);padding-left:8px;}
+.plegend .k{font-family:var(--jp);font-size:20px;color:var(--dc);text-align:center;}
+.plegend .n{font-size:14px;}
+.plegend .n small{font-size:11.5px;color:var(--ash);margin-left:6px;}
+.plegend b{font-weight:300;font-size:18px;}
+.plegend .dan{font-family:var(--serif);font-size:12.5px;color:var(--bone-2);text-align:right;}
+.dir-note{font-size:11.5px;color:var(--ash);margin-top:10px;}
+@media(max-width:960px){.story{grid-template-columns:1fr;gap:28px;}}
+
+/* ── 壱 分鏡表 ── */
+.dream-intro{margin-top:24px;color:var(--bone-2);font-size:14.5px;}
+.dgroup{margin-top:26px;}
+.dgroup h3{font-family:var(--serif);font-weight:500;font-size:16px;color:var(--gold);}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px;}
+.dcard{position:relative;border:1px dashed var(--line);padding:16px 16px 14px;display:flex;flex-direction:column;gap:6px;background:transparent;transition:transform .4s var(--ease),border-color .3s,background .3s;}
+.dcard:hover{transform:translateY(-3px);border-color:var(--dc);}
+.dcard.doing{border-style:solid;background:var(--night-2);}
+.dcard.done{border-style:solid;border-color:var(--dc);background:var(--night-2);}
+.dmeta{display:flex;justify-content:space-between;align-items:center;}
+.dmeta .k{font-family:var(--jp);font-size:20px;color:var(--dc);}
+.dmeta .st{font-size:11.5px;padding:1px 9px;border:1px solid var(--line);color:var(--ash);}
+.dcard.doing .st{border-color:var(--gold);color:var(--gold);}
+.dcard.done .st{background:var(--dc);border-color:var(--dc);color:var(--night);}
+.dcard h4{font-family:var(--serif);font-weight:500;font-size:16px;line-height:1.55;}
+.dcard .why{font-size:13px;color:var(--bone-2);line-height:1.7;}
+.dcard .help,.dcard .dlink{font-size:12.5px;color:var(--gold);margin-top:auto;padding-top:6px;}
+.dcard .help:hover,.dcard .dlink:hover{text-decoration:underline;text-underline-offset:3px;}
 
 /* ── 弐 連載 ── */
 .mv-toggle{display:inline-flex;margin-top:28px;border:1px solid var(--line);}
@@ -158,8 +169,10 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .node .r{font-size:12.5px;color:var(--bone-2);white-space:nowrap;transition:color .3s;}
 .node:hover .r,.node[aria-current="true"] .r{color:var(--gold);}
 .node[aria-current="true"] .dot{transform:scale(1.25);}
-.mdetail{margin-top:26px;border-top:1px solid var(--line);padding-top:26px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:40px;}
+.mdetail{min-width:0;}
 .mdetail>*{animation:detIn .6s var(--ease) both;}
+.mnums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px;}
+.mnums div{border-top:1px solid var(--line);padding-top:10px;}
 .mdetail .tag{font-size:12.5px;color:var(--ash);}
 .mdetail .tag b{font-weight:400;color:var(--gold);margin-right:8px;}
 .mdetail h3{font-family:var(--serif);font-weight:500;font-size:24px;margin-top:4px;line-height:1.45;}
@@ -168,18 +181,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .mdetail ul{list-style:none;margin-top:6px;}
 .mdetail li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;}
 .mdetail li .k{font-family:var(--jp);color:var(--dc,var(--ash));}
-.tally{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:22px;border:1px solid var(--line);background:var(--line);}
-.tally div{background:var(--night);padding:12px 8px 10px;text-align:center;transition:background .3s,transform .4s var(--ease);}
-.tally div:hover{background:var(--night-2);transform:translateY(-2px);}
-.tally .k{font-family:var(--jp);font-size:22px;line-height:1;color:var(--dc);display:block;}
-.tally b{display:block;font-weight:300;font-size:22px;line-height:1.2;margin-top:6px;font-variant-numeric:tabular-nums;}
-.tally small{font-size:11.5px;color:var(--ash);}
-.tally div.zero .k{opacity:.35;} .tally div.zero b{color:var(--ash);}
-.tally-h{font-family:var(--serif);font-weight:500;font-size:14px;color:var(--gold);margin-top:22px;}
-.tally-h span{font-family:var(--sans);font-weight:300;font-size:12.5px;color:var(--ash);margin-left:8px;}
 .ch-link{display:inline-block;margin-top:22px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s,padding .4s var(--ease);}
 .ch-link:hover{color:var(--bone);border-color:var(--gold);padding-left:6px;}
-.mnums div{padding:12px 0;border-bottom:1px solid var(--line);}
 .mnums b{display:block;font-size:28px;font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;}
 .mnums small{font-size:12.5px;color:var(--ash);}
 .ygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-top:28px;padding:1px 0 0 1px;}
@@ -192,53 +195,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .ycard.next{background:var(--gold-soft);}
 .ycard.final{background:var(--night-3);}
 .ycard.final h4{color:var(--gold);}
-@media(max-width:860px){.mdetail{grid-template-columns:1fr;gap:20px;}}
-
-/* ── 伍 body ── */
-.blive{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--ash);}
-.blive i{width:7px;height:7px;border-radius:50%;background:#5E9C6A;box-shadow:0 0 0 0 rgba(94,156,106,.5);animation:livePulse 2.4s ease-out infinite;}
-.blive.stale i{background:var(--ash);animation:none;}
-@keyframes livePulse{70%{box-shadow:0 0 0 7px rgba(94,156,106,0);}100%{box-shadow:0 0 0 0 rgba(94,156,106,0);}}
-.bstats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:26px;background:var(--line);border:1px solid var(--line);}
-.bstat{background:var(--night);padding:18px 20px 16px;transition:background .3s;}
-.bstat:hover{background:var(--night-2);}
-.bstat b{display:block;font-family:var(--serif);font-weight:500;font-size:34px;line-height:1.1;color:var(--bone);}
-.bstat small{font-size:12.5px;color:var(--ash);}
-.bstat b.up{color:var(--c-strengthen);} .bstat b.down{color:var(--c-conjure);}
-.bmain{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;margin-top:28px;align-items:start;}
-.bchart{border:1px solid var(--line);padding:20px 22px 14px;background:var(--night);}
-.bchart svg{width:100%;height:auto;display:block;overflow:visible;}
-.bchart-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--bone-2);margin-bottom:10px;gap:10px;flex-wrap:wrap;}
-.bchart .bar{transition:opacity .3s;}
-.bchart .bar:hover{opacity:.75;}
-.bchart .ln{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 1.6s var(--ease) forwards;}
-.bchart .grow{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);animation:growUp .9s var(--ease) forwards;animation-delay:calc(var(--k) * 40ms);}
-@keyframes growUp{to{transform:scaleY(1);}}
-@keyframes draw{to{stroke-dashoffset:0;}}
-.tabs{display:flex;gap:4px;}
-.tabs button{font-size:12.5px;padding:2px 10px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
-.tabs button:hover{border-color:var(--bone-2);}
-.tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
-.brecent h3,.bsrc h3{font-family:var(--serif);font-weight:500;font-size:16px;}
-.brecent ol{list-style:none;margin-top:10px;}
-.brecent li{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);font-size:14px;transition:padding .35s var(--ease);}
-.brecent li:hover{padding-left:6px;}
-.brecent li time{font-size:12.5px;color:var(--ash);font-variant-numeric:tabular-nums;}
-.brecent li small{font-size:12.5px;color:var(--bone-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
-.brecent li.empty{display:block;color:var(--ash);font-size:13px;}
-.strava{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:9px 16px;border:1px solid #FC4C02;color:#C73D00;font-size:13.5px;transition:background .3s,color .3s,gap .4s var(--ease);}
-.strava:hover{background:#FC4C02;color:#fff;gap:12px;}
-.bsrc{margin-top:40px;padding-top:28px;border-top:1px solid var(--line);}
-.flow{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:18px;counter-reset:f;}
-.flow li{position:relative;padding-top:14px;border-top:2px solid var(--line);}
-.flow li:not(:last-child)::after{content:'→';position:absolute;right:-22px;top:-13px;color:var(--ash);font-size:14px;}
-.flow li.now{border-top-color:var(--gold);}
-.flow .tag{font-size:11.5px;letter-spacing:.08em;color:var(--ash);}
-.flow b{display:block;font-family:var(--serif);font-weight:500;font-size:16px;margin-top:4px;}
-.flow em{display:block;font-style:normal;font-size:13px;color:var(--gold);margin-top:2px;}
-.flow p{font-size:13px;color:var(--bone-2);margin-top:8px;line-height:1.75;}
-@media(max-width:960px){.bmain{grid-template-columns:1fr;}.bstats{grid-template-columns:repeat(2,1fr);}.flow{grid-template-columns:1fr 1fr;row-gap:24px;}.flow li:nth-child(2)::after{display:none;}}
-@media(max-width:560px){.flow{grid-template-columns:1fr;}.flow li::after{display:none;}.bstat b{font-size:28px;}}
 
 /* ── 肆 works ── */
 .strip{display:flex;gap:20px;overflow-x:auto;margin-top:36px;padding:10px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--ash) transparent;}
@@ -293,6 +249,65 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .btn-ink:hover::after{left:120%;}
 @media(max-width:900px){.about{grid-template-columns:1fr;}}
 
+/* ── 肆 服務 ── */
+.svc{margin-top:64px;padding-top:40px;border-top:1px solid var(--line);}
+.svc-h{font-family:var(--serif);font-weight:500;font-size:clamp(22px,2.6vw,30px);}
+.svc-h2{font-family:var(--serif);font-weight:500;font-size:20px;}
+.svc-lede{color:var(--bone-2);margin-top:8px;max-width:34em;font-size:16px;}
+.proof{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin-top:24px;background:var(--line);border:1px solid var(--line);}
+.proof li{background:var(--night);padding:14px 16px;}
+.proof b{display:block;font-family:var(--serif);font-weight:500;font-size:28px;line-height:1.15;color:var(--gold);}
+.proof small{font-size:12.5px;color:var(--bone-2);}
+.scards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px;}
+.scard{background:var(--night-2);border:1px solid var(--line);padding:22px 22px 18px;display:flex;flex-direction:column;scroll-margin-top:90px;transition:border-color .3s,transform .4s var(--ease);}
+.scard:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
+.s-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ash);}
+.badge{border:1px solid var(--gold);color:var(--gold);padding:0 8px;}
+.scard h4{font-family:var(--serif);font-weight:500;font-size:22px;margin-top:10px;line-height:1.4;}
+.scard h4 small{display:block;font-family:var(--jp);font-size:13px;color:var(--ash);margin-top:2px;}
+.scard .for{font-size:13px;color:var(--gold);margin-top:8px;}
+.sdesc{font-size:14.5px;color:var(--bone-2);margin-top:8px;}
+.sitems{list-style:none;margin-top:12px;}
+.sitems li{position:relative;padding:7px 0 7px 18px;border-top:1px solid var(--line);font-size:14px;}
+.sitems li::before{content:'';position:absolute;left:2px;top:15px;width:6px;height:6px;border-radius:50%;background:var(--gold);}
+.sex{font-size:12.5px;color:var(--ash);margin-top:10px;}
+.sex b{font-weight:400;color:var(--bone-2);margin-right:8px;}
+.s-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:16px;}
+.price{font-size:12.5px;color:var(--bone-2);}
+.btn-gold2{display:inline-flex;align-items:center;min-height:40px;padding:8px 16px;background:var(--gold);color:#1C0F14;font-size:13.5px;transition:transform .3s var(--ease),background .3s;}
+.btn-gold2:hover{transform:translateY(-1px);background:#E2B35E;}
+.ai-note{margin-top:16px;padding:14px 16px;border:1px dashed var(--line);font-size:13.5px;color:var(--bone-2);scroll-margin-top:90px;}
+.ai-note span{font-family:var(--jp);color:var(--c-operate);margin-right:10px;font-size:18px;}
+.ai-note a{color:var(--gold);}
+.stays{margin-top:36px;}
+.stays-note{font-size:13px;color:var(--ash);margin-top:2px;}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px;}
+.stay{display:flex;flex-direction:column;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
+.stay:hover{border-color:var(--gold);transform:translateY(-3px);}
+.stay img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+.stay div{padding:12px 14px 4px;}
+.stay h4{font-family:var(--serif);font-weight:500;font-size:16px;}
+.stay p{font-size:13px;color:var(--bone-2);}
+.stay small{font-size:12px;color:var(--gold);}
+.stay .go{padding:8px 14px 12px;font-size:12.5px;color:var(--gold);}
+.inq{margin-top:44px;background:#EFE5D6;color:#1C0F14;padding:26px;scroll-margin-top:80px;}
+.inq .svc-h2{color:#1C0F14;}
+.inq-note{font-size:13px;color:#5B4B4E;margin-top:4px;}
+.inq label{display:block;font-size:13px;color:#5B4B4E;margin-top:14px;}
+.inq input,.inq select,.inq textarea{display:block;width:100%;margin-top:5px;font:inherit;font-size:16px;color:#1C0F14;background:#FBF6F3;border:1px solid rgba(42,24,30,.18);padding:10px 12px;border-radius:0;transition:border-color .2s,box-shadow .2s;}
+.inq input:focus,.inq select:focus,.inq textarea:focus{outline:none;border-color:#9E6F22;box-shadow:0 0 0 3px rgba(158,111,34,.15);}
+.inq textarea{resize:vertical;line-height:1.7;}
+.frow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0;}
+.consent{font-size:12px;color:#806B72;margin-top:12px;}
+.consent a{color:#9E6F22;text-decoration:underline;text-underline-offset:2px;}
+.fsend{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap;}
+.fsend .btn-ink{margin-left:0;}
+.fmsg{font-size:13.5px;}
+.fmsg.ok{color:#4E6B3A;}.fmsg.err{color:#A1324A;}
+.wsvc{display:inline-block;margin-top:12px;font-size:12.5px;color:var(--gold);}
+@media(max-width:860px){.scards{grid-template-columns:1fr;}}
+
 /* ── 手機版（≤640px）：版面收斂、觸控目標加大、橫向內容加提示 ── */
 @media(max-width:640px){
   .hero-in{padding:96px 20px 32px;}
@@ -303,18 +318,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .cd-clock{font-size:20px;}
   .next-rel{min-height:44px;align-items:center;}
 
-  .dirs{gap:24px;margin-top:24px;}
-  .penta svg{max-width:270px;}
-  .axis{font-size:24px;}
-  .idx button{grid-template-columns:34px minmax(0,1fr) 52px 40px;gap:10px;padding:12px 4px;min-height:56px;}
-  .idx button[aria-selected="true"]{padding-left:10px;}
-  .idx .k{font-size:24px;}
-  .idx .dan{font-size:12.5px;}
-  .detail{min-height:0;}
-  .detail .big{font-size:120px;top:-14px;}
-  .detail h3{font-size:21px;}
-  .detail .es a{flex-direction:column;gap:2px;padding:12px 0;}
-  .detail .es time:empty{display:none;}
 
   .mv-toggle{margin-top:22px;}
   .mv-toggle button{padding:9px 18px;font-size:13.5px;}
@@ -325,15 +328,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .track li{scroll-snap-align:center;}
   .node{min-height:44px;}
   .swipe-hint{display:block;}
-  .mdetail{gap:18px;padding-top:20px;}
+  .dgrid{grid-template-columns:1fr;}
+  .stat .tabs button{padding:7px 12px;font-size:13px;}
+  .stat{padding:14px 12px 12px;}
   .mdetail h3{font-size:21px;}
-  .tally div{padding:10px 2px 8px;}
-  .tally .k{font-size:18px;}
-  .tally b{font-size:19px;}
-  .tally small{font-size:11px;}
-  .mnums{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-  .mnums div{border-bottom:0;border-top:1px solid var(--line);}
-  .mnums b{font-size:22px;}
+          .mnums b{font-size:22px;}
   .mnums small{font-size:11.5px;line-height:1.4;display:block;}
   .ygrid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .ycard{min-height:118px;padding:14px 14px 12px;}
@@ -350,20 +349,21 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .work{flex-basis:84vw;padding:22px;min-height:220px;}
   .work h3{font-size:18px;}
 
-  .bstats{margin-top:20px;}
-  .bstat{padding:14px 14px 12px;}
-  .bstat b{font-size:26px;}
-  .bchart{padding:14px 14px 10px;}
-  .bchart-top{flex-direction:column;align-items:flex-start;}
-  .tabs button{padding:7px 14px;font-size:13px;}
-  .brecent li{grid-template-columns:44px minmax(0,1fr) auto;}
-  .strava{min-height:44px;}
 
   .about{gap:32px;margin-top:24px;}
   .about .q{font-size:19px;}
   .support{padding:22px 20px;}
   .support .r{gap:12px;}
   .btn-ink{margin-left:0;width:100%;text-align:center;padding:13px 20px;}
+  .svc{margin-top:48px;padding-top:32px;}
+  .proof b{font-size:22px;}
+  .proof li{padding:12px 10px;}
+  .proof small{font-size:11.5px;line-height:1.5;display:block;}
+  .scard{padding:18px 16px 16px;}
+  .scard h4{font-size:20px;}
+  .btn-gold2{width:100%;justify-content:center;min-height:46px;}
+  .inq{padding:20px 16px;margin:36px -4px 0;}
+  .frow{grid-template-columns:1fr;}
 }
 .swipe-hint{display:none;font-size:12px;color:var(--ash);margin-top:8px;letter-spacing:.04em;}
 </style>
@@ -382,54 +382,47 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<section class="sec band-light" id="five" aria-labelledby="five-h">
-  <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Status</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.five_sub}</p><h2 id="five-h" class="rv" style="--i:1">{copy.five_title}</h2></div>
-      <div class="dirs">
-        <div class="penta rv" style="--i:2">
-          <svg id="penta" viewBox="-190 -190 380 380" role="img" aria-label="五個方向的累積雷達圖">
-            {rings.map((r) => <polygon points={r} fill="none" style="stroke:var(--line)" />)}
-            {pillars.map((_, i) => { const [x, y] = pt(i, 1); return <line x1="0" y1="0" x2={x.toFixed(1)} y2={y.toFixed(1)} style="stroke:var(--line)" />; })}
-            <g class="grow"><polygon class="shape" points={shape} />
-              {pillars.map((p, i) => { const [x, y] = pt(i, val(p.slug)); return <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="4.5" style={`fill:var(--c-${p.slug})`} />; })}</g>
-            {pillars.map((p, i) => { const [x, y] = pt(i, 1.2); return <text class="axis" data-i={i} x={x.toFixed(1)} y={(y + 7).toFixed(1)} text-anchor="middle">{p.kanji}</text>; })}
-          </svg>
-        </div>
-        <div>
-          <div class="idx" role="tablist" aria-label="五個方向" id="idx">
-            {pillars.map((p, i) => (
-              <button role="tab" id={`tab-${p.slug}`} aria-controls={`panel-${p.slug}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} style={`--dc:var(--c-${p.slug})`} class="rv" data-i={i}>
-                <span class="k" style={`view-transition-name:k-${p.slug}`}>{p.kanji}</span><span class="n">{p.type}<small>{p.title}・{counts[p.slug]} 篇</small></span>
-                <span class="bar" aria-hidden="true"><i style={`width:${Math.min(100, (counts[p.slug] / MAX) * 100)}%`}></i></span><span class="dan">{dan(counts[p.slug])}</span>
-              </button>
-            ))}
-          </div>
-          {pillars.map((p, i) => {
-            const es = all.filter((a) => a.dir === p.slug).slice(0, 3);
-            return (
-              <div class="detail" role="tabpanel" id={`panel-${p.slug}`} aria-labelledby={`tab-${p.slug}`} hidden={i !== 0} style={`--dc:var(--c-${p.slug})`}>
-                <div class="big" aria-hidden="true">{p.kanji}</div>
-                <h3>{p.title}</h3><p class="jp" lang="ja">{p.titleJp}</p><p class="d">{p.desc}</p>
-                <div class="es">{es.map((a) => <a href={`/pillars/${p.slug}/${a.e.slug}`}><time>{dot(a.e.data.date)}</time><span>{a.e.data.title}</span></a>)}<a href={`/pillars/${p.slug}`}><time></time><span>看「{p.type}」全部文章</span></a></div>
-              </div>
-            );
-          })}
-          <p class="dir-note">段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">弐</span><span class="sl"></span><span class="se">Chapters</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Chapters</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
-      <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="toc">第一卷目次</button></div>
-      <div id="vOne"><div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p><div class="mdetail" id="mdetail" aria-live="polite"></div></div>
+      <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="dream">分鏡表</button><button aria-pressed="false" data-v="toc">第一卷目次</button></div>
+      <div id="vOne">
+        <div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p>
+        <div class="story">
+          <div class="mdetail" id="mdetail" aria-live="polite"></div>
+          <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
+            <div class="stat-top"><span id="pLabel">全卷累計</span><div class="tabs" id="pMode" role="group" aria-label="切換累計範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></div>
+            <div class="penta">
+              <svg id="penta" viewBox="-190 -190 380 380" role="img" aria-label="五個方向的累積雷達圖">
+                {rings.map((r) => <polygon points={r} fill="none" style="stroke:var(--line)" />)}
+                {pillars.map((_, i) => { const [x, y] = pt(i, 1); return <line x1="0" y1="0" x2={x.toFixed(1)} y2={y.toFixed(1)} style="stroke:var(--line)" />; })}
+                <g class="grow"><polygon class="shape" id="pShape" points={shape} />
+                  {pillars.map((p, i) => { const [x, y] = pt(i, val(p.slug)); return <circle class="pdot" cx={x.toFixed(1)} cy={y.toFixed(1)} r="4.5" style={`fill:var(--c-${p.slug})`} />; })}</g>
+                {pillars.map((p, i) => { const [x, y] = pt(i, 1.2); return <a href={`/pillars/${p.slug}`}><text class="axis" x={x.toFixed(1)} y={(y + 7).toFixed(1)} text-anchor="middle">{p.kanji}</text></a>; })}
+              </svg>
+            </div>
+            <ul class="plegend" id="pLegend">
+              {pillars.map((p) => <li style={`--dc:var(--c-${p.slug})`}><a href={`/pillars/${p.slug}`}><span class="k">{p.kanji}</span><span class="n">{p.type}<small>{p.title}</small></span><b class="num" data-d={p.slug}>{counts[p.slug]}</b><span class="dan" data-dan={p.slug}>{dan(counts[p.slug])}</span></a></li>)}
+            </ul>
+            <p class="dir-note">段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
+          </aside>
+        </div>
+      </div>
+      <div id="vDream" hidden>
+        <p class="dream-intro">{dreams.intro}</p>
+        {[['vol1', '第一卷（40 歲前）'], ['someday', '總有一天']].map(([h, label]) => { const list = dreams.items.filter((d) => d.public && d.horizon === h); return list.length > 0 && (
+          <div class="dgroup"><h3>{label}</h3><div class="dgrid">
+            {list.map((d) => { const p = pillars.find((x) => x.slug === d.dir) || pillars[0]; const st = ({ idea: '想畫', doing: '作畫中', done: '已刊出' } as any)[d.state] || '想畫'; return (
+              <article class={`dcard ${d.state}`} style={`--dc:var(--c-${p.slug})`}>
+                <div class="dmeta"><span class="k">{p.kanji}</span><span class="st">{st}</span></div>
+                <h4>{d.title}</h4>{d.why && <p class="why">{d.why}</p>}
+                {d.help && <a class="help" href="#inquiry" data-svc="other">需要幫忙：{d.help} →</a>}
+                {safeHref(d.link) && <a class="dlink" href={safeHref(d.link)}>{d.state === 'done' ? '看這一格怎麼完成的 →' : '相關內容 →'}</a>}
+              </article>); })}
+          </div></div>); })}
+      </div>
       <div id="vToc" hidden><div class="ygrid" id="ygrid"></div></div>
     </div>
   </div>
@@ -437,7 +430,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 <section class="sec band-light" id="journal" aria-labelledby="j-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Journal</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">弐</span><span class="sl"></span><span class="se">Journal</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
       <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
@@ -459,52 +452,13 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 <section class="sec" id="works" aria-labelledby="works-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Works</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Works</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
       <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
         {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div></article>
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div>{(w as any).service && <a class="wsvc" href={`#svc-${(w as any).service}`}>相關服務 →</a>}</article>
         ); })}
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec band-light" id="body" aria-labelledby="body-h">
-  <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Body</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.body_sub}</p><h2 id="body-h" class="rv" style="--i:1">{copy.body_title}</h2></div>
-      <p class="blive rv" style="--i:2"><i aria-hidden="true"></i><span id="bdLive">讀取最新資料中…</span></p>
-
-      <div class="bstats" role="list">
-        <div class="bstat rv" style="--i:2" role="listitem"><b class="num" id="bsMin">—</b><small>本週訓練（分鐘）</small></div>
-        <div class="bstat rv" style="--i:3" role="listitem"><b class="num" id="bsN">—</b><small>本週運動（次）</small></div>
-        <div class="bstat rv" style="--i:4" role="listitem"><b class="num" id="bsFat">—</b><small>體脂 12 週變化</small></div>
-        <div class="bstat rv" style="--i:5" role="listitem"><b class="num" id="bsScale">—</b><small>最近一次量體脂</small></div>
-      </div>
-
-      <div class="bmain">
-        <div class="bchart rv" style="--i:3">
-          <div class="bchart-top"><span id="sparkLabel">近 12 週・每週訓練分鐘</span><div class="tabs" id="bTabs" role="group" aria-label="切換指標"></div></div>
-          <svg id="spark" viewBox="0 0 600 200" role="img" aria-label="近 12 週身體指標趨勢"></svg>
-        </div>
-        <div class="brecent rv" style="--i:4">
-          <h3>最近的運動</h3>
-          <ol id="bsRecent"><li class="empty">讀取中…</li></ol>
-          <a class="strava" href="https://www.strava.com/athletes/103942910" target="_blank" rel="noopener">在 Strava 一起運動<span aria-hidden="true">↗</span></a>
-        </div>
-      </div>
-
-      <div class="bsrc">
-        <h3 class="rv" style="--i:2">這些數字是怎麼來的</h3>
-        <ol class="flow">
-          <li class="rv" style="--i:3"><span class="tag">來源一</span><b>運動</b><em>Strava</em><p>跑步、跳舞、訓練都用 Strava 記錄，網站直接讀取，約每 6 小時更新。</p></li>
-          <li class="rv" style="--i:4"><span class="tag">來源二</span><b>體重・體脂</b><em>OMRON 體組成計</em><p>量完自動存進 iPhone「健康」，每晚 23:30 由捷徑送到網站。</p></li>
-          <li class="rv" style="--i:5"><span class="tag">保存</span><b>私人資料庫</b><em>原始數字不公開</em><p>每一筆紀錄只存在這裡，這一頁看到的是彙總後的趨勢。</p></li>
-          <li class="now rv" style="--i:6"><span class="tag">公開</span><b>確認後才寫成文章</b><em>由巴決定</em><p>要寫進「強化」的文章，公開哪些數字，都由我看過再決定。</p></li>
-        </ol>
       </div>
     </div>
   </div>
@@ -512,7 +466,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 <section class="sec band-wine" id="about" aria-labelledby="a-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">陸</span><span class="sl"></span><span class="se">Hello</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Hello</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
       <div class="about">
@@ -526,6 +480,61 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
           <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
         </aside>
+      </div>
+
+      <div class="svc" id="services">
+        <h3 class="svc-h rv">{services.title}</h3>
+        <p class="svc-lede rv" style="--i:1">{services.lede}</p>
+        <ul class="proof rv" style="--i:2">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
+        <div class="scards">
+          {services.services.map((x, i) => (
+            <article class="scard rv" style={`--i:${i + 2}`} id={`svc-${x.id}`}>
+              <div class="s-top"><span class="prov">{x.provider}</span>{x.badge && <span class="badge">{x.badge}</span>}</div>
+              <h4>{x.name}<small lang="ja">{x.name_jp}</small></h4>
+              <p class="for">給：{x.for}</p>
+              <p class="sdesc">{x.desc}</p>
+              <ul class="sitems">{x.items.map((t) => <li>{t}</li>)}</ul>
+              {x.excludes.length > 0 && <p class="sex"><b>不包含</b>{x.excludes.join('、')}</p>}
+              <div class="s-foot"><span class="price">{x.price}</span><a class="btn-gold2" href="#inquiry" data-svc={x.id}>填寫需求 →</a></div>
+            </article>
+          ))}
+        </div>
+        <p class="ai-note rv" id="svc-ai"><span>操</span>{services.ai_note} <a href="#works">看作品 →</a></p>
+
+        {stays.length > 0 && (
+          <div class="stays">
+            <h3 class="svc-h2">{services.stays_title}</h3><p class="stays-note">{services.stays_note}</p>
+            <div class="sgrid">{stays.map((st: any) => (
+              <a class="stay" href={st.url} target="_blank" rel="noopener">
+                {st.img && <img src={st.img} alt="" loading="lazy" />}
+                <div><h4>{st.name}</h4><p>{st.desc}</p>{st.rating && <small>★ {st.rating}</small>}</div><span class="go">在 Airbnb 查看空房 ↗</span>
+              </a>))}</div>
+          </div>
+        )}
+
+        <form class="inq rv" id="inquiry" novalidate>
+          <h3 class="svc-h2">{services.form_title}</h3>
+          <p class="inq-note">{services.form_note}</p>
+          <div class="frow">
+            <label>想詢問的服務<select name="service" required>
+              <option value="owner">海外屋主代管（TRS Living Studio）</option>
+              <option value="omakase">大阪おまかせ導覽（佰花堂）</option>
+              <option value="interpret">單次隨行翻譯（佰花堂）</option>
+              <option value="ai">一人團隊 AI 工具</option>
+              <option value="other">其他・合作・分鏡表的幫忙</option>
+            </select></label>
+            <label>怎麼稱呼你<input name="name" required maxlength="80" autocomplete="name"></label>
+          </div>
+          <div class="frow">
+            <label>聯絡方式<input name="contact" required maxlength="160" placeholder="Email 或 LINE ID" autocomplete="email"></label>
+            <label>日期或期間<input name="dates" maxlength="120" placeholder="例如：2027 年 3 月下旬"></label>
+          </div>
+          <label>人數或物件概況<input name="people" maxlength="40" placeholder="例如：2 大 1 小／大阪市內 2LDK"></label>
+          <label>想請我們幫忙的事<textarea name="message" required maxlength="3000" rows="5" placeholder="越具體越好：想去的地方、在意的事、屋況或需要處理的狀況"></textarea></label>
+          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p class="consent">送出即表示你同意我們依<a href="/privacy/">隱私權政策</a>使用這些資料回覆你。</p>
+          <div class="fsend"><button type="submit" class="btn-ink">送出需求</button><span class="fmsg" id="inqMsg" role="status"></span></div>
+        </form>
       </div>
     </div>
   </div>
@@ -587,15 +596,6 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   raf=requestAnimationFrame(loop);
   new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;if(run){last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv.parentElement);})();
 
-/* five directions: index + pentagon share one selection, arrow keys loop */
-(function(){var I=document.getElementById('idx'),tabs=[].slice.call(I.querySelectorAll('[role=tab]')),S=document.getElementById('penta');
-  function sel(i,focus){i=(i+tabs.length)%tabs.length;tabs.forEach(function(t,j){t.setAttribute('aria-selected',j===i);t.tabIndex=j===i?0:-1;document.getElementById(t.getAttribute('aria-controls')).hidden=j!==i;});
-    if(focus)tabs[i].focus();S.querySelectorAll('.axis').forEach(function(a,j){a.classList.toggle('on',j===i);});}
-  tabs.forEach(function(t,i){t.addEventListener('click',function(){sel(i);});});
-  I.addEventListener('keydown',function(e){var i=tabs.indexOf(document.activeElement);if(e.key==='ArrowDown'||e.key==='ArrowRight'){e.preventDefault();sel(i+1,true);}if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();sel(i-1,true);}});
-  S.addEventListener('click',function(e){var a=e.target.closest('.axis');if(a)sel(+a.dataset.i);});
-  sel(0);})();
-
 /* 連載: 第 0 話 … 第 11 話 → 第一卷 */
 (function(){var C=D.chapters,now=Date.now(),T=function(d){return new Date(d+'T00:00:00+09:00').getTime();};
   var list=C.chapters.map(function(c){return Object.assign({},c);});list.push(Object.assign({final:true,no:12},C.volume));
@@ -619,74 +619,44 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     else b='<p>這一話還在畫分鏡，刊出當天公開。</p>';
     var from=i>0?list[i-1].date:D.start.slice(0,10),inRange=function(e){return (i>0?e.date>from:e.date>=from)&&e.date<=r.date;};
     var es=D.entries.filter(inRange),total=es.length,showT=!r.final&&(r.state!=='future');
-    var tally=showT?'<p class="tally-h">'+(r.state==='next'?'這一話目前累積':'這一話累積')+'<span>'+from.slice(5).replace('-','.')+' – '+md(r)+'</span></p><div class="tally">'+D.dirs.map(function(d){var n=es.filter(function(e){return e.dir===d.id;}).length;return '<div class="'+(n?'':'zero')+'" style="--dc:'+col(d.id)+'"><span class="k">'+d.k+'</span><b>'+n+'</b><small>'+d.n+'</small></div>';}).join('')+'</div>':'';
-    Md.innerHTML='<div><p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+tally+'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a></div><div class="mnums"><div><b>'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>—</b><small>這一話的訓練分鐘</small></div><div><b>—</b><small>這一話完成的成果</small></div></div>';}
+    var cc={};D.dirs.forEach(function(d){cc[d.id]=es.filter(function(e){return e.dir===d.id;}).length;});
+    var topD=D.dirs.slice().sort(function(a,b){return cc[b.id]-cc[a.id];})[0],hasTop=showT&&cc[topD.id]>0;
+    Md.innerHTML='<p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+'<div class="mnums"><div><b class="num">'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>'+(hasTop?'<span style="color:'+col(topD.id)+'">'+topD.k+'</span> '+topD.n:'—')+'</b><small>這一話寫最多的方向</small></div></div><a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>';
+    CUR={counts:cc,label:showT?label(r)+'（'+from.slice(5).replace('-','.')+'–'+md(r)+'）':label(r)+'・尚未開始'};if(PM==='ch')penta('ch');}
+  /* 五角形：全卷累計 ↔ 這一話 */
+  var PM='all',CUR=null,PS=document.getElementById('pShape'),PD=[].slice.call(document.querySelectorAll('#penta .pdot')),PL=document.getElementById('pLabel'),PMB=document.getElementById('pMode');
+  var dan=function(c){return c>=100?'四段':c>=60?'三段':c>=30?'二段':c>=10?'初段':'見習';};
+  function penta(m){PM=m;var c=m==='all'?D.totals:(CUR?CUR.counts:D.totals),top=Math.max(1,Math.max.apply(null,D.dirs.map(function(d){return c[d.id]||0;})));
+    var pts=D.dirs.map(function(d,i){var v=.15+((c[d.id]||0)/top)*.85,a=-Math.PI/2+i*2*Math.PI/5;return [Math.cos(a)*150*v,Math.sin(a)*150*v];});
+    PS.setAttribute('points',pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' '));
+    PD.forEach(function(el,i){el.setAttribute('cx',pts[i][0].toFixed(1));el.setAttribute('cy',pts[i][1].toFixed(1));});
+    D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');});
+    PL.textContent=m==='all'?'全卷累計':(CUR?CUR.label:'這一話');
+    PMB.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===m);});}
+  PMB.addEventListener('click',function(e){var b=e.target.closest('button');if(b)penta(b.dataset.m);});
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
   requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n&&w.scrollWidth>w.clientWidth){var li=n.closest('li');w.scrollLeft=Math.max(0,li.offsetLeft-w.clientWidth/2+li.offsetWidth/2);}});
   var Y=document.getElementById('ygrid');
   Y.innerHTML=list.map(function(r,i){var s={done:'已刊出',break:'休載',next:'製作中・'+r.days+' 天後',future:r.days+' 天後'}[r.state];return '<button class="ycard '+r.state+(r.final?' final':'')+'" data-i="'+i+'"><span class="n">'+label(r)+'・'+md(r)+(r.arc?'・'+r.arc:'')+'</span><h4>'+esc(r.title)+'</h4><span class="s">'+s+'</span></button>';}).join('');
-  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V2=document.getElementById('vToc');
-  function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V2.hidden=v!=='toc';}
+  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V2=document.getElementById('vToc'),V3=document.getElementById('vDream');
+  function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V2.hidden=v!=='toc';V3.hidden=v!=='dream';}
+  if(location.hash==='#dreams')view('dream');
   MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});
   Y.addEventListener('click',function(e){var c=e.target.closest('.ycard');if(c){view('one');show(+c.dataset.i);}});})();
 
-/* body: live summary from the private database's public endpoint; static file as fallback */
-(function(){
-  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/health-public';
-  var S=document.getElementById('spark'),L=document.getElementById('sparkLabel'),TB=document.getElementById('bTabs'),live=document.getElementById('bdLive');
-  var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');};
-  var ago=function(iso){if(!iso)return null;var m=Math.round((Date.now()-new Date(iso).getTime())/6e4);return m<60?Math.max(1,m)+' 分鐘前':m<1440?Math.round(m/60)+' 小時前':Math.round(m/1440)+' 天前';};
-  var series={},labels=[],drawn=false,current='mins';
-  var META={mins:['近 12 週・每週訓練分鐘','分'],fat:['近 12 週・體脂（%）','%'],weight:['近 12 週・體重（kg）','kg']};
-  function draw(k){
-    var v=series[k]||[],W=Math.max(300,Math.min(640,Math.round(S.getBoundingClientRect().width)||600)),H=W<480?220:200,pl=8,pr=8,pt=18,pb=26,cw=(W-pl-pr)/Math.max(1,v.length);
-    var nums=v.filter(function(x){return x!=null;}); if(!nums.length){S.innerHTML='<text x="300" y="100" text-anchor="middle" style="fill:var(--ash)" font-size="13">資料累積中</text>';L.textContent=META[k][0];return;}
-    var mx=Math.max.apply(0,nums),mn=k==='mins'?0:Math.min.apply(0,nums),rg=(mx-mn)||1;
-    var y=function(x){return pt+(H-pt-pb)*(1-(x-mn)/rg);},g='';
-    for(var i=0;i<4;i++){var gy=pt+(H-pt-pb)*i/3;g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+gy+'" y2="'+gy+'" style="stroke:var(--line)"/>';}
-    var xl=labels.map(function(t,i){return (i%3===2||i===labels.length-1)?'<text x="'+(pl+cw*i+cw/2)+'" y="'+(H-6)+'" text-anchor="middle" style="fill:var(--ash)" font-size="11">'+esc(t)+'</text>':'';}).join('');
-    var body='';
-    if(k==='mins'){
-      body=v.map(function(x,i){var bh=Math.max(x?2:0,(H-pt-pb)-(y(x||0)-pt)),bx=pl+cw*i+cw*.18,last=i===v.length-1;
-        return '<g class="grow" style="--k:'+i+'"><rect class="bar" x="'+bx+'" y="'+(H-pb-bh)+'" width="'+(cw*.64)+'" height="'+bh+'" style="fill:'+(last?'var(--gold)':'var(--gold-soft)')+';stroke:var(--gold);stroke-width:'+(last?0:1)+'"><title>'+esc(labels[i])+' 那一週：'+(x||0)+' 分鐘</title></rect></g>';}).join('');
-      var lx=pl+cw*(v.length-1)+cw/2; body+='<text x="'+lx+'" y="'+(y(v[v.length-1]||0)-8)+'" text-anchor="middle" style="fill:var(--bone)" font-size="13">'+(v[v.length-1]||0)+'</text>';
-    }else{
-      var pts=v.map(function(x,i){return x==null?null:(pl+cw*i+cw/2)+','+y(x);}).filter(Boolean).join(' ');
-      body='<polyline class="ln" points="'+pts+'" fill="none" style="stroke:var(--gold)" stroke-width="2"/>';
-      var last=v[v.length-1];if(last!=null){var cx=pl+cw*(v.length-1)+cw/2;body+='<circle cx="'+cx+'" cy="'+y(last)+'" r="4.5" style="fill:var(--gold)"/><text x="'+cx+'" y="'+(y(last)-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+last+'</text>';}
-    }
-    S.setAttribute('viewBox','0 0 '+W+' '+H);S.innerHTML=g+body+xl;L.textContent=META[k][0];current=k;
-  }
-  function tabs(keys){
-    if(keys.length<2){TB.innerHTML='';return;}
-    var names={mins:'訓練',fat:'體脂',weight:'體重'};
-    TB.innerHTML=keys.map(function(k){return '<button aria-pressed="'+(k===current)+'" data-m="'+k+'">'+names[k]+'</button>';}).join('');
-  }
-  var rz;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){if(labels.length&&drawn)draw(current);},200);});
-  TB.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(TB.children,function(x){x.setAttribute('aria-pressed',x===b);});draw(b.dataset.m);});
-  function render(d,isLive){
-    series={mins:d.weeks.mins};if(d.weeks.fat)series.fat=d.weeks.fat;if(d.weeks.weight)series.weight=d.weeks.weight;
-    labels=d.weeks.labels||[];
-    var st=d.stats||{};
-    document.getElementById('bsMin').textContent=st.week_minutes!=null?st.week_minutes:'—';
-    document.getElementById('bsN').textContent=st.week_sessions!=null?st.week_sessions:'—';
-    var f=document.getElementById('bsFat');
-    if(st.fat_change==null){f.textContent='累積中';f.style.fontSize='22px';}
-    else{f.textContent=(st.fat_change>0?'+':st.fat_change<0?'−':'±')+Math.abs(st.fat_change).toFixed(1);f.className='num '+(st.fat_change>0?'up':st.fat_change<0?'down':'');}
-    document.getElementById('bsScale').textContent=d.scale_last_day?d.scale_last_day.slice(5).replace('-','.'):'—';
-    var R=document.getElementById('bsRecent');
-    R.innerHTML=(d.recent&&d.recent.length)?d.recent.map(function(r){return '<li><time>'+esc(r.date.slice(5).replace('-','.'))+'</time><span>'+esc(r.name)+'</span><small>'+r.min+' 分'+(r.km?'・'+r.km+' km':'')+'</small></li>';}).join(''):'<li class="empty">最近還沒有運動紀錄。</li>';
-    tabs(Object.keys(series));
-    if(isLive){var a=ago(d.updated_at),s=ago(d.strava_synced_at);live.textContent='自動同步中'+(a?'・最新資料 '+a:'')+(s?'・Strava '+s+'同步':'');}
-    else{live.parentElement.classList.add('stale');live.textContent='暫時讀不到即時資料，顯示的是上次發布時的數字';}
-    if(drawn)draw('mins');
-  }
-  var sec=document.getElementById('body'),want=false;
-  new IntersectionObserver(function(es,o){if(es[0].isIntersecting){want=true;drawn=true;o.disconnect();if(labels.length)draw('mins');}},{threshold:.15}).observe(sec);
-  var fallback=function(){var b=D.body;render({weeks:{mins:b.weeks.mins,labels:[],fat:(b.sample||b.show_values)?b.weeks.fat:null,weight:(b.sample||b.show_values)?b.weeks.weight:null},stats:{week_minutes:b.stats.week_minutes,week_sessions:null,fat_change:null},recent:[]},false);if(want)draw('mins');};
-  fetch(API,{mode:'cors'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){if(d.error)throw 0;render(d,true);if(want)draw('mins');}).catch(fallback);
-})();
+
+/* 需求表：選服務 → 預先帶入；送出到私人收件匣 */
+(function(){var F=document.getElementById('inquiry');if(!F)return;var M=document.getElementById('inqMsg'),SEL=F.querySelector('select[name=service]');
+  document.addEventListener('click',function(e){var a=e.target.closest('[data-svc]');if(!a)return;var v=a.dataset.svc;if(v==='ai')v='ai';if([].some.call(SEL.options,function(o){return o.value===v;}))SEL.value=v;});
+  F.addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(F),b={};fd.forEach(function(v,k){b[k]=String(v);});b.lang=navigator.language||'';
+    if(!b.name.trim()||!b.contact.trim()||b.message.trim().length<5){M.className='fmsg err';M.textContent='請填寫稱呼、聯絡方式和需求內容。';return;}
+    var btn=F.querySelector('button[type=submit]');btn.disabled=true;M.className='fmsg';M.textContent='送出中…';
+    fetch('https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/inquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
+      .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
+      .then(function(x){if(!x.ok)throw new Error(x.d&&x.d.error||'送出失敗');F.reset();M.className='fmsg ok';M.textContent='已收到，我們會在 2 個工作天內回覆你。';})
+      .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';})
+      .then(function(){btn.disabled=false;});});})();
 
 /* journal filter */
 (function(){var F=document.getElementById('filters'),rows=[].slice.call(document.querySelectorAll('.jrow')),E=document.getElementById('jempty');

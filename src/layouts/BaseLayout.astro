@@ -18,19 +18,19 @@ const jsonld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [web
 const path = Astro.url.pathname;
 const isHome = path === '/' || path === '';
 import { pillars } from '../data/pillars';
+import services from '../data/services.json';
 // The Japanese serif and the Latin display face only draw a small, known set of characters
 // (section numerals, pillar kanji, Japanese subtitles, vertical English labels), so request just those glyphs.
 const glyphs = [...new Set([
   '壱弐参肆伍陸序結巻零・、。', 'したことは残す。済んだことは手放す。',
   ...pillars.flatMap((p) => [p.kanji, p.titleJp]),
+  ...services.services.map((x) => x.name_jp), 'お品書き松竹梅分鏡',
   'StatusChaptersJournalWorksBodyHelloDirections', '0123456789',
 ].join(''))].join('');
 const nav = [
-  { href: '/#five', label: '能力值儀表' },
   { href: '/#chapters', label: '39・連載中' },
   { href: '/#journal', label: '日常紀錄' },
   { href: '/#works', label: '有點樣子' },
-  { href: '/#body', label: '身體紀錄' },
   { href: '/#about', label: '初次見面' },
 ];
 ---

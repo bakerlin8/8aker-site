@@ -170,6 +170,8 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .hb-preview{white-space:pre-wrap;font-size:13.5px;background:var(--parchment);padding:14px 16px;line-height:1.8;max-height:360px;overflow:auto;}
 .hb-checks{display:flex;flex-direction:column;gap:6px;margin:8px 0 14px;}
 .hb-checks label{display:flex;gap:8px;align-items:center;font-size:13.5px;}
+.hb-card input[type=text]{width:100%;min-width:0;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:11px 13px;font-size:13.5px;color:var(--ink);}
+.hb-card input[type=text]:focus{border-color:var(--rose);outline:none;box-shadow:0 0 0 3px rgba(158,111,34,.12);}
 
 /* ── icons ── */
 .login-mark{width:72px;height:72px;border-radius:16px;display:block;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);}
@@ -272,8 +274,11 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <div class="nav-group">
       <div class="nav-group-label">網站</div>
       <div class="nav-item" data-view="home">首頁文案</div>
+      <div class="nav-item" data-view="inbox">需求收件匣 <span class="count" id="count-inbox"></span></div>
       <div class="nav-item" data-view="chapters">連載・每月一話</div>
-      <div class="nav-item" data-view="works">成果</div>
+      <div class="nav-item" data-view="dreams">分鏡表</div>
+      <div class="nav-item" data-view="works">有點樣子（作品）</div>
+      <div class="nav-item" data-view="services">服務與住宿</div>
       <div class="nav-item" data-view="body">身體紀錄 <span class="count" id="count-body"></span></div>
     </div>
 
@@ -319,6 +324,30 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="page-title">身體紀錄</div>
       <div class="page-sub">資料每天從 iPhone「健康」自動送進來；你確認過的，才會變成文章公開</div>
       <div id="bodyForm"></div>
+    </section>
+
+    <!-- INBOX -->
+    <section class="view" id="view-inbox">
+      <div class="page-eyebrow">Inbox</div>
+      <div class="page-title">需求收件匣</div>
+      <div class="page-sub">首頁「填寫需求」送進來的內容。只有你看得到。</div>
+      <div id="inboxList"></div>
+    </section>
+
+    <!-- DREAMS -->
+    <section class="view" id="view-dreams">
+      <div class="page-eyebrow">Storyboard</div>
+      <div class="page-title">分鏡表</div>
+      <div class="page-sub">想做的事。狀態：想畫 → 作畫中 → 已刊出；不想公開的取消「公開」即可。</div>
+      <div id="dreamsForm"></div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="view" id="view-services">
+      <div class="page-eyebrow">Services</div>
+      <div class="page-title">服務與住宿</div>
+      <div class="page-sub">首頁「初次見面」下方的服務卡、實績數字、Airbnb 住宿連結</div>
+      <div id="servicesForm"></div>
     </section>
 
     <!-- WORKS -->
@@ -517,7 +546,7 @@ function slugify(title) {
 }
 
 /* ══════════════════════════ NAV / ROUTER ══════════════════════════ */
-const views = ['home', 'chapters', 'works', 'body', 'pillar', 'article'];
+const views = ['home', 'inbox', 'chapters', 'dreams', 'works', 'services', 'body', 'pillar', 'article'];
 let currentPillar = null;
 let currentArticle = null; // { path, sha, isNew }
 
@@ -546,6 +575,9 @@ function showView(name) {
 document.querySelectorAll('.nav-item[data-view="home"]').forEach(el => el.addEventListener('click', () => loadHome()));
 document.querySelectorAll('.nav-item[data-view="chapters"]').forEach(el => el.addEventListener('click', () => loadChapters()));
 document.querySelectorAll('.nav-item[data-view="works"]').forEach(el => el.addEventListener('click', () => loadWorks()));
+document.querySelectorAll('.nav-item[data-view="inbox"]').forEach(el => el.addEventListener('click', () => loadInbox()));
+document.querySelectorAll('.nav-item[data-view="dreams"]').forEach(el => el.addEventListener('click', () => loadDreams()));
+document.querySelectorAll('.nav-item[data-view="services"]').forEach(el => el.addEventListener('click', () => loadServices()));
 document.querySelectorAll('.nav-item[data-view="body"]').forEach(el => el.addEventListener('click', () => loadBody()));
 document.querySelectorAll('.nav-item[data-pillar]').forEach(el => {
   el.addEventListener('click', () => loadPillar(el.dataset.pillar));
@@ -557,13 +589,11 @@ const HOME_FIELDS = [
   ['hero_lede', '首頁｜座右銘下面的說明', 'area'],
   ['countdown_label', '倒數｜標籤文字', 'text'],
   ['countdown_start', '倒數｜累積帳起算日（ISO 格式）', 'text'], ['countdown_target', '倒數｜第一卷發售日（ISO 格式）', 'text'],
-  ['five_sub', '壱 五個方向｜小標', 'text'], ['five_title', '壱 五個方向｜標題', 'text'],
-  ['chapters_sub', '弐 連載｜小標', 'text'], ['chapters_title', '弐 連載｜標題', 'text'],
-  ['body_sub', '参 身體｜小標', 'text'], ['body_title', '参 身體｜標題', 'text'],
-  ['works_sub', '肆 成果｜小標', 'text'], ['works_title', '肆 成果｜標題', 'text'],
-  ['journal_sub', '伍 筆記｜小標', 'text'], ['journal_title', '伍 筆記｜標題', 'text'],
-  ['about_meta', '陸 關於｜小標', 'text'], ['about_name', '陸 關於｜名字', 'text'],
-  ['about_lede', '陸 關於｜開場', 'area'], ['about_p1', '陸 關於｜第一段', 'area'], ['about_p2', '陸 關於｜第二段', 'area'],
+  ['chapters_sub', '壱 連載｜小標', 'text'], ['chapters_title', '壱 連載｜標題', 'text'],
+  ['journal_sub', '弐 日常紀錄｜小標', 'text'], ['journal_title', '弐 日常紀錄｜標題', 'text'],
+  ['works_sub', '参 有點樣子｜小標', 'text'], ['works_title', '参 有點樣子｜標題', 'text'],
+  ['about_meta', '肆 初次見面｜小標', 'text'], ['about_name', '肆 初次見面｜標題', 'text'],
+  ['about_lede', '肆 初次見面｜開場', 'area'], ['about_p1', '肆 初次見面｜第一段', 'area'], ['about_p2', '肆 初次見面｜第二段', 'area'],
   ['subscribe_title', '訂閱｜標題', 'text'], ['subscribe_desc', '訂閱｜說明', 'area'],
   ['subscribe_price', '訂閱｜價格', 'text'], ['subscribe_url', '訂閱｜Stripe 連結', 'text'],
   ['contact_email', '聯絡信箱（隱私權政策用，可空白）', 'text'],
@@ -678,12 +708,13 @@ async function loadWorks() {
         <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
         <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
         <div class="field"><label class="field-label">一句話說明</label><textarea rows="2" data-w="${i}" data-key="desc">${escapeHtml(w.desc)}</textarea></div>
+        <div class="field"><label class="field-label">相關服務（作品卡下方會出現連結）</label><select data-w="${i}" data-key="service" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)">${[['','（不連結）'],['owner','海外屋主代管'],['omakase','大阪おまかせ導覽'],['ai','AI 工具']].map(([v,t]) => `<option value="${v}" ${v === (w.service || '') ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label class="field-label">花費小時</label><input type="text" data-w="${i}" data-key="spent" value="${escapeAttr(w.spent)}"></div>
         <div class="field"><label class="field-label">每月省下（小時）</label><input type="text" data-w="${i}" data-key="saved" value="${escapeAttr(w.saved)}"></div></div>
       </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addWork">＋ 新增一件成果</button><div class="spacer"></div><button class="btn btn-primary" id="saveWorks">儲存變更</button></div>`;
     form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定從首頁移除這件成果嗎？儲存後才會生效。')) return; collect(); data.works.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.works[i - 1], data.works[i]] = [data.works[i], data.works[i - 1]]; render(); }));
-    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.unshift({ dir: 'conjure', date: '', title: '', desc: '', spent: '—', saved: '—' }); render(); });
+    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.unshift({ dir: 'conjure', date: '', title: '', desc: '', spent: '—', saved: '—', service: '' }); render(); });
     document.getElementById('saveWorks').addEventListener('click', async () => {
       const btn = document.getElementById('saveWorks'); btn.disabled = true; btn.textContent = '儲存中…';
       try { collect(); const r = await ghPutFile('src/data/works.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update works via Studio'); file.sha = r.content.sha; toast('已儲存，網站將在約一分鐘內更新'); }
@@ -692,6 +723,166 @@ async function loadWorks() {
     });
   }
   render();
+}
+
+
+/* ══════════════════════════ 共用：清單欄位 ══════════════════════════ */
+const SEL_STYLE = 'width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)';
+const opt = (pairs, cur) => pairs.map(([v, t]) => `<option value="${escapeAttr(v)}" ${v === cur ? 'selected' : ''}>${escapeHtml(t)}</option>`).join('');
+const lines = (v) => String(v || '').split('\n').map(x => x.trim()).filter(Boolean);
+async function saveJson(path, data, sha, msg, btn) {
+  btn.disabled = true; const t = btn.textContent; btn.textContent = '儲存中…';
+  try { const r = await ghPutFile(path, JSON.stringify(data, null, 2) + '\n', sha, msg); toast('已儲存，網站將在約一分鐘內更新'); return r.content.sha; }
+  catch (e) { toast('儲存失敗：' + e.message, 'err'); return sha; }
+  finally { btn.disabled = false; btn.textContent = t; }
+}
+
+/* ══════════════════════════ 分鏡表 ══════════════════════════ */
+async function loadDreams() {
+  showView('dreams');
+  const form = document.getElementById('dreamsForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const file = await ghGetFile('src/data/dreams.json');
+  const data = JSON.parse(file.content);
+  const dirs = Object.entries(KANJI_BY_DIR).map(([d, k]) => [d, `${k}・${PILLARS[d].jp}`]);
+  function collect() {
+    data.intro = form.querySelector('[data-intro]').value;
+    form.querySelectorAll('[data-d]').forEach(el => { const it = data.items[+el.dataset.d]; it[el.dataset.key] = el.type === 'checkbox' ? el.checked : el.value; });
+  }
+  function render() {
+    form.innerHTML = `<div class="field"><label class="field-label">分鏡表開頭的一句話</label><input type="text" data-intro value="${escapeAttr(data.intro || '')}"></div>` +
+      data.items.map((d, i) => `
+      <div class="hb-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="field-label" style="margin:0">第 ${i + 1} 格</span>
+          <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-up="${i}" ${i === 0 ? 'disabled' : ''}>上移</button><button class="btn btn-danger" data-del="${i}">移除</button></span></div>
+        <div class="field"><label class="field-label">想做的事（做完時能判斷「完成了」）</label><input type="text" data-d="${i}" data-key="title" value="${escapeAttr(d.title)}"></div>
+        <div class="field"><label class="field-label">為什麼想做</label><textarea rows="2" data-d="${i}" data-key="why">${escapeHtml(d.why || '')}</textarea></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+          <div class="field"><label class="field-label">方向</label><select data-d="${i}" data-key="dir" style="${SEL_STYLE}">${opt(dirs, d.dir)}</select></div>
+          <div class="field"><label class="field-label">期限</label><select data-d="${i}" data-key="horizon" style="${SEL_STYLE}">${opt([['vol1', '第一卷（40 歲前）'], ['someday', '總有一天']], d.horizon)}</select></div>
+          <div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt([['idea', '想畫'], ['doing', '作畫中'], ['done', '已刊出']], d.state)}</select></div>
+        </div>
+        <div class="field"><label class="field-label">需要幫忙（可空白，讀者可以從這裡聯絡你）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
+        <div class="field"><label class="field-label">完成證據或相關連結（例：/chapters/3/）</label><input type="text" data-d="${i}" data-key="link" value="${escapeAttr(d.link || '')}"></div>
+        <div class="field-checkbox"><input type="checkbox" id="dp${i}" data-d="${i}" data-key="public" ${d.public ? 'checked' : ''}><label for="dp${i}">公開在網站上</label></div>
+      </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 新增一格</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
+    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定移除這一格嗎？儲存後才會生效。')) return; collect(); data.items.splice(+b.dataset.del, 1); render(); }));
+    form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.items[i - 1], data.items[i]] = [data.items[i], data.items[i - 1]]; render(); }));
+    document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.unshift({ id: 'd' + Date.now(), dir: 'conjure', title: '', why: '', horizon: 'vol1', state: 'idea', help: '', link: '', public: true }); render(); });
+    document.getElementById('saveDreams').addEventListener('click', async (e) => {
+      collect(); if (data.items.some(x => !x.title.trim())) { toast('有一格還沒填「想做的事」', 'err'); return; }
+      file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update storyboard via Studio', e.currentTarget);
+    });
+  }
+  render();
+}
+
+/* ══════════════════════════ 服務與住宿 ══════════════════════════ */
+async function loadServices() {
+  showView('services');
+  const form = document.getElementById('servicesForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const file = await ghGetFile('src/data/services.json');
+  const data = JSON.parse(file.content);
+  const inp = (k, v, attrs) => `<input type="text" ${attrs} data-key="${k}" value="${escapeAttr(v || '')}">`;
+  function collect() {
+    form.querySelectorAll('[data-top]').forEach(el => { data[el.dataset.key] = el.value; });
+    form.querySelectorAll('[data-p]').forEach(el => { data.proof[+el.dataset.p][el.dataset.key] = el.value; });
+    form.querySelectorAll('[data-s]').forEach(el => { const s = data.services[+el.dataset.s]; s[el.dataset.key] = el.dataset.list ? lines(el.value) : el.value; });
+    form.querySelectorAll('[data-st]').forEach(el => { data.stays[+el.dataset.st][el.dataset.key] = el.value; });
+  }
+  function render() {
+    form.innerHTML = `
+      <div class="hb-card"><h3>開場</h3>
+        <div class="field"><label class="field-label">區塊標題</label>${inp('title', data.title, 'data-top')}</div>
+        <div class="field"><label class="field-label">一句話定位</label><textarea rows="2" data-top data-key="lede">${escapeHtml(data.lede)}</textarea></div>
+        <label class="field-label">實績數字（三格）</label>
+        ${data.proof.map((x, i) => `<div style="display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;margin-bottom:8px">${inp('num', x.num, `data-p="${i}"`)}${inp('label', x.label, `data-p="${i}"`)}</div>`).join('')}
+      </div>` +
+      data.services.map((x, i) => `
+      <div class="hb-card"><h3>${escapeHtml(x.name)}（${escapeHtml(x.provider)}）</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+          <div class="field"><label class="field-label">服務名稱</label>${inp('name', x.name, `data-s="${i}"`)}</div>
+          <div class="field"><label class="field-label">日文副標</label>${inp('name_jp', x.name_jp, `data-s="${i}"`)}</div>
+          <div class="field"><label class="field-label">承接名義</label>${inp('provider', x.provider, `data-s="${i}"`)}</div>
+          <div class="field"><label class="field-label">標籤（主力／合作）</label>${inp('badge', x.badge, `data-s="${i}"`)}</div>
+        </div>
+        <div class="field"><label class="field-label">給誰</label>${inp('for', x.for, `data-s="${i}"`)}</div>
+        <div class="field"><label class="field-label">一段說明</label><textarea rows="2" data-s="${i}" data-key="desc">${escapeHtml(x.desc)}</textarea></div>
+        <div class="field"><label class="field-label">服務內容（一行一項）</label><textarea rows="5" data-s="${i}" data-list="1" data-key="items">${escapeHtml(x.items.join('\n'))}</textarea></div>
+        <div class="field"><label class="field-label">不包含（一行一項）</label><textarea rows="3" data-s="${i}" data-list="1" data-key="excludes">${escapeHtml(x.excludes.join('\n'))}</textarea></div>
+        <div class="field"><label class="field-label">價格說明</label>${inp('price', x.price, `data-s="${i}"`)}</div>
+      </div>`).join('') + `
+      <div class="hb-card"><h3>AI 工具與需求表</h3>
+        <div class="field"><label class="field-label">AI 工具說明</label><textarea rows="2" data-top data-key="ai_note">${escapeHtml(data.ai_note)}</textarea></div>
+        <div class="field"><label class="field-label">需求表說明</label><textarea rows="2" data-top data-key="form_note">${escapeHtml(data.form_note)}</textarea></div>
+      </div>
+      <div class="hb-card"><h3>住宿推薦（Airbnb）</h3>
+        <p class="hb-note" style="margin-bottom:10px">只放自家經營的物件。沒有任何一間時，首頁不會顯示這一塊。</p>
+        ${data.stays.map((st, i) => `<div style="border-top:1px solid var(--border-soft);padding-top:12px;margin-top:12px">
+          <div class="field"><label class="field-label">名稱</label>${inp('name', st.name, `data-st="${i}"`)}</div>
+          <div class="field"><label class="field-label">一句特色</label>${inp('desc', st.desc, `data-st="${i}"`)}</div>
+          <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px"><div class="field"><label class="field-label">評價</label>${inp('rating', st.rating, `data-st="${i}"`)}</div>
+          <div class="field"><label class="field-label">Airbnb 連結</label>${inp('url', st.url, `data-st="${i}" inputmode="url"`)}</div></div>
+          <div class="field"><label class="field-label">照片網址（可空白）</label>${inp('img', st.img, `data-st="${i}" inputmode="url"`)}</div>
+          <button class="btn btn-danger" data-delst="${i}">移除這間</button></div>`).join('')}
+        <div class="btn-row" style="margin-top:16px"><button class="btn btn-ghost" id="addStay">＋ 新增一間</button></div>
+      </div>
+      <div class="btn-row"><div class="spacer"></div><button class="btn btn-primary" id="saveSvc">儲存變更</button></div>`;
+    form.querySelectorAll('[data-delst]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定移除這間住宿嗎？儲存後才會生效。')) return; collect(); data.stays.splice(+b.dataset.delst, 1); render(); }));
+    document.getElementById('addStay').addEventListener('click', () => { collect(); data.stays.push({ name: '', desc: '', rating: '', url: '', img: '' }); render(); });
+    document.getElementById('saveSvc').addEventListener('click', async (e) => {
+      collect();
+      const bad = data.stays.find(st => st.url && !/^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url));
+      if (bad) { toast('住宿連結請貼 Airbnb 的網址（https://www.airbnb.…）', 'err'); return; }
+      if (data.stays.some(st => st.img && !/^https:\/\//i.test(st.img))) { toast('照片網址要用 https:// 開頭', 'err'); return; }
+      data.stays = data.stays.filter(st => st.name.trim() && st.url.trim());
+      file.sha = await saveJson('src/data/services.json', data, file.sha, 'Update services via Studio', e.currentTarget);
+      render();
+    });
+  }
+  render();
+}
+
+/* ══════════════════════════ 需求收件匣 ══════════════════════════ */
+const SVC_NAME = { owner: '海外屋主代管', omakase: 'おまかせ導覽', interpret: '單次隨行翻譯', ai: 'AI 工具', other: '其他' };
+const ST_NAME = [['new', '未處理'], ['replied', '已回覆'], ['done', '已完成'], ['spam', '垃圾訊息']];
+async function inboxApi(method, body) {
+  const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-inbox`, { method, headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
+  return r.json();
+}
+async function refreshInboxCount() {
+  try { const d = await inboxApi('GET'); const n = d.items.filter(x => x.status === 'new').length; document.getElementById('count-inbox').textContent = n || ''; return d; } catch (e) { return null; }
+}
+async function loadInbox() {
+  showView('inbox');
+  const box = document.getElementById('inboxList');
+  box.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  let data; try { data = await inboxApi('GET'); } catch (e) { box.innerHTML = `<div class="hb-card"><h3>讀取失敗</h3><p class="hb-note">${escapeHtml(e.message)}</p></div>`; return; }
+  const items = data.items;
+  document.getElementById('count-inbox').textContent = items.filter(x => x.status === 'new').length || '';
+  if (!items.length) { box.innerHTML = '<div class="empty-state">還沒有人送出需求。</div>'; return; }
+  box.innerHTML = items.map((x, i) => `
+    <div class="hb-card" style="${x.status === 'new' ? 'border-left:3px solid var(--vermillion)' : ''}">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+        <h3 style="margin:0">${escapeHtml(x.name)}・${escapeHtml(SVC_NAME[x.service] || x.service)}</h3>
+        <span class="hb-note">${escapeHtml(new Date(x.created_at).toLocaleString('zh-TW', { timeZone: 'Asia/Tokyo' }))}</span></div>
+      <p class="hb-note" style="margin-top:6px">聯絡：<b style="user-select:all">${escapeHtml(x.contact)}</b>${x.dates ? '｜日期：' + escapeHtml(x.dates) : ''}${x.people ? '｜' + escapeHtml(x.people) : ''}</p>
+      <div class="hb-preview" style="margin-top:10px">${escapeHtml(x.message)}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:12px;align-items:end">
+        <div class="field" style="margin:0"><label class="field-label">狀態</label><select data-i="${i}" data-k="status" style="${SEL_STYLE}">${opt(ST_NAME, x.status)}</select></div>
+        <div class="field" style="margin:0"><label class="field-label">備註（只有你看得到）</label><input type="text" data-i="${i}" data-k="note" value="${escapeAttr(x.note || '')}"></div>
+      </div>
+      <div class="btn-row" style="margin-top:12px;padding-top:12px">${/@/.test(x.contact) ? `<a class="btn btn-ghost" href="mailto:${escapeAttr(x.contact)}">寫信回覆</a>` : ''}<div class="spacer"></div><button class="btn btn-primary" data-save="${i}">更新</button></div>
+    </div>`).join('');
+  box.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
+    const i = +b.dataset.save, x = items[i];
+    const status = box.querySelector(`[data-i="${i}"][data-k="status"]`).value, note = box.querySelector(`[data-i="${i}"][data-k="note"]`).value;
+    b.disabled = true;
+    try { await inboxApi('POST', { action: 'update', id: x.id, status, note }); x.status = status; x.note = note; toast('已更新'); loadInbox(); }
+    catch (e) { toast('更新失敗：' + e.message, 'err'); b.disabled = false; }
+  }));
 }
 
 /* ══════════════════════════ PILLAR ARTICLE LIST ══════════════════════════ */
@@ -1020,6 +1211,7 @@ async function boot() {
       } else toast('沒有完成 Strava 授權', 'err');
       loadBody(); return;
     }
+    refreshInboxCount();
     loadHome();
   } catch (e) {
     document.getElementById('loginScreen').style.display = 'flex';

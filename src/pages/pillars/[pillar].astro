@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { pillars, pillarBySlug } from '../../data/pillars';
+import BodyPanel from '../../components/BodyPanel.astro';
 
 export async function getStaticPaths() {
   return pillars.map((p) => ({ params: { pillar: p.slug } }));
@@ -48,6 +49,7 @@ const schema = [
 .arow:hover h2{color:var(--gold);}
 .arow:hover .arrow{opacity:1;transform:none;}
 .empty{padding:40px 0;color:var(--ash);}
+.list-h{font-family:var(--serif);font-weight:500;font-size:20px;margin-bottom:14px;}
 .others{display:flex;gap:10px;flex-wrap:wrap;margin-top:56px;padding-top:24px;border-top:1px solid var(--line);align-items:center;font-size:13px;color:var(--ash);}
 .others a{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--line);color:var(--bone);transition:border-color .3s,transform .35s var(--ease);}
 .others a b{font-family:var(--jp);font-weight:400;color:var(--dc);}
@@ -57,7 +59,7 @@ const schema = [
 <section class="ph" style={`--dc:var(--c-${meta.slug})`}>
   <div class="ph-in">
     <div>
-      <p class="crumb rv"><a href="/#five">能力值儀表</a>　／　{meta.type}</p>
+      <p class="crumb rv"><a href="/#chapters">連載中・五個方向</a>　／　{meta.type}</p>
       <h1 class="rv" style="--i:1">{meta.title}</h1>
       <p class="jp rv" style="--i:2" lang="ja">{meta.titleJp}</p>
       <p class="d rv" style="--i:3">{meta.desc}</p>
@@ -68,6 +70,8 @@ const schema = [
 </section>
 <section class="list-sec band-light" style="background:var(--night);color:var(--bone)">
   <div class="list-in">
+    {meta.slug === 'strengthen' && <BodyPanel />}
+    {meta.slug === 'strengthen' && <h2 class="list-h">「強化」的文章</h2>}
     {entries.length === 0 && <p class="empty">這個方向還沒有文章，第一篇可以從今天開始。</p>}
     {entries.map((e: any, i: number) => (
       <a class="arow rv" style={`--i:${Math.min(i, 8)}`} href={`/pillars/${meta.slug}/${e.slug}`}>

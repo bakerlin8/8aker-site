@@ -6,7 +6,8 @@
       "title": "8AKER零 網站與 Studio 後台",
       "desc": "從一張空白頁到每天可以自己發文章的個人網站。",
       "spent": "—",
-      "saved": "—"
+      "saved": "—",
+      "service": "ai"
     },
     {
       "dir": "operate",
@@ -14,7 +15,8 @@
       "title": "民宿線上 check-in 系統",
       "desc": "旅客入住前線上填名簿、上傳護照、簽名同意。",
       "spent": "—",
-      "saved": "—"
+      "saved": "—",
+      "service": "owner"
     },
     {
       "dir": "strengthen",
@@ -22,7 +24,8 @@
       "title": "Better Than Baker 個人儀表板",
       "desc": "串接 Strava，把運動、語言、工作放在同一個畫面。",
       "spent": "—",
-      "saved": "—"
+      "saved": "—",
+      "service": "ai"
     }
   ]
 }
