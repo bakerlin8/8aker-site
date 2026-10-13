@@ -586,23 +586,27 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var full=y-b[0],frac=(now-bd(y))/(bd(y+1)-bd(y)),total=Math.max(40,full+1);
   var rnd=function(a,c){return a+Math.random()*(c-a);},seed=[rnd(0,6.28),rnd(0,6.28)],acc=0,rr=[0];
   for(var i=1;i<=total;i++){acc+=rnd(.75,1.3);rr.push(acc);}
-  /* 年輪＝我的輪廓：內圈是圓（小時候），越往外越長成現在的樣子。輪廓點只算一次。 */
-  var SH=D.sil||(function(){var a=[];for(var q=0;q<240;q++){var t=-Math.PI/2+q/240*6.2832,w=1+.045*Math.sin(t*3+seed[0])+.028*Math.sin(t*5+seed[1]);a.push([Math.cos(t)*w,Math.sin(t)*w]);}return a;})(),N=SH.length,UX=[],UY=[],RD=[],rm=0;
-  for(var j=0;j<N;j++){var r0=Math.hypot(SH[j][0],SH[j][1])||1e-3;RD.push(r0);UX.push(SH[j][0]/r0);UY.push(SH[j][1]/r0);rm+=r0;}rm/=N;
-  var RX=[],RY=[];/* 每一圈的點（相對中心、未乘尺寸），預先算好 */
-  for(i=1;i<=total;i++){var f=rr[i]/acc,m=Math.min(1,Math.pow(f,1.6)),sc=.04+f*.96,xs=new Float32Array(N),ys=new Float32Array(N);
-    for(j=0;j<N;j++){var rad=((1-m)*rm+m*RD[j])*sc*(1+.012*Math.sin(j/N*6.283*5+seed[0]+f*3)+.006*Math.sin(j/N*6.283*11+seed[1]));xs[j]=UX[j]*rad;ys[j]=UY[j]*rad;}
+  /* 年輪「向光而長」：30 歲前在台灣，圍著同一個中心長；搬到日本後，年輪往東北（日本的方向）偏心生長。 */
+  var MOVE=D.move||30,N=240,LEAN=-0.62,RX=[],RY=[];
+  for(i=1;i<=total;i++){var f=rr[i]/acc,r=.03+f*.97,k=Math.max(0,i-MOVE)/10,ox=-.08+.088*k,oy=.05-.064*k,xs=new Float32Array(N),ys=new Float32Array(N);
+    for(var j=0;j<N;j++){var t=-Math.PI/2+j/N*6.2832,w=1+.03*Math.sin(t*3+seed[0])+.018*Math.sin(t*5+seed[1]+f*2)+.009*Math.sin(t*11+f*4),bias=i>MOVE?1+.18*k*Math.cos(t-LEAN):1,rad=r*w*bias;
+      xs[j]=ox+Math.cos(t)*rad;ys[j]=oy+Math.sin(t)*rad;}
     RX[i]=xs;RY[i]=ys;}
   var CX=0,CY=0,S=1,layer=null,future=null;
   function geom(){var wide=W>900*dpr;var hg=cv.parentElement.querySelector('.hero-grid'),hr=cv.parentElement.getBoundingClientRect();
-    var oy=D.sil?.1:0;if(wide){S=Math.min(W*.3,H*.4);CX=W*.68;CY=H*.52+S*oy;return;}
+    var oy=0;if(wide){S=Math.min(W*.22,H*.32);CX=W*.69;CY=H*.55;return;}
     var top=hg?(hg.getBoundingClientRect().bottom-hr.top+16)*dpr:H*.5,gh=Math.max(H-top,0);
-    if(gh>200*dpr){S=Math.min(W*(D.sil?.42:.4),gh/(D.sil?1.7:2.15));CX=W*.5;CY=top+gh*.5+S*oy;}else{S=Math.min(W,H)*.34;CX=W*.5;CY=H*.7;}}
+    if(gh>200*dpr){S=Math.min(W*.38,gh/2.25);CX=W*.5;CY=top+gh*.5+S*oy;}else{S=Math.min(W,H)*.34;CX=W*.5;CY=H*.7;}}
   function path(c,i,p){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p));c.beginPath();c.moveTo(CX+xs[0]*S,CY+ys[0]*S);for(var j=1;j<=n;j++){var k=j%N;c.lineTo(CX+xs[k]*S,CY+ys[k]*S);}}
   function mk(){var c=document.createElement('canvas');c.width=W;c.height=H;return c;}
   /* 已長好的年輪與未來的虛線圈，畫一次存起來，之後每幀只貼圖 */
   function bake(){layer=mk();var c=layer.getContext('2d');c.lineJoin='round';
-    for(var i=1;i<=full;i++){var f=i/full;c.strokeStyle='rgba(212,162,76,'+(.06+.26*f*f).toFixed(3)+')';c.lineWidth=(.7+.4*f)*dpr;path(c,i,1);c.closePath();c.stroke();}
+    /* 台灣的年＝淡玫瑰色，搬家那年加亮，日本的年＝金色 */
+    for(var i=1;i<=full;i++){var f,col,lw;
+      if(i<MOVE){f=i/MOVE;col='rgba(196,140,150,'+(.07+.27*f*f).toFixed(3)+')';lw=(.7+.3*f)*dpr;}
+      else if(i===MOVE){col='rgba(214,160,170,.7)';lw=1.4*dpr;}
+      else{f=(i-MOVE)/Math.max(1,full-MOVE);col='rgba(212,162,76,'+(.22+.4*f).toFixed(3)+')';lw=(.9+.3*f)*dpr;}
+      c.strokeStyle=col;c.lineWidth=lw;path(c,i,1);c.closePath();c.stroke();}
     future=mk();c=future.getContext('2d');c.setLineDash([2*dpr,7*dpr]);c.strokeStyle='rgba(239,229,214,.2)';c.lineWidth=dpr;for(var k=full+2;k<=total;k++){path(c,k,1);c.closePath();c.stroke();}}
   function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
     /* iOS 捲動時網址列伸縮只改高度：寬度沒變就不重建畫布 */
