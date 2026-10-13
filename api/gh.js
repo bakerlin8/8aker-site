@@ -1,6 +1,7 @@
-// Studio → GitHub, through the server. The GitHub token lives only in Vercel (GITHUB_CONTENT_TOKEN)
+// Studio → GitHub, through the server. GitHub credentials live only on the server (see _github.js)
 // and this proxy only reaches the contents of the one repo.
 import { getSession, sameOrigin } from './_session.js';
+import { githubToken } from './_github.js';
 const REPO = process.env.CONTENT_REPO || 'bakerlin8/8aker-site';
 const PREFIX = `/repos/${REPO}/contents/`;
 export default async function handler(req, res) {
@@ -13,10 +14,11 @@ export default async function handler(req, res) {
   const path = String(req.query.p || '');
   if (path === '/user') return res.status(200).json({ login: s.email });
   if (!path.startsWith(PREFIX) || path.includes('..') || path.length > 400) return res.status(400).json({ message: 'path not allowed' });
-  if (!process.env.GITHUB_CONTENT_TOKEN) return res.status(503).json({ message: '缺少 GITHUB_CONTENT_TOKEN' });
+  let token;
+  try { token = await githubToken(); } catch (e) { return res.status(503).json({ message: String(e.message || e) }); }
   const r = await fetch(`https://api.github.com${path}`, {
     method: req.method,
-    headers: { Authorization: `Bearer ${process.env.GITHUB_CONTENT_TOKEN}`, Accept: 'application/vnd.github+json', 'User-Agent': '8aker0-studio', 'Content-Type': 'application/json' },
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'User-Agent': '8aker0-studio', 'Content-Type': 'application/json' },
     body: req.method === 'GET' ? undefined : JSON.stringify(typeof req.body === 'string' ? JSON.parse(req.body) : req.body),
   });
   const text = await r.text();
