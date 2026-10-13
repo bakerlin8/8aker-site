@@ -52,7 +52,9 @@ const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 <style is:global>
 /* ── hero ── */
 .hero{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;align-items:center;background:radial-gradient(120% 80% at 70% 40%,#2A1520 0%,#1C0F14 60%);color:#EFE5D6;}
-#art{position:absolute;inset:0;width:100%;height:100%;}
+#art,#smoke{position:absolute;inset:0;width:100%;height:100%;}
+#smoke{opacity:0;transition:opacity 2.4s var(--ease);}
+#smoke.on{opacity:1;}
 .hero-in{position:relative;z-index:2;width:100%;max-width:1240px;margin:0 auto;padding:120px 40px 80px;}
 .hero-grid{max-width:660px;}
 .hero .rv{--d:0}
@@ -459,6 +461,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 </style>
 
 <section class="hero" aria-labelledby="motto">
+  <canvas id="smoke" aria-hidden="true"></canvas>
   <canvas id="art" aria-hidden="true"></canvas>
   <div class="hero-in">
     <div class="hero-grid">
@@ -646,7 +649,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     future=mk();c=future.getContext('2d');c.setLineDash([2*dpr,7*dpr]);c.strokeStyle='rgba(239,229,214,.2)';c.lineWidth=dpr;for(var k=full+2;k<=total;k++){path(c,k,1);c.closePath();c.stroke();}}
   function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
     /* iOS 捲動時網址列伸縮只改高度：寬度沒變就不重建畫布 */
-    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();bake();return true;}
+    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();bake();window.__ring={x:CX/W,y:CY/H,r:S/H};return true;}
   function frame(dt){t+=dt;var g=Math.min(1,t/4.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
     if(e<1){ctx.save();ctx.beginPath();var oS=S;S=oS*(.05+e*1.02);path(ctx,total,1);S=oS;ctx.closePath();ctx.clip();ctx.drawImage(layer,0,0);ctx.restore();}else ctx.drawImage(layer,0,0);
     ctx.globalAlpha=e;ctx.drawImage(future,0,0);ctx.globalAlpha=1;
@@ -672,6 +675,36 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;cancelAnimationFrame(raf);if(run){last=0;raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv.parentElement);}
   /* 等字型與第一屏排好再開始長，避開開場最忙的那一秒 */
   if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
+
+
+/* 煙霧：細細、延展的煙絲，繞著年輪慢慢流動（WebGL；離開畫面或切到別的分頁就暫停） */
+(function(){var c=document.getElementById('smoke');if(!c)return;var gl=c.getContext('webgl',{premultipliedAlpha:true,alpha:true,antialias:false});if(!gl)return;
+  var fs='precision mediump float;uniform vec2 r;uniform float t;uniform vec2 rc;uniform float rs;'+
+  'float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}'+
+  'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}'+
+  'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+vec2(1.7,9.2);a*=.5;}return v;}'+
+  'float wisp(vec2 p,float T,float sc,float pw){vec2 q=vec2(fbm(p*sc+vec2(0.,-T)),fbm(p*sc+vec2(5.2,1.3+T*.7)));float f=fbm(p*sc*.8+1.8*q+vec2(T*.3,-T*.6));return pow(1.-abs(f*2.-1.),pw);}'+
+  'void main(){vec2 uv=gl_FragCoord.xy/r.y;vec2 c=rc*vec2(r.x/r.y,1.);vec2 d=uv-c;float L=length(d);float T=t*.045;'+
+  'float ang=1.1*exp(-L/(rs*1.1))+T*.25*exp(-L/rs);float cs=cos(ang),sn=sin(ang);vec2 sw=c+vec2(cs*d.x-sn*d.y,sn*d.x+cs*d.y);vec2 p=vec2(sw.x*.75,sw.y*1.6);'+
+  'float a1=wisp(p,T,1.4,24.),a2=wisp(p*1.6+3.1,T*1.2,1.3,32.)*.8,a3=wisp(p*.7+7.,T*.8,1.5,18.)*.45;'+
+  'float mask=smoothstep(.28,.62,fbm(p*.45+vec2(T*.12,-T*.2)));float aura=exp(-L/(rs*1.6));mask=max(mask,smoothstep(.2,.9,aura)*.85);'+
+  'float m=(a1+a2+a3)*mask;float side=.25+.75*smoothstep(.1,.85,gl_FragCoord.x/r.x);'+
+  'vec3 col=mix(vec3(.80,.58,.60),vec3(.92,.74,.44),clamp(a1*.6+aura*.5,0.,1.));float a=clamp(m*(.5+.7*aura)*side,0.,.7);gl_FragColor=vec4(col*a,a);}';
+  function sh(t,src){var o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);return gl.getShaderParameter(o,gl.COMPILE_STATUS)?o:null;}
+  var vs=sh(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'),fsh=sh(gl.FRAGMENT_SHADER,fs);if(!vs||!fsh)return;
+  var pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fsh);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return;gl.useProgram(pr);
+  var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);var lp=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(lp);gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+  var uR=gl.getUniformLocation(pr,'r'),uT=gl.getUniformLocation(pr,'t'),uC=gl.getUniformLocation(pr,'rc'),uS=gl.getUniformLocation(pr,'rs');
+  var W0=0,run=true,raf=0,t=0,last=0,odd=false;
+  function size(){var rr=c.getBoundingClientRect(),k=innerWidth<900?.55:.75;if(Math.round(rr.width*k)===W0)return;W0=Math.round(rr.width*k);c.width=W0;c.height=Math.round(rr.height*k);gl.viewport(0,0,c.width,c.height);}
+  function draw(){var g=window.__ring||{x:.69,y:.55,r:.3};gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.uniform2f(uR,c.width,c.height);gl.uniform1f(uT,t);gl.uniform2f(uC,g.x,1-g.y);gl.uniform1f(uS,g.r);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);}
+  function loop(ts){if(!run)return;var dt=last?Math.min(.1,(ts-last)/1e3):0;last=ts;t+=dt*6;odd=!odd;if(odd)draw();raf=requestAnimationFrame(loop);}
+  size();addEventListener('resize',size);
+  if(RM){t=40;draw();c.classList.add('on');return;}
+  setTimeout(function(){c.classList.add('on');},400);raf=requestAnimationFrame(loop);
+  new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting&&!document.hidden;cancelAnimationFrame(raf);if(run){last=0;raf=requestAnimationFrame(loop);}});},{threshold:.02}).observe(c.parentElement);
+  document.addEventListener('visibilitychange',function(){if(document.hidden){run=false;cancelAnimationFrame(raf);}else{run=true;last=0;raf=requestAnimationFrame(loop);}});
+})();
 
 /* 連載: 第 0 話 … 第 11 話 → 第一卷 */
 (function(){var C=D.chapters,now=Date.now(),T=function(d){return new Date(d+'T00:00:00+09:00').getTime();};
