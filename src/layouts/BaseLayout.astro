@@ -211,12 +211,19 @@ footer.site-foot a:hover{color:#EFE5D6;}
     a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+.006);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(a);a.connect(master);o.start(t0);o.stop(t0+dur+.02);}
   function noise(t0,dur,g,f1,f2,q){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),a=ctx.createGain();n.buffer=noiseBuf;b.type='bandpass';b.Q.value=q||1.2;b.frequency.setValueAtTime(f1,t0);if(f2)b.frequency.exponentialRampToValueAtTime(f2,t0+dur);
     a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+dur*.3);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);n.connect(b);b.connect(a);a.connect(master);n.start(t0);n.stop(t0+dur+.02);}
+  // 很短、很近、略帶左右位置的輕敲聲（ASMR 質感）
+  function tick(t0,dur,g,fr,q,p){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),h=ctx.createBiquadFilter(),a=ctx.createGain(),pn=ctx.createStereoPanner?ctx.createStereoPanner():null;
+    n.buffer=noiseBuf;b.type='bandpass';b.frequency.value=fr*(p||1);b.Q.value=q;h.type='highpass';h.frequency.value=900;
+    a.gain.setValueAtTime(g,t0);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);n.connect(h);h.connect(b);b.connect(a);
+    if(pn){pn.pan.value=(Math.random()-.5)*.35;a.connect(pn);pn.connect(master);}else a.connect(master);n.start(t0,Math.random()*.3);n.stop(t0+dur+.01);}
   var last={};
   function play(kind){if(!on||!unlocked||!ctx||ctx.state!=='running')return;var now=ctx.currentTime,p=1+(Math.random()-.5)*.06;
     if(last[kind]&&now-last[kind]<(kind==='hover'?.045:.03))return;last[kind]=now;
     switch(kind){
       case 'hover':tone(1750*p,now,.05,.06,'sine');break;
-      case 'press':tone(560*p,now,.08,.16,'triangle',380*p);noise(now,.03,.07,2400,0,2);break;
+      case 'press':/* ASMR 風的近距離輕敲：清脆的指尖觸感＋一點木質的「咚」 */
+        tick(now,.012,.8,5200,2.5,p);tick(now+.002,.03,.4,2300,1.6,p);tone(170*p,now,.05,.16,'sine',120*p);break;
+      case 'release':tick(now,.008,.32,6500,3,p);tick(now+.001,.018,.15,3200,2,p);break;
       case 'select':tone(1318*p,now,.34,.1,'sine');tone(1975*p,now+.07,.4,.08,'sine');tone(2637*p,now+.07,.22,.02,'sine');break;
       case 'go':noise(now,.22,.09,500,1800,.9);tone(880*p,now+.03,.16,.035,'sine',1320*p);break;
       case 'open':tone(330,now,.16,.11,'sine',660);break;
@@ -229,6 +236,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
   var hov=null;
   document.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var el=e.target.closest&&e.target.closest(SEL);if(el===hov)return;hov=el;if(el&&!el.disabled)play('hover');},{passive:true});
   document.addEventListener('pointerdown',function(e){unlock();var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))play('press');},{passive:true});
+  document.addEventListener('pointerup',function(e){var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))play('release');},{passive:true});
   document.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')unlock();},{passive:true});
   document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest(SEL);if(!el||el.disabled)return;
     if(el.id==='sfxBtn')return;
