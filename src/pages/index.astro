@@ -759,7 +759,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     if(r.state==='done'||r.state==='break'){b+=r.summary?'<p>'+esc(r.summary)+'</p>':'';b+=(r.keep&&r.keep.length)?'<h4>這一話留下的</h4>'+items(r.keep):'';b+=(r.letgo&&r.letgo.length)?'<h4>這一話放下的</h4>'+items(r.letgo):'';if(!b)b='<p>'+(r.state==='break'?'這個月休載。':'這一話的內容整理中。')+'</p>';}
     else if(r.final)b='<p>'+esc(r.summary)+'</p>';
     else if(r.plan&&r.plan.length)b='<p>這一話預計刊出的內容：</p>'+items(r.plan,true);
-    else b='<p>這一話還在畫分鏡，刊出當天公開。</p>';
+    else b='<p>這一話還在準備中，刊出當天公開。</p>';
     var from=i>0?list[i-1].date:D.start.slice(0,10),inRange=function(e){return (i>0?e.date>from:e.date>=from)&&e.date<=r.date;};
     var es=D.entries.filter(inRange),total=es.length,showT=!r.final&&(r.state!=='future');
     var cc={};D.dirs.forEach(function(d){cc[d.id]=es.filter(function(e){return e.dir===d.id;}).length;});

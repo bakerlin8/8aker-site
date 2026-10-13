@@ -79,7 +79,7 @@ const schema = [
       </>
     ) : (
       <>
-        <p class="lead">{c.label}預定 {dot(c.date)} 刊出。{c.plan?.length ? '這一話預計刊出的內容：' : '內容還在畫分鏡。'}</p>
+        <p class="lead">{c.label}預定 {dot(c.date)} 刊出。{c.plan?.length ? '這一話預計刊出的內容：' : '內容還在準備中。'}</p>
         {c.plan?.length > 0 && <ul>{c.plan.map((x: any) => { const d = dirOf(x.dir); return <li style={d ? `--dc:var(--c-${d.slug})` : ''}><span class="k">{d ? d.kanji : '・'}</span><span>{x.text}</span></li>; })}</ul>}
       </>
     )}
