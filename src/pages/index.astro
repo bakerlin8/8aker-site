@@ -229,7 +229,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .work .wq small{display:block;font-family:var(--latin);font-size:12px;letter-spacing:.24em;margin-bottom:2px;}
 .work .wq.bf{color:var(--bone-2);border-left-color:rgba(134,112,122,.55);}
 .work .wq.bf small{color:var(--ash);}
-.work .wq.af{color:var(--bone);border-left-color:var(--gold);margin-bottom:20px;}
+.work .wq.af{color:var(--bone);border-left-color:var(--gold);margin-bottom:8px;}
 .work .wq.af small{color:var(--gold);}
 .work .wfoot{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--ash);position:relative;z-index:1;}
 .work .wfoot{margin-top:auto;}.work .wq.af+.wfoot,.work .wq.bf+.wfoot{margin-top:auto;}
@@ -486,7 +486,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
       <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
         {worksData.works.map((w, i) => { return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}><div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}<div class="wfoot"><span>你也是嗎？</span><a class="wsvc" href="#inquiry" data-svc={(w as any).service || 'other'}>聊聊 →</a></div></article>
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}><div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}</article>
         ); })}
       </div>
     </div>
