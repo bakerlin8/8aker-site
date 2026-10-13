@@ -217,7 +217,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .strip{display:flex;gap:20px;overflow-x:auto;margin-top:36px;padding:10px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:var(--ash) transparent;}
 .work{flex:0 0 min(380px,82vw);scroll-snap-align:start;background:var(--night-2);border:1px solid var(--line);padding:26px;display:flex;flex-direction:column;min-height:250px;position:relative;overflow:hidden;transition:transform .5s var(--ease),border-color .4s,box-shadow .5s var(--ease);}
 .work::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--dc);transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);}
-.work::after{content:attr(data-k);position:absolute;right:-6px;bottom:-26px;font-family:var(--jp);font-weight:300;font-size:150px;line-height:1;color:var(--dc);opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none;}
+.work::after{content:attr(data-k);position:absolute;right:-6px;bottom:-26px;font-family:var(--latin);font-weight:300;font-size:150px;line-height:1;color:var(--dc);opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none;}
 .work:hover{transform:translateY(-6px);border-color:rgba(239,229,214,.2);box-shadow:0 18px 40px -20px rgba(0,0,0,.6);}
 .work:hover::before{transform:scaleX(1);}
 .work:hover::after{opacity:.1;transform:none;}
@@ -479,8 +479,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div>
       <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
       <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
-        {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><p class="wy"><small>為什麼做</small>{(w as any).why}</p>{(w as any).result && <p class="wy"><small>做出來之後</small>{(w as any).result}</p>}</> : <p>{w.desc}</p>}<a class="wsvc" href="#inquiry" data-svc={(w as any).service || 'other'}>你也有類似的狀況？聊聊 →</a></article>
+        {worksData.works.map((w, i) => { return (
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}><div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><p class="wy"><small>為什麼做</small>{(w as any).why}</p>{(w as any).result && <p class="wy"><small>做出來之後</small>{(w as any).result}</p>}</> : <p>{w.desc}</p>}<a class="wsvc" href="#inquiry" data-svc={(w as any).service || 'other'}>你也有類似的狀況？聊聊 →</a></article>
         ); })}
       </div>
     </div>

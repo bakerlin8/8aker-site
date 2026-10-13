@@ -704,7 +704,6 @@ async function loadWorks() {
       <div style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span class="field-label" style="margin:0">成果 ${i + 1}</span>
           <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">移除</button></span></div>
-        <div class="field"><label class="field-label">方向</label><select data-w="${i}" data-key="dir" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)">${dirOpts(w.dir)}</select></div>
         <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
         <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
         <div class="field"><label class="field-label">一句話說明</label><textarea rows="2" data-w="${i}" data-key="desc">${escapeHtml(w.desc)}</textarea></div>
