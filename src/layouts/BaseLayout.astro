@@ -27,6 +27,12 @@ const glyphs = [...new Set([
   ...services.services.map((x) => x.name_jp), 'お品書き松竹梅分鏡',
   'StatusChaptersJournalWorksBodyHelloDirections', '0123456789',
 ].join(''))].join('');
+// Handwritten face for the 分鏡表 drafts (homepage only), subset to exactly the characters on the board.
+import dreams from '../data/dreams.json';
+const handGlyphs = [...new Set([
+  dreams.intro, '第一卷（40 歲前）總有一天想畫作畫中已刊出草稿需要幫忙：看這一格怎麼完成的相關內容→ CUT0123456789%✎',
+  ...dreams.items.filter((d: any) => d.public).flatMap((d: any) => [d.title, d.why, d.help, d.note || '']),
+].join(''))].join('');
 const nav = [
   { href: '/#chapters', label: '39・連載中' },
   { href: '/#journal', label: '日常紀錄' },
@@ -66,6 +72,7 @@ const nav = [
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500&family=Noto+Sans+TC:wght@300;400&display=swap" rel="stylesheet">
 <link href={`https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300&family=Cormorant+Garamond:wght@500&display=swap&text=${encodeURIComponent(glyphs)}`} rel="stylesheet">
+{isHome && <link href={`https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400&display=swap&text=${encodeURIComponent(handGlyphs)}`} rel="stylesheet">}
 <style is:global>
 /* ── tokens: palette 二「酒と生成り」── */
 :root{
@@ -77,6 +84,7 @@ const nav = [
   --serif:'Noto Serif TC','Noto Serif JP',serif;
   --sans:'Noto Sans TC',system-ui,sans-serif;
   --jp:'Noto Serif JP','Noto Serif TC',serif;
+  --hand:'LXGW WenKai TC','Noto Serif TC',serif;
   --latin:'Cormorant Garamond',serif;
   --ease:cubic-bezier(.16,1,.3,1);
 }

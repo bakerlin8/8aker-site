@@ -338,7 +338,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-dreams">
       <div class="page-eyebrow">Storyboard</div>
       <div class="page-title">分鏡表</div>
-      <div class="page-sub">想做的事。狀態：想畫 → 作畫中 → 已刊出；不想公開的取消「公開」即可。</div>
+      <div class="page-sub">網站上以草稿紙呈現：想畫＝鉛筆構圖、作畫中＝依進度鋪上斜線、已刊出＝上墨蓋章。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#dreams" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
       <div id="dreamsForm"></div>
     </section>
 
@@ -747,7 +747,10 @@ async function loadDreams() {
   const dirs = Object.entries(KANJI_BY_DIR).map(([d, k]) => [d, `${k}・${PILLARS[d].jp}`]);
   function collect() {
     data.intro = form.querySelector('[data-intro]').value;
-    form.querySelectorAll('[data-d]').forEach(el => { const it = data.items[+el.dataset.d]; it[el.dataset.key] = el.type === 'checkbox' ? el.checked : el.value; });
+    form.querySelectorAll('[data-d]').forEach(el => { if (el.disabled) return; const it = data.items[+el.dataset.d]; const k = el.dataset.key;
+      if (el.type === 'checkbox') it[k] = el.checked;
+      else if (k === 'progress') { const v = el.value.trim(); if (v === '') delete it.progress; else it.progress = Math.max(0, Math.min(100, Math.round(+v) || 0)); }
+      else it[k] = el.value; });
   }
   function render() {
     form.innerHTML = `<div class="field"><label class="field-label">分鏡表開頭的一句話</label><input type="text" data-intro value="${escapeAttr(data.intro || '')}"></div>` +
@@ -762,13 +765,18 @@ async function loadDreams() {
           <div class="field"><label class="field-label">期限</label><select data-d="${i}" data-key="horizon" style="${SEL_STYLE}">${opt([['vol1', '第一卷（40 歲前）'], ['someday', '總有一天']], d.horizon)}</select></div>
           <div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt([['idea', '想畫'], ['doing', '作畫中'], ['done', '已刊出']], d.state)}</select></div>
         </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:12px">
+          <div class="field"><label class="field-label">鉛筆旁註（紅筆小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
+          <div class="field"><label class="field-label">作畫進度 %</label><input type="number" min="0" max="100" step="5" data-d="${i}" data-key="progress" value="${d.progress ?? ''}" placeholder="${d.state === 'doing' ? '30' : '—'}" ${d.state === 'doing' ? '' : 'disabled title="只有「作畫中」會顯示進度"'}></div>
+        </div>
         <div class="field"><label class="field-label">需要幫忙（可空白，讀者可以從這裡聯絡你）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
         <div class="field"><label class="field-label">完成證據或相關連結（例：/chapters/3/）</label><input type="text" data-d="${i}" data-key="link" value="${escapeAttr(d.link || '')}"></div>
         <div class="field-checkbox"><input type="checkbox" id="dp${i}" data-d="${i}" data-key="public" ${d.public ? 'checked' : ''}><label for="dp${i}">公開在網站上</label></div>
       </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 新增一格</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
     form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定移除這一格嗎？儲存後才會生效。')) return; collect(); data.items.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.items[i - 1], data.items[i]] = [data.items[i], data.items[i - 1]]; render(); }));
-    document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.unshift({ id: 'd' + Date.now(), dir: 'conjure', title: '', why: '', horizon: 'vol1', state: 'idea', help: '', link: '', public: true }); render(); });
+    form.querySelectorAll('select[data-key="state"]').forEach(sel => sel.addEventListener('change', () => { collect(); render(); }));
+    document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.unshift({ id: 'd' + Date.now(), dir: 'conjure', title: '', why: '', horizon: 'vol1', state: 'idea', note: '', help: '', link: '', public: true }); render(); });
     document.getElementById('saveDreams').addEventListener('click', async (e) => {
       collect(); if (data.items.some(x => !x.title.trim())) { toast('有一格還沒填「想做的事」', 'err'); return; }
       file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update storyboard via Studio', e.currentTarget);

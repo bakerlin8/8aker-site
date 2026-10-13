@@ -127,24 +127,48 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .dir-note{font-size:11.5px;color:var(--ash);margin-top:10px;}
 @media(max-width:960px){.story{grid-template-columns:1fr;gap:28px;}}
 
-/* ── 壱 分鏡表 ── */
-.dream-intro{margin-top:24px;color:var(--bone-2);font-size:14.5px;}
-.dgroup{margin-top:26px;}
-.dgroup h3{font-family:var(--serif);font-weight:500;font-size:16px;color:var(--gold);}
-.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px;}
-.dcard{position:relative;border:1px dashed var(--line);padding:16px 16px 14px;display:flex;flex-direction:column;gap:6px;background:transparent;transition:transform .4s var(--ease),border-color .3s,background .3s;}
-.dcard:hover{transform:translateY(-3px);border-color:var(--dc);}
-.dcard.doing{border-style:solid;background:var(--night-2);}
-.dcard.done{border-style:solid;border-color:var(--dc);background:var(--night-2);}
-.dmeta{display:flex;justify-content:space-between;align-items:center;}
-.dmeta .k{font-family:var(--jp);font-size:20px;color:var(--dc);}
-.dmeta .st{font-size:11.5px;padding:1px 9px;border:1px solid var(--line);color:var(--ash);}
-.dcard.doing .st{border-color:var(--gold);color:var(--gold);}
-.dcard.done .st{background:var(--dc);border-color:var(--dc);color:var(--night);}
-.dcard h4{font-family:var(--serif);font-weight:500;font-size:16px;line-height:1.55;}
-.dcard .why{font-size:13px;color:var(--bone-2);line-height:1.7;}
-.dcard .help,.dcard .dlink{font-size:12.5px;color:var(--gold);margin-top:auto;padding-top:6px;}
-.dcard .help:hover,.dcard .dlink:hover{text-decoration:underline;text-underline-offset:3px;}
+/* ── 壱 分鏡表：草稿紙 ── */
+.dream-intro{margin-top:24px;color:var(--bone-2);font-size:14.5px;font-family:var(--hand);}
+.dgroup{margin-top:30px;}
+.dgroup h3{font-family:var(--hand);font-weight:400;font-size:17px;color:var(--gold);display:flex;align-items:center;gap:10px;}
+.dgroup h3::after{content:"";flex:1;height:1px;background:repeating-linear-gradient(90deg,rgba(201,163,92,.45) 0 6px,transparent 6px 11px);}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:26px 20px;margin-top:18px;}
+.sb{--paper:#EEE7D8;--ink:#2B2522;--pencil:rgba(43,37,34,.55);--blue:rgba(74,128,190,.22);
+  position:relative;background:var(--paper);color:var(--ink);padding:14px 14px 16px;display:flex;flex-direction:column;gap:8px;
+  background-image:linear-gradient(var(--blue) 1px,transparent 1px),linear-gradient(90deg,var(--blue) 1px,transparent 1px);background-size:100% 22px,22px 100%;background-position:0 7px,7px 0;
+  box-shadow:0 1px 0 rgba(0,0,0,.08),0 10px 24px -14px rgba(0,0,0,.6);transform:rotate(var(--tilt,0deg));transition:transform .45s var(--ease),box-shadow .45s;}
+.sb:nth-child(3n+1){--tilt:-.7deg}.sb:nth-child(3n+2){--tilt:.5deg}.sb:nth-child(3n){--tilt:-.2deg}
+.sb:hover{--tilt:0deg;box-shadow:0 1px 0 rgba(0,0,0,.08),0 18px 30px -14px rgba(0,0,0,.7);}
+.sb .tape{position:absolute;top:-9px;left:50%;width:62px;height:18px;margin-left:-31px;background:rgba(232,220,190,.62);transform:rotate(-3deg);box-shadow:0 1px 2px rgba(0,0,0,.15);}
+.sb-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-family:var(--hand);font-size:12.5px;color:var(--pencil);letter-spacing:.04em;}
+.sb-h .st{font-size:12.5px;padding:0 7px;border:1px solid currentColor;border-radius:40% 55% 45% 60%/60% 40% 55% 45%;}
+.frame{position:relative;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;}
+.frame::before{content:"";position:absolute;inset:1px;border:1.4px solid var(--pencil);filter:url(#sbRough);pointer-events:none;z-index:2;}
+.frame .guide{position:absolute;inset:0;background:linear-gradient(var(--pencil),var(--pencil)) center/1px 100% no-repeat,linear-gradient(var(--pencil),var(--pencil)) center/100% 1px no-repeat;opacity:.18;}
+.frame .ink{position:absolute;inset:0;width:var(--pg,0%);background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--dc) 55%,transparent) 0 1.2px,transparent 1.2px 6px);border-right:1.2px dashed var(--pencil);}
+.frame .k{position:relative;z-index:1;font-family:var(--jp);font-size:64px;line-height:1;color:transparent;-webkit-text-stroke:1.1px var(--ink);opacity:.55;}
+.frame .pg{position:absolute;right:8px;bottom:5px;z-index:2;font-family:var(--hand);font-size:12px;color:var(--pencil);}
+.sb h4{font-family:var(--hand);font-weight:400;font-size:17px;line-height:1.5;color:var(--ink);}
+.sb .why{font-family:var(--hand);font-size:13.5px;line-height:1.75;color:var(--pencil);}
+.sb .memo{font-family:var(--hand);font-size:13px;line-height:1.6;color:#B0453A;transform:rotate(-1.2deg);padding-left:2px;}
+.sb .help,.sb .dlink{font-family:var(--hand);font-size:13px;color:#7A4E1E;margin-top:auto;padding-top:4px;text-decoration:underline;text-decoration-style:wavy;text-decoration-color:rgba(122,78,30,.35);text-underline-offset:4px;}
+.sb .help:hover,.sb .dlink:hover{color:var(--ink);}
+/* 想畫：只有鉛筆構圖線 */
+.sb.idea .frame::before{border-style:dashed;opacity:.7;}
+.sb.idea .frame .k{opacity:.28;-webkit-text-stroke-width:.8px;}
+.sb.idea h4{color:#4a423d;}
+/* 作畫中：線條轉實、斜線依進度鋪上 */
+.sb.doing .st{color:#B0453A;}
+/* 已刊出：上墨＋上色＋印章 */
+.sb.done .frame::before{border:2px solid var(--ink);filter:none;}
+.sb.done .frame{background:color-mix(in srgb,var(--dc) 22%,transparent);}
+.sb.done .frame .k{color:var(--ink);-webkit-text-stroke:0;opacity:.85;}
+.sb.done .frame .ink,.sb.done .frame .guide{display:none;}
+.sb.done .stamp{position:absolute;right:10px;top:10px;z-index:3;font-family:var(--hand);font-size:13px;color:#B0453A;border:2px solid #B0453A;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;transform:rotate(-12deg);opacity:.85;}
+#vDream:not([hidden]) .sb{animation:sbIn .55s var(--ease) both;animation-delay:calc(var(--n,0) * 70ms);}
+@keyframes sbIn{from{opacity:0;transform:translateY(12px) rotate(var(--tilt,0deg));}}
+@media (prefers-reduced-motion:reduce){#vDream:not([hidden]) .sb{animation:none;}.sb{transition:none;}}
+@media(max-width:640px){.dgrid{gap:28px 0;}.frame .k{font-size:54px;}}
 
 /* ── 弐 連載 ── */
 .mv-toggle{display:inline-flex;margin-top:28px;border:1px solid var(--line);}
@@ -411,17 +435,22 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         </div>
       </div>
       <div id="vDream" hidden>
+        <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><filter id="sbRough"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="8"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter></svg>
         <p class="dream-intro">{dreams.intro}</p>
-        {[['vol1', '第一卷（40 歲前）'], ['someday', '總有一天']].map(([h, label]) => { const list = dreams.items.filter((d) => d.public && d.horizon === h); return list.length > 0 && (
+        {(() => { let n = 0; return [['vol1', '第一卷（40 歲前）'], ['someday', '總有一天']].map(([h, label]) => { const list = dreams.items.filter((d: any) => d.public && d.horizon === h); return list.length > 0 && (
           <div class="dgroup"><h3>{label}</h3><div class="dgrid">
-            {list.map((d) => { const p = pillars.find((x) => x.slug === d.dir) || pillars[0]; const st = ({ idea: '想畫', doing: '作畫中', done: '已刊出' } as any)[d.state] || '想畫'; return (
-              <article class={`dcard ${d.state}`} style={`--dc:var(--c-${p.slug})`}>
-                <div class="dmeta"><span class="k">{p.kanji}</span><span class="st">{st}</span></div>
+            {list.map((d: any) => { const p = pillars.find((x) => x.slug === d.dir) || pillars[0]; const st = ({ idea: '想畫', doing: '作畫中', done: '已刊出' } as any)[d.state] || '想畫'; n++;
+              const raw = Number(d.progress); const hasPg = d.progress !== '' && d.progress != null && Number.isFinite(raw); const pg = d.state === 'done' ? 100 : d.state === 'idea' ? 0 : Math.max(0, Math.min(100, hasPg ? Math.round(raw) : 25)); return (
+              <article class={`sb ${d.state}`} style={`--dc:var(--c-${p.slug});--pg:${pg}%;--n:${n - 1}`}>
+                <span class="tape" aria-hidden="true"></span>
+                <div class="sb-h"><span>CUT {String(n).padStart(2, '0')}・{p.title || ''}</span><span class="st">{st}</span></div>
+                <div class="frame" aria-hidden="true"><span class="guide"></span><span class="ink"></span><span class="k">{p.kanji}</span>{d.state === 'doing' && hasPg && <span class="pg">{pg}%</span>}{d.state === 'done' && <span class="stamp">已刊出</span>}</div>
                 <h4>{d.title}</h4>{d.why && <p class="why">{d.why}</p>}
+                {d.note && <p class="memo">✎ {d.note}</p>}
                 {d.help && <a class="help" href="#inquiry" data-svc="other">需要幫忙：{d.help} →</a>}
                 {safeHref(d.link) && <a class="dlink" href={safeHref(d.link)}>{d.state === 'done' ? '看這一格怎麼完成的 →' : '相關內容 →'}</a>}
               </article>); })}
-          </div></div>); })}
+          </div></div>); }); })()}
       </div>
       <div id="vToc" hidden><div class="ygrid" id="ygrid"></div></div>
     </div>
