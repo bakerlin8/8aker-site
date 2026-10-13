@@ -125,14 +125,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 .btn-gold::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);transition:left .7s var(--ease);}
 .btn-gold:hover{transform:translateY(-1px);}
 .btn-gold:hover::after{left:120%;}
-.bgm-btn{width:40px;height:40px;margin-left:-26px;display:grid;place-items:center;color:#B9A89E;border-radius:50%;position:relative;transition:color .3s,background .3s;}
-.bgm-btn:hover{color:#EFE5D6;background:rgba(239,229,214,.08);}
-.bgm-btn[aria-pressed="true"]{color:#D4A24C;}
-.bgm-btn .eq{position:absolute;right:5px;bottom:7px;display:none;gap:1px;align-items:flex-end;height:8px;}
-.bgm-btn[aria-pressed="true"] .eq{display:flex;}
-.bgm-btn .eq i{width:2px;background:#D4A24C;animation:eq 1s ease-in-out infinite;}
-.bgm-btn .eq i:nth-child(2){animation-delay:.25s}.bgm-btn .eq i:nth-child(3){animation-delay:.5s}
-@keyframes eq{0%,100%{height:2px}50%{height:8px}}
 .sfx-btn{width:40px;height:40px;margin-left:-26px;display:grid;place-items:center;color:#B9A89E;border-radius:50%;transition:color .3s,background .3s;}
 .sfx-btn:hover{color:#EFE5D6;background:rgba(239,229,214,.08);}
 .sfx-btn .x{display:none}.sfx-btn[aria-pressed="false"] .x{display:block}.sfx-btn[aria-pressed="false"] .w{display:none}.sfx-btn[aria-pressed="false"]{color:#86707A;}
@@ -145,7 +137,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 .menu-open .drawer{opacity:1;pointer-events:auto;}
 .menu-open .drawer a{opacity:1;transform:none;}
 .menu-open .drawer a:nth-child(2){transition-delay:.04s}.menu-open .drawer a:nth-child(3){transition-delay:.08s}.menu-open .drawer a:nth-child(4){transition-delay:.12s}.menu-open .drawer a:nth-child(5){transition-delay:.16s}.menu-open .drawer a:nth-child(6){transition-delay:.2s}
-@media(max-width:820px){.nav,.top-in>.btn-gold{display:none;}.menu-btn{display:block;margin-left:-30px;}.bgm-btn{margin-left:auto;}.sfx-btn{margin-left:-30px;}.top-in{padding:12px 20px;}}
+@media(max-width:820px){.nav,.top-in>.btn-gold{display:none;}.menu-btn{display:block;margin-left:-30px;}.sfx-btn{margin-left:auto;}.top-in{padding:12px 20px;}}
 
 /* ── section frame: 一式・側柱 ── */
 .sec{padding:96px 40px;position:relative;background:var(--night);color:var(--bone);}
@@ -197,7 +189,6 @@ footer.site-foot a:hover{color:#EFE5D6;}
     <a href="/" class="mark vt-mark" aria-label={`${copy.site_name} 首頁`}>{[...copy.site_name].map((ch) => <span>{ch}</span>)}</a>
     <nav class="nav" aria-label="主要導覽">{nav.map((n) => <a href={n.href}>{n.label}</a>)}</nav>
     <a class="btn-gold" href="/#support">支持</a>
-    <button class="bgm-btn" id="bgmBtn" type="button" aria-pressed="false" aria-label="背景音樂：關（點一下播放）" title="背景音樂"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 17.5V6.2l10-2.2v11.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="6.6" cy="17.6" r="2.4" fill="currentColor"/><circle cx="16.6" cy="15.4" r="2.4" fill="currentColor"/></svg><span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></button>
     <button class="sfx-btn" id="sfxBtn" type="button" aria-pressed="true" aria-label="音效：開" title="音效開關"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z" fill="currentColor"/><path class="w" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.6a7.6 7.6 0 0 1 0 10.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path class="x" d="M16 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
     <button class="menu-btn" id="menuBtn" aria-label="開啟選單" aria-expanded="false" aria-controls="drawer"><i></i><i></i></button>
   </div>
@@ -207,84 +198,6 @@ footer.site-foot a:hover{color:#EFE5D6;}
 <main><slot /></main>
 
 <footer class="site-foot"><span>{copy.site_name}</span><span>大阪・2026</span><a href="/privacy/">隱私權政策</a><span>{copy.motto_line1}{copy.motto_line2}</span></footer>
-
-<script is:inline>
-/* 背景音樂：瀏覽器裡即時生成的 Jazz／R&B／City Pop 風格 lo-fi 演奏（Rhodes 電鋼琴、貝斯、輕鼓、偶爾的鐵琴旋律），每次彈的都不一樣；不下載音檔。預設關閉，按右上角音符播放。 */
-(function(){
-  var btn=document.getElementById('bgmBtn');if(!btn)return;
-  var AC=window.AudioContext||window.webkitAudioContext;if(!AC){btn.style.display='none';return;}
-  var KEY='8aker-bgm',want=false;try{want=localStorage.getItem(KEY)==='on';}catch(e){}
-  var ctx,out,bus,verb,timer=null,playing=false,next=0,step=0,bar=0,noiseBuf;
-  var BPM=84,S16=60/BPM/4;
-  // 進行（和弦不受著作權保護）：四種 City Pop／Neo-soul 常見進行輪流
-  var PROGS=[
-    [[53,[0,4,7,11,14]],[52,[0,4,10,15]],[57,[0,3,7,10,14]],[55,[0,3,10,14]],[48,[0,4,10,14,21]]],
-    [[50,[0,3,7,10,14]],[55,[0,4,10,14,21]],[48,[0,4,7,11,14]],[57,[0,3,7,10]]],
-    [[53,[0,4,7,11,16]],[55,[0,4,10,14]],[52,[0,3,7,10,14]],[57,[0,3,7,10,17]]],
-    [[48,[0,4,7,11,14]],[45,[0,3,7,10,14]],[50,[0,3,7,10,14]],[55,[0,5,7,10,14]]]];
-  var prog=PROGS[0],ci=0,barsInChord=0;
-  var mtof=function(m){return 440*Math.pow(2,(m-69)/12);};
-  function build(){
-    ctx=new AC();out=ctx.createGain();out.gain.value=0;
-    var lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;lp.Q.value=.3;
-    var comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=3;
-    bus=ctx.createGain();bus.gain.value=.9;bus.connect(lp);lp.connect(comp);comp.connect(out);out.connect(ctx.destination);
-    // 房間殘響
-    verb=ctx.createConvolver();var len=ctx.sampleRate*2.2,ir=ctx.createBuffer(2,len,ctx.sampleRate);
-    for(var c=0;c<2;c++){var d=ir.getChannelData(c);for(var i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6);}
-    verb.buffer=ir;var vg=ctx.createGain();vg.gain.value=.28;verb.connect(vg);vg.connect(lp);
-    noiseBuf=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);var nd=noiseBuf.getChannelData(0);for(var k=0;k<nd.length;k++)nd[k]=Math.random()*2-1;
-    // 黑膠底噪
-    var cr=ctx.createBufferSource();cr.buffer=noiseBuf;cr.loop=true;var hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=3500;var cg=ctx.createGain();cg.gain.value=.006;cr.connect(hp);hp.connect(cg);cg.connect(bus);cr.start();
-  }
-  function env(g,t,a,peak,dec){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+dec);}
-  function rhodes(m,t,dur,vel){var f=mtof(m),car=ctx.createOscillator(),mod=ctx.createOscillator(),mg=ctx.createGain(),g=ctx.createGain(),pan=ctx.createStereoPanner?ctx.createStereoPanner():null;
-    car.frequency.value=f;mod.frequency.value=f*1.0;mg.gain.setValueAtTime(f*1.6,t);mg.gain.exponentialRampToValueAtTime(f*.08,t+.45);
-    mod.connect(mg);mg.connect(car.frequency);car.connect(g);env(g,t,.008,.05*vel,t+dur);
-    var tr=ctx.createOscillator(),tg=ctx.createGain();tr.frequency.value=4.6;tg.gain.value=.012*vel;tr.connect(tg);tg.connect(g.gain);
-    var dst=pan||g;if(pan){pan.pan.value=(Math.random()-.5)*.5;g.connect(pan);}dst.connect(bus);dst.connect(verb);
-    [car,mod,tr].forEach(function(o){o.start(t);o.stop(t+dur+.05);});}
-  function bass(m,t,dur){var o=ctx.createOscillator(),o2=ctx.createOscillator(),f=ctx.createBiquadFilter(),g=ctx.createGain();o.type='triangle';o.frequency.value=mtof(m);o2.type='sine';o2.frequency.value=mtof(m);
-    f.type='lowpass';f.frequency.value=700;o.connect(f);o2.connect(f);f.connect(g);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.012);g.gain.setTargetAtTime(.08,t+.05,.12);g.gain.setTargetAtTime(0,t+dur,.04);g.connect(bus);
-    o.start(t);o2.start(t);o.stop(t+dur+.3);o2.stop(t+dur+.3);}
-  function kick(t,v){var o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(42,t+.12);env(g,t,.003,.32*v,t+.28);o.connect(g);g.connect(bus);o.start(t);o.stop(t+.3);}
-  function nz(t,dur,v,type,fr,q,wet){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),g=ctx.createGain();n.buffer=noiseBuf;b.type=type;b.frequency.value=fr;b.Q.value=q||.7;env(g,t,.002,v,t+dur);n.connect(b);b.connect(g);g.connect(bus);if(wet)g.connect(verb);n.start(t,Math.random()*.5);n.stop(t+dur+.02);}
-  function snare(t,v){nz(t,.16,.09*v,'bandpass',1900,.8,true);var o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=190;env(g,t,.002,.05*v,t+.08);o.connect(g);g.connect(bus);o.start(t);o.stop(t+.1);}
-  function hat(t,v){nz(t,.045,.035*v,'highpass',7500,.5);}
-  function vibe(m,t){var o=ctx.createOscillator(),g=ctx.createGain(),o2=ctx.createOscillator(),g2=ctx.createGain();o.frequency.value=mtof(m);o2.frequency.value=mtof(m)*4;
-    env(g,t,.004,.045,t+1.3);env(g2,t,.002,.01,t+.25);o.connect(g);o2.connect(g2);g.connect(bus);g.connect(verb);g2.connect(bus);o.start(t);o2.start(t);o.stop(t+1.4);o2.stop(t+.3);}
-  var lastMel=72;
-  function schedule(t,s){ // s：一小節 16 格中的第幾格
-    var swing=(s%2===1)?S16*.28:0,tt=t+swing,ch=prog[ci],root=ch[0],iv=ch[1];
-    // 鼓
-    if(s===0||s===10||(s===7&&Math.random()<.35))kick(tt,s===0?1:.75);
-    if(s===4||s===12)snare(tt,.9);else if(Math.random()<.06&&s%2)snare(tt,.25);
-    if(s%2===0||Math.random()<.25)hat(tt,s%4===0?1:.6);
-    // 貝斯
-    if(s===0)bass(root-12,tt,S16*5.5);
-    if(s===6&&Math.random()<.8)bass(root-12+(Math.random()<.5?7:12),tt,S16*1.6);
-    if(s===14&&Math.random()<.6)bass(root-12+(Math.random()<.5?-1:2),tt,S16*1.4);
-    // 電鋼琴和弦
-    if(s===0||(s===6&&Math.random()<.7)||(s===11&&Math.random()<.4)){var v=s===0?1:.7;iv.forEach(function(x,i){rhodes(root+12+x,tt+i*.012,S16*(s===0?7:4),v*(i?.85:1));});}
-    // 偶爾的鐵琴旋律（和弦音＋五聲音階）
-    if(s%2===0&&Math.random()<.22){var pool=iv.map(function(x){return root+24+x;}).concat([root+24+2,root+24+9]);
-      pool.sort(function(a,b){return Math.abs(a-lastMel)-Math.abs(b-lastMel);});lastMel=pool[Math.floor(Math.random()*Math.min(3,pool.length))];if(lastMel>86)lastMel-=12;vibe(lastMel,tt);}
-  }
-  function tick(){while(next<ctx.currentTime+.15){schedule(next,step);next+=S16;step++;if(step===16){step=0;bar++;barsInChord++;
-      if(barsInChord>=1){barsInChord=0;ci=(ci+1)%prog.length;if(ci===0&&Math.random()<.5)prog=PROGS[Math.floor(Math.random()*PROGS.length)];}}}}
-  function start(){if(!ctx)build();if(ctx.state==='suspended')ctx.resume();if(playing)return;playing=true;next=ctx.currentTime+.08;step=0;
-    out.gain.cancelScheduledValues(ctx.currentTime);out.gain.setValueAtTime(out.gain.value,ctx.currentTime);out.gain.linearRampToValueAtTime(.55,ctx.currentTime+2.5);
-    timer=setInterval(tick,25);tick();paint(true);}
-  function stop(save){if(!playing)return;playing=false;var t=ctx.currentTime;out.gain.cancelScheduledValues(t);out.gain.setValueAtTime(out.gain.value,t);out.gain.linearRampToValueAtTime(0,t+.8);
-    setTimeout(function(){if(!playing){clearInterval(timer);ctx.suspend&&ctx.suspend();}},900);paint(false);}
-  function paint(on){btn.setAttribute('aria-pressed',on?'true':'false');btn.setAttribute('aria-label',on?'背景音樂：播放中（點一下停止）':'背景音樂：關（點一下播放）');}
-  btn.addEventListener('click',function(){want=!playing;try{localStorage.setItem(KEY,want?'on':'off');}catch(e){}want?start():stop();});
-  // 上次有開著：等訪客第一次點擊頁面（瀏覽器規定）就自動接著播
-  if(want){var go=function(e){if(e&&e.target&&e.target.closest&&e.target.closest('#bgmBtn'))return;start();document.removeEventListener('pointerdown',go);document.removeEventListener('keydown',go);};document.addEventListener('pointerdown',go);document.addEventListener('keydown',go);}
-  // 切到別的分頁時暫停，回來再接著播
-  document.addEventListener('visibilitychange',function(){if(!ctx)return;if(document.hidden&&playing){clearInterval(timer);ctx.suspend();}else if(!document.hidden&&playing){ctx.resume();next=ctx.currentTime+.08;timer=setInterval(tick,25);}});
-})();
-</script>
 
 <script is:inline>
 /* 介面音效：全部用 Web Audio 即時合成（不用下載音檔）。滑過＝輕點、按下＝木頭聲、切換＝鈴聲、換頁＝風聲、成功＝和弦。右上角喇叭可關閉，會記住。 */
