@@ -34,6 +34,9 @@ const escH = (x: string) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 // 直排時，兩位以內的數字或英文字母橫躺排成一格（縦中横）
 const tcy = (x: string) => escH(x).replace(/(?<![0-9A-Za-z])([0-9A-Za-z]{1,2})(?![0-9A-Za-z])/g, '<span class="tcy">$1</span>');
 const kanjiYear = String(new Date().getFullYear()).split('').map((c) => '〇一二三四五六七八九'[+c]).join('');
+const igHandle = String((copy as any).instagram_handle || '').replace(/^@/, '').trim();
+const igUrl = /^[A-Za-z0-9._]{1,30}$/.test(igHandle) ? `https://ig.me/m/${igHandle}` : '';
+const aboutPhoto = /^\/(about|works)\/[\w./-]+\.(webp|png|jpe?g)$/i.test(String((copy as any).about_photo || '')) ? (copy as any).about_photo : '';
 const pageData = {
   dirs: pillars.map((p) => ({ id: p.slug, k: p.kanji, n: p.type })),
   entries: all.map((a) => ({ date: ymd(a.e.data.date), dir: a.dir, t: a.e.data.title, url: `/pillars/${a.dir}/${a.e.slug}` })),
@@ -407,6 +410,45 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .inq{padding:20px 16px;margin:36px -4px 0;}
   .frow{grid-template-columns:1fr;}
 }
+/* ── 壱 初次見面：我在做什麼 ── */
+.hero-id{margin-top:18px;font-size:14px;letter-spacing:.06em;color:#D4A24C;}
+.me{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;margin-top:30px;align-items:center;}
+.me.has-photo{grid-template-columns:200px minmax(0,1fr);}
+.me-photo{width:200px;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line);}
+.me-intro{font-family:var(--serif);font-size:clamp(19px,2.2vw,23px);line-height:1.75;color:var(--bone);max-width:30em;}
+.me-name{margin-top:12px;font-size:13.5px;color:var(--ash);max-width:34em;}
+.hats{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:34px;}
+.hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
+.hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
+.hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
+.hat h3{font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.5;}
+.hat p{font-size:13.5px;color:var(--bone-2);margin-top:6px;line-height:1.8;}
+.hat a{display:inline-block;margin-top:10px;font-size:13px;color:var(--gold);}
+.hat a:hover{text-decoration:underline;text-underline-offset:4px;}
+.me-cta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:26px;}
+.ig-btn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 16px;border:1px solid rgba(239,229,214,.3);color:var(--bone);font-size:13.5px;transition:border-color .3s,background .3s;}
+.ig-btn:hover{border-color:var(--gold);background:rgba(212,162,76,.08);}
+.ig-btn span{color:var(--gold);}
+.ig-btn.big{margin-top:14px;min-height:48px;padding:10px 20px;font-size:15px;}
+.ig-mini{font-size:13px;color:var(--bone-2);border-bottom:1px solid var(--line);margin-right:12px;}
+.ig-mini:hover{color:var(--gold);border-color:var(--gold);}
+.s-acts{display:flex;align-items:center;}
+.show{font-size:12.5px;color:var(--bone-2);margin-top:8px;}
+.show b{font-weight:400;color:var(--gold);margin-right:8px;}
+#services .svc{margin-top:28px;padding-top:0;border-top:0;}
+.faq{margin-top:44px;}
+.faq details{border-bottom:1px solid var(--line);padding:14px 0;}
+.faq summary{cursor:pointer;font-family:var(--serif);font-size:16px;list-style:none;display:flex;justify-content:space-between;gap:12px;}
+.faq summary::-webkit-details-marker{display:none;}
+.faq summary::after{content:'+';color:var(--gold);font-size:18px;line-height:1;transition:transform .3s var(--ease);}
+.faq details[open] summary::after{transform:rotate(45deg);}
+.faq details p{font-size:14px;color:var(--bone-2);margin-top:8px;line-height:1.85;}
+.contact{margin-top:44px;}
+.about.end{margin-top:56px;padding-top:36px;border-top:1px solid var(--line);align-items:start;}
+.about.end .motto-card{margin-top:0;border-top:0;padding-top:0;font-size:22px;}
+@media(max-width:900px){.hats{grid-template-columns:1fr;}.me.has-photo{grid-template-columns:120px minmax(0,1fr);gap:18px;}.me-photo{width:120px;}}
+@media(max-width:640px){.me.has-photo{grid-template-columns:1fr;}.me-photo{width:150px;}.s-foot{flex-direction:column;align-items:stretch;}.s-acts{justify-content:space-between;}.ig-btn{width:100%;justify-content:center;}.about.end{grid-template-columns:1fr;gap:28px;}}
+
 .swipe-hint{display:none;font-size:12px;color:var(--ash);margin-top:8px;letter-spacing:.04em;}
 </style>
 
@@ -416,6 +458,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="hero-grid">
       <div>
         <h1 class="motto rv" id="motto" style="--i:0"><span>{copy.motto_line1}</span><span class="l2">{copy.motto_line2}</span></h1>
+        <p class="hero-id rv" style="--i:1">{copy.hero_identity}</p>
         <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>
         <div class="cd rv" style="--i:3"><small>{copy.countdown_label}</small><span class="cd-days num" id="cdD">—</span><small>天</small><span class="cd-clock num" id="cdC">00:00:<b>00</b></span></div>
         <a class="next-rel rv" style="--i:4" href="#chapters" id="nextRel">&nbsp;</a>
@@ -424,9 +467,46 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
+<section class="sec band-wine" id="about" aria-labelledby="a-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Hello</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
+      <div class={`me${aboutPhoto ? ' has-photo' : ''}`}>
+        {aboutPhoto && <img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="林子翔（巴）" loading="lazy" decoding="async" />}
+        <div>
+          <p class="me-intro rv" style="--i:2">{copy.about_intro}</p>
+          <p class="me-name rv" style="--i:3">{copy.about_lede}</p>
+        </div>
+      </div>
+      <ol class="hats">
+        {services.hats.map((h: any, i: number) => (
+          <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p><a href={h.link}>{h.help} →</a></div></li>
+        ))}
+      </ol>
+      <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
+      <div class="me-cta rv" style="--i:7"><a class="btn-gold2" href="#services">看我能幫你的事 →</a>{igUrl && <a class="ig-btn" href={igUrl} target="_blank" rel="noopener"><span aria-hidden="true">◎</span> IG 私訊我</a>}</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="works" aria-labelledby="works-h">
+  <div class="sec-grid">
+    <div class="side" aria-hidden="true"><span class="sn">弐</span><span class="sl"></span><span class="se">Works</span></div>
+    <div>
+      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
+      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
+        {worksData.works.map((w, i) => { return (
+          <a class="work rv" href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品 →</span>}</a>
+        ); })}
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Chapters</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Chapters</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
       <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">單話</button><button aria-pressed="false" data-v="dream">祈願所</button></div>
@@ -474,7 +554,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 <section class="sec band-light" id="journal" aria-labelledby="j-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">弐</span><span class="sl"></span><span class="se">Journal</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Journal</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
       <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
@@ -494,56 +574,31 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   </div>
 </section>
 
-<section class="sec" id="works" aria-labelledby="works-h">
+<section class="sec" id="services" aria-labelledby="s-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Works</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Service</span></div>
     <div>
-      <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
-      <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
-        {worksData.works.map((w, i) => { return (
-          <a class="work rv" href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};--dc:var(--gold)`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品 →</span>}</a>
-        ); })}
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec band-wine" id="about" aria-labelledby="a-h">
-  <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Hello</span></div>
-    <div>
-      <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
-      <div class="about">
-        <div>
-          <p class="q rv" style="--i:2">{copy.about_lede}</p>
-          <p class="rv" style="--i:3">{copy.about_p1}</p>
-          <p class="rv" style="--i:4">{copy.about_p2}</p>
-          <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
-        </div>
-        <aside class="support rv" style="--i:4" id="support">
-          <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
-          <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
-        </aside>
-      </div>
-
-      <div class="svc" id="services">
-        <h3 class="svc-h rv">{services.title}</h3>
-        <p class="svc-lede rv" style="--i:1">{services.lede}</p>
-        <ul class="proof rv" style="--i:2">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
+      <div class="sec-head"><p class="sub rv">{copy.services_sub}</p><h2 id="s-h" class="rv" style="--i:1">{services.title}</h2></div>
+      <div class="svc">
         <div class="scards">
-          {services.services.map((x, i) => (
+          {services.services.map((x: any, i: number) => (
             <article class="scard rv" style={`--i:${i + 2}`} id={`svc-${x.id}`}>
               <div class="s-top"><span class="prov">{x.provider}</span>{x.badge && <span class="badge">{x.badge}</span>}</div>
               <h4>{x.name}<small lang="ja">{x.name_jp}</small></h4>
               <p class="for">給：{x.for}</p>
               <p class="sdesc">{x.desc}</p>
-              <ul class="sitems">{x.items.map((t) => <li>{t}</li>)}</ul>
+              <ul class="sitems">{x.items.map((t: string) => <li>{t}</li>)}</ul>
               {x.excludes.length > 0 && <p class="sex"><b>不包含</b>{x.excludes.join('、')}</p>}
-              <div class="s-foot"><span class="price">{x.price}</span><a class="btn-gold2" href="#inquiry" data-svc={x.id}>填寫需求 →</a></div>
+              {x.how && <p class="show"><b>怎麼開始</b>{x.how}</p>}
+              <div class="s-foot"><span class="price">{x.price}</span><span class="s-acts">{igUrl && <a class="ig-mini" href={igUrl} target="_blank" rel="noopener">IG 私訊</a>}<a class="btn-gold2" href="#inquiry" data-svc={x.id}>填寫需求 →</a></span></div>
             </article>
           ))}
         </div>
-        <p class="ai-note rv" id="svc-ai"><span>操</span>{services.ai_note} <a href="#works">看作品 →</a></p>
+
+        <div class="faq rv">
+          <h3 class="svc-h2">常見問題</h3>
+          {services.faq.map((f: any) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+        </div>
 
         {stays.length > 0 && (
           <div class="stays">
@@ -556,29 +611,49 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           </div>
         )}
 
+
+        <div class="contact rv">
+          <h3 class="svc-h2">{services.contact_title}</h3><p class="inq-note">{services.contact_note}</p>
+          {igUrl && <a class="ig-btn big" href={igUrl} target="_blank" rel="noopener"><span aria-hidden="true">◎</span> 在 Instagram 私訊我　@{igHandle}</a>}
+        </div>
+
         <form class="inq rv" id="inquiry" novalidate>
           <h3 class="svc-h2">{services.form_title}</h3>
           <p class="inq-note">{services.form_note}</p>
           <div class="frow">
             <label>想詢問的服務<select name="service" required>
-              <option value="owner">海外屋主代管（TRS Living Studio）</option>
+              <option value="property">在日本置產陪跑（佰花堂）</option>
+              <option value="owner">海外屋主代管（佰花堂）</option>
               <option value="omakase">大阪おまかせ導覽（佰花堂）</option>
               <option value="interpret">單次隨行翻譯（佰花堂）</option>
-              <option value="ai">一人團隊 AI 工具</option>
+              <option value="ai">一人團隊 AI 工具（TRS Living Studio）</option>
               <option value="other">其他・合作・祈願所的幫忙</option>
             </select></label>
             <label>怎麼稱呼你<input name="name" required maxlength="80" autocomplete="name"></label>
           </div>
           <div class="frow">
-            <label>聯絡方式<input name="contact" required maxlength="160" placeholder="Email 或 LINE ID" autocomplete="email"></label>
+            <label>聯絡方式<input name="contact" required maxlength="160" placeholder="Email 或 Instagram 帳號" autocomplete="email"></label>
             <label>日期或期間<input name="dates" maxlength="120" placeholder="例如：2027 年 3 月下旬"></label>
           </div>
-          <label>人數或物件概況<input name="people" maxlength="40" placeholder="例如：2 大 1 小／大阪市內 2LDK"></label>
-          <label>想請我們幫忙的事<textarea name="message" required maxlength="3000" rows="5" placeholder="越具體越好：想去的地方、在意的事、屋況或需要處理的狀況"></textarea></label>
+          <div class="frow">
+            <label>人數或物件概況<input name="people" maxlength="40" placeholder="例如：2 大 1 小／大阪市內 2LDK"></label>
+            <label>你從哪裡知道我？（選填）<select name="source"><option value="">—</option><option>朋友介紹</option><option>Instagram</option><option>LINE 群組</option><option>Facebook</option><option>搜尋</option><option>其他</option></select></label>
+          </div>
+                    <label>想請我們幫忙的事<textarea name="message" required maxlength="3000" rows="5" placeholder="越具體越好：想去的地方、在意的事、屋況或需要處理的狀況"></textarea></label>
           <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <p class="consent">送出即表示你同意我們依<a href="/privacy/">隱私權政策</a>使用這些資料回覆你。</p>
           <div class="fsend"><button type="submit" class="btn-ink">送出需求</button><span class="fmsg" id="inqMsg" role="status"></span></div>
         </form>
+
+        <div class="about end">
+          <div>
+          <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
+          </div>
+        <aside class="support rv" style="--i:4" id="support">
+          <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
+          <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
+        </aside>
+        </div>
       </div>
     </div>
   </div>

@@ -24,14 +24,15 @@ import services from '../data/services.json';
 const glyphs = [...new Set([
   '壱弐参肆伍陸序結巻零・、。', 'したことは残す。済んだことは手放す。',
   ...pillars.flatMap((p) => [p.kanji, p.titleJp]),
-  ...services.services.map((x) => x.name_jp), 'お品書き松竹梅分鏡祈願所',
-  'StatusChaptersJournalWorksBodyHelloDirections', 'BEFOREAFTNo.VIDSCRNUBLG', '0123456789',
+  ...services.services.map((x) => x.name_jp), 'お品書き松竹梅分鏡祈願所築歩',
+  'StatusChaptersJournalWorksBodyHelloDirections', 'BEFOREAFTNo.VIDSCRNUBLGService', '0123456789',
 ].join(''))].join('');
 const nav = [
+  { href: '/#about', label: '初次見面' },
+  { href: '/#works', label: '有點樣子' },
   { href: '/#chapters', label: '39・連載中' },
   { href: '/#journal', label: '日常紀錄' },
-  { href: '/#works', label: '有點樣子' },
-  { href: '/#about', label: '初次見面' },
+  { href: '/#services', label: '我能幫你' },
 ];
 ---
 <!DOCTYPE html>
@@ -45,7 +46,12 @@ const nav = [
 <meta property="og:url" content={canonical}>
 <meta property="og:type" content={type}>
 <meta property="og:locale" content="zh_TW">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content={`${SITE}/og.jpg`}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="8AKER零・做過的留下，做完的放下。住在大阪的台灣人">
+<meta name="twitter:image" content={`${SITE}/og.jpg`}>
 <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <script type="application/ld+json" set:html={jsonld}></script>

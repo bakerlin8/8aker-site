@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
   if (!(await owner(req))) return reply({ error: 'unauthorized' }, 401);
   try {
     if (req.method === 'GET') {
-      const rows = await db('inquiries?select=id,created_at,service,name,contact,dates,people,message,lang,status,note&order=created_at.desc&limit=200');
+      const rows = await db('inquiries?select=id,created_at,service,name,contact,dates,people,message,lang,source,status,note&order=created_at.desc&limit=200');
       return reply({ items: rows });
     }
     const b = await req.json().catch(() => ({}));

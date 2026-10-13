@@ -2,7 +2,7 @@
 import { db, sha256, json, SITE } from './shared.ts';
 const CORS = { 'Access-Control-Allow-Origin': SITE, 'Access-Control-Allow-Headers': 'content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS', Vary: 'Origin' };
 const reply = (b: unknown, s = 200) => json(b, s, CORS);
-const SERVICES = ['omakase', 'interpret', 'owner', 'ai', 'other'];
+const SERVICES = ['property', 'owner', 'omakase', 'interpret', 'ai', 'other'];
 const clip = (v: unknown, n: number) => String(v ?? '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, n);
 
 Deno.serve(async (req) => {
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   const row = {
     service: SERVICES.includes(b.service) ? b.service : 'other',
     name: clip(b.name, 80), contact: clip(b.contact, 160), dates: clip(b.dates, 120),
-    people: clip(b.people, 40), message: clip(b.message, 3000), lang: clip(b.lang, 10),
+    people: clip(b.people, 40), message: clip(b.message, 3000), lang: clip(b.lang, 10), source: clip(b.source, 60) || null,
   };
   if (!row.name || !row.contact || row.message.length < 5) return reply({ error: '請填寫稱呼、聯絡方式和需求內容' }, 400);
   const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim();
