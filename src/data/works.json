@@ -9,7 +9,12 @@
       "saved": "—",
       "service": "ai",
       "why": "想有一個地方，把做過的事好好留下來，而不是散落在各個社群裡。",
-      "result": "現在打開 Studio 就能自己發文、改內容，不用再找人幫忙。"
+      "result": "現在打開 Studio 就能自己發文、改內容，不用再找人幫忙。",
+      "slug": "site",
+      "intro": "",
+      "images": [],
+      "video": "",
+      "link": ""
     },
     {
       "dir": "operate",
@@ -20,7 +25,12 @@
       "saved": "—",
       "service": "owner",
       "why": "房客入住前，我總在 LINE 上一張一張追護照、手打名簿。",
-      "result": "房客出發前就在手機上填好名簿、上傳護照、簽名，我只要確認一次。"
+      "result": "房客出發前就在手機上填好名簿、上傳護照、簽名，我只要確認一次。",
+      "slug": "checkin",
+      "intro": "",
+      "images": [],
+      "video": "",
+      "link": ""
     },
     {
       "dir": "strengthen",
@@ -31,7 +41,12 @@
       "saved": "—",
       "service": "ai",
       "why": "運動、語言、工作的紀錄散在不同 App，看不出自己到底有沒有在進步。",
-      "result": "打開一個畫面，就知道這週做了多少、今天該做什麼。"
+      "result": "打開一個畫面，就知道這週做了多少、今天該做什麼。",
+      "slug": "dashboard",
+      "intro": "",
+      "images": [],
+      "video": "",
+      "link": ""
     }
   ]
 }

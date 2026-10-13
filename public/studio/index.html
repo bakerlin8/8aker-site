@@ -514,7 +514,7 @@ function toast(msg, type = 'ok') {
 /* ══════════════════════════ FRONTMATTER (articles) ══════════════════════════ */
 function parseFrontmatter(raw) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, body: raw };
+  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, work: '', body: raw };
   const fm = {};
   m[1].split('\n').forEach(line => {
     const idx = line.indexOf(':');
@@ -530,12 +530,13 @@ function parseFrontmatter(raw) {
       fm[key] = val.replace(/^"|"$/g, '');
     }
   });
-  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: fm.draft || false, body: m[2].trim() };
+  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: fm.draft || false, work: fm.work || '', body: m[2].trim() };
 }
 
 function serializeFrontmatter(fm) {
   const tagsStr = '[' + fm.tags.map(t => `"${t}"`).join(', ') + ']';
-  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.draft}\n---\n\n${fm.body}\n`;
+  const workLine = /^[a-z0-9-]+$/.test(fm.work || '') ? `work: "${fm.work}"\n` : '';
+  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.draft}\n${workLine}---\n\n${fm.body}\n`;
 }
 
 function slugify(title) {
@@ -689,34 +690,102 @@ async function loadChapters(pick) {
 }
 
 /* ══════════════════════════ WORKS VIEW ══════════════════════════ */
+let WORKS_CACHE = null;
+async function worksOptions() {
+  if (!WORKS_CACHE) { const f = await ghGetFile('src/data/works.json'); WORKS_CACHE = f ? (JSON.parse(f.content).works || []).filter(w => /^[a-z0-9-]+$/.test(w.slug || '')) : []; }
+  return WORKS_CACHE;
+}
+async function ghPutBinary(path, b64, message) {
+  const res = await ghFetch(`/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message, content: b64, branch: BRANCH }) });
+  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || `upload ${path} failed`); }
+  return res.json();
+}
+// 上傳前在瀏覽器裡壓縮：最長邊 1800px、轉成 WebP，避免拖慢網站
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!/^image\/(png|jpe?g|webp|gif|heic|heif)$/i.test(file.type)) return reject(new Error('只接受圖片檔'));
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight)), w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k);
+      const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
+      const out = c.toDataURL('image/webp', 0.82);
+      if (!out.startsWith('data:image/webp')) return reject(new Error('這個瀏覽器無法轉檔，請改用 Chrome 或 Safari 最新版'));
+      const b64 = out.split(',')[1]; if (b64.length > 3.8e6) return reject(new Error('圖片壓縮後還是太大，請先裁小一點'));
+      resolve(b64);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('讀不到這張圖片（HEIC 請先轉成 JPG）')); };
+    img.src = url;
+  });
+}
+const VIDEO_RE = /^https:\/\/((www\.|m\.)?(youtube\.com|youtu\.be|vimeo\.com)\/|[^\s]+\.(mp4|webm)(\?|$))/i;
 async function loadWorks() {
   showView('works');
   const form = document.getElementById('worksForm');
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
   const file = await ghGetFile('src/data/works.json');
   const data = JSON.parse(file.content);
-  const dirOpts = sel => Object.entries(KANJI_BY_DIR).map(([d, k]) => `<option value="${d}" ${d === sel ? 'selected' : ''}>${k}・${PILLARS[d].jp}</option>`).join('');
+  data.works.forEach(w => { w.images = (w.images || []).map(x => typeof x === 'string' ? { src: x, caption: '' } : x); });
   function collect() {
-    form.querySelectorAll('[data-w]').forEach(el => { data.works[+el.dataset.w][el.dataset.key] = el.value; });
+    form.querySelectorAll('[data-w]').forEach(el => { data.works[+el.dataset.w][el.dataset.key] = el.value.trim ? el.value : el.value; });
+    form.querySelectorAll('[data-cap]').forEach(el => { const [i, j] = el.dataset.cap.split(':').map(Number); data.works[i].images[j].caption = el.value; });
   }
+  const IN = 'width:100%';
   function render() {
-    form.innerHTML = data.works.map((w, i) => `
+    form.innerHTML = `<div class="field-hint" style="margin-bottom:16px">每件作品都有自己的介紹頁（網址 8aker0.com/works/代號/）。日常紀錄在編輯時選「屬於哪個作品」，就會自動列進該作品的製作紀錄。</div>` + data.works.map((w, i) => `
       <div style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><span class="field-label" style="margin:0">成果 ${i + 1}</span>
-          <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">移除</button></span></div>
-        <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
-        <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
-        <div class="field"><label class="field-label">一句話說明</label><textarea rows="2" data-w="${i}" data-key="desc">${escapeHtml(w.desc)}</textarea></div>
-        <div class="field"><label class="field-label">相關服務（作品卡下方會出現連結）</label><select data-w="${i}" data-key="service" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)">${[['','（不連結）'],['owner','海外屋主代管'],['omakase','大阪おまかせ導覽'],['ai','AI 工具']].map(([v,t]) => `<option value="${v}" ${v === (w.service || '') ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
-        <div class="field"><label class="field-label">為什麼做（當時卡住的狀況，一句話）</label><textarea rows="2" data-w="${i}" data-key="why">${escapeHtml(w.why || '')}</textarea></div>
-        <div class="field"><label class="field-label">做出來之後（現在變成怎樣，一句話）</label><textarea rows="2" data-w="${i}" data-key="result">${escapeHtml(w.result || '')}</textarea></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px"><span class="field-label" style="margin:0">No.${String(i + 1).padStart(2, '0')}</span>
+          <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">從列表移除</button></span></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+          <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
+          <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
+          <div class="field"><label class="field-label">網址代號（英文小寫、數字、-）</label><input type="text" data-w="${i}" data-key="slug" value="${escapeAttr(w.slug || '')}" placeholder="例：checkin"></div>
+        </div>
+        <div class="field"><label class="field-label">BEFORE・為什麼做（當時卡住的狀況，一句話）</label><textarea rows="2" data-w="${i}" data-key="why">${escapeHtml(w.why || '')}</textarea></div>
+        <div class="field"><label class="field-label">AFTER・做出來之後（現在變成怎樣，一句話）</label><textarea rows="2" data-w="${i}" data-key="result">${escapeHtml(w.result || '')}</textarea></div>
+        <div class="field"><label class="field-label">作品頁的簡短介紹（選填）</label><textarea rows="3" data-w="${i}" data-key="intro">${escapeHtml(w.intro || '')}</textarea></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <div class="field"><label class="field-label">影片連結（YouTube／Vimeo，選填）</label><input type="text" data-w="${i}" data-key="video" value="${escapeAttr(w.video || '')}" placeholder="https://youtu.be/…"></div>
+          <div class="field"><label class="field-label">工具網址（有公開才填，會出現「打開看看」）</label><input type="text" data-w="${i}" data-key="link" value="${escapeAttr(w.link || '')}" placeholder="https://…"></div>
+        </div>
+        <div class="field"><label class="field-label">截圖（第一張會當作品卡的縮圖）</label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${(w.images || []).map((im, j) => `
+            <div style="border:1px solid var(--border);padding:6px;background:var(--warm-white)"><img src="${escapeAttr(im.src)}" alt="" style="width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#ddd">
+              <input type="text" data-cap="${i}:${j}" value="${escapeAttr(im.caption || '')}" placeholder="說明（選填）" style="margin-top:6px;font-size:13px;padding:6px">
+              <div style="display:flex;gap:4px;margin-top:6px"><button class="btn btn-ghost" style="padding:2px 8px;font-size:12px" data-imup="${i}:${j}" ${j === 0 ? 'disabled' : ''}>←</button><button class="btn btn-ghost" style="padding:2px 8px;font-size:12px" data-imdel="${i}:${j}">從作品拿掉</button></div></div>`).join('')}
+            <label style="border:1px dashed var(--border);display:grid;place-items:center;min-height:110px;cursor:pointer;font-size:13px;color:var(--text-muted,#7a716a);text-align:center;padding:8px">＋ 上傳截圖<br><small>可一次選多張</small><input type="file" accept="image/*" multiple data-upload="${i}" style="display:none"></label>
+          </div>
+          <div class="field-hint">⚠️ 截圖前請用假資料示範，或先遮掉房客姓名、護照、簽名等個資。上傳後記得按下方「儲存變更」。</div>
+        </div>
       </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addWork">＋ 新增一件成果</button><div class="spacer"></div><button class="btn btn-primary" id="saveWorks">儲存變更</button></div>`;
-    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定從首頁移除這件成果嗎？儲存後才會生效。')) return; collect(); data.works.splice(+b.dataset.del, 1); render(); }));
+    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定從「有點樣子」移除這件成果嗎？儲存後才會生效（已上傳的截圖檔案會保留）。')) return; collect(); data.works.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.works[i - 1], data.works[i]] = [data.works[i], data.works[i - 1]]; render(); }));
-    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.unshift({ dir: 'conjure', date: '', title: '', desc: '', why: '', result: '', service: '' }); render(); });
+    form.querySelectorAll('[data-imup]').forEach(b => b.addEventListener('click', () => { collect(); const [i, j] = b.dataset.imup.split(':').map(Number); const a = data.works[i].images; [a[j - 1], a[j]] = [a[j], a[j - 1]]; render(); }));
+    form.querySelectorAll('[data-imdel]').forEach(b => b.addEventListener('click', () => { collect(); const [i, j] = b.dataset.imdel.split(':').map(Number); data.works[i].images.splice(j, 1); render(); }));
+    form.querySelectorAll('[data-upload]').forEach(inp => inp.addEventListener('change', async () => {
+      collect(); const i = +inp.dataset.upload, w = data.works[i];
+      if (!/^[a-z0-9-]+$/.test(w.slug || '')) { toast('請先填「網址代號」（英文小寫、數字、-）再上傳', 'err'); inp.value = ''; return; }
+      const files = [...inp.files]; let ok = 0;
+      for (const f of files) {
+        try { toast(`上傳中… ${f.name}`); const b64 = await compressImage(f); const path = `public/works/${w.slug}/${Date.now()}-${Math.random().toString(36).slice(2, 6)}.webp`;
+          await ghPutBinary(path, b64, `Upload screenshot for ${w.slug} via Studio`); w.images.push({ src: path.replace(/^public/, ''), caption: '' }); ok++; }
+        catch (e) { toast(`${f.name}：${e.message}`, 'err'); }
+      }
+      if (ok) { toast(`已上傳 ${ok} 張，記得按「儲存變更」`); render(); }
+    }));
+    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.push({ date: '', title: '', desc: '', why: '', result: '', slug: '', intro: '', images: [], video: '', link: '' }); render(); });
     document.getElementById('saveWorks').addEventListener('click', async () => {
+      collect();
+      const slugs = data.works.map(w => (w.slug || '').trim());
+      for (const [k, w] of data.works.entries()) {
+        w.slug = (w.slug || '').trim(); w.video = (w.video || '').trim(); w.link = (w.link || '').trim();
+        if (!w.title.trim()) return toast(`No.${k + 1} 還沒填名稱`, 'err');
+        if (!/^[a-z0-9-]+$/.test(w.slug)) return toast(`「${w.title}」的網址代號只能用英文小寫、數字和 -`, 'err');
+        if (slugs.indexOf(w.slug) !== k) return toast(`網址代號「${w.slug}」重複了`, 'err');
+        if (w.video && !VIDEO_RE.test(w.video)) return toast(`「${w.title}」的影片連結看不懂，請貼 YouTube 或 Vimeo 網址`, 'err');
+        if (w.link && !/^https:\/\//.test(w.link)) return toast(`「${w.title}」的工具網址要用 https:// 開頭`, 'err');
+      }
       const btn = document.getElementById('saveWorks'); btn.disabled = true; btn.textContent = '儲存中…';
-      try { collect(); const r = await ghPutFile('src/data/works.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update works via Studio'); file.sha = r.content.sha; toast('已儲存，網站將在約一分鐘內更新'); }
+      try { const r = await ghPutFile('src/data/works.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update works via Studio'); file.sha = r.content.sha; WORKS_CACHE = null; toast('已儲存，網站將在約一分鐘內更新'); }
       catch (e) { toast('儲存失敗：' + e.message, 'err'); }
       btn.disabled = false; btn.textContent = '儲存變更';
     });
@@ -961,6 +1030,7 @@ function renderArticleForm(fm) {
       <input type="text" id="f-tag-input" placeholder="輸入標籤後按 Enter">
       <div class="tag-row" id="f-tags"></div>
     </div>
+    <div class="field"><label class="field-label">屬於哪個作品（選填：選了會自動出現在該作品頁的「製作紀錄」）</label><select id="f-work" style="${SEL_STYLE}"><option value="">（不屬於任何作品）</option></select></div>
     <div class="field field-checkbox"><input type="checkbox" id="f-draft" ${fm.draft ? 'checked' : ''}><label for="f-draft">先存草稿（不公開顯示）</label></div>
     <div class="field">
       <label class="field-label">正文（Markdown）</label>
@@ -975,6 +1045,7 @@ function renderArticleForm(fm) {
     </div>
   `;
 
+  worksOptions().then(list => { const sel = document.getElementById('f-work'); if (!sel) return; sel.innerHTML = '<option value="">（不屬於任何作品）</option>' + list.map(w => `<option value="${escapeAttr(w.slug)}" ${w.slug === fm.work ? 'selected' : ''}>${escapeHtml(w.title)}</option>`).join('') + (fm.work && !list.some(w => w.slug === fm.work) ? `<option value="${escapeAttr(fm.work)}" selected>${escapeHtml(fm.work)}（已不在作品列表）</option>` : ''); }).catch(() => {});
   let tags = [...fm.tags];
   const tagsWrap = document.getElementById('f-tags');
   function renderTags() {
@@ -1009,6 +1080,7 @@ function renderArticleForm(fm) {
         excerpt: document.getElementById('f-excerpt').value.trim(),
         tags,
         draft: document.getElementById('f-draft').checked,
+        work: (document.getElementById('f-work') || {}).value || '',
         body: document.getElementById('f-body').value,
       };
       const content = serializeFrontmatter(newFm);

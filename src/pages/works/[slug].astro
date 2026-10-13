@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import worksData from '../../data/works.json';
+import { safeImg, safeLink, videoEmbed, entriesForWork } from '../../data/work-utils';
+
+export async function getStaticPaths() {
+  const list = (worksData.works as any[]).filter((w) => /^[a-z0-9-]+$/.test(w.slug || ''));
+  return list.map((w) => ({ params: { slug: w.slug }, props: { w, no: (worksData.works as any[]).indexOf(w) + 1 } }));
+}
+const { w, no } = Astro.props as any;
+const imgs: string[] = (w.images || []).map((x: any) => (typeof x === 'string' ? x : x?.src)).map(safeImg).filter(Boolean);
+const caps: string[] = (w.images || []).map((x: any) => (typeof x === 'string' ? '' : x?.caption || ''));
+const vid = videoEmbed(w.video || '');
+const link = safeLink(w.link || '');
+const log = await entriesForWork(w.slug);
+const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
+const NO = String(no).padStart(2, '0');
+const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
+const url = `${SITE}/works/${w.slug}/`;
+const desc = w.result || w.desc || '';
+const schema = [
+  { '@type': 'CreativeWork', '@id': `${url}#work`, name: w.title, description: desc, creator: { '@id': `${SITE}/#person` }, url, inLanguage: 'zh-Hant-TW', ...(imgs[0] ? { image: imgs[0].startsWith('/') ? SITE + imgs[0] : imgs[0] } : {}) },
+  { '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首頁', item: `${SITE}/` },
+    { '@type': 'ListItem', position: 2, name: '有點樣子', item: `${SITE}/#works` },
+    { '@type': 'ListItem', position: 3, name: w.title, item: url } ] },
+];
+---
+<BaseLayout title={`${w.title} — 有點樣子 — 8AKER零`} description={desc} schema={schema} type="article">
+<style is:global>
+.wh{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 56px;}
+.wh-in{max-width:880px;margin:0 auto;position:relative;}
+.wh .no{position:absolute;right:-20px;top:-70px;font-family:var(--latin);font-size:220px;line-height:1;color:#D4A24C;opacity:.07;pointer-events:none;}
+.wh .crumb{font-size:13px;color:#86707A;display:flex;gap:10px;flex-wrap:wrap;}
+.wh .crumb a{border-bottom:1px solid rgba(239,229,214,.15);transition:color .3s,border-color .3s;}
+.wh .crumb a:hover{color:#EFE5D6;border-color:#D4A24C;}
+.wh .meta{margin-top:22px;font-size:12.5px;letter-spacing:.06em;color:#86707A;display:flex;gap:14px;}
+.wh .meta b{color:#D4A24C;font-weight:400;}
+.wh h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.2vw,42px);line-height:1.4;margin-top:10px;color:#EBD3A8;}
+.wh .ba{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:30px;}
+.wh .wq{margin:0;padding-left:16px;border-left:2px solid rgba(134,112,122,.55);font-family:var(--serif);font-size:17px;line-height:1.85;color:#B9A89E;}
+.wh .wq small{display:block;font-family:var(--latin);font-size:12.5px;letter-spacing:.24em;color:#86707A;margin-bottom:4px;}
+.wh .wq.af{border-left-color:#D4A24C;color:#EFE5D6;}
+.wh .wq.af small{color:#D4A24C;}
+.wh .open{display:inline-flex;align-items:center;gap:8px;margin-top:30px;padding:11px 20px;background:#D4A24C;color:#1C0F14;font-size:14px;transition:background .3s;}
+.wh .open:hover{background:#E6BA6A;}
+.wb{padding:56px 40px 96px;background:var(--night);color:var(--bone);}
+.wb-in{max-width:880px;margin:0 auto;}
+.wb h2{font-family:var(--serif);font-weight:500;font-size:21px;margin:0 0 18px;display:flex;align-items:baseline;gap:12px;}
+.wb h2 small{font-family:var(--latin);font-size:12.5px;letter-spacing:.22em;color:var(--gold);}
+.wb section+section{margin-top:56px;}
+.vid{position:relative;aspect-ratio:16/9;background:#000;border:1px solid var(--line);}
+.vid iframe,.vid video{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.gal{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;overscroll-behavior-x:contain;}
+.gal figure{flex:0 0 min(620px,86%);margin:0;scroll-snap-align:start;}
+.gal button{display:block;width:100%;padding:0;border:1px solid var(--line);background:var(--night-2);cursor:zoom-in;}
+.gal img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;}
+.gal figcaption{font-size:13px;color:var(--bone-2);margin-top:8px;}
+.gal.one figure{flex-basis:100%;}
+.intro{font-family:var(--serif);font-size:17px;line-height:2;color:var(--bone);white-space:pre-line;}
+.log{list-style:none;margin:0;padding:0;border-left:1px solid var(--line);}
+.log li{position:relative;padding:0 0 22px 24px;}
+.log li::before{content:'';position:absolute;left:-4px;top:9px;width:7px;height:7px;border-radius:50%;background:var(--gold);}
+.log time{font-size:12.5px;color:var(--ash);letter-spacing:.04em;}
+.log a{display:block;font-family:var(--serif);font-size:17px;line-height:1.55;margin-top:2px;transition:color .3s;}
+.log a:hover{color:var(--gold);}
+.log p{font-size:13.5px;color:var(--bone-2);margin-top:4px;line-height:1.75;}
+.empty{font-size:14px;color:var(--bone-2);line-height:1.9;}
+.back{display:inline-block;margin-top:64px;font-size:14px;color:var(--gold);border-bottom:1px solid currentColor;}
+dialog.lb{border:0;padding:0;background:transparent;max-width:96vw;max-height:94vh;}
+dialog.lb::backdrop{background:rgba(10,5,7,.88);}
+dialog.lb img{display:block;max-width:96vw;max-height:88vh;width:auto;height:auto;}
+dialog.lb p{color:#EFE5D6;font-size:13px;text-align:center;margin-top:8px;}
+dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;background:rgba(239,229,214,.12);color:#EFE5D6;font-size:20px;cursor:pointer;}
+@media(max-width:720px){.wh{padding:96px 20px 44px;}.wh .ba{grid-template-columns:1fr;gap:18px;}.wb{padding:44px 20px 80px;}.wh .wq{font-size:16px;}}
+</style>
+<header class="wh">
+  <div class="wh-in">
+    <span class="no" aria-hidden="true">{NO}</span>
+    <nav class="crumb" aria-label="麵包屑"><a href="/">首頁</a><span>/</span><a href="/#works">有點樣子</a></nav>
+    <div class="meta"><b>No.{NO}</b><span>{w.date}</span></div>
+    <h1>{w.title}</h1>
+    {(w.why || w.result) && <div class="ba">
+      {w.why && <blockquote class="wq"><small>BEFORE</small>{w.why}</blockquote>}
+      {w.result && <blockquote class="wq af"><small>AFTER</small>{w.result}</blockquote>}
+    </div>}
+    {link && <a class="open" href={link} target="_blank" rel="noopener">打開看看 ↗</a>}
+  </div>
+</header>
+<main class="wb">
+  <div class="wb-in">
+    {vid && <section aria-label="影片"><h2>影片<small>VIDEO</small></h2>
+      <div class="vid">{vid.kind === 'iframe'
+        ? <iframe src={vid.src} title={`${w.title} 影片`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        : <video src={vid.src} controls preload="metadata" playsinline></video>}</div></section>}
+    {imgs.length > 0 && <section aria-label="畫面"><h2>畫面<small>SCREENS</small></h2>
+      <div class={`gal${imgs.length === 1 ? ' one' : ''}`}>{imgs.map((src, i) => (
+        <figure><button type="button" data-lb={src} data-cap={caps[i] || ''} aria-label={`放大第 ${i + 1} 張畫面`}><img src={src} alt={caps[i] || `${w.title} 畫面 ${i + 1}`} loading={i ? 'lazy' : 'eager'} decoding="async" /></button>{caps[i] && <figcaption>{caps[i]}</figcaption>}</figure>))}</div></section>}
+    {w.intro && <section aria-label="介紹"><h2>這是什麼<small>ABOUT</small></h2><p class="intro">{w.intro}</p></section>}
+    <section aria-label="製作紀錄"><h2>製作紀錄<small>LOG</small></h2>
+      {log.length > 0
+        ? <ol class="log">{log.map((e) => <li><time datetime={e.date.toISOString().slice(0, 10)}>{dot(e.date)}</time><a href={e.url}>{e.title}</a>{e.excerpt && <p>{e.excerpt}</p>}</li>)}</ol>
+        : <p class="empty">做這個作品時寫下的日常紀錄，會自動整理在這裡。</p>}
+    </section>
+    <a class="back" href="/#works">← 回到有點樣子</a>
+  </div>
+</main>
+<dialog class="lb" id="lb" aria-label="放大畫面"><button class="x" type="button" aria-label="關閉">×</button><img alt="" /><p></p></dialog>
+<script>
+(function(){var d=document.getElementById('lb') as HTMLDialogElement|null;if(!d||!d.showModal)return;var im=d.querySelector('img') as HTMLImageElement,cp=d.querySelector('p') as HTMLElement;
+  document.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('[data-lb]') as HTMLElement|null;if(!b)return;im.src=b.dataset.lb||'';im.alt=b.dataset.cap||'';cp.textContent=b.dataset.cap||'';d.showModal();});
+  d.addEventListener('click',function(e){if(e.target===d||(e.target as HTMLElement).closest('.x'))d.close();});})();
+</script>
+</BaseLayout>

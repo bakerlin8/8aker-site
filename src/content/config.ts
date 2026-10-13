@@ -8,6 +8,7 @@ const pillarSchema = z.object({
   excerpt: z.string().optional(),
   tags: z.array(z.string()).optional(),
   draft: z.boolean().optional().default(false), // set true to hide from the site until you're ready
+  work: z.string().optional(), // 屬於「有點樣子」哪一件作品（works.json 的 slug），作品頁會自動列為製作紀錄
 });
 
 export const collections = {

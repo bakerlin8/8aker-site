@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import { pillars } from '../data/pillars';
 import { chapterList } from '../data/chapter-utils';
+import worksData from '../data/works.json';
 
 export async function GET({ site }: { site: URL }) {
   const base = (site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
@@ -13,6 +14,7 @@ export async function GET({ site }: { site: URL }) {
   }
   urls.push({ loc: `${base}/chapters/`, priority: '0.7' });
   for (const c of chapterList().list) urls.push({ loc: `${base}/chapters/${c.no}/`, lastmod: c.state === 'done' ? c.date : undefined, priority: '0.6' });
+  for (const w of worksData.works as any[]) if (/^[a-z0-9-]+$/.test(w.slug || '')) urls.push({ loc: `${base}/works/${w.slug}/`, priority: '0.7' });
   urls.push({ loc: `${base}/privacy/`, priority: '0.2' });
   const body = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map((u) => `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}<priority>${u.priority}</priority></url>`)

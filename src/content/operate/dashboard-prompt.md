@@ -3,6 +3,7 @@ title: "用 Claude 做出自己的 Personal Dashboard，附完整 Prompt"
 date: 2026-09-16
 excerpt: "從零開始，一步步教你怎麼跟 AI 對話，做出一個串接 Strava、可以自動同步運動數據的個人網站。"
 tags: ["Claude", "工作流"]
+work: "dashboard"
 ---
 
 這篇記錄我怎麼從一句話開始，跟 Claude 一步步把「Better Than Baker」這個個人 Dashboard 做出來。

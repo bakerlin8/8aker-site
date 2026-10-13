@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { pillars, pillarBySlug } from '../../../data/pillars';
+import worksData from '../../../data/works.json';
 
 export async function getStaticPaths() {
   const paths: any[] = [];
@@ -15,6 +16,7 @@ const { pillar } = Astro.params;
 const { entry, prev, next } = Astro.props as any;
 const meta = pillarBySlug(pillar!)!;
 const { Content } = await render(entry);
+const ofWork = entry.data.work ? (worksData.works as any[]).find((x) => x.slug === entry.data.work && /^[a-z0-9-]+$/.test(x.slug)) : null;
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
 const url = `${SITE}/pillars/${meta.slug}/${entry.slug}/`;
@@ -57,6 +59,11 @@ const schema = [
 .prose img{max-width:100%;height:auto;display:block;margin:1.6em 0;}
 .prose code{font-size:.88em;background:var(--night-2);padding:.1em .4em;}
 .prose pre{overflow-x:auto;background:var(--night-2);padding:16px;margin:0 0 1.3em;font-size:14px;line-height:1.7;}
+.ofwork{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 16px;margin-top:48px;padding:18px 22px;border:1px solid var(--line);border-left:2px solid var(--gold);background:var(--night-2);transition:border-color .3s;}
+.ofwork small{grid-column:1/-1;font-size:12px;letter-spacing:.12em;color:var(--ash);}
+.ofwork span{font-family:var(--serif);font-size:17px;}
+.ofwork i{font-style:normal;font-size:13px;color:var(--gold);}
+.ofwork:hover{border-color:rgba(212,162,76,.5);}
 .pn{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:64px;border:1px solid var(--line);}
 .pn a,.pn span{padding:20px;min-height:96px;display:flex;flex-direction:column;gap:6px;transition:background .3s;}
 .pn a:hover{background:var(--night-2);}
@@ -80,6 +87,7 @@ const schema = [
 <article class="read band-light">
   <div class="read-in">
     <div class="prose"><Content /></div>
+    {ofWork && <a class="ofwork" href={`/works/${ofWork.slug}/`}><small>這篇屬於作品</small><span>{ofWork.title}</span><i>看作品 →</i></a>}
     <nav class="pn" aria-label="同方向的上一篇與下一篇">
       {prev ? <a href={`/pillars/${meta.slug}/${prev.slug}`}><small>← 上一篇</small><b>{prev.data.title}</b></a> : <span><small>← 上一篇</small><b style="color:var(--ash)">這是第一篇</b></span>}
       {next ? <a class="nx" href={`/pillars/${meta.slug}/${next.slug}`}><small>下一篇 →</small><b>{next.data.title}</b></a> : <span class="nx"><small>下一篇 →</small><b style="color:var(--ash)">還沒寫</b></span>}
