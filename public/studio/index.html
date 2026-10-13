@@ -709,12 +709,12 @@ async function loadWorks() {
         <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
         <div class="field"><label class="field-label">一句話說明</label><textarea rows="2" data-w="${i}" data-key="desc">${escapeHtml(w.desc)}</textarea></div>
         <div class="field"><label class="field-label">相關服務（作品卡下方會出現連結）</label><select data-w="${i}" data-key="service" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--warm-white)">${[['','（不連結）'],['owner','海外屋主代管'],['omakase','大阪おまかせ導覽'],['ai','AI 工具']].map(([v,t]) => `<option value="${v}" ${v === (w.service || '') ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="field"><label class="field-label">花費小時</label><input type="text" data-w="${i}" data-key="spent" value="${escapeAttr(w.spent)}"></div>
-        <div class="field"><label class="field-label">每月省下（小時）</label><input type="text" data-w="${i}" data-key="saved" value="${escapeAttr(w.saved)}"></div></div>
+        <div class="field"><label class="field-label">為什麼做（當時卡住的狀況，一句話）</label><textarea rows="2" data-w="${i}" data-key="why">${escapeHtml(w.why || '')}</textarea></div>
+        <div class="field"><label class="field-label">做出來之後（現在變成怎樣，一句話）</label><textarea rows="2" data-w="${i}" data-key="result">${escapeHtml(w.result || '')}</textarea></div>
       </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addWork">＋ 新增一件成果</button><div class="spacer"></div><button class="btn btn-primary" id="saveWorks">儲存變更</button></div>`;
     form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定從首頁移除這件成果嗎？儲存後才會生效。')) return; collect(); data.works.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.works[i - 1], data.works[i]] = [data.works[i], data.works[i - 1]]; render(); }));
-    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.unshift({ dir: 'conjure', date: '', title: '', desc: '', spent: '—', saved: '—', service: '' }); render(); });
+    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.unshift({ dir: 'conjure', date: '', title: '', desc: '', why: '', result: '', service: '' }); render(); });
     document.getElementById('saveWorks').addEventListener('click', async () => {
       const btn = document.getElementById('saveWorks'); btn.disabled = true; btn.textContent = '儲存中…';
       try { collect(); const r = await ghPutFile('src/data/works.json', JSON.stringify(data, null, 2) + '\n', file.sha, 'Update works via Studio'); file.sha = r.content.sha; toast('已儲存，網站將在約一分鐘內更新'); }

@@ -225,6 +225,10 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .work .meta span:first-child{color:var(--dc);}
 .work h3{font-family:var(--serif);font-weight:500;font-size:20px;margin-top:18px;line-height:1.45;}
 .work p{font-size:13.5px;color:var(--bone-2);margin-top:8px;}
+.work .wy{margin-top:14px;line-height:1.75;}
+.work .wy small{display:block;font-size:11.5px;letter-spacing:.12em;color:var(--dc);margin-bottom:2px;}
+.work .wy+.wy small{color:var(--gold);}
+.work .wsvc{margin-top:auto;padding-top:18px;}
 .work .nums{display:flex;gap:24px;margin-top:auto;padding-top:20px;}
 .work .nums b{display:block;font-size:24px;font-weight:300;}
 .work .nums small{font-size:11.5px;color:var(--ash);}
@@ -476,7 +480,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="sec-head"><p class="sub rv">{copy.works_sub}</p><h2 id="works-h" class="rv" style="--i:1">{copy.works_title}</h2></div>
       <div class="strip" tabindex="0" aria-label="成果列表，可左右捲動">
         {worksData.works.map((w, i) => { const p = pillars.find((x) => x.slug === w.dir)!; return (
-          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3><p>{w.desc}</p><div class="nums"><div><b class="num">{w.spent}</b><small>花費小時</small></div><div><b class="num">{w.saved}</b><small>每月省下</small></div></div>{(w as any).service && <a class="wsvc" href={`#svc-${(w as any).service}`}>相關服務 →</a>}</article>
+          <article class="work rv" style={`--i:${i + 2};--dc:var(--c-${w.dir})`} data-k={p.kanji}><div class="meta"><span>{p.type}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><p class="wy"><small>為什麼做</small>{(w as any).why}</p>{(w as any).result && <p class="wy"><small>做出來之後</small>{(w as any).result}</p>}</> : <p>{w.desc}</p>}<a class="wsvc" href="#inquiry" data-svc={(w as any).service || 'other'}>你也有類似的狀況？聊聊 →</a></article>
         ); })}
       </div>
     </div>
