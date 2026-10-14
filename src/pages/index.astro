@@ -759,7 +759,13 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       else{TR[n2].length=0;var an2=t*1.6+n2/5*6.2832;pp=[a[0]+Math.cos(an2)*22*dpr,a[1]+Math.sin(an2)*9*dpr,.55];sz=.55;lab=null;al=Math.max(0,Math.min(1,(u-G1-.3)/.6));}
       if(u<G1)tail(n2,pp,c);dot(pp,c,lab,al,sz);}
     if(u>G1-.2&&u<G1+1.4){var gl=Math.sin(Math.min(1,(u-G1+.2)/1.6)*Math.PI);ctx.beginPath();ctx.arc(a[0],a[1],(9+12*gl)*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,'+(.3*gl).toFixed(3)+')';ctx.fill();}
-    if(u>G1&&u<G1+1.1){var ph=(u-G1)/1.1;ctx.beginPath();ctx.arc(a[0],a[1],ph*100*dpr,0,6.2832);ctx.strokeStyle='rgba(243,217,160,'+(.6*(1-ph)).toFixed(3)+')';ctx.lineWidth=2*dpr;ctx.stroke();}}
+    if(u>G1&&u<G1+1.1){var ph=(u-G1)/1.1;ctx.beginPath();ctx.arc(a[0],a[1],ph*100*dpr,0,6.2832);ctx.strokeStyle='rgba(243,217,160,'+(.6*(1-ph)).toFixed(3)+')';ctx.lineWidth=2*dpr;ctx.stroke();}
+    /* 集結之後，在「今」旁邊浮出現在的歲數（到小數點兩位） */
+    if(u>G1+1.2){var ta=Math.min(1,(u-G1-1.2)/1.2),ag=(full+frac).toFixed(2),fx=a[0]+30*dpr,fy=a[1]-14*dpr-6*dpr*(1-ta);
+      ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.font='500 '+(26*dpr)+'px "Cormorant Garamond",Georgia,serif';var w=ctx.measureText(ag).width,tw=w+22*dpr;
+      if(fx+tw>W-14*dpr)fx=a[0]-30*dpr-tw;if(fx<14*dpr)fx=14*dpr;
+      ctx.fillStyle='rgba(243,217,160,'+ta.toFixed(3)+')';ctx.fillText(ag,fx,fy);
+      ctx.font=(12*dpr)+'px "Noto Serif TC","Noto Serif JP",serif';ctx.fillStyle='rgba(185,168,158,'+ta.toFixed(3)+')';ctx.fillText('歲',fx+w+5*dpr,fy);}}
   function tip(k){var a=P(RX[full+1][k],RY[full+1][k],0),x=a[0],yy=a[1];
     for(var q=0;q<3;q++){var ph=((t*.55)+q/3)%1;ctx.beginPath();ctx.arc(x,yy,(4+ph*28)*dpr,0,6.2832);ctx.strokeStyle='rgba(236,196,118,'+((1-ph)*.55).toFixed(3)+')';ctx.lineWidth=dpr;ctx.stroke();}
     ctx.beginPath();ctx.arc(x,yy,9*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.18)';ctx.fill();
