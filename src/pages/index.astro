@@ -8,6 +8,8 @@ import worksData from '../data/works.json';
 import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
+import { buildRing } from '../data/ring';
+const endRing = buildRing(copy.birth_date);
 
 const all = (await Promise.all(
   pillars.map(async (p) => (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).map((e: any) => ({ dir: p.slug, e })))
@@ -443,6 +445,14 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hats{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:34px;}
 .hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
 .hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
+.end-ring{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+.end-ring svg{width:120px;height:120px;overflow:visible;}
+.end-ring path{fill:none;stroke-width:.45;}
+.end-ring path.tw{stroke:#C9707E;opacity:.22;}
+.end-ring path.jp{stroke:#D4A24C;opacity:.26;}
+.end-ring path.now{stroke:#E6BA6A;stroke-width:1.1;opacity:1;filter:drop-shadow(0 0 3px rgba(230,186,106,.75));}
+.end-ring .dot{fill:#F3D9A0;filter:drop-shadow(0 0 3px #F3D9A0);}
+.end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
 .nextsec{display:flex;flex-direction:column;align-items:center;gap:6px;width:max-content;margin:72px auto -40px;color:var(--ash);transition:color .3s;}
 .nextsec:hover{color:var(--gold);}
 .nextsec .nk{font-family:var(--jp),var(--serif);font-size:18px;color:var(--gold);line-height:1;}
@@ -665,6 +675,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"></div>
     <div class="about end">
       <div>
+          <div class="end-ring rv" style="--i:3" aria-hidden="true"><svg viewBox="0 0 100 100">{endRing.paths.map((p) => <path d={p.d} class={p.cls} />)}<circle cx={endRing.lx} cy={endRing.ly} r="1.8" class="dot" /></svg><span>第 {endRing.age} 圈</span></div>
           {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
           <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
       </div>
