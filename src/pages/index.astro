@@ -518,7 +518,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>
         <div class="cd rv" style="--i:3"><span class="cd-pre" id="cdP">{(copy.ring_label || '第 {n} 圈，還有').replace('{n}', '39')}</span><span class="cd-days num" id="cdD">—</span><span class="cd-unit">{copy.ring_unit || '天長完'}</span></div>
         <p class="cd-sub rv" style="--i:3">{copy.ring_sub || '每一天，都是這一圈的一條細線'}</p>
-        <a class="next-rel rv" style="--i:4" href="#chapters" id="nextRel">&nbsp;</a>
       </div>
     </div>
   </div>
@@ -772,7 +771,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var md=function(r){return (+r.date.slice(5,7))+'.'+r.date.slice(8);},label=function(r){return r.final?'第一卷':'第 '+r.no+' 話';};
   var esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');};
   var nr=list[Math.min(nextIdx,list.length-1)];
-  document.getElementById('nextRel').innerHTML=(nr.no===0?'新連載・':'連載中・')+label(nr)+'・'+(+nr.date.slice(5,7))+' 月 '+(+nr.date.slice(8))+' 日刊出 <b>'+(nr.days<=0?'今天':nr.days+' 天後')+'</b>';
+  var nrEl=document.getElementById('nextRel');if(nrEl)nrEl.innerHTML=(nr.no===0?'新連載・':'連載中・')+label(nr)+'・'+(+nr.date.slice(5,7))+' 月 '+(+nr.date.slice(8))+' 日刊出 <b>'+(nr.days<=0?'今天':nr.days+' 天後')+'</b>';
   var Tr=document.getElementById('track'),Md=document.getElementById('mdetail');
   Tr.innerHTML=list.map(function(r,i){return '<li><button class="node '+r.state+(r.final?' final':'')+'" data-i="'+i+'" aria-label="'+label(r)+'，'+md(r)+'"><span class="dot">'+(r.final?'巻':'')+'</span><span class="r">'+label(r)+'</span><span class="d">'+md(r)+'</span></button></li>';}).join('')
     +'<span class="fill" style="width:calc((100% - 64px) * '+Math.max(0,nextIdx-.5)/(list.length-1)+')"></span>';
