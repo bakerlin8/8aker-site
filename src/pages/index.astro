@@ -446,24 +446,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
 .hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
 .end-ring{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
-.end-ring svg{width:120px;height:120px;overflow:visible;}
-.end-ring path{fill:none;stroke-width:.45;}
-.end-ring path.tw{stroke:#C9707E;opacity:.22;}
-.end-ring path.jp{stroke:#D4A24C;opacity:.26;}
-.end-ring path.now{stroke:#E6BA6A;stroke-width:1.1;opacity:1;filter:drop-shadow(0 0 3px rgba(230,186,106,.75));}
-.end-ring .dot{fill:#F3D9A0;filter:drop-shadow(0 0 3px #F3D9A0);}
+.end-ring canvas{display:block;width:230px;height:170px;margin-left:-20px;}
 .end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
-.nextsec{display:block;width:60px;margin:64px auto -40px;color:var(--gold);opacity:.85;transition:opacity .3s,transform .4s var(--ease);}
-.nextsec:hover{opacity:1;transform:translateY(3px);}
-.nextsec svg{display:block;width:60px;height:64px;overflow:visible;}
-.nextsec path{fill:none;stroke:currentColor;stroke-linecap:round;}
-.nextsec .a0{stroke-width:1.2;opacity:.9;}
-.nextsec .a1{stroke-width:.8;opacity:.22;}
-.nextsec .a2{stroke-width:.8;opacity:.4;}
-.nextsec .seed{fill:#F3D9A0;filter:drop-shadow(0 0 3px #E6BA6A);offset-path:path('M26 2C44 12 52 32 50 58');offset-rotate:0deg;animation:seedfall 2.8s var(--ease) infinite;}
-@keyframes seedfall{0%{offset-distance:0%;opacity:0}15%{opacity:1}80%{opacity:1}100%{offset-distance:100%;opacity:0}}
-@media(prefers-reduced-motion:reduce){.nextsec .seed{animation:none;offset-distance:100%;}}
-@media(max-width:720px){.nextsec{margin:48px auto -24px;}}
 .svc-head{margin-top:44px;display:flex;align-items:baseline;gap:14px;}
 .svc-head small{font-family:var(--latin);font-size:13px;letter-spacing:.3em;color:var(--gold);}
 .svc-head h3{font-family:var(--serif);font-weight:500;font-size:20px;}
@@ -572,7 +556,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
     </div>
   </div>
-  <a class="nextsec" href="#works" aria-label="往下：有點樣子"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec" id="works" aria-labelledby="works-h">
@@ -596,7 +579,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
-  <a class="nextsec" href="#chapters" aria-label="往下：39・連載中"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
@@ -646,7 +628,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
-  <a class="nextsec" href="#journal" aria-label="往下：日常紀錄"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec band-light" id="journal" aria-labelledby="j-h">
@@ -669,7 +650,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
-  <a class="nextsec" href="#support-end" aria-label="往下：寫在最後"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec closing" id="support-end" aria-label="支持這個連載">
@@ -677,7 +657,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"></div>
     <div class="about end">
       <div>
-          <div class="end-ring rv" style="--i:3" aria-hidden="true"><svg viewBox="0 0 100 100">{endRing.paths.map((p) => <path d={p.d} class={p.cls} />)}<circle cx={endRing.lx} cy={endRing.ly} r="1.8" class="dot" /></svg><span>第 {endRing.age} 圈</span></div>
+          <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas><span>第 {endRing.age} 圈</span></div>
           {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
           <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
       </div>
@@ -773,6 +753,35 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   /* 等字型與第一屏排好再開始長，避開開場最忙的那一秒 */
   if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
 
+
+/* 結尾小年輪：跟首頁同一套 3D 木頭切片，慢慢轉；只有今年這一圈（第 N 圈）亮起來，其他圈都調淡 */
+(function(){var cv=document.getElementById('endRing');if(!cv||!cv.getContext)return;var ctx=cv.getContext('2d'),W=0,H=0,dpr=1,t=0,last=0,raf=0,run=false;
+  var b=D.birth.split('-').map(Number),bd=function(y){return new Date(y+'-'+pad(b[1])+'-'+pad(b[2])+'T00:00:00+09:00').getTime();};
+  var now=Date.now(),y=new Date(now+9*3600e3).getUTCFullYear();if(bd(y)>now)y--;var full=Math.max(1,y-b[0]);
+  var MOVE=D.move||30,N=140,LEAN=-0.62,RX=[],RY=[],rr=[0],acc=0,sd=[1.7,4.1],i,j;
+  for(i=1;i<=full;i++){acc+=.85+.4*((Math.sin(i*12.9898)*43758.5453)%1+1)%1;rr.push(acc);}
+  for(i=1;i<=full;i++){var f=rr[i]/acc,r=.04+f*.96,k=Math.max(0,i-MOVE)/10,ox=-.08+.088*k,oy=.05-.064*k,xs=new Float32Array(N),ys=new Float32Array(N);
+    for(j=0;j<N;j++){var a=-Math.PI/2+j/N*6.2832,w=1+.03*Math.sin(a*3+sd[0])+.018*Math.sin(a*5+sd[1]+f*2)+.009*Math.sin(a*11+f*4),bias=i>MOVE?1+.18*k*Math.cos(a-LEAN):1,rad=r*w*bias;
+      xs[j]=ox+Math.cos(a)*rad;ys[j]=oy+Math.sin(a)*rad;}RX[i]=xs;RY[i]=ys;}
+  var CX,CY,S,cY,sY,cT,sT,TH=.16,mx=0,my=0,smx=0,smy=0;
+  addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;},{passive:true});
+  function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
+  function ring(i,z){var xs=RX[i],ys=RY[i],a=P(xs[0],ys[0],z||0);ctx.beginPath();ctx.moveTo(a[0],a[1]);for(var j=1;j<N;j++){a=P(xs[j],ys[j],z||0);ctx.lineTo(a[0],a[1]);}ctx.closePath();}
+  function size(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);S=Math.min(W*.34,H*.5);CX=W*.5;CY=H*.44;}
+  function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+t*.06+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
+    ctx.clearRect(0,0,W,H);ctx.lineJoin='round';var xs=RX[full],ys=RY[full],a;
+    ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
+    var g=ctx.createLinearGradient(0,CY-S*.3,0,CY+S*.7);g.addColorStop(0,'#3a2016');g.addColorStop(1,'#1d0f0b');ctx.fillStyle=g;ctx.fill();
+    ring(full,0);var fg=ctx.createRadialGradient(CX,CY,0,CX,CY,S*1.1);fg.addColorStop(0,'rgba(58,26,30,.95)');fg.addColorStop(1,'rgba(40,18,22,.95)');ctx.fillStyle=fg;ctx.fill();
+    for(i=1;i<full;i++){ctx.strokeStyle=i<=MOVE?'rgba(196,140,150,.13)':'rgba(212,162,76,.18)';ctx.lineWidth=.8*dpr;ring(i,0);ctx.stroke();}
+    var br=.5+.5*Math.sin(t*1.4);ring(full,0);ctx.strokeStyle='rgba(212,162,76,'+(.16+.12*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
+    ctx.strokeStyle='rgba(240,204,130,.98)';ctx.lineWidth=1.8*dpr;ctx.stroke();
+    var kk=Math.floor(N*.12),p=P(RX[full][kk],RY[full][kk],0);ctx.beginPath();ctx.arc(p[0],p[1],7*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.22)';ctx.fill();
+    ctx.beginPath();ctx.arc(p[0],p[1],2.8*dpr,0,6.2832);ctx.fillStyle='rgb(243,217,160)';ctx.fill();}
+  var odd=false;function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;t+=dt;odd=!odd;if(odd)frame();raf=requestAnimationFrame(loop);}
+  size();t=2;frame();addEventListener('resize',function(){size();frame();});
+  if(RM)return;
+  new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;cancelAnimationFrame(raf);if(run){last=0;raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv);})();
 
 /* 有點樣子：唱盤（目前那件在中間，其他沿著弧線轉到兩側；唱片從封套滑出、轉動） */
 (function(){var D=document.getElementById('deck');if(!D)return;var C=[].slice.call(D.querySelectorAll('.work')),T=[].slice.call(document.querySelectorAll('#wTicks [data-go]')),NOW=document.getElementById('wNow'),VL=null,n=C.length,cur=0;
