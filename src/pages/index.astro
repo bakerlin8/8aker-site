@@ -299,6 +299,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .support p{font-size:13.5px;color:#5B4B4E;margin-top:8px;}
 .support .r{display:flex;align-items:baseline;gap:10px;margin-top:18px;flex-wrap:wrap;}
 .support .r b{font-size:30px;font-weight:400;}
+.support .tw{margin-top:20px;padding-top:16px;border-top:1px solid rgba(28,15,20,.14);}
+.support .tw p{margin-top:0;color:#1C0F14;}
+.support .tw b{font-weight:600;}
+.support .tw a{display:inline-block;margin-top:8px;font-size:13.5px;color:#1C0F14;border-bottom:1px solid #D4A24C;padding-bottom:1px;transition:color .3s;}
+.support .tw a:hover{color:#8A5A1E;}
+.support .tw small{display:block;margin-top:10px;font-size:12px;line-height:1.7;color:#7A6A6C;}
 .btn-ink{position:relative;overflow:hidden;margin-left:auto;background:#1C0F14;color:#EFE5D6;padding:10px 20px;font-size:13.5px;transition:background .3s;}
 .btn-ink::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(212,162,76,.35),transparent);transform:skewX(-20deg);transition:left .7s var(--ease);}
 .btn-ink:hover{background:#3D0F1A;}
@@ -647,6 +653,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
           <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
+          {igUrl && <div class="tw">
+            <p><span aria-hidden="true">🇹🇼</span> 在台灣？<b>單筆或每月</b>都可以用銀行轉帳支持，金額隨意。</p>
+            <a href={igUrl} target="_blank" rel="noopener">私訊 @{igHandle} 索取轉帳資訊 ↗</a>
+            <small>轉帳資訊只會由 @{igHandle} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。</small>
+          </div>}
         </aside>
     </div>
   </div>
