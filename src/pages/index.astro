@@ -696,7 +696,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
             <div class="end-cd"><small>第 <b id="ecN">{endRing.age}</b> 圈，還有</small>
               <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span></p>
               <small>長完這一圈</small></div></div>
-          {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
       </div>
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
@@ -839,7 +838,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
   function ring(i,z){var xs=RX[i],ys=RY[i],a=P(xs[0],ys[0],z||0);ctx.beginPath();ctx.moveTo(a[0],a[1]);for(var j=1;j<N;j++){a=P(xs[j],ys[j],z||0);ctx.lineTo(a[0],a[1]);}ctx.closePath();}
   function size(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);S=Math.min(W*.34,H*.5);CX=W*.5;CY=H*.44;}
-  function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
+  function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+t*.06+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
     ctx.clearRect(0,0,W,H);ctx.lineJoin='round';var xs=RX[full],ys=RY[full],a;
     ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
     var g=ctx.createLinearGradient(0,CY-S*.3,0,CY+S*.7);g.addColorStop(0,'#3a2016');g.addColorStop(1,'#1d0f0b');ctx.fillStyle=g;ctx.fill();
