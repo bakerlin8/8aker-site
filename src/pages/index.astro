@@ -449,6 +449,29 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .end-ring{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
 .end-ring canvas{display:block;width:230px;height:170px;margin-left:-20px;}
 .end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
+
+/* —— 手機排版優化（2026-10-14）—— */
+.tale p,.story-echo,.sec-head .sub,.motto-card,.hat p{text-wrap:pretty;}
+.story-echo b,.tale .tale-end,.about.end .motto-card{word-break:keep-all;}
+.jlist h3,#journal h3,.work h3{text-wrap:pretty;}
+@media(max-width:720px){
+  .tale{padding-left:18px;font-size:16px;line-height:2;margin-top:26px;}
+  .tale p+p{margin-top:1.2em;}
+  .tale .tale-end{font-size:19px;}
+  .svc-head{margin-top:36px;}
+  .hat{padding:18px 16px;grid-template-columns:36px minmax(0,1fr);}
+  .proof{grid-template-columns:1fr;}
+  .proof li{display:flex;align-items:baseline;gap:14px;padding:12px 16px;}
+  .proof b{min-width:64px;}
+  .proof small{font-size:12.5px;}
+  .wn-ticks button{min-height:44px;padding:0 6px;}
+  .support .tw a{padding:8px 0 3px;}
+  .end-ring{flex-direction:column;align-items:flex-start;gap:4px;margin-bottom:16px;}
+  .end-ring canvas{width:100%;max-width:320px;height:190px;margin-left:-8px;}
+  .about.end .motto-card{font-size:18px;}
+  .story-echo{font-size:14.5px;}
+  .story-echo b{font-size:16px;}
+}
 .svc-head{margin-top:44px;display:flex;align-items:baseline;gap:14px;}
 .svc-head small{font-family:var(--latin);font-size:13px;letter-spacing:.3em;color:var(--gold);}
 .svc-head h3{font-family:var(--serif);font-weight:500;font-size:20px;}
