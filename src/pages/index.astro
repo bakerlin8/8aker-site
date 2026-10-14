@@ -372,6 +372,10 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 /* ── 手機版（≤640px）：版面收斂、觸控目標加大、橫向內容加提示 ── */
 @media(max-width:640px){
   .hero-in{padding:96px 20px 32px;}
+  .hero{min-height:0;}
+  .hero{min-height:62vh;min-height:62svh;align-items:center;}
+  .hero .hero-in{padding:84px 20px 56px;}
+  .hero h1.motto,.hero .hero-id{text-shadow:0 2px 18px rgba(28,15,20,.85),0 0 2px rgba(28,15,20,.6);}
   h1.motto{font-size:clamp(32px,9.4vw,40px);}
   .hero-lede{font-size:14.5px;margin-top:16px;}
   .cd{margin-top:22px;gap:10px;}
@@ -447,6 +451,15 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
 .hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
 .end-ring{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+.end-cd{display:flex;flex-direction:column;gap:6px;}
+.end-cd small{font-size:13px;letter-spacing:.12em;color:var(--bone-2);}
+.end-cd small b{font-weight:500;color:var(--gold);}
+.ecd{display:flex;gap:14px;align-items:baseline;margin:0;}
+.ecd span{display:inline-flex;align-items:baseline;gap:4px;}
+.ecd b{font-family:var(--latin),var(--serif);font-weight:500;font-size:40px;line-height:1;color:var(--bone);font-variant-numeric:tabular-nums lining-nums;min-width:1.2ch;}
+.ecd span:first-child b{color:var(--gold);}
+.ecd i{font-style:normal;font-size:13px;color:var(--ash);}
+@media(max-width:720px){.ecd b{font-size:34px;}.ecd{gap:12px;}}
 .end-ring canvas{display:block;width:230px;height:170px;margin-left:-20px;}
 .end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
 
@@ -554,8 +567,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         <h1 class="motto rv" id="motto" style="--i:0"><span>{copy.motto_line1}</span><span class="l2">{copy.motto_line2}</span></h1>
         <p class="hero-id rv" style="--i:1">{copy.hero_identity}</p>
         {copy.hero_lede && <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>}
-        <div class="cd rv" style="--i:3"><span class="cd-pre" id="cdP">{(copy.ring_label || '第 {n} 圈，還有').replace('{n}', '39')}</span><span class="cd-days num" id="cdD">—</span><span class="cd-unit">{copy.ring_unit || '天長完'}</span></div>
-        {copy.ring_sub && <p class="cd-sub rv" style="--i:3">{copy.ring_sub}</p>}
       </div>
     </div>
   </div>
@@ -681,9 +692,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"></div>
     <div class="about end">
       <div>
-          <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas><span>第 {endRing.age} 圈</span></div>
+          <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas>
+            <div class="end-cd"><small>第 <b id="ecN">{endRing.age}</b> 圈，還有</small>
+              <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span></p>
+              <small>長完這一圈</small></div></div>
           {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
-          <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}{copy.motto_ja && <small lang="ja">{copy.motto_ja}</small>}</p>
       </div>
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
@@ -735,7 +748,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   /* 3D 木頭切片：年輪刻在一片斜放、有厚度的木頭上，非常慢地轉；滑鼠移動時微微傾斜 */
   var CX=0,CY=0,S=1,YAW=0,TILT=1.0,mx=0,my=0,smx=0,smy=0,TH=.13;
   addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;},{passive:true});
-  function geom(){var wide=W>900*dpr;if(wide){S=Math.min(W*.34,H*.56);CX=W*.5;CY=H*.6;}else{S=Math.min(W*.42,H*.26);CX=W*.5;CY=H*.76;}}
+  function geom(){var wide=W>900*dpr,phone=W<=720*dpr;if(wide){S=Math.min(W*.34,H*.56);CX=W*.5;CY=H*.6;}else if(phone){S=Math.min(W*.46,H*.4);CX=W*.5;var hg=document.querySelector('.hero-grid'),hr=hg?hg.getBoundingClientRect():null,cr=cv.getBoundingClientRect(),mid=hr?((hr.top+hr.bottom)/2-cr.top)*dpr:H*.5;CY=mid+S*.12;}else{S=Math.min(W*.42,H*.26);CX=W*.5;CY=H*.76;}}
   var cY=1,sY=0,cT=1,sT=0;
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
   function path(c,i,p,z){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p)),a=P(xs[0],ys[0],z||0);c.beginPath();c.moveTo(a[0],a[1]);for(var j=1;j<=n;j++){var k=j%N;a=P(xs[k],ys[k],z||0);c.lineTo(a[0],a[1]);}}
@@ -773,7 +786,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     ctx.beginPath();ctx.arc(x,y,4.4*dpr*s,0,6.2832);ctx.fillStyle='rgba(255,246,228,'+al+')';ctx.fill();
     if(k&&s>.6){ctx.font=(13*dpr)+'px "Noto Serif TC","Noto Serif JP",serif';ctx.textAlign='center';ctx.fillStyle='rgba('+c+','+(.9*al)+')';ctx.fillText(k,x,y-19*dpr*s);}}
   function tail(n,p,c){var q=TR[n];q.push([p[0],p[1]]);if(q.length>24)q.shift();for(var m=1;m<q.length;m++){var al=m/q.length;ctx.beginPath();ctx.moveTo(q[m-1][0],q[m-1][1]);ctx.lineTo(q[m][0],q[m][1]);ctx.strokeStyle='rgba('+c+','+(.45*al).toFixed(3)+')';ctx.lineWidth=(1+2.2*al)*dpr;ctx.lineCap='round';ctx.stroke();}}
-  function orbs(u){if(u<0)return;var o=full+1,k=Math.floor(N*frac)%N,a=P(RX[o][k],RY[o][k],0),G0=6,G1=8.2;
+  function orbs(u){if(u<0)return;var o=full+1,k=Math.floor(N*frac)%N,a=P(RX[o][k],RY[o][k],0),G0=3,G1=5.2;
     if(u>G1&&u<G1+3){var dd=(u-G1)*15,fd=1-(u-G1)/3;
       for(var n=0;n<5;n++){var c0=OB[n].slice(0,3).join(','),ctr=o-dd+n*1.6;for(var m=1;m<=o;m++){var off=Math.abs(m-ctr);if(off<1.2){ctx.strokeStyle='rgba('+c0+','+((1-off/1.2)*.9*fd).toFixed(3)+')';ctx.lineWidth=(1.4+(1-off/1.2)*1.6)*dpr;path(ctx,m,1,0);ctx.closePath();ctx.stroke();}}}}
     for(var n2=0;n2<5;n2++){var c=OB[n2].slice(0,3).join(','),lab=OB[n2][3],pp,sz=1,al=1;
@@ -804,6 +817,13 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   /* 等字型與第一屏排好再開始長，避開開場最忙的那一秒 */
   if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
 
+
+/* 結尾倒數：距離下一個生日（這一圈長完）還有幾天、幾時、幾分，每 20 秒更新 */
+(function(){var eD=document.getElementById('ecD'),eH=document.getElementById('ecH'),eM=document.getElementById('ecM'),eN=document.getElementById('ecN');if(!eD||!D.birth)return;
+  var b=D.birth.split('-').map(Number),bd=function(y){return new Date(y+'-'+pad(b[1])+'-'+pad(b[2])+'T00:00:00+09:00').getTime();};
+  function tk(){var now=Date.now(),y=new Date(now+9*3600e3).getUTCFullYear();if(bd(y)>now)y--;var r=Math.max(0,bd(y+1)-now);
+    eN.textContent=y-b[0];eD.textContent=Math.floor(r/DAY);eH.textContent=pad(Math.floor(r%DAY/36e5));eM.textContent=pad(Math.floor(r%36e5/6e4));}
+  tk();setInterval(tk,20000);})();
 
 /* 結尾小年輪：跟首頁同一套 3D 木頭切片，慢慢轉；只有今年這一圈（第 N 圈）亮起來，其他圈都調淡 */
 (function(){var cv=document.getElementById('endRing');if(!cv||!cv.getContext)return;var ctx=cv.getContext('2d'),W=0,H=0,dpr=1,t=0,last=0,raf=0,run=false;
