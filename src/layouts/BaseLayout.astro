@@ -1,7 +1,7 @@
 ---
 import copy from '../data/site-copy.json';
 export interface Props { title?: string; description?: string; schema?: any[]; type?: string; }
-const { title = `${copy.site_name} — ${copy.motto_line1}${copy.motto_line2}`, description = (copy as any).site_description || copy.hero_lede, schema = [], type = 'website' } = Astro.props;
+const { title = `${copy.site_name} — ${copy.motto_line1}，${copy.motto_line2}`, description = (copy as any).site_description || copy.hero_lede, schema = [], type = 'website' } = Astro.props;
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, SITE + '/').href;
 // Site-wide identity: the same person and site on every page, so search and AI engines can connect them.
@@ -171,7 +171,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
   html footer.site-foot{padding:28px 20px calc(env(safe-area-inset-bottom,0px) + 88px);gap:10px 18px;}
   html footer.site-foot .sf-motto{margin:0;flex-basis:auto;}
   html footer.site-foot{flex-direction:column;align-items:center;text-align:center;}
-  html footer.site-foot .sf-l,html footer.site-foot .sf-links{justify-content:center;}
+  html footer.site-foot .sf-l,html footer.site-foot .sf-links{justify-content:center;margin-left:0;margin-right:0;}
   .sec-grid{grid-template-columns:minmax(0,1fr);gap:14px;}
   .side{flex-direction:row;}
   .sn{font-size:30px;}
@@ -187,7 +187,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 footer.site-foot{padding:32px max(40px,calc((100% - 1160px)/2)) 44px;background:#1C0F14;border-top:1px solid rgba(239,229,214,.08);display:flex;gap:24px;flex-wrap:wrap;font-size:12.5px;color:#86707A;}
 footer.site-foot .sf-l{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;}
 footer.site-foot .sf-name{font-family:var(--latin),var(--serif);letter-spacing:.2em;color:#B9A89E;}
-footer.site-foot .sf-links{display:flex;gap:18px;flex-wrap:wrap;}
+footer.site-foot .sf-links{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;margin-right:56px;}
 footer.site-foot .sf-motto{margin-left:auto;font-family:var(--serif);color:#B9A89E;}
 @media(max-width:720px){footer.site-foot{align-items:center;}footer.site-foot a{display:inline-block;padding:10px 0;}}
 
@@ -219,7 +219,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
 
 <main><slot /></main>
 
-<footer class="site-foot"><div class="sf-l"><span class="sf-name">{copy.site_name}</span><span>© 2026 林子翔・大阪</span></div><nav class="sf-links" aria-label="頁尾"><a href="/chat/">有空聊聊</a><a href="/#support">支持贊助</a>{copy.instagram_handle && <a href={`https://www.instagram.com/${copy.instagram_handle}/`} target="_blank" rel="noopener">Instagram</a>}<a href="/privacy/">隱私權政策</a></nav><span class="sf-motto">{copy.motto_line1}{copy.motto_line2}</span></footer>
+<footer class="site-foot"><div class="sf-l"><span class="sf-name">{copy.site_name}</span><span>© 2026 林子翔・大阪</span></div><nav class="sf-links" aria-label="頁尾"><a href="/chat/">有空聊聊</a><a href="/#support">支持贊助</a>{copy.instagram_handle && <a href={`https://www.instagram.com/${copy.instagram_handle}/`} target="_blank" rel="noopener">Instagram</a>}<a href="/privacy/">隱私權政策</a></nav></footer>
 
 <script is:inline>
 /* 介面音效：全部用 Web Audio 即時合成（不用下載音檔）。滑過＝輕點、按下＝木頭聲、切換＝鈴聲、換頁＝風聲、成功＝和弦。右上角喇叭可關閉，會記住。 */
