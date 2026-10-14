@@ -784,7 +784,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     ctx.beginPath();ctx.arc(x,y,4.4*dpr*s,0,6.2832);ctx.fillStyle='rgba(255,246,228,'+al+')';ctx.fill();
     if(k&&s>.6){ctx.font=(13*dpr)+'px "Noto Serif TC","Noto Serif JP",serif';ctx.textAlign='center';ctx.fillStyle='rgba('+c+','+(.9*al)+')';ctx.fillText(k,x,y-19*dpr*s);}}
   function tail(n,p,c){var q=TR[n];q.push([p[0],p[1]]);if(q.length>24)q.shift();for(var m=1;m<q.length;m++){var al=m/q.length;ctx.beginPath();ctx.moveTo(q[m-1][0],q[m-1][1]);ctx.lineTo(q[m][0],q[m][1]);ctx.strokeStyle='rgba('+c+','+(.45*al).toFixed(3)+')';ctx.lineWidth=(1+2.2*al)*dpr;ctx.lineCap='round';ctx.stroke();}}
-  function orbs(u){if(u<0)return;var o=full+1,k=Math.floor(N*frac)%N,a=P(RX[o][k],RY[o][k],0),G0=6,G1=8.2;
+  function orbs(u){if(u<0)return;var o=full+1,k=Math.floor(N*frac)%N,a=P(RX[o][k],RY[o][k],0),G0=3,G1=5.2;
     if(u>G1&&u<G1+3){var dd=(u-G1)*15,fd=1-(u-G1)/3;
       for(var n=0;n<5;n++){var c0=OB[n].slice(0,3).join(','),ctr=o-dd+n*1.6;for(var m=1;m<=o;m++){var off=Math.abs(m-ctr);if(off<1.2){ctx.strokeStyle='rgba('+c0+','+((1-off/1.2)*.9*fd).toFixed(3)+')';ctx.lineWidth=(1.4+(1-off/1.2)*1.6)*dpr;path(ctx,m,1,0);ctx.closePath();ctx.stroke();}}}}
     for(var n2=0;n2<5;n2++){var c=OB[n2].slice(0,3).join(','),lab=OB[n2][3],pp,sz=1,al=1;
