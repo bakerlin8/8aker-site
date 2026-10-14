@@ -43,7 +43,7 @@ const pageData = {
   entries: all.map((a) => ({ date: ymd(a.e.data.date), dir: a.dir, t: a.e.data.title, url: `/pillars/${a.dir}/${a.e.slug}` })),
   chapters,
   totals: counts,
-  start: copy.countdown_start, target: copy.countdown_target, birth: copy.birth_date,
+  start: copy.countdown_start, target: copy.countdown_target, birth: copy.birth_date, ringLabel: copy.ring_label,
 };
 const safeHref = (u: string) => (/^(\/(?!\/)|https:\/\/)/.test(u || '') ? u : '');
 const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url || '') && st.name).map((st) => ({ ...st, img: /^https:\/\//.test(st.img || '') ? st.img : '' }));
@@ -66,12 +66,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hero.in h1.motto .l2{color:#B9A89E;}
 .hero-lede{margin-top:20px;max-width:30em;color:#B9A89E;}
 .cd{margin-top:30px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
-.cd small{font-size:13px;color:#86707A;}
-.cd-days{font-family:var(--serif);font-size:56px;line-height:1;}
-.cd-clock{font-size:24px;display:inline-flex;}
-.cd-clock b{font-weight:400;color:#D4A24C;display:inline-block;}
-.cd-clock b.tick{animation:tick .45s var(--ease);}
-@keyframes tick{from{transform:translateY(-40%);opacity:0;}}
+.cd-pre,.cd-unit{font-family:var(--serif);font-size:20px;color:#B9A89E;}
+.cd-days{font-family:var(--serif);font-size:56px;line-height:1;color:#EFE5D6;}
+.cd-sub{margin-top:10px;font-size:13.5px;letter-spacing:.08em;color:#86707A;}
 .next-rel{display:inline-flex;gap:10px;align-items:baseline;margin-top:14px;font-size:13.5px;color:#B9A89E;border-bottom:1px solid rgba(239,229,214,.12);padding-bottom:3px;transition:color .3s,border-color .3s,gap .4s var(--ease);}
 .next-rel b{font-weight:400;color:#D4A24C;}
 .next-rel:hover{color:#EFE5D6;border-color:#D4A24C;gap:14px;}
@@ -377,7 +374,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .hero-lede{font-size:14.5px;margin-top:16px;}
   .cd{margin-top:22px;gap:10px;}
   .cd-days{font-size:46px;}
-  .cd-clock{font-size:20px;}
+  .cd-pre,.cd-unit{font-size:17px;}
   .next-rel{min-height:44px;align-items:center;}
 
 
@@ -519,7 +516,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         <h1 class="motto rv" id="motto" style="--i:0"><span>{copy.motto_line1}</span><span class="l2">{copy.motto_line2}</span></h1>
         <p class="hero-id rv" style="--i:1">{copy.hero_identity}</p>
         <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>
-        <div class="cd rv" style="--i:3"><small>{copy.countdown_label}</small><span class="cd-days num" id="cdD">—</span><small>天</small><span class="cd-clock num" id="cdC">00:00:<b>00</b></span></div>
+        <div class="cd rv" style="--i:3"><span class="cd-pre" id="cdP">{(copy.ring_label || '第 {n} 圈，還有').replace('{n}', '39')}</span><span class="cd-days num" id="cdD">—</span><span class="cd-unit">{copy.ring_unit || '天長完'}</span></div>
+        <p class="cd-sub rv" style="--i:3">{copy.ring_sub || '每一天，都是這一圈的一條細線'}</p>
         <a class="next-rel rv" style="--i:4" href="#chapters" id="nextRel">&nbsp;</a>
       </div>
     </div>
@@ -677,11 +675,12 @@ var col=function(id){return 'var(--c-'+id+')';};
 var hero=document.querySelector('.hero');
 requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList.add('in');hero.querySelectorAll('.rv').forEach(function(r){r.classList.add('in');});});});
 
-/* countdown — the seconds digit rolls in each tick */
-(function(){var d=document.getElementById('cdD'),c=document.getElementById('cdC');
-  function t(){var r=Math.max(0,TARGET-Date.now());d.textContent=Math.floor(r/DAY);
-    c.innerHTML=pad(Math.floor(r%DAY/36e5))+':'+pad(Math.floor(r%36e5/6e4))+':<b class="'+(RM?'':'tick')+'">'+pad(Math.floor(r%6e4/1e3))+'</b>';}
-  t();setInterval(t,1000);})();
+/* 年輪倒數：第 N 圈（滿 N 歲）還有幾天長完 = 距離下一個生日的天數；一天只變一次 */
+(function(){var d=document.getElementById('cdD'),p=document.getElementById('cdP');if(!d||!D.birth)return;
+  var b=D.birth.split('-').map(Number),bd=function(y){return new Date(y+'-'+pad(b[1])+'-'+pad(b[2])+'T00:00:00+09:00').getTime();};
+  function t(){var now=Date.now(),y=new Date(now+9*3600e3).getUTCFullYear();if(bd(y)>now)y--;var n=y-b[0],left=Math.ceil((bd(y+1)-now)/DAY);
+    if(p)p.textContent=(D.ringLabel||'第 {n} 圈，還有').replace('{n}',n);d.textContent=left;}
+  t();setInterval(t,60000);})();
 
 /* age rings: one ring a year, current ring drawn to the fraction of the year */
 (function(){var cv=document.getElementById('art');if(!cv)return;var ctx=cv.getContext('2d'),W=0,H=0,dpr=1,run=true,last=0,t=0,raf=0,started=false;
