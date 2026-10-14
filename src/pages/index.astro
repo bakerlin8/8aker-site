@@ -372,6 +372,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 /* ── 手機版（≤640px）：版面收斂、觸控目標加大、橫向內容加提示 ── */
 @media(max-width:640px){
   .hero-in{padding:96px 20px 32px;}
+  .hero{min-height:0;}
+  .hero .hero-in{padding:92px 20px calc(62px + 54vw);}
   h1.motto{font-size:clamp(32px,9.4vw,40px);}
   .hero-lede{font-size:14.5px;margin-top:16px;}
   .cd{margin-top:22px;gap:10px;}
@@ -744,7 +746,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   /* 3D 木頭切片：年輪刻在一片斜放、有厚度的木頭上，非常慢地轉；滑鼠移動時微微傾斜 */
   var CX=0,CY=0,S=1,YAW=0,TILT=1.0,mx=0,my=0,smx=0,smy=0,TH=.13;
   addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;},{passive:true});
-  function geom(){var wide=W>900*dpr;if(wide){S=Math.min(W*.34,H*.56);CX=W*.5;CY=H*.6;}else{S=Math.min(W*.42,H*.26);CX=W*.5;CY=H*.76;}}
+  function geom(){var wide=W>900*dpr,phone=W<=720*dpr;if(wide){S=Math.min(W*.34,H*.56);CX=W*.5;CY=H*.6;}else if(phone){S=Math.min(W*.4,H*.32);CX=W*.5;var hg=document.querySelector('.hero-grid'),tb=hg?(hg.getBoundingClientRect().bottom-cv.getBoundingClientRect().top)*dpr:H*.4;CY=Math.min(H-S*.7,tb+62*dpr+S*.6);}else{S=Math.min(W*.42,H*.26);CX=W*.5;CY=H*.76;}}
   var cY=1,sY=0,cT=1,sT=0;
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
   function path(c,i,p,z){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p)),a=P(xs[0],ys[0],z||0);c.beginPath();c.moveTo(a[0],a[1]);for(var j=1;j<=n;j++){var k=j%N;a=P(xs[k],ys[k],z||0);c.lineTo(a[0],a[1]);}}
