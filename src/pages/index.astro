@@ -758,28 +758,35 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function geom(){var wide=W>900*dpr,phone=W<=720*dpr;if(wide){S=Math.min(W*.34,H*.56);CX=W*.5;CY=H*.6;}else if(phone){S=Math.min(W*.46,H*.4);CX=W*.5;var hg=document.querySelector('.hero-grid'),hr=hg?hg.getBoundingClientRect():null,cr=cv.getBoundingClientRect(),mid=hr?((hr.top+hr.bottom)/2-cr.top)*dpr:H*.5;CY=mid+S*.12;}else{S=Math.min(W*.42,H*.26);CX=W*.5;CY=H*.76;}}
   var cY=1,sY=0,cT=1,sT=0;
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
-  function path(c,i,p,z){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p)),a=P(xs[0],ys[0],z||0);c.beginPath();c.moveTo(a[0],a[1]);for(var j=1;j<=n;j++){var k=j%N;a=P(xs[k],ys[k],z||0);c.lineTo(a[0],a[1]);}}
-  function bake(){}
-  function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
-    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();return true;}
-  function frame(dt){t+=dt;var g=Math.min(1,t/3.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
-    smx+=(mx-smx)*.05;smy+=(my-smy)*.05;YAW=-.35+smx*.5;TILT=1.0+smy*.25;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
-    var oS=S;S=oS*(.55+.45*e);ctx.globalAlpha=e;ctx.lineJoin='round';
-    var o=full+1,xs=RX[o],ys=RY[o],j,a;
-    /* 側面（樹皮） */
-    ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
-    var gr=ctx.createLinearGradient(0,CY-S*.3,0,CY+S*.7);gr.addColorStop(0,'#3a2016');gr.addColorStop(1,'#1d0f0b');ctx.fillStyle=gr;ctx.fill();
-    for(j=0;j<N;j+=6){var a1=P(xs[j],ys[j],0),a2=P(xs[j],ys[j],-TH);ctx.beginPath();ctx.moveTo(a1[0],a1[1]);ctx.lineTo(a2[0],a2[1]);ctx.strokeStyle='rgba(0,0,0,.22)';ctx.lineWidth=dpr;ctx.stroke();}
-    /* 切面 */
-    path(ctx,o,1,0);ctx.closePath();var fg=ctx.createRadialGradient(CX,CY,0,CX,CY,S*1.1);fg.addColorStop(0,'rgba(58,26,30,.95)');fg.addColorStop(1,'rgba(40,18,22,.95)');ctx.fillStyle=fg;ctx.fill();
+  /* 畫一圈年輪：投影直接算在迴圈裡，不另外產生陣列（每幀上萬個點，省下記憶體回收造成的頓點） */
+  function path(c,i,p,z){var xs=RX[i],ys=RY[i],n=Math.max(1,Math.floor(N*p)),zs=(z||0)*sT,zc=(z||0)*cT;c.beginPath();
+    for(var j=0;j<=n;j++){var k=j%N,px=xs[k],py=ys[k],X=px*cY-py*sY,Y=px*sY+py*cY,q=S*3/(3+(Y*sT+zc)*.7),x=CX+X*q,y=CY+(Y*cT-zs)*q;j?c.lineTo(x,y):c.moveTo(x,y);}}
+  /* 木頭切片本體（樹皮側面＋切面＋已長完的年輪）幾乎不動，先畫在一張暫存畫布上；只有傾斜角度真的變了才重畫 */
+  var bc=document.createElement('canvas'),bx=bc.getContext('2d'),bkey='',lkey='',stab=0;
+  function slab(c){var o=full+1,xs=RX[o],ys=RY[o],j,a;c.lineJoin='round';
+    c.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?c.lineTo(a[0],a[1]):c.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);c.lineTo(a[0],a[1]);}
+    var gr=c.createLinearGradient(0,CY-S*.3,0,CY+S*.7);gr.addColorStop(0,'#3a2016');gr.addColorStop(1,'#1d0f0b');c.fillStyle=gr;c.fill();
+    c.beginPath();for(j=0;j<N;j+=6){var a1=P(xs[j],ys[j],0),a2=P(xs[j],ys[j],-TH);c.moveTo(a1[0],a1[1]);c.lineTo(a2[0],a2[1]);}c.strokeStyle='rgba(0,0,0,.22)';c.lineWidth=dpr;c.stroke();
+    path(c,o,1,0);c.closePath();var fg=c.createRadialGradient(CX,CY,0,CX,CY,S*1.1);fg.addColorStop(0,'rgba(58,26,30,.95)');fg.addColorStop(1,'rgba(40,18,22,.95)');c.fillStyle=fg;c.fill();
     /* 台灣的年＝玫瑰色，搬家那年加亮，日本的年＝金色 */
     for(var i=1;i<=full;i++){var f,col,lw;
       if(i<MOVE){f=i/MOVE;col='rgba(196,140,150,'+(.07+.24*f*f).toFixed(3)+')';lw=(.7+.3*f)*dpr;}
       else if(i===MOVE){col='rgba(214,160,170,.6)';lw=1.3*dpr;}
       else{f=(i-MOVE)/Math.max(1,full-MOVE);col='rgba(212,162,76,'+(.2+.35*f).toFixed(3)+')';lw=(.9+.3*f)*dpr;}
-      ctx.strokeStyle=col;ctx.lineWidth=lw;path(ctx,i,1,0);ctx.closePath();ctx.stroke();}
+      c.strokeStyle=col;c.lineWidth=lw;path(c,i,1,0);c.closePath();c.stroke();}
+    path(c,o,1,0);c.closePath();c.strokeStyle='rgba(236,196,118,.35)';c.lineWidth=dpr;c.stroke();}
+  function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
+    if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();return true;}
+  function frame(dt){t+=dt;var g=Math.min(1,t/3.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
+    smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var qx=Math.round(smx*400)/400,qy=Math.round(smy*400)/400;YAW=-.35+qx*.5;TILT=1.0+qy*.25;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
+    var oS=S;S=oS*(.55+.45*e);ctx.globalAlpha=e;ctx.lineJoin='round';var o=full+1;
+    if(g<1)slab(ctx);
+    else{var key=W+'x'+H+':'+CX.toFixed(0)+','+CY.toFixed(0)+':'+Math.round(smx*400)+','+Math.round(smy*400);
+      /* 滑鼠正在動（角度一直變）時直接畫；角度停穩幾幀後才存成暫存圖，之後每幀只要貼上 */
+      if(key!==lkey){lkey=key;stab=0;}
+      if(key===bkey)ctx.drawImage(bc,0,0);
+      else{slab(ctx);if(++stab>8){if(bc.width!==W||bc.height!==H){bc.width=W;bc.height=H;}else bx.clearRect(0,0,W,H);slab(bx);bkey=key;}}}
     var p=frac*e,br=.5+.5*Math.sin(t*1.3);
-    path(ctx,o,1,0);ctx.closePath();ctx.strokeStyle='rgba(236,196,118,.35)';ctx.lineWidth=dpr;ctx.stroke();
     path(ctx,o,p,0);ctx.strokeStyle='rgba(212,162,76,'+(.10+.08*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
     ctx.strokeStyle='rgba(236,196,118,.92)';ctx.lineWidth=1.7*dpr;ctx.stroke();
     S=oS;ctx.globalAlpha=1;if(g>.98){tip(Math.floor(N*frac)%N);orbs(RM?30:t-3.5);}}
@@ -814,8 +821,8 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     for(var q=0;q<3;q++){var ph=((t*.55)+q/3)%1;ctx.beginPath();ctx.arc(x,yy,(4+ph*28)*dpr,0,6.2832);ctx.strokeStyle='rgba(236,196,118,'+((1-ph)*.55).toFixed(3)+')';ctx.lineWidth=dpr;ctx.stroke();}
     ctx.beginPath();ctx.arc(x,yy,9*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.18)';ctx.fill();
     ctx.beginPath();ctx.arc(x,yy,3.6*dpr,0,6.2832);ctx.fillStyle='rgb(236,196,118)';ctx.fill();}
-  /* 切片轉得很慢，每兩幀畫一次就夠順，省一半運算 */
-  var acc2=0,odd=false;function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;acc2+=dt;odd=!odd;if(odd){frame(acc2);acc2=0;}raf=requestAnimationFrame(loop);}
+  /* 切片本體已經先畫好暫存，每幀只剩光珠與光線，可以全速 60fps 播放（之前是每兩幀畫一次，光珠移動會一格一格跳） */
+  function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;frame(dt);raf=requestAnimationFrame(loop);}
   var rt=0;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(size(false)&&(RM||!run))frame(0);},150);});
   function start(){if(started)return;started=true;size(true);
     if(RM){t=9;frame(0);return;}
@@ -844,20 +851,22 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var CX,CY,S,cY,sY,cT,sT,TH=.16,mx=0,my=0,smx=0,smy=0;
   addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;},{passive:true});
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
-  function ring(i,z){var xs=RX[i],ys=RY[i],a=P(xs[0],ys[0],z||0);ctx.beginPath();ctx.moveTo(a[0],a[1]);for(var j=1;j<N;j++){a=P(xs[j],ys[j],z||0);ctx.lineTo(a[0],a[1]);}ctx.closePath();}
+  function ring(i,z){var xs=RX[i],ys=RY[i],zs=(z||0)*sT,zc=(z||0)*cT;ctx.beginPath();
+    for(var j=0;j<N;j++){var px=xs[j],py=ys[j],X=px*cY-py*sY,Y=px*sY+py*cY,q=S*3/(3+(Y*sT+zc)*.7),x=CX+X*q,y=CY+(Y*cT-zs)*q;j?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();}
   function size(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);S=Math.min(W*.34,H*.5);CX=W*.5;CY=H*.44;}
   function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+t*.06+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
     ctx.clearRect(0,0,W,H);ctx.lineJoin='round';var xs=RX[full],ys=RY[full],a;
     ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
     var g=ctx.createLinearGradient(0,CY-S*.3,0,CY+S*.7);g.addColorStop(0,'#3a2016');g.addColorStop(1,'#1d0f0b');ctx.fillStyle=g;ctx.fill();
     ring(full,0);var fg=ctx.createRadialGradient(CX,CY,0,CX,CY,S*1.1);fg.addColorStop(0,'rgba(58,26,30,.95)');fg.addColorStop(1,'rgba(40,18,22,.95)');ctx.fillStyle=fg;ctx.fill();
-    for(i=1;i<full;i++){ctx.strokeStyle=i<=MOVE?'rgba(196,140,150,.13)':'rgba(212,162,76,.18)';ctx.lineWidth=.8*dpr;ring(i,0);ctx.stroke();}
+    ctx.lineWidth=.8*dpr;ctx.strokeStyle='rgba(196,140,150,.13)';for(i=1;i<full&&i<=MOVE;i++){ring(i,0);ctx.stroke();}
+    ctx.strokeStyle='rgba(212,162,76,.18)';for(;i<full;i++){ring(i,0);ctx.stroke();}
     var br=.5+.5*Math.sin(t*1.4);ring(full,0);ctx.strokeStyle='rgba(212,162,76,'+(.16+.12*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
     ctx.strokeStyle='rgba(240,204,130,.98)';ctx.lineWidth=1.8*dpr;ctx.stroke();
     var kk=Math.floor(N*.12),p=P(RX[full][kk],RY[full][kk],0);ctx.beginPath();ctx.arc(p[0],p[1],7*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.22)';ctx.fill();
     ctx.beginPath();ctx.arc(p[0],p[1],2.8*dpr,0,6.2832);ctx.fillStyle='rgb(243,217,160)';ctx.fill();}
-  var odd=false;function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;t+=dt;odd=!odd;if(odd)frame();raf=requestAnimationFrame(loop);}
-  size();t=2;frame();addEventListener('resize',function(){size();frame();});
+  function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;t+=dt;frame();raf=requestAnimationFrame(loop);}
+  size();t=2;frame();var rz=0;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){size();frame();},150);});
   if(RM)return;
   new IntersectionObserver(function(es){es.forEach(function(e){run=e.isIntersecting;cancelAnimationFrame(raf);if(run){last=0;raf=requestAnimationFrame(loop);}});},{threshold:.05}).observe(cv);})();
 
