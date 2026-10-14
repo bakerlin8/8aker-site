@@ -430,7 +430,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .frow{grid-template-columns:1fr;}
 }
 /* ── 壱 初次見面：我在做什麼 ── */
-.hero-id{margin-top:18px;font-size:14px;letter-spacing:.06em;color:#D4A24C;}
+.hero-id{margin-top:18px;font-size:14px;letter-spacing:.06em;color:#D4A24C;text-wrap:balance;word-break:keep-all;}
+@media(max-width:720px){h1.motto{font-size:clamp(26px,8.2vw,40px);}.hero-id{font-size:13px;letter-spacing:.02em;}}
 .tale{position:relative;margin-top:34px;padding-left:28px;max-width:34em;font-family:var(--serif);font-size:clamp(17px,1.9vw,19px);line-height:2.05;color:#E7D9C6;}
 .tale::before{content:'';position:absolute;left:0;top:.6em;bottom:.6em;width:1px;background:linear-gradient(180deg,rgba(201,112,126,.7),rgba(212,162,76,.9));}
 .tale p+p{margin-top:1.35em;}
@@ -529,9 +530,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div>
         <h1 class="motto rv" id="motto" style="--i:0"><span>{copy.motto_line1}</span><span class="l2">{copy.motto_line2}</span></h1>
         <p class="hero-id rv" style="--i:1">{copy.hero_identity}</p>
-        <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>
+        {copy.hero_lede && <p class="hero-lede rv" style="--i:2">{copy.hero_lede}</p>}
         <div class="cd rv" style="--i:3"><span class="cd-pre" id="cdP">{(copy.ring_label || '第 {n} 圈，還有').replace('{n}', '39')}</span><span class="cd-days num" id="cdD">—</span><span class="cd-unit">{copy.ring_unit || '天長完'}</span></div>
-        <p class="cd-sub rv" style="--i:3">{copy.ring_sub || '每一天，都是這一圈的一條細線'}</p>
+        {copy.ring_sub && <p class="cd-sub rv" style="--i:3">{copy.ring_sub}</p>}
       </div>
     </div>
   </div>
@@ -659,7 +660,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div>
           <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas><span>第 {endRing.age} 圈</span></div>
           {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
-          <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
+          <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}{copy.motto_ja && <small lang="ja">{copy.motto_ja}</small>}</p>
       </div>
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>

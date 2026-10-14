@@ -1,7 +1,7 @@
 ---
 import copy from '../data/site-copy.json';
 export interface Props { title?: string; description?: string; schema?: any[]; type?: string; }
-const { title = `${copy.site_name} — ${copy.motto_line1}${copy.motto_line2}`, description = copy.hero_lede, schema = [], type = 'website' } = Astro.props;
+const { title = `${copy.site_name} — ${copy.motto_line1}${copy.motto_line2}`, description = (copy as any).site_description || copy.hero_lede, schema = [], type = 'website' } = Astro.props;
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, SITE + '/').href;
 // Site-wide identity: the same person and site on every page, so search and AI engines can connect them.
@@ -13,7 +13,7 @@ const person = {
   knowsAbout: ['日本不動產', '民宿營運', '室內佈置', 'AI 工具', '跑步與運動'],
   sameAs: ['https://www.strava.com/athletes/103942910'],
 };
-const website = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: copy.site_name, description: copy.hero_lede, inLanguage: 'zh-Hant-TW', publisher: { '@id': `${SITE}/#person` } };
+const website = { '@type': 'WebSite', '@id': `${SITE}/#website`, url: `${SITE}/`, name: copy.site_name, description: (copy as any).site_description || copy.hero_lede, inLanguage: 'zh-Hant-TW', publisher: { '@id': `${SITE}/#person` } };
 const jsonld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [website, person, ...schema] }).replace(/</g, '\\u003c');
 const path = Astro.url.pathname;
 const isHome = path === '/' || path === '';
@@ -22,7 +22,7 @@ import services from '../data/services.json';
 // The Japanese serif and the Latin display face only draw a small, known set of characters
 // (section numerals, pillar kanji, Japanese subtitles, vertical English labels), so request just those glyphs.
 const glyphs = [...new Set([
-  '壱弐参肆伍陸序結巻零・、。', 'したことは残す。済んだことは手放す。',
+  '壱弐参肆伍陸序結巻零・、。', 'したことは残す。済んだことは手放す。', String((copy as any).motto_ja || ''),
   ...pillars.flatMap((p) => [p.kanji, p.titleJp]),
   ...services.services.map((x) => x.name_jp), 'お品書き松竹梅祈願所築歩旅',
   'StatusChaptersJournalWorksBodyHelloDirections', 'BEFOREAFTNo.VIDSCRNUBLGService', '0123456789',
