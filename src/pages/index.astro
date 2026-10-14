@@ -453,15 +453,17 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .end-ring path.now{stroke:#E6BA6A;stroke-width:1.1;opacity:1;filter:drop-shadow(0 0 3px rgba(230,186,106,.75));}
 .end-ring .dot{fill:#F3D9A0;filter:drop-shadow(0 0 3px #F3D9A0);}
 .end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
-.nextsec{display:flex;flex-direction:column;align-items:center;gap:6px;width:max-content;margin:72px auto -40px;color:var(--ash);transition:color .3s;}
-.nextsec:hover{color:var(--gold);}
-.nextsec .nk{font-family:var(--jp),var(--serif);font-size:18px;color:var(--gold);line-height:1;}
-.nextsec .nt{font-size:12px;letter-spacing:.24em;}
-.nextsec .nl{position:relative;width:1px;height:46px;margin-top:6px;background:linear-gradient(180deg,currentColor,transparent);opacity:.7;}
-.nextsec .nl i{position:absolute;left:-2.5px;top:0;width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);animation:seedfall 2.6s var(--ease) infinite;}
-@keyframes seedfall{0%{transform:translateY(0);opacity:0}15%{opacity:1}80%{opacity:1}100%{transform:translateY(42px);opacity:0}}
-@media(prefers-reduced-motion:reduce){.nextsec .nl i{animation:none;top:40px;}}
-@media(max-width:720px){.nextsec{margin:56px auto -24px;}}
+.nextsec{display:block;width:60px;margin:64px auto -40px;color:var(--gold);opacity:.85;transition:opacity .3s,transform .4s var(--ease);}
+.nextsec:hover{opacity:1;transform:translateY(3px);}
+.nextsec svg{display:block;width:60px;height:64px;overflow:visible;}
+.nextsec path{fill:none;stroke:currentColor;stroke-linecap:round;}
+.nextsec .a0{stroke-width:1.2;opacity:.9;}
+.nextsec .a1{stroke-width:.8;opacity:.22;}
+.nextsec .a2{stroke-width:.8;opacity:.4;}
+.nextsec .seed{fill:#F3D9A0;filter:drop-shadow(0 0 3px #E6BA6A);offset-path:path('M26 2C44 12 52 32 50 58');offset-rotate:0deg;animation:seedfall 2.8s var(--ease) infinite;}
+@keyframes seedfall{0%{offset-distance:0%;opacity:0}15%{opacity:1}80%{opacity:1}100%{offset-distance:100%;opacity:0}}
+@media(prefers-reduced-motion:reduce){.nextsec .seed{animation:none;offset-distance:100%;}}
+@media(max-width:720px){.nextsec{margin:48px auto -24px;}}
 .svc-head{margin-top:44px;display:flex;align-items:baseline;gap:14px;}
 .svc-head small{font-family:var(--latin);font-size:13px;letter-spacing:.3em;color:var(--gold);}
 .svc-head h3{font-family:var(--serif);font-weight:500;font-size:20px;}
@@ -570,7 +572,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
     </div>
   </div>
-  <a class="nextsec" href="#works" aria-label="往下：有點樣子"><span class="nk">弐</span><span class="nt">有點樣子</span><span class="nl" aria-hidden="true"><i></i></span></a>
+  <a class="nextsec" href="#works" aria-label="往下：有點樣子"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec" id="works" aria-labelledby="works-h">
@@ -594,7 +596,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
-  <a class="nextsec" href="#chapters" aria-label="往下：39・連載中"><span class="nk">参</span><span class="nt">39・連載中</span><span class="nl" aria-hidden="true"><i></i></span></a>
+  <a class="nextsec" href="#chapters" aria-label="往下：39・連載中"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
@@ -644,7 +646,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
-  <a class="nextsec" href="#journal" aria-label="往下：日常紀錄"><span class="nk">肆</span><span class="nt">日常紀錄</span><span class="nl" aria-hidden="true"><i></i></span></a>
+  <a class="nextsec" href="#journal" aria-label="往下：日常紀錄"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec band-light" id="journal" aria-labelledby="j-h">
@@ -667,7 +669,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
-  <a class="nextsec" href="#support-end" aria-label="往下：寫在最後"><span class="nk">結</span><span class="nt">寫在最後</span><span class="nl" aria-hidden="true"><i></i></span></a>
+  <a class="nextsec" href="#support-end" aria-label="往下：寫在最後"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec closing" id="support-end" aria-label="支持這個連載">
