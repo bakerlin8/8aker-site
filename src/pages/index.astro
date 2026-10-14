@@ -756,7 +756,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function size(force){var nd=Math.min(devicePixelRatio||1,innerWidth<900?1.5:2),r=cv.parentElement.getBoundingClientRect(),nw=Math.round(r.width*nd),nh=Math.round(r.height*nd);
     if(!force&&nw===W&&Math.abs(nh-H)<160*nd)return false;dpr=nd;W=cv.width=nw;H=cv.height=nh;geom();return true;}
   function frame(dt){t+=dt;var g=Math.min(1,t/3.5),e=1-Math.pow(1-g,3);ctx.clearRect(0,0,W,H);
-    smx+=(mx-smx)*.05;smy+=(my-smy)*.05;YAW=-.35+t*.035+smx*.5;TILT=1.0+smy*.25;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
+    smx+=(mx-smx)*.05;smy+=(my-smy)*.05;YAW=-.35+smx*.5;TILT=1.0+smy*.25;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
     var oS=S;S=oS*(.55+.45*e);ctx.globalAlpha=e;ctx.lineJoin='round';
     var o=full+1,xs=RX[o],ys=RY[o],j,a;
     /* 側面（樹皮） */
@@ -839,7 +839,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
   function ring(i,z){var xs=RX[i],ys=RY[i],a=P(xs[0],ys[0],z||0);ctx.beginPath();ctx.moveTo(a[0],a[1]);for(var j=1;j<N;j++){a=P(xs[j],ys[j],z||0);ctx.lineTo(a[0],a[1]);}ctx.closePath();}
   function size(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);S=Math.min(W*.34,H*.5);CX=W*.5;CY=H*.44;}
-  function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+t*.06+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
+  function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
     ctx.clearRect(0,0,W,H);ctx.lineJoin='round';var xs=RX[full],ys=RY[full],a;
     ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
     var g=ctx.createLinearGradient(0,CY-S*.3,0,CY+S*.7);g.addColorStop(0,'#3a2016');g.addColorStop(1,'#1d0f0b');ctx.fillStyle=g;ctx.fill();
