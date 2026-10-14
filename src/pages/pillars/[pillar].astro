@@ -1,17 +1,15 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { pillars, pillarBySlug } from '../../data/pillars';
 import BodyPanel from '../../components/BodyPanel.astro';
+import { pillarEntries } from '../../data/journal';
 
 export async function getStaticPaths() {
   return pillars.map((p) => ({ params: { pillar: p.slug } }));
 }
 const { pillar } = Astro.params;
 const meta = pillarBySlug(pillar!)!;
-const entries = (await getCollection(meta.slug as any, ({ data }: any) => !data.draft)).sort(
-  (a: any, b: any) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const entries = await pillarEntries(meta.slug, 'desc');
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const others = pillars.filter((p) => p.slug !== meta.slug);
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
@@ -48,6 +46,7 @@ const schema = [
 .arow:hover{padding-left:10px;}
 .arow:hover h2{color:var(--gold);}
 .arow:hover .arrow{opacity:1;transform:none;}
+.dft{display:inline-block;font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px dashed var(--gold);color:var(--gold);vertical-align:3px;}
 .empty{padding:40px 0;color:var(--ash);}
 .list-h{font-family:var(--serif);font-weight:500;font-size:20px;margin-bottom:14px;}
 .others{display:flex;gap:10px;flex-wrap:wrap;margin-top:56px;padding-top:24px;border-top:1px solid var(--line);align-items:center;font-size:13px;color:var(--ash);}
@@ -59,7 +58,7 @@ const schema = [
 <section class="ph" style={`--dc:var(--c-${meta.slug})`}>
   <div class="ph-in">
     <div>
-      <p class="crumb rv"><a href="/#chapters">連載中・五個方向</a>　／　{meta.type}</p>
+      <p class="crumb rv"><a href="/">首頁</a>　／　<a href="/journal/">日常紀錄</a>　／　{meta.type}</p>
       <h1 class="rv" style="--i:1">{meta.title}</h1>
       <p class="jp rv" style="--i:2" lang="ja">{meta.titleJp}</p>
       <p class="d rv" style="--i:3">{meta.desc}</p>
@@ -76,11 +75,11 @@ const schema = [
     {entries.map((e: any, i: number) => (
       <a class="arow rv" style={`--i:${Math.min(i, 8)}`} href={`/pillars/${meta.slug}/${e.slug}`}>
         <time>{dot(e.data.date)}</time>
-        <div><h2>{e.data.title}</h2>{e.data.excerpt && <p>{e.data.excerpt}</p>}{e.data.tags?.length > 0 && <div class="tags">{e.data.tags.map((t: string) => <span>{t}</span>)}</div>}</div>
+        <div><h2>{e.data.draft && <span class="dft">草稿</span>}{e.data.title}</h2>{e.data.excerpt && <p>{e.data.excerpt}</p>}{e.data.tags?.length > 0 && <div class="tags">{e.data.tags.map((t: string) => <span>{t}</span>)}</div>}</div>
         <span class="arrow" aria-hidden="true">→</span>
       </a>
     ))}
-    <div class="others"><span>其他方向</span>{others.map((p) => <a href={`/pillars/${p.slug}`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}</a>)}</div>
+    <div class="others"><a href="/journal/" style="--dc:var(--gold)">日常紀錄・全部</a><span>其他方向</span>{others.map((p) => <a href={`/pillars/${p.slug}`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}</a>)}</div>
   </div>
 </section>
 </BaseLayout>

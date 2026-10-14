@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 import { pillars } from '../data/pillars';
 import copy from '../data/site-copy.json';
 import chapters from '../data/chapters.json';
@@ -9,12 +8,10 @@ import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
+import { allEntries } from '../data/journal';
 const endRing = buildRing(copy.birth_date);
 
-const all = (await Promise.all(
-  pillars.map(async (p) => (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).map((e: any) => ({ dir: p.slug, e })))
-)).flat();
-all.sort((a, b) => b.e.data.date.valueOf() - a.e.data.date.valueOf());
+const all = await allEntries();
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
 const dot = (d: Date) => ymd(d).replaceAll('-', '.');
 const counts = Object.fromEntries(pillars.map((p) => [p.slug, all.filter((a) => a.dir === p.slug).length]));
@@ -31,7 +28,11 @@ const val = (s: string) => 0.15 + (counts[s] / top) * 0.85;
 const shape = pillars.map((p, i) => pt(i, val(p.slug)).map((n) => n.toFixed(1)).join(',')).join(' ');
 const rings = [0.25, 0.5, 0.75, 1].map((l) => pillars.map((_, i) => pt(i, l).map((n) => n.toFixed(1)).join(',')).join(' '));
 
-const journal = all.slice(0, 12);
+// 首頁只放最新 6 篇；篩選某個方向時顯示該方向最新 4 篇，其餘到 /journal/ 看
+const HOME_N = 6, PER_DIR = 4;
+const topSet = new Set(all.slice(0, HOME_N));
+const dirSet = new Set(pillars.flatMap((p) => all.filter((a) => a.dir === p.slug).slice(0, PER_DIR)));
+const journal = all.filter((a) => topSet.has(a) || dirSet.has(a)).map((a) => ({ ...a, top: topSet.has(a) }));
 const escH = (x: string) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as any)[c]);
 // 直排時，兩位以內的數字或英文字母橫躺排成一格（縦中横）
 const tcy = (x: string) => escH(x).replace(/(?<![0-9A-Za-z])([0-9A-Za-z]{1,2})(?![0-9A-Za-z])/g, '<span class="tcy">$1</span>');
@@ -275,6 +276,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .jlist{margin-top:10px;}
 .jrow{display:grid;grid-template-columns:96px 36px minmax(0,1fr) 24px;gap:18px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline;transition:opacity .4s,padding .4s var(--ease);}
 .jrow[hidden]{display:none;}
+.jrow .dft{display:inline-block;font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px dashed var(--gold);color:var(--gold);vertical-align:2px;}
+.jmore{display:inline-flex;align-items:center;gap:10px;margin-top:28px;min-height:44px;padding:0 20px;border:1px solid var(--line);font-size:14px;color:var(--bone);transition:border-color .3s,color .3s;}
+.jmore i{font-style:normal;color:var(--gold);transition:transform .45s var(--ease);}
+.jmore:hover{border-color:var(--gold);color:var(--gold);}
+.jmore:hover i{transform:translateX(4px);}
+.jmore[hidden]{display:none;}
 .jrow time{font-size:13px;color:var(--ash);}
 .jrow .k{font-family:var(--jp);font-size:19px;line-height:1;color:var(--dc);width:32px;height:32px;display:grid;place-items:center;border-radius:50%;align-self:start;margin-top:0;transition:background .35s,color .35s;}
 .jrow h3{font-family:var(--serif);font-weight:500;font-size:17px;transition:color .3s,transform .45s var(--ease);}
@@ -676,13 +683,14 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
       <div class="jlist" id="jlist">
         {journal.map((a, i) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
-          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} href={`/pillars/${a.dir}/${a.e.slug}`}>
+          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} data-top={a.top ? '1' : undefined} hidden={!a.top} href={`/pillars/${a.dir}/${a.e.slug}/`}>
             <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
-            <div><h3>{a.e.data.title}</h3>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div><span class="arrow" aria-hidden="true">→</span>
+            <div><h3>{a.e.data.draft && <span class="dft">草稿</span>}{a.e.data.title}</h3>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div><span class="arrow" aria-hidden="true">→</span>
           </a>
         ); })}
         <p class="jempty" id="jempty" hidden>這個方向還沒有文章。</p>
       </div>
+      <a class="jmore rv" id="jmore" href="/journal/" data-all={`看全部 ${all.length} 篇`} data-counts={JSON.stringify(Object.fromEntries(pillars.map((p) => [p.slug, { n: counts[p.slug], t: p.type }])))}><span>看全部 {all.length} 篇</span><i aria-hidden="true">→</i></a>
     </div>
   </div>
 </section>
@@ -951,7 +959,10 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 (function(){var F=document.getElementById('filters'),rows=[].slice.call(document.querySelectorAll('.jrow')),E=document.getElementById('jempty');
   F.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;var f=b.dataset.f,n=0;
     F.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===b);});
-    rows.forEach(function(r){var on=f==='all'||r.dataset.dir===f;r.hidden=!on;if(on)n++;});E.hidden=n>0;});})();
+    rows.forEach(function(r){var on=f==='all'?!!r.dataset.top:(r.dataset.dir===f&&n<4);r.hidden=!on;if(on)n++;});E.hidden=n>0;
+    var M=document.getElementById('jmore');if(M){var C=JSON.parse(M.dataset.counts||'{}'),c=C[f];
+      if(f==='all'||!c){M.href='/journal/';M.firstChild.textContent=M.dataset.all;M.hidden=false;}
+      else{M.href='/pillars/'+f+'/';M.firstChild.textContent='看「'+c.t+'」全部 '+c.n+' 篇';M.hidden=c.n===0;}}});})();
 })();
 </script>
 </BaseLayout>

@@ -1,13 +1,14 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { pillars, pillarBySlug } from '../../../data/pillars';
 import worksData from '../../../data/works.json';
+import { pillarEntries } from '../../../data/journal';
 
 export async function getStaticPaths() {
   const paths: any[] = [];
   for (const p of pillars) {
-    const entries = (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).sort((a: any, b: any) => a.data.date.valueOf() - b.data.date.valueOf());
+    const entries = await pillarEntries(p.slug, 'asc');
     entries.forEach((entry: any, i: number) => paths.push({ params: { pillar: p.slug, slug: entry.slug }, props: { entry, prev: entries[i - 1] ?? null, next: entries[i + 1] ?? null } }));
   }
   return paths;
@@ -27,8 +28,9 @@ const schema = [
     articleSection: `${meta.type}・${meta.title}`, keywords: (entry.data.tags ?? []).join(', ') },
   { '@type': 'BreadcrumbList', itemListElement: [
     { '@type': 'ListItem', position: 1, name: '首頁', item: `${SITE}/` },
-    { '@type': 'ListItem', position: 2, name: `${meta.type}・${meta.title}`, item: `${SITE}/pillars/${meta.slug}/` },
-    { '@type': 'ListItem', position: 3, name: entry.data.title, item: url } ] },
+    { '@type': 'ListItem', position: 2, name: '日常紀錄', item: `${SITE}/journal/` },
+    { '@type': 'ListItem', position: 3, name: `${meta.type}・${meta.title}`, item: `${SITE}/pillars/${meta.slug}/` },
+    { '@type': 'ListItem', position: 4, name: entry.data.title, item: url } ] },
 ];
 ---
 <BaseLayout title={`${entry.data.title} — 8AKER零`} description={entry.data.excerpt ?? meta.desc} schema={schema} type="article">
@@ -71,17 +73,21 @@ const schema = [
 .pn b{font-family:var(--serif);font-weight:500;font-size:15px;line-height:1.5;transition:color .3s;}
 .pn a:hover b{color:var(--gold);}
 .pn .nx{text-align:right;border-left:1px solid var(--line);}
-.back{display:inline-block;margin-top:28px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s;}
-.back:hover{color:var(--bone);border-color:var(--gold);}
+.backs{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px;}
+.backs a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);font-size:13.5px;color:var(--bone-2);transition:color .3s,border-color .3s;}
+.backs a:hover{color:var(--bone);border-color:var(--gold);}
+.backs a:last-child{margin-left:auto;}
+.ah .meta .dft{border:1px dashed #D4A24C;color:#D4A24C;}
+@media(max-width:700px){.backs a{flex:1 1 auto;justify-content:center;}.backs a:last-child{margin-left:0;}}
 @media(max-width:700px){.ah{padding:96px 20px 40px;}.ah .k{font-size:150px;right:-20px;}.read{padding:44px 20px 72px;}.prose{font-size:16px;}}
 @media(prefers-reduced-motion:reduce){.prose>*{animation:none;}}
 </style>
 <header class="ah" style={`--dc:var(--c-${meta.slug})`}>
   <div class="ah-in">
     <div class="k" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
-    <p class="crumb rv"><a href="/#chapters">連載中</a>／<a href={`/pillars/${meta.slug}`}>{meta.type}・{meta.title}</a></p>
+    <p class="crumb rv"><a href="/">首頁</a>／<a href="/journal/">日常紀錄</a>／<a href={`/pillars/${meta.slug}/`}>{meta.type}・{meta.title}</a></p>
     <h1 class="rv" style="--i:1">{entry.data.title}</h1>
-    <div class="meta rv" style="--i:2"><time>{dot(entry.data.date)}</time>{entry.data.tags?.map((t: string) => <span>{t}</span>)}</div>
+    <div class="meta rv" style="--i:2">{entry.data.draft && <span class="dft">草稿・只在預覽顯示</span>}<time>{dot(entry.data.date)}</time>{entry.data.tags?.map((t: string) => <span>{t}</span>)}</div>
   </div>
 </header>
 <article class="read band-light">
@@ -92,7 +98,11 @@ const schema = [
       {prev ? <a href={`/pillars/${meta.slug}/${prev.slug}`}><small>← 上一篇</small><b>{prev.data.title}</b></a> : <span><small>← 上一篇</small><b style="color:var(--ash)">這是第一篇</b></span>}
       {next ? <a class="nx" href={`/pillars/${meta.slug}/${next.slug}`}><small>下一篇 →</small><b>{next.data.title}</b></a> : <span class="nx"><small>下一篇 →</small><b style="color:var(--ash)">還沒寫</b></span>}
     </nav>
-    <a class="back" href={`/pillars/${meta.slug}`}>回到「{meta.type}」全部文章</a>
+    <nav class="backs" aria-label="回到列表">
+      <a href={`/pillars/${meta.slug}/`}>「{meta.type}」全部文章</a>
+      <a href="/journal/">日常紀錄・全部</a>
+      <a href="/">回首頁</a>
+    </nav>
   </div>
 </article>
 </BaseLayout>
