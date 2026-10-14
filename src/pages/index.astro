@@ -8,6 +8,8 @@ import worksData from '../data/works.json';
 import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
+import { buildRing } from '../data/ring';
+const endRing = buildRing(copy.birth_date);
 
 const all = (await Promise.all(
   pillars.map(async (p) => (await getCollection(p.slug as any, ({ data }: any) => !data.draft)).map((e: any) => ({ dir: p.slug, e })))
@@ -443,6 +445,25 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hats{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:34px;}
 .hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
 .hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
+.end-ring{display:flex;align-items:center;gap:16px;margin-bottom:22px;}
+.end-ring svg{width:120px;height:120px;overflow:visible;}
+.end-ring path{fill:none;stroke-width:.45;}
+.end-ring path.tw{stroke:#C9707E;opacity:.22;}
+.end-ring path.jp{stroke:#D4A24C;opacity:.26;}
+.end-ring path.now{stroke:#E6BA6A;stroke-width:1.1;opacity:1;filter:drop-shadow(0 0 3px rgba(230,186,106,.75));}
+.end-ring .dot{fill:#F3D9A0;filter:drop-shadow(0 0 3px #F3D9A0);}
+.end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
+.nextsec{display:block;width:60px;margin:64px auto -40px;color:var(--gold);opacity:.85;transition:opacity .3s,transform .4s var(--ease);}
+.nextsec:hover{opacity:1;transform:translateY(3px);}
+.nextsec svg{display:block;width:60px;height:64px;overflow:visible;}
+.nextsec path{fill:none;stroke:currentColor;stroke-linecap:round;}
+.nextsec .a0{stroke-width:1.2;opacity:.9;}
+.nextsec .a1{stroke-width:.8;opacity:.22;}
+.nextsec .a2{stroke-width:.8;opacity:.4;}
+.nextsec .seed{fill:#F3D9A0;filter:drop-shadow(0 0 3px #E6BA6A);offset-path:path('M26 2C44 12 52 32 50 58');offset-rotate:0deg;animation:seedfall 2.8s var(--ease) infinite;}
+@keyframes seedfall{0%{offset-distance:0%;opacity:0}15%{opacity:1}80%{opacity:1}100%{offset-distance:100%;opacity:0}}
+@media(prefers-reduced-motion:reduce){.nextsec .seed{animation:none;offset-distance:100%;}}
+@media(max-width:720px){.nextsec{margin:48px auto -24px;}}
 .svc-head{margin-top:44px;display:flex;align-items:baseline;gap:14px;}
 .svc-head small{font-family:var(--latin);font-size:13px;letter-spacing:.3em;color:var(--gold);}
 .svc-head h3{font-family:var(--serif);font-weight:500;font-size:20px;}
@@ -551,6 +572,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
     </div>
   </div>
+  <a class="nextsec" href="#works" aria-label="往下：有點樣子"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec" id="works" aria-labelledby="works-h">
@@ -574,6 +596,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
+  <a class="nextsec" href="#chapters" aria-label="往下：39・連載中"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
@@ -623,6 +646,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
+  <a class="nextsec" href="#journal" aria-label="往下：日常紀錄"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
 <section class="sec band-light" id="journal" aria-labelledby="j-h">
@@ -645,13 +669,15 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>
     </div>
   </div>
+  <a class="nextsec" href="#support-end" aria-label="往下：寫在最後"><svg viewBox="0 0 60 64" aria-hidden="true"><path class="a1" d="M6 4C30 14 38 34 30 60"/><path class="a2" d="M16 2C38 12 46 34 40 62"/><path class="a0" d="M26 2C44 12 52 32 50 58"/><circle class="seed" r="2.6"/></svg></a>
 </section>
 
-<section class="sec closing" aria-label="支持這個連載">
+<section class="sec closing" id="support-end" aria-label="支持這個連載">
   <div class="sec-grid">
     <div class="side" aria-hidden="true"></div>
     <div class="about end">
       <div>
+          <div class="end-ring rv" style="--i:3" aria-hidden="true"><svg viewBox="0 0 100 100">{endRing.paths.map((p) => <path d={p.d} class={p.cls} />)}<circle cx={endRing.lx} cy={endRing.ly} r="1.8" class="dot" /></svg><span>第 {endRing.age} 圈</span></div>
           {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
           <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
       </div>
