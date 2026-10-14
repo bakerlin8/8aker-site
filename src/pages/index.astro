@@ -429,6 +429,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 }
 /* ── 壱 初次見面：我在做什麼 ── */
 .hero-id{margin-top:18px;font-size:14px;letter-spacing:.06em;color:#D4A24C;}
+.tale{position:relative;margin-top:34px;padding-left:28px;max-width:34em;font-family:var(--serif);font-size:clamp(17px,1.9vw,19px);line-height:2.05;color:#E7D9C6;}
+.tale::before{content:'';position:absolute;left:0;top:.6em;bottom:.6em;width:1px;background:linear-gradient(180deg,rgba(201,112,126,.7),rgba(212,162,76,.9));}
+.tale p+p{margin-top:1.35em;}
+.tale .tale-end{margin-top:1.8em;font-size:clamp(20px,2.4vw,24px);line-height:1.7;color:#D4A24C;}
+.story-echo{font-family:var(--serif);font-size:15px;line-height:1.9;color:var(--bone-2);margin-bottom:18px;}
+.story-echo b{display:block;font-weight:500;color:var(--gold);font-size:17px;}
 .me{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;margin-top:30px;align-items:center;}
 .me.has-photo{grid-template-columns:200px minmax(0,1fr);}
 .me-photo{width:200px;aspect-ratio:4/5;object-fit:cover;border:1px solid var(--line);}
@@ -437,9 +443,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hats{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:34px;}
 .hat{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:20px 18px;background:var(--night-2);border:1px solid var(--line);transition:border-color .3s,transform .4s var(--ease);}
 .hat:hover{border-color:rgba(212,162,76,.45);transform:translateY(-3px);}
-.hitems{list-style:none;margin-top:10px;}
-.hitems li{position:relative;padding-left:14px;font-size:13.5px;color:var(--bone);line-height:1.9;}
-.hitems li::before{content:"";position:absolute;left:0;top:.85em;width:5px;height:1px;background:var(--gold);}
+.svc-head{margin-top:44px;display:flex;align-items:baseline;gap:14px;}
+.svc-head small{font-family:var(--latin);font-size:13px;letter-spacing:.3em;color:var(--gold);}
+.svc-head h3{font-family:var(--serif);font-weight:500;font-size:20px;}
+.svc-head+.hats{margin-top:16px;}
+.hitems{list-style:none;margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;}
+.hitems li{font-size:12.5px;color:var(--bone);line-height:1.5;padding:3px 10px;border:1px solid rgba(212,162,76,.35);}
 .hprov{display:block;margin-top:10px;font-size:11.5px;letter-spacing:.06em;color:var(--ash);}
 .closing{padding-top:24px;}
 .closing .about.end{margin-top:0;}
@@ -528,20 +537,18 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"><span class="sn">壱</span><span class="sl"></span><span class="se">Hello</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
-      <div class={`me${aboutPhoto ? ' has-photo' : ''}`}>
-        {aboutPhoto && <img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="林子翔（巴）" loading="lazy" decoding="async" />}
-        <div>
-          <p class="me-intro rv" style="--i:2">{copy.about_intro}</p>
-          <p class="me-name rv" style="--i:3">{copy.about_lede}</p>
-        </div>
-      </div>
+      {Array.isArray(copy.about_story) && copy.about_story.length > 0 && <div class="tale">
+        {copy.about_story.map((para: string, i: number) => <p class="rv" style={`--i:${Math.min(i + 2, 8)}`}>{para.split('\n').map((ln: string, j: number) => <>{j > 0 && <br />}{ln}</>)}</p>)}
+        {copy.about_story_end && <p class="tale-end rv" style="--i:8">{copy.about_story_end}</p>}
+      </div>}
+      {aboutPhoto && <div class="me has-photo"><img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="林子翔（巴）" loading="lazy" decoding="async" /></div>}
+      <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>我能幫上忙的事</h3></div>
       <ol class="hats">
         {services.hats.map((h: any, i: number) => (
-          <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}{h.provider && <small class="hprov">{h.provider}</small>}</div></li>
+          <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
         ))}
       </ol>
       <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
-      <div class="me-cta rv" style="--i:7"><a class="btn-gold2" href="/chat/">有空聊聊 →</a><a class="ig-btn" href="#works">看我做過的東西 →</a></div>
     </div>
   </div>
 </section>
@@ -577,7 +584,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">現在進度</button><button aria-pressed="false" data-v="dream">未來祈願</button></div>
       <div id="vOne">
         <div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p>
-        <div class="story">
+        <div class="tale">
           <div class="mdetail" id="mdetail" aria-live="polite"></div>
           <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
             <div class="stat-top"><span id="pLabel">全卷累計</span><div class="tabs" id="pMode" role="group" aria-label="切換累計範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></div>
@@ -645,6 +652,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"></div>
     <div class="about end">
       <div>
+          {copy.about_story_end && <p class="story-echo rv" style="--i:4">年輪最外面那個小光點，就是今天的我，還在長。<b>{copy.about_story_end}</b></p>}
           <p class="motto-card rv" style="--i:5">{copy.motto_line1}{copy.motto_line2}<small lang="ja">したことは残す。済んだことは手放す。</small></p>
       </div>
         <aside class="support rv" style="--i:4" id="support">
