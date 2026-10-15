@@ -56,7 +56,7 @@
   "tw_text": "在台灣？也可以轉帳**單筆支持**。",
   "tw_link": "請我喝杯咖啡・私訊 @{ig}",
   "tw_note": "轉帳資訊只由 @{ig} 回覆，其他帳號請忽略。",
-  "give_show": "off",
+  "give_show": "on",
   "give_rate": "8",
   "give_org": "Civic Force",
   "give_url": "",

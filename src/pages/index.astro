@@ -476,6 +476,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .support .glink{display:inline-block;margin-top:6px;font-size:12.5px;color:#5B4B4E;border-bottom:1px solid #8A2B3D;padding-bottom:1px;transition:color .3s;}
 .support .glink:hover{color:#8A2B3D;}
 .flow{margin-top:2px;}
+.flow-k{margin:0 0 8px!important;font-size:11px!important;letter-spacing:.24em;color:#A07A3A!important;}
+.end-card .support .give{margin-top:0;margin-bottom:24px;padding:14px 16px;border-top:0;border-left:2px solid rgba(138,43,61,.35);background:rgba(138,43,61,.04);}
+.end-card .flow-key{margin-top:0;gap:5px;font-size:12.5px;}
 .support .give>div:empty{display:none;}
 .flow-bar{display:flex;gap:2px;height:30px;border-radius:2px;}
 .flow-bar span{display:flex;align-items:center;justify-content:center;min-width:3px;transform-origin:0 50%;}
@@ -697,7 +700,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .end-card{display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:stretch;border:1px solid rgba(239,229,214,.1);box-shadow:0 40px 80px -40px rgba(0,0,0,.8);}
 .end-card .support{align-self:stretch;display:flex;flex-direction:column;padding:32px 28px 26px;}
 .end-card .support .tw{margin-top:auto;padding-top:0;border-top:0;}
-.end-card .support .give-cta{margin-bottom:28px;}
+.end-card .support .give-cta{margin-bottom:20px;}
 .end-card .tw-box{padding:16px 16px 14px;border:1px solid rgba(28,15,20,.14);background:rgba(255,255,255,.28);}
 .end-card .tw p{font-size:13.5px;}
 .end-card .tw a{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;border:1px solid rgba(28,15,20,.3);border-bottom-color:rgba(28,15,20,.3);font-size:13px;transition:border-color .3s,background .3s,color .3s;}
@@ -964,8 +967,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
               {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
             </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div>
-            <div class="flow"><div class="flow-bar" role="img" aria-label={flowAll.map((x) => `${x.name} ${x.pct}%`).join('，')}>{flowAll.map((x, i) => <span class={x.give ? 'fb' : ''} style={`flex:${x.pct};background:${x.c};color:${x.dark ? '#EFE5D6' : '#1C0F14'};--d:${i * 0.08}s`}>{x.pct >= 7 && <b class="num">{x.pct}</b>}</span>)}</div>
-              <ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b>{x.name}</li>)}</ul></div>
+            <div class="flow">
+              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b>{x.name}</li>)}</ul></div>
           </div>
           </>}
           {igUrl && C.tw_show !== 'off' && <div class="tw">
