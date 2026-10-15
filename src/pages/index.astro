@@ -8,7 +8,7 @@ import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
-import { allEntries } from '../data/journal';
+import { allEntries, SHOW_DRAFTS } from '../data/journal';
 import { workColor, colorVars } from '../data/work-colors';
 const endRing = buildRing(copy.birth_date);
 // 連載區的五角儀表板：首頁先拿掉（段位改顯示在「日常紀錄」頁的分類按鈕上），改回 true 就會重新出現
@@ -165,15 +165,17 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 @media(max-width:960px){.story{grid-template-columns:1fr;gap:28px;}}
 
 /* ── 未來祈願：提灯（亮度＝進度） ── */
-.cho-wrap{padding-top:4px;margin-top:26px;position:relative;background:linear-gradient(#170b10,#26101a 70%,#2e1219);border:1px solid var(--line);}
+.cho-wrap{margin-top:30px;position:relative;}
 .cho-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:22px 26px 0;}
 .cho-head .t{font-family:var(--serif);font-size:22px;color:#EBD3A8;}
 .cho-head .y{font-size:12.5px;color:var(--ash);letter-spacing:.12em;}
 .cho-head .s{flex-basis:100%;font-size:13px;color:var(--bone-2);}
-.cho-scroll{overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;position:relative;}
-.cho-row{display:flex;gap:10px;padding:0 26px 28px;min-width:min-content;position:relative;}
-.cho-row::before{content:"";position:absolute;left:0;right:0;top:22px;height:46px;border-top:1.5px solid rgba(239,229,214,.3);border-radius:50%/0 0 100% 100%;pointer-events:none;}
-.cho{flex:0 0 190px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding-top:10px;color:inherit;}
+.cho-scroll{position:relative;}
+/* 祈願所：燈籠沿著一串串垂下的繩子排列，自動換行，不用橫向捲動 */
+.cho-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:40px 0;position:relative;}
+.cho::before{content:'';position:absolute;top:0;left:0;right:0;height:26px;border-bottom:1.2px solid rgba(239,229,214,.28);border-radius:0 0 50% 50%/0 0 100% 100%;pointer-events:none;}
+.cho{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 14px 0;color:inherit;}
+.cho h4,.cho .more{align-self:stretch;}.cho .st{align-self:center;}
 .cho .lan{align-self:center;}
 .cho .pin,.cho .pin-none{display:grid;place-items:center;width:24px;height:24px;margin-bottom:0;}
 .cho .pin{border-radius:50%;border:1px solid rgba(212,162,76,.6);color:var(--gold);font-size:12px;background:rgba(28,15,20,.85);transition:background .3s,color .3s,transform .3s var(--ease);}
@@ -184,7 +186,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho.go:focus-visible{outline:1px solid var(--gold);outline-offset:6px;}
 .cho .needs{margin-top:6px;font-size:12.5px;color:var(--bone-2);}
 .cho .lan{display:flex;flex-direction:column;align-items:center;transform-origin:50% 0;animation:sway 5.5s ease-in-out infinite;animation-delay:calc(var(--n) * -1.1s);}
-.cho .str{width:1px;height:22px;background:rgba(239,229,214,.4);}
+.cho .str{width:1px;height:18px;background:rgba(239,229,214,.4);}
+.cho .lan{position:relative;}
+.cho .pin,.cho .pin-none{position:absolute;top:0;left:calc(50% + 8px);}
 .cho .cp{width:44px;height:9px;background:#1a0f0a;border-radius:2px;}
 .cho .bd{position:relative;width:80px;height:116px;border-radius:44%/30%;display:grid;place-items:center;font-family:var(--serif);font-size:28px;color:#5a1a14;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 1px 11px),radial-gradient(60% 60% at 50% 50%,#ffe0a0,#e8893a 70%,#b0472a);
@@ -210,80 +214,118 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho .memo{margin-top:6px;font-size:12.5px;color:#E2A08F;}
 .cho .st{margin-top:10px;font-size:11.5px;letter-spacing:.1em;color:var(--gold);}
 .cho.idea .st{color:var(--ash);}
-.cho-hint{display:none;font-size:12px;color:var(--ash);padding:0 26px 18px;}
+.cho-hint{display:none!important;}
 @keyframes sway{0%,100%{transform:rotate(-1.6deg);}50%{transform:rotate(1.6deg);}}
 #kiganjo.in .cho{animation:choIn .7s var(--ease) both;animation-delay:calc(var(--n) * 90ms);}
 @keyframes choIn{from{opacity:0;transform:translateY(-12px);}}
 @media(prefers-reduced-motion:reduce){.cho .lan,#kiganjo.in .cho{animation:none;}}
-@media(max-width:640px){.cho-head{padding:18px 18px 0;}.cho-row{padding:0 18px 22px;}.cho{flex-basis:160px;}.cho-hint{display:block;padding:0 18px 16px;}}
+@media(max-width:640px){.cho-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 0;}.cho{padding:26px 8px 0;}.cho .bd{width:70px;height:100px;}}
 
 /* ── 弐 連載 ── */
 .mv-toggle{display:inline-flex;margin-top:28px;border:1px solid var(--line);}
-/* ── 連載 Dashboard ── */
-.dash{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;margin-top:22px;}
-.tile{background:rgba(20,8,12,.35);border:1px solid var(--line);padding:18px 20px;min-width:0;}
-.th{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px;color:var(--bone-2);}
-.th small{font-family:var(--latin);font-size:12px;letter-spacing:.24em;color:var(--ash);}
-.t-now{grid-column:span 7;grid-row:span 2;display:flex;flex-direction:column;}
-.t-kpi{grid-column:span 5;display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0;}
-.t-track{grid-column:span 5;}
-.t-dirs{grid-column:1/-1;}
-.t-rep{grid-column:1/-1;}
-.t-now h3{font-family:var(--serif);font-weight:500;font-size:15px;color:var(--gold);letter-spacing:.06em;}
-.t-now h3 span{display:block;margin-top:4px;font-size:24px;line-height:1.45;color:var(--bone);letter-spacing:0;}
-.t-now h4{font-size:12px;letter-spacing:.14em;color:var(--ash);margin-top:18px;font-weight:400;}
-.t-now p{color:var(--bone-2);margin-top:10px;}
-.t-now .mute{color:var(--ash);}
-.t-now .ch-link{margin-top:auto;padding-top:18px;align-self:flex-start;}
-.st{font-weight:400;padding:1px 9px;border:1px solid currentColor;margin-right:4px;font-size:12px;}
-.st-next{color:var(--gold);}.st-done{color:#9CC7B2;}.st-break,.st-future{color:var(--ash);}
-.ilist{list-style:none;margin-top:8px;}
+/* ── 連載：三種版型 ── */
+.chd{margin-top:24px;}
+.ca-kick{font-size:12.5px;letter-spacing:.14em;color:var(--gold);}
+.chd h3{font-family:var(--serif);font-weight:500;font-size:26px;line-height:1.45;margin-top:6px;color:var(--bone);}
+.chd h3 em{display:block;font-style:normal;font-size:14px;letter-spacing:.12em;color:var(--bone-2);margin-bottom:2px;}
+.chd h4{font-size:12px;letter-spacing:.16em;color:var(--ash);margin-top:18px;font-weight:400;}
+.chd article p{color:var(--bone-2);margin-top:10px;}
+.chd .mute{color:var(--ash)!important;}
+.chd .ch-link{display:inline-block;margin-top:20px;}
+.ilist{list-style:none;margin-top:6px;}
 .ilist li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:6px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px;color:var(--bone);}
 .ilist .k{font-family:var(--jp);color:var(--dc,var(--gold));}
-.mprog{margin-top:16px;}
-.mbar{height:6px;background:rgba(239,229,214,.08);position:relative;overflow:hidden;}
-.mbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,rgba(212,162,76,.5),#D4A24C);}
-.mprog small{display:block;margin-top:7px;font-size:12.5px;color:var(--ash);}
-.mprog b{color:var(--bone);font-weight:400;}
-.kpi{padding:16px 18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px;}
-.kpi:nth-child(2n){border-right:0;}
-.kpi:nth-child(n+3){border-bottom:0;}
-.kpi b{font-weight:300;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--bone);}
-.kpi small{font-size:12.5px;color:var(--bone-2);}
-.kpi em{font-style:normal;font-size:11.5px;color:var(--ash);}
-.t-track .track-wrap{margin:4px 0 0!important;overflow:visible;padding:0!important;}
-.t-track .track{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;min-width:0!important;width:100%;}
-.t-track .track::before,.t-track .track .fill{display:none;}
-.t-track .track li{min-width:0;}
-.t-track .node{width:100%;min-width:0;flex-direction:column;gap:3px;padding:0!important;}
-.t-track .node .dot{width:100%;height:38px;margin:0;border-radius:0;display:grid;place-items:center;font-family:var(--latin);font-size:16px;color:var(--bone-2);border:1px solid var(--line);background:transparent;transition:background .3s,border-color .3s,color .3s;}
-.t-track .node.done .dot{background:rgba(212,162,76,.85);border-color:#D4A24C;color:#1C0F14;}
-.t-track .node.next .dot{border-color:#D4A24C;color:#D4A24C;animation:none;box-shadow:inset 0 0 0 1px rgba(212,162,76,.5);}
-.t-track .node.final .dot{width:100%;height:38px;font-family:var(--jp);font-size:15px;color:var(--gold);}
-.t-track .node:hover .dot{transform:none;border-color:var(--bone-2);box-shadow:none;}
-.t-track .node[aria-current="true"] .dot{transform:none;outline:1.5px solid var(--bone);outline-offset:2px;}
-.t-track .node .d{font-size:10.5px;}
-.dbars{list-style:none;}
-.dbars a{display:grid;grid-template-columns:22px 44px minmax(0,1fr) 40px 130px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);transition:background .3s;}
-.dbars li:last-child a{border-bottom:0;}
-.dbars a:hover{background:rgba(239,229,214,.03);}
-.dbars .k{font-family:var(--jp);font-size:18px;color:var(--dc);}
-.dbars .nm{font-size:13px;color:var(--bone-2);}
-.dbars .bar{height:6px;background:rgba(239,229,214,.07);position:relative;overflow:hidden;}
-.dbars .bar i{position:absolute;inset:0 auto 0 0;background:var(--dc);transition:width 1s var(--ease);}
-.dbars b{font-weight:300;font-size:18px;text-align:right;}
-.dbars small{font-size:11.5px;color:var(--ash);white-space:nowrap;}
-.t-dirs .tabs{display:flex;gap:4px;}
-.t-dirs .tabs button{font-size:12px;padding:3px 10px;border:1px solid var(--line);color:var(--bone-2);}
-.t-dirs .tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
-.t-rep{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;border-color:rgba(212,162,76,.3);background:linear-gradient(110deg,rgba(212,162,76,.08),rgba(20,8,12,.35) 70%);}
-.t-rep .mi{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--gold);color:var(--gold);font-family:var(--jp);font-size:16px;}
-.t-rep b{display:block;font-weight:500;font-size:14px;color:var(--bone);}
-.t-rep small{display:block;font-size:12px;color:var(--bone-2);line-height:1.6;margin-top:2px;}
-.t-rep .vol{text-align:right;border-left:1px solid var(--line);padding-left:14px;}
-.t-rep .vol b{font-family:var(--latin);font-weight:400;font-size:28px;color:var(--gold);line-height:1;}
-@media(max-width:980px){.t-now,.t-kpi,.t-track,.t-dirs,.t-rep{grid-column:1/-1;grid-row:auto;}}
-@media(max-width:520px){.dash{gap:10px;}.tile{padding:16px 14px;}.t-kpi{padding:0;}.kpi{padding:14px;}.kpi b{font-size:28px;}.t-now h3 span{font-size:20px;}.dbars a{grid-template-columns:20px 36px minmax(0,1fr) 28px;}.dbars small{display:none;}.t-rep{grid-template-columns:auto minmax(0,1fr);}.t-rep .vol{grid-column:1/-1;text-align:left;border-left:0;border-top:1px solid var(--line);padding:10px 0 0;display:flex;align-items:baseline;gap:8px;}}
+.ca-prog{height:2px;background:rgba(239,229,214,.12);margin-top:18px;position:relative;}
+.ca-prog i{position:absolute;inset:0 auto 0 0;background:var(--gold);}
+.ca-prog i::after{content:'';position:absolute;right:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(212,162,76,.18);}
+.ca-pn{font-size:12.5px!important;color:var(--ash)!important;margin-top:9px!important;}
+.ca-pn b{color:var(--bone);font-weight:400;}
+.ca-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:22px;border-top:1px solid var(--line);}
+.ca-nums div{padding:12px 0 0;}
+.ca-nums div+div{padding-left:16px;border-left:1px solid var(--line);}
+.ca-nums b{display:block;font-weight:300;font-size:30px;line-height:1.1;color:var(--bone);}
+.ca-nums small{font-size:12px;color:var(--ash);}
+.dline{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:16px;font-size:13.5px;color:var(--bone-2);}
+.dline a{display:inline-flex;align-items:baseline;gap:5px;}
+.dline b{font-family:var(--jp);font-weight:400;color:var(--dc);}
+.dline a:hover{color:var(--bone);}
+.rline{display:flex;align-items:center;gap:12px;margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--bone-2);}
+.rline span{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--gold);color:var(--gold);font-family:var(--jp);font-size:14px;flex:none;}
+/* A 目次 */
+.ca{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;}
+.ca-toc .ca-th{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.5px solid var(--bone);padding-bottom:8px;}
+.ca-th span{font-family:var(--serif);font-size:20px;color:var(--bone);letter-spacing:.3em;}
+.ca-th small{font-family:var(--latin);font-size:12px;letter-spacing:.2em;color:var(--ash);}
+.ca-toc ol{list-style:none;}
+.ca-toc button{width:100%;display:grid;grid-template-columns:30px minmax(0,1fr) auto 14px;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--bone-2);transition:color .3s,padding .35s var(--ease);}
+.ca-toc .no{font-family:var(--latin);font-size:17px;color:var(--ash);}
+.ca-toc .tt{position:relative;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:var(--serif);font-size:14.5px;}
+.ca-toc .dt{font-family:var(--latin);font-size:13px;color:var(--ash);font-variant-numeric:tabular-nums;}
+.ca-toc .mk{width:8px;height:8px;border-radius:50%;border:1px solid var(--ash);justify-self:center;align-self:center;}
+.ca-toc .done .mk{background:var(--gold);border-color:var(--gold);}
+.ca-toc .done .no{color:var(--gold);}
+.ca-toc .next .mk{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,162,76,.2);}
+.ca-toc .future{color:rgba(239,229,214,.45);}
+.ca-toc button:hover{color:var(--bone);padding-left:6px;}
+.ca-toc button.on{color:var(--bone);}
+.ca-toc button.on .no,.ca-toc button.on .dt{color:var(--gold);}
+.ca-toc button.on .tt::before{content:'▸ ';color:var(--gold);}
+.ca-toc .fin .no{font-family:var(--jp);color:var(--gold);}
+/* B 年輪帳 */
+.cb{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:56px;align-items:start;}
+.cb-ring{position:relative;}
+.cb-ring svg{width:100%;height:auto;display:block;overflow:visible;}
+.rg{fill:none;stroke:rgba(239,229,214,.24);stroke-width:1;cursor:pointer;transition:stroke .3s,stroke-width .3s;}
+.rg.future{stroke-dasharray:2 5;}
+.rg.done{stroke:rgba(212,162,76,.7);stroke-width:1.6;}
+.rg.next{stroke:#F3D9A0;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(212,162,76,.6));}
+.rg.fin{stroke:rgba(212,162,76,.35);stroke-dasharray:1 4;}
+.rg.on{stroke-width:3;}
+.rg:hover{stroke:var(--bone);}
+.rg-hit{fill:none;stroke:none;}
+.cb-c{position:absolute;left:50%;top:0;width:100%;aspect-ratio:1;transform:translateX(-50%);display:grid;place-content:center;justify-items:center;pointer-events:none;}
+.cb-c b{font-family:var(--jp);font-weight:400;font-size:30px;color:var(--gold);line-height:1;}
+.cb-c small{font-size:11px;color:var(--ash);margin-top:4px;letter-spacing:.2em;}
+.cb-ch{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:18px;}
+.cb-ch button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);font-family:var(--latin);font-size:14px;color:var(--bone-2);transition:all .3s;}
+.cb-ch .done{border-color:rgba(212,162,76,.6);color:var(--gold);}
+.cb-ch .next{border-color:var(--gold);color:var(--gold);}
+.cb-ch .on{background:var(--gold);color:#1C0F14;border-color:var(--gold);}
+.cb-nums{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:22px;border-top:1px solid var(--line);}
+.cb-nums div{padding:12px 0 0;}
+.cb-nums div+div{padding-left:14px;border-left:1px solid var(--line);}
+.cb-nums dt{font-size:12px;color:var(--ash);}
+.cb-nums dd{font-weight:300;font-size:28px;color:var(--bone);line-height:1.2;}
+.cb-nums dd small{font-size:11px;color:var(--ash);margin-left:3px;}
+/* C 縦書き帳 */
+.cc-cols{list-style:none;display:flex;flex-direction:row-reverse;border-top:1.5px solid var(--bone);border-bottom:1.5px solid var(--bone);overflow-x:auto;scrollbar-width:none;}
+.cc-cols::-webkit-scrollbar{display:none;}
+.cc-cols li{flex:1 0 64px;}
+.cc-cols li+li{border-right:1px solid var(--line);}
+.cc-cols button{position:relative;width:100%;height:300px;padding:16px 0 12px;display:flex;flex-direction:row-reverse;justify-content:center;align-items:flex-start;gap:6px;color:var(--bone-2);transition:background .35s,color .3s;}
+.cc-cols button>span{writing-mode:vertical-rl;}
+.cc-cols .vn{font-family:var(--serif);font-size:15px;color:var(--bone);letter-spacing:.12em;}
+.cc-cols button>span{flex:none;}
+.cc-cols .vt{inline-size:190px;font-family:var(--serif);font-size:13px;line-height:1.55;letter-spacing:.06em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.cc-cols .vd{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;}
+.cc-cols .vd{font-size:11.5px;color:var(--ash);letter-spacing:.08em;}
+.cc-cols .future{opacity:.5;}
+.cc-cols button:hover{background:rgba(239,229,214,.04);opacity:1;}
+.cc-cols button.on{background:linear-gradient(rgba(212,162,76,.14),rgba(212,162,76,.05));}
+.cc-cols button.on .vn{color:var(--gold);}
+.cc-cols .hk{writing-mode:horizontal-tb;}
+.hk{position:absolute;bottom:56px;left:50%;transform:translateX(-50%) rotate(-8deg);writing-mode:horizontal-tb;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--jp);font-size:13px;border:1.5px solid currentColor;}
+.hk.done{color:#C8584A;background:rgba(200,88,74,.08);}
+.hk.next{color:var(--gold);}
+.hk.fin{color:var(--gold);border-radius:3px;}
+.cc-now{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px;margin-top:26px;}
+.cc-side .ca-nums{margin-top:6px;}
+@media(max-width:900px){.ca,.cb,.cc-now{grid-template-columns:1fr;gap:32px;}.cb-ring{max-width:360px;margin:0 auto;width:100%;}}
+@media(max-width:520px){.chd h3{font-size:21px;}.ca-nums b{font-size:24px;}.cb-nums{grid-template-columns:repeat(2,minmax(0,1fr));}.cb-nums div:nth-child(3){padding-left:0;border-left:0;}.cc-cols li{flex-basis:56px;}.cc-cols button{height:260px;}}
+.dash-pick{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;gap:6px;align-items:center;padding:8px 10px;background:rgba(28,15,20,.94);border:1px solid rgba(212,162,76,.4);}
+.dash-pick small{font-size:11px;color:#B9A89E;margin-right:4px;}
+.dash-pick button{font-size:12.5px;padding:6px 10px;min-height:36px;border:1px solid rgba(239,229,214,.2);color:#EFE5D6;}
+.dash-pick button[aria-pressed=true]{border-color:#D4A24C;color:#D4A24C;}
 .mv-toggle button{font-size:13px;padding:5px 16px;color:var(--bone-2);transition:background .3s,color .3s;}
 .mv-toggle button:hover{color:var(--bone);}
 .mv-toggle button[aria-pressed="true"]{background:var(--bone);color:var(--night);}
@@ -813,15 +855,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div>
       <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
       
-      <div id="vOne" class="dash rv" style="--i:2">
-        <article class="tile t-now" id="tNow" aria-live="polite"></article>
-        <div class="tile t-kpi" id="tKpi"></div>
-        <section class="tile t-track"><header class="th"><span>12 話進度</span><small>EPISODES</small></header>
-          <div class="track-wrap"><ol class="track" id="track" aria-label="連載時間軸"></ol></div></section>
-        <section class="tile t-dirs"><header class="th"><span id="dLabel">五個方向・全卷</span><div class="tabs" id="dMode" role="group" aria-label="切換範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></header>
-          <ul class="dbars" id="dBars"></ul></section>
-        <div class="tile t-rep" id="tRep"></div>
-      </div>
+      <div id="chDash" class="chd rv" style="--i:2" data-v="a" aria-live="polite"></div>
+      {SHOW_DRAFTS && <div class="dash-pick" id="dashPick" role="group" aria-label="連載版型（只在預覽顯示）"><small>連載版型</small><button data-s="a" aria-pressed="true">A 目次</button><button data-s="b" aria-pressed="false">B 年輪帳</button><button data-s="c" aria-pressed="false">C 縦書き帳</button></div>}
     </div>
   </div>
 </section>
@@ -1060,51 +1095,63 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');};
   var nr=list[Math.min(nextIdx,list.length-1)];
   var nrEl=document.getElementById('nextRel');if(nrEl)nrEl.innerHTML=(nr.no===0?'新連載・':'連載中・')+label(nr)+'・'+(+nr.date.slice(5,7))+' 月 '+(+nr.date.slice(8))+' 日刊出 <b>'+(nr.days<=0?'今天':nr.days+' 天後')+'</b>';
-  var Tr=document.getElementById('track'),Tn=document.getElementById('tNow'),Tk=document.getElementById('tKpi'),Rp=document.getElementById('tRep'),DB=document.getElementById('dBars'),DM=document.getElementById('dMode'),DL=document.getElementById('dLabel');
-  Tr.innerHTML=list.map(function(r,i){return '<li><button class="node '+r.state+(r.final?' final':'')+'" data-i="'+i+'" aria-label="'+label(r)+'，'+md(r)+'"><span class="dot">'+(r.final?'巻':r.no)+'</span><span class="d">'+md(r)+'</span></button></li>';}).join('');
-  function items(arr,withDir){return '<ul class="ilist">'+arr.map(function(x){var d=withDir&&x.dir?dirOf(x.dir):null;return '<li'+(d?' style="--dc:'+col(d.id)+'"':'')+'><span class="k">'+(d?d.k:'・')+'</span><span>'+esc(x.text||x)+'</span></li>';}).join('')+'</ul>';}
+  /* ── 連載：三種版型（A 目次／B 年輪帳／C 縦書き帳），資料共用 ── */
+  var CD=document.getElementById('chDash');
+  var KN=['〇','一','二','三','四','五','六','七','八','九','十','十一'];
   var dan=function(c){return c>=100?'四段':c>=60?'三段':c>=30?'二段':c>=10?'初段':'見習';};
-  var nextTier=function(c){var T=[10,30,60,100];for(var k=0;k<T.length;k++)if(c<T[k])return T[k];return 0;};
-  var DMODE='all',CUR=null;
-  function bars(){var c=DMODE==='all'?D.totals:(CUR?CUR.counts:{}),mx=Math.max(1,Math.max.apply(null,D.dirs.map(function(d){return c[d.id]||0;})));
-    DL.textContent=DMODE==='all'?'五個方向・全卷':'五個方向・'+(CUR?CUR.label:'這一話');
-    DB.innerHTML=D.dirs.map(function(d){var n=c[d.id]||0,w=DMODE==='all'?(nextTier(n)?n/nextTier(n):1):n/mx;
-      return '<li style="--dc:'+col(d.id)+'"><a href="/pillars/'+d.id+'/"><span class="k">'+d.k+'</span><span class="nm">'+d.n+'</span><span class="bar"><i style="width:'+Math.max(n?4:0,Math.round(w*100))+'%"></i></span><b class="num">'+n+'</b><small>'+(DMODE==='all'?dan(n)+(nextTier(n)?'・下一段 '+nextTier(n):''):'篇')+'</small></a></li>';}).join('');
-    DM.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===DMODE);});}
-  DM.addEventListener('click',function(e){var b=e.target.closest('button');if(b){DMODE=b.dataset.m;bars();}});
-  /* 連續紀錄：從今天往回數，每天都有文章的天數 */
   var days={};D.entries.forEach(function(e){days[e.date]=1;});
   var streak=0,dd=new Date(now+9*3600e3);for(var g=0;g<400;g++){var key=dd.toISOString().slice(0,10);if(days[key])streak++;else if(g>0)break;dd.setUTCDate(dd.getUTCDate()-1);}
-  var last=D.entries.length?D.entries.map(function(e){return e.date;}).sort().pop():'';
-  var sinceLast=last?Math.max(0,Math.floor((now-T(last))/DAY)):null;
-  var vol=list[list.length-1];
-  function show(i){var r=list[i];Tr.querySelectorAll('.node').forEach(function(n){n.setAttribute('aria-current',+n.dataset.i===i);});
-    var from=i>0?list[i-1].date:D.start.slice(0,10),inRange=function(e){return (i>0?e.date>from:e.date>=from)&&e.date<=r.date;};
-    var es=D.entries.filter(inRange),total=es.length,live=!r.final&&(r.state!=='future');
-    var cc={};D.dirs.forEach(function(d){cc[d.id]=es.filter(function(e){return e.dir===d.id;}).length;});
-    var topD=D.dirs.slice().sort(function(a,b){return cc[b.id]-cc[a.id];})[0],hasTop=live&&cc[topD.id]>0;
-    /* 這一話的月份進度 */
-    var t0=T(from),t1=T(r.date),pct=Math.max(0,Math.min(1,(now-t0)/(t1-t0))),dayN=Math.max(0,Math.min(Math.round((t1-t0)/DAY),Math.floor((now-t0)/DAY)+1)),dayT=Math.round((t1-t0)/DAY);
-    var st={done:'已刊出',break:'休載',next:'製作中',future:'預定'}[r.state];
+  var vol=list[list.length-1],SEL=Math.min(nextIdx,list.length-1);
+  function items(arr,withDir){return '<ul class="ilist">'+arr.map(function(x){var d=withDir&&x.dir?dirOf(x.dir):null;return '<li'+(d?' style="--dc:'+col(d.id)+'"':'')+'><span class="k">'+(d?d.k:'・')+'</span><span>'+esc(x.text||x)+'</span></li>';}).join('')+'</ul>';}
+  function info(i){var r=list[i],from=i>0?list[i-1].date:D.start.slice(0,10),inR=function(e){return (i>0?e.date>from:e.date>=from)&&e.date<=r.date;};
+    var es=D.entries.filter(inR),live=!r.final&&r.state!=='future',cc={};D.dirs.forEach(function(d){cc[d.id]=es.filter(function(e){return e.dir===d.id;}).length;});
+    var t0=T(from),t1=T(r.date),pct=Math.max(0,Math.min(1,(now-t0)/(t1-t0))),dayT=Math.round((t1-t0)/DAY),dayN=Math.max(0,Math.min(dayT,Math.floor((now-t0)/DAY)+1));
     var body='';
     if(r.state==='done'||r.state==='break'){body+=r.summary?'<p>'+esc(r.summary)+'</p>':'';body+=(r.keep&&r.keep.length)?'<h4>留下的</h4>'+items(r.keep):'';body+=(r.letgo&&r.letgo.length)?'<h4>放下的</h4>'+items(r.letgo):'';if(!body)body='<p class="mute">'+(r.state==='break'?'這個月休載。':'這一話的內容整理中。')+'</p>';}
     else if(r.final)body='<p>'+esc(r.summary)+'</p>';
     else if(r.plan&&r.plan.length)body='<h4>預計內容</h4>'+items(r.plan,true);
     else body='<p class="mute">這一話還在準備中，刊出當天公開。</p>';
-    Tn.innerHTML='<header class="th"><span><b class="st st-'+r.state+'">'+st+'</b>'+(r.arc?'・'+r.arc:'')+'</span><small>'+r.date.replace(/-/g,'.')+'</small></header>'
-      +'<h3>'+label(r)+'<span>'+esc(r.title)+'</span></h3>'
-      +(r.state==='next'?'<div class="mprog"><div class="mbar"><i style="width:'+(pct*100).toFixed(1)+'%"></i></div><small>這一話第 <b>'+dayN+'</b> 天 / '+dayT+' 天・還有 <b>'+r.days+'</b> 天刊出</small></div>':'')
-      +body+'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>';
-    var k=function(v,l,sub){return '<div class="kpi"><b class="num">'+v+'</b><small>'+l+'</small>'+(sub?'<em>'+sub+'</em>':'')+'</div>';};
-    Tk.innerHTML=k(live?total:'—',r.state==='next'?'這一話目前的文章':'這一話的文章')
-      +k(hasTop?'<span style="color:'+col(topD.id)+'">'+topD.k+'</span>':'—','寫最多的方向',hasTop?topD.n+' '+cc[topD.id]+' 篇':'')
-      +k(D.entries.length,'全卷累積文章')
-      +k(streak,'連續紀錄天數',sinceLast===null?'':sinceLast===0?'今天有寫':'上一篇 '+sinceLast+' 天前');
-    Rp.innerHTML=r.final?'<span class="mi" aria-hidden="true">巻</span><div><b>第一卷・'+vol.date.replace(/-/g,'.')+'</b><small>還有 '+Math.max(0,vol.days)+' 天，十二話收成一本。</small></div>'
-      :'<span class="mi" aria-hidden="true">報</span><div><b>每月 2 號・月報</b><small>'+(r.state==='done'?'這一話的月報已寄給天使投資人。':'這個月的日常紀錄，'+(+r.date.slice(5,7))+' 月 2 日會依方向整理成月報，寄給天使投資人。')+'</small></div><div class="vol"><b class="num">'+Math.max(0,vol.days)+'</b><small>天後・第一卷</small></div>';
-    CUR={counts:cc,label:live?label(r):label(r)+'（未開始）'};bars();}
-  Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
-  show(Math.min(nextIdx,list.length-1));
+    return {r:r,total:es.length,live:live,cc:cc,pct:pct,dayN:dayN,dayT:dayT,body:body,st:{done:'刊出',break:'休載',next:'製作中',future:'預定'}[r.state],
+      link:'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>'};}
+  var dirLine=function(c){return '<p class="dline">'+D.dirs.map(function(d){return '<a href="/pillars/'+d.id+'/" style="--dc:'+col(d.id)+'"><b>'+d.k+'</b>'+(c[d.id]||0)+'</a>';}).join('')+'</p>';};
+  var repLine='<p class="rline"><span>報</span>每月 2 號，這個月的日常紀錄會依方向整理成月報，寄給天使投資人。</p>';
+  var knum=function(r){return r.final?'巻':KN[r.no]||r.no;};
+  /* A：雜誌目次 */
+  function vA(){var x=info(SEL),r=x.r;
+    return '<div class="ca"><article class="ca-now"><p class="ca-kick">'+(r.state==='next'?'今月號・製作中':x.st)+(r.arc?'・'+r.arc:'')+'</p><h3><em>'+label(r)+'</em>'+esc(r.title)+'</h3>'
+      +(r.state==='next'?'<div class="ca-prog"><i style="width:'+(x.pct*100).toFixed(1)+'%"></i></div><p class="ca-pn">第 <b>'+x.dayN+'</b> 天／'+x.dayT+' 天　'+r.date.slice(5).replace('-','.')+' 刊出・還有 <b>'+r.days+'</b> 天</p>':'')
+      +x.body+'<div class="ca-nums"><div><b class="num">'+(x.live?x.total:'—')+'</b><small>這一話的文章</small></div><div><b class="num">'+D.entries.length+'</b><small>全卷累積</small></div><div><b class="num">'+streak+'</b><small>連續紀錄天數</small></div></div>'+x.link+'</article>'
+      +'<nav class="ca-toc" aria-label="連載目次"><p class="ca-th"><span>目次</span><small>CONTENTS・第一卷</small></p><ol>'
+      +list.map(function(q,i){return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="no">'+(q.final?'巻':q.no)+'</span><span class="tt">'+esc(q.final?'第一卷・40 歲發售':q.title)+'</span><span class="dt">'+md(q)+'</span><span class="mk" aria-hidden="true"></span></button></li>';}).join('')+'</ol>'
+      +dirLine(D.totals)+'</nav></div>'+repLine;}
+  /* B：年輪帳——每一話是一圈，刊出的圈描金，這一話依月份進度畫到一半 */
+  function vB(){var x=info(SEL),r=x.r,n=list.length,R0=26,R1=148,sv='';
+    for(var i=0;i<n;i++){var q=list[i],rr=R0+(R1-R0)*i/(n-1),c=2*Math.PI*rr,cls=q.state,dash='';
+      if(q.state==='next'){var qi=info(i);dash=' stroke-dasharray="'+(c*Math.max(.02,qi.pct)).toFixed(1)+' '+c.toFixed(1)+'"';}
+      sv+='<circle class="rg '+cls+(i===SEL?' on':'')+(q.final?' fin':'')+'" r="'+rr.toFixed(1)+'"'+dash+' transform="rotate(-90)" data-i="'+i+'"/>';}
+    var cr=R0+(R1-R0)*SEL/(n-1);
+    return '<div class="cb"><div class="cb-ring"><svg viewBox="-170 -170 340 340" role="img" aria-label="連載年輪：每一話一圈">'+sv
+      +'<circle r="'+cr.toFixed(1)+'" class="rg-hit" transform="rotate(-90)"/></svg><div class="cb-c"><b>'+knum(r)+'</b><small>'+(r.final?'第一卷':'話')+'</small></div>'
+      +'<ol class="cb-ch">'+list.map(function(q,i){return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+'">'+(q.final?'巻':q.no)+'</button></li>';}).join('')+'</ol></div>'
+      +'<article class="cb-now"><p class="ca-kick">'+x.st+(r.arc?'・'+r.arc:'')+'・'+r.date.replace(/-/g,'.')+'</p><h3><em>'+label(r)+'</em>'+esc(r.title)+'</h3>'
+      +(r.state==='next'?'<p class="ca-pn">這一圈長到第 <b>'+x.dayN+'</b> 天／'+x.dayT+' 天・還有 <b>'+r.days+'</b> 天刊出</p>':'')+x.body
+      +'<dl class="cb-nums"><div><dt>這一話</dt><dd class="num">'+(x.live?x.total:'—')+'</dd></div><div><dt>全卷累積</dt><dd class="num">'+D.entries.length+'</dd></div><div><dt>連續紀錄</dt><dd class="num">'+streak+'</dd></div><div><dt>第一卷</dt><dd class="num">'+Math.max(0,vol.days)+'<small>天後</small></dd></div></dl>'
+      +dirLine(x.live?x.cc:D.totals)+x.link+'</article></div>'+repLine;}
+  /* C：縦書き帳——由右往左，一話一欄，刊出的蓋朱印 */
+  function vC(){var x=info(SEL),r=x.r;
+    var cols=list.map(function(q,i){var stamp=q.state==='done'?'<span class="hk done">刊</span>':q.state==='next'?'<span class="hk next">今</span>':q.final?'<span class="hk fin">巻</span>':'';
+      return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="vn">'+(q.final?'第一卷':'第'+KN[q.no]+'話')+'</span><span class="vt">'+esc(q.final?'四十歲・發售':q.title)+'</span><span class="vd">'+(+q.date.slice(5,7))+'月'+(+q.date.slice(8))+'日</span>'+stamp+'</button></li>';}).join('');
+    return '<div class="cc"><ol class="cc-cols" aria-label="連載帳">'+cols+'</ol>'
+      +'<article class="cc-now"><div><p class="ca-kick">'+x.st+(r.arc?'・'+r.arc:'')+'・'+r.date.replace(/-/g,'.')+'</p><h3><em>'+label(r)+'</em>'+esc(r.title)+'</h3>'
+      +(r.state==='next'?'<div class="ca-prog"><i style="width:'+(x.pct*100).toFixed(1)+'%"></i></div><p class="ca-pn">第 <b>'+x.dayN+'</b> 天／'+x.dayT+' 天・還有 <b>'+r.days+'</b> 天刊出</p>':'')+x.body+x.link+'</div>'
+      +'<div class="cc-side"><div class="ca-nums"><div><b class="num">'+(x.live?x.total:'—')+'</b><small>這一話</small></div><div><b class="num">'+D.entries.length+'</b><small>全卷累積</small></div><div><b class="num">'+streak+'</b><small>連續紀錄</small></div></div>'+dirLine(D.totals)+'</div></article></div>'+repLine;}
+  function render(){var v=CD.dataset.v;CD.innerHTML=v==='b'?vB():v==='c'?vC():vA();
+    var cc=CD.querySelector('.cc-cols');if(cc){var on=cc.querySelector('.on');if(on)cc.scrollLeft=on.parentElement.offsetLeft-cc.clientWidth/2;}}
+  CD.addEventListener('click',function(e){var b=e.target.closest('[data-i]');if(!b)return;SEL=+b.getAttribute('data-i');render();});
+  var qv=(location.search.match(/[?&]dash=([abc])/)||[])[1];if(qv)CD.dataset.v=qv;
+  var DP=document.getElementById('dashPick');if(DP){DP.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.s===CD.dataset.v);});
+    DP.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;CD.dataset.v=b.dataset.s;DP.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});render();});}
+  render();
   document.querySelectorAll('article.cho').forEach(function(c){c.addEventListener('click',function(){c.classList.toggle('open');});});
 })();
 
