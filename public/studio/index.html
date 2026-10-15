@@ -626,10 +626,14 @@ const HOME_GROUPS = [
     [['chapters_sub', '参 連載｜小標'], ['chapters_title', '標題', 'short']],
     [['journal_sub', '肆 日常紀錄｜小標'], ['journal_title', '標題', 'short']],
   ]},
-  { title: '支持贊助', note: '結尾「支持這個連載」的方塊', rows: [
-    [['subscribe_title', '標題']],
-    [['subscribe_desc', '說明', 'area']],
-    [['subscribe_url', 'Stripe 連結'], ['subscribe_price', '金額', 'short']],
+  { title: '結尾', note: '首頁最後一屏：小年輪倒數＋支持贊助', rows: [
+    [['end_cd_before', '倒數上方（{n} 會換成歲數）'], ['end_cd_after', '倒數下方（留空就不顯示）']],
+    [['subscribe_title', '支持區｜標題']],
+    [['subscribe_desc', '支持區｜說明', 'area']],
+    [['subscribe_url', 'Stripe 連結（留空就不顯示按鈕）'], ['subscribe_btn', '按鈕文字', 'short']],
+    [['subscribe_price', '金額（可留空）'], ['subscribe_unit', '金額後面（例：／月，可留空）', 'short']],
+    [['tw_show', '台灣轉帳區塊（填 off 就隱藏）', 'short'], ['tw_text', '台灣轉帳｜說明（**粗體** 會變粗）']],
+    [['tw_link', '台灣轉帳｜按鈕文字（{ig} 會換成 IG 帳號）'], ['tw_note', '台灣轉帳｜防詐提醒（可留空）']],
   ]},
   { title: '分享與聯絡', note: '分享到 LINE／FB 或 Google 搜尋時看到的介紹，以及聯絡資訊', rows: [
     [['site_description', '網站介紹（分享預覽／搜尋結果）', 'area']],

@@ -11,6 +11,15 @@ import { buildRing } from '../data/ring';
 import { allEntries } from '../data/journal';
 import { workColor, colorVars } from '../data/work-colors';
 const endRing = buildRing(copy.birth_date);
+// 結尾區塊的文字：都可以在 Studio「首頁文案 → 結尾」修改；沒填就用這裡的預設
+const C0: Record<string, string> = {
+  end_cd_before: '第 {n} 圈，還有', end_cd_after: '長完這一圈',
+  subscribe_unit: '／月', subscribe_btn: '前往 Stripe 訂閱',
+  tw_show: 'on', tw_text: '在台灣？也可以用銀行轉帳**單筆支持**，金額隨意。',
+  tw_link: '私訊 @{ig} 索取轉帳資訊', tw_note: '轉帳資訊只會由 @{ig} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。',
+};
+const C: Record<string, string> = Object.fromEntries(Object.keys(C0).map((k) => [k, (copy as any)[k] != null ? String((copy as any)[k]) : C0[k]]));
+const endBefore = (C.end_cd_before.includes('{n}') ? C.end_cd_before.split('{n}') : [C.end_cd_before + ' ', '']).slice(0, 2);
 // 連載區的五角儀表板：首頁先拿掉（段位改顯示在「日常紀錄」頁的分類按鈕上），改回 true 就會重新出現
 const SHOW_PENTA = false;
 // 實績數字（三格）暫時隱藏：資料與 Studio 都保留，改回 true 就會重新出現
@@ -45,6 +54,8 @@ const fortieth = (() => { const b = String((copy as any).birth_date || '1987-10-
 const kanjiYear = String(new Date().getFullYear()).split('').map((c) => '〇一二三四五六七八九'[+c]).join('');
 const igHandle = String((copy as any).instagram_handle || '').replace(/^@/, '').trim();
 const igUrl = /^[A-Za-z0-9._]{1,30}$/.test(igHandle) ? `https://ig.me/m/${igHandle}` : '';
+const fillIg = (x: string) => String(x || '').replaceAll('{ig}', igHandle);
+const twHtml = escH(C.tw_text).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const aboutPhoto = /^\/(about|works)\/[\w./-]+\.(webp|png|jpe?g)$/i.test(String((copy as any).about_photo || '')) ? (copy as any).about_photo : '';
 const pageData = {
   dirs: pillars.map((p) => ({ id: p.slug, k: p.kanji, n: p.type })),
@@ -859,17 +870,17 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="about end">
       <div>
           <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas>
-            <div class="end-cd"><small>第 <b id="ecN">{endRing.age}</b> 圈，還有</small>
+            <div class="end-cd"><small>{endBefore[0]}<b id="ecN">{endRing.age}</b>{endBefore[1]}</small>
               <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span><span><b id="ecS">—</b><i>秒</i></span></p>
-              <small>長完這一圈</small></div></div>
+              {C.end_cd_after && <small>{C.end_cd_after}</small>}</div></div>
       </div>
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
-          <div class="r"><b>{copy.subscribe_price}</b><span>／月</span><a class="btn-ink" href={copy.subscribe_url} target="_blank" rel="noopener">前往 Stripe 訂閱</a></div>
-          {igUrl && <div class="tw">
-            <p><span aria-hidden="true">🇹🇼</span> 在台灣？也可以用銀行轉帳<b>單筆支持</b>，金額隨意。</p>
-            <a href={igUrl} target="_blank" rel="noopener">私訊 @{igHandle} 索取轉帳資訊 ↗</a>
-            <small>轉帳資訊只會由 @{igHandle} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。</small>
+          <div class="r">{copy.subscribe_price && <b>{copy.subscribe_price}</b>}{C.subscribe_unit && <span>{C.subscribe_unit}</span>}{safeHref(copy.subscribe_url) && <a class="btn-ink" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">{C.subscribe_btn}</a>}</div>
+          {igUrl && C.tw_show !== 'off' && <div class="tw">
+            <p><span aria-hidden="true">🇹🇼</span> <Fragment set:html={twHtml} /></p>
+            <a href={igUrl} target="_blank" rel="noopener">{fillIg(C.tw_link)} ↗</a>
+            {C.tw_note && <small>{fillIg(C.tw_note)}</small>}
           </div>}
         </aside>
     </div>
