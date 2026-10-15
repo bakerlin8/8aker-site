@@ -10,6 +10,8 @@ import services from '../data/services.json';
 import { buildRing } from '../data/ring';
 import { allEntries } from '../data/journal';
 const endRing = buildRing(copy.birth_date);
+// 實績數字（三格）暫時隱藏：資料與 Studio 都保留，改回 true 就會重新出現
+const SHOW_PROOF = false;
 
 const all = await allEntries();
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
@@ -635,7 +637,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
         ))}
       </ol>
-      <ul class="proof rv" style="--i:6">{services.proof.map((x: any) => <li><b class="num flap" data-v={x.num} aria-label={x.num}>{x.num}</b><small>{x.label}</small></li>)}</ul>
+      {SHOW_PROOF && <ul class="proof rv" style="--i:6">{services.proof.map((x: any) => <li><b class="num flap" data-v={x.num} aria-label={x.num}>{x.num}</b><small>{x.label}</small></li>)}</ul>}
     </div>
   </div>
 </section>

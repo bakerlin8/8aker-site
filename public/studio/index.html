@@ -929,7 +929,7 @@ async function loadServices() {
           <div class="field"><label class="field-label">說明（一句話）</label>${inp('desc', h.desc, `data-h="${i}"`)}</div>
           <div class="field"><label class="field-label">提供的服務（一行一項，保持精簡）</label><textarea rows="3" data-h="${i}" data-list="1" data-key="items">${escapeHtml((h.items || []).join('\n'))}</textarea></div></div>`).join('')}
       </div>
-      <div class="hb-card"><h3>實績數字</h3>
+      <div class="hb-card"><h3>實績數字 <small style="font-size:11.5px;color:var(--ink-ghost);font-weight:400">（目前首頁隱藏中，資料先保留）</small></h3>
         <div class="field-hint" style="margin:-4px 0 10px">左：數字　右：說明（顯示在服務卡下方，可新增或刪除）</div>
         ${data.proof.map((x, i) => `<div style="display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:8px;margin-bottom:8px">${inp('num', x.num, `data-p="${i}"`)}${inp('label', x.label, `data-p="${i}"`)}<button type="button" class="btn btn-ghost" data-delp="${i}" title="刪除這一格">×</button></div>`).join('')}
         <button type="button" class="btn btn-ghost" id="addProof" style="margin-top:4px">＋ 新增一格</button>
