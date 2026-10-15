@@ -11,6 +11,8 @@ import { buildRing } from '../data/ring';
 import { allEntries } from '../data/journal';
 import { workColor, colorVars } from '../data/work-colors';
 const endRing = buildRing(copy.birth_date);
+// 連載區的五角儀表板：首頁先拿掉（段位改顯示在「日常紀錄」頁的分類按鈕上），改回 true 就會重新出現
+const SHOW_PENTA = false;
 // 實績數字（三格）暫時隱藏：資料與 Studio 都保留，改回 true 就會重新出現
 const SHOW_PROOF = false;
 
@@ -254,7 +256,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .ch-link{display:inline-block;margin-top:22px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s,padding .4s var(--ease);}
 .ch-link:hover{color:var(--bone);border-color:var(--gold);padding-left:6px;}
 /* 每月月報 */
-.mrep{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;margin-top:22px;padding:14px 16px;border:1px solid rgba(212,162,76,.3);background:linear-gradient(100deg,rgba(212,162,76,.08),transparent 70%);max-width:34em;}
+.mrep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;margin-top:22px;padding:14px 16px;border:1px solid rgba(212,162,76,.3);background:linear-gradient(100deg,rgba(212,162,76,.08),transparent 70%);max-width:34em;}
 .mrep .mi{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--gold);color:var(--gold);font-family:var(--jp);font-size:16px;}
 .mrep b{display:block;font-weight:500;font-size:14.5px;color:var(--bone);}
 .mrep small{display:block;font-size:12.5px;color:var(--bone-2);line-height:1.6;margin-top:2px;}
@@ -725,7 +727,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
         <div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p>
         <div class="tale">
           <div class="mdetail" id="mdetail" aria-live="polite"></div>
-          <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
+          {SHOW_PENTA && <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
             <div class="stat-top"><span id="pLabel">全卷累計</span><div class="tabs" id="pMode" role="group" aria-label="切換累計範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></div>
             <div class="pent">
               <svg id="penta" viewBox="-190 -190 380 380" role="img" aria-label="五個方向的累積雷達圖">
@@ -741,7 +743,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
                   <span class="pn"><b class="num" data-d={p.slug}>{counts[p.slug]}</b><i data-dan={p.slug}>{dan(counts[p.slug])}</i></span>
                 </a>); })}
             </div>
-          </aside>
+          </aside>}
         </div>
       </div>
       <div id="vDream" hidden>
@@ -1013,9 +1015,8 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var cc={};D.dirs.forEach(function(d){cc[d.id]=es.filter(function(e){return e.dir===d.id;}).length;});
     var topD=D.dirs.slice().sort(function(a,b){return cc[b.id]-cc[a.id];})[0],hasTop=showT&&cc[topD.id]>0;
     Md.innerHTML='<p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+'<div class="mnums"><div><b class="num">'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>'+(hasTop?'<span style="color:'+col(topD.id)+'">'+topD.k+'</span> '+topD.n:'—')+'</b><small>這一話寫最多的方向</small></div></div><a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>'
-      +(r.final?'':'<div class="mrep"><span class="mi" aria-hidden="true">報</span><div><b>'+(r.state==='done'&&r.report?'這一話的月報':'每月 2 號・月報')+'</b><small>'+(r.state==='done'&&r.report?'整理成一份 PDF，可以直接下載。':(+r.date.slice(5,7))+' 月 2 日，這個月的日常紀錄會依方向自動整理成月報，寄給支持者。')+'</small></div>'
-      +(r.state==='done'&&r.report?'<a href="'+esc(r.report)+'" target="_blank" rel="noopener">下載 PDF ↓</a>':'<a href="#support">收月報 →</a>')+'</div>');
-    CUR={counts:cc,label:showT?label(r)+'（'+from.slice(5).replace('-','.')+'–'+md(r)+'）':label(r)+'・尚未開始'};if(PM==='ch')penta('ch');}
+      +(r.final?'':'<div class="mrep"><span class="mi" aria-hidden="true">報</span><div><b>每月 2 號・月報</b><small>'+(r.state==='done'?'這一話的月報已寄出。':'這個月的日常紀錄，'+(+r.date.slice(5,7))+' 月 2 日會依方向整理成月報，寄給天使投資人。')+'</small></div></div>');
+    CUR={counts:cc,label:showT?label(r)+'（'+from.slice(5).replace('-','.')+'–'+md(r)+'）':label(r)+'・尚未開始'};if(PM==='ch'&&PS)penta('ch');}
   /* 五角形：全卷累計 ↔ 這一話 */
   var PM='all',CUR=null,PS=document.getElementById('pShape'),PD=[].slice.call(document.querySelectorAll('#penta .pdot')),PL=document.getElementById('pLabel'),PMB=document.getElementById('pMode');
   var dan=function(c){return c>=100?'四段':c>=60?'三段':c>=30?'二段':c>=10?'初段':'見習';};
@@ -1035,7 +1036,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');ring(document.querySelector('[data-ring="'+d.id+'"]'),n,m==='all'?null:n/top);});
     PL.textContent=m==='all'?'全卷累計':(CUR?CUR.label:'這一話');
     PMB.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===m);});}
-  PMB.addEventListener('click',function(e){var b=e.target.closest('button');if(b)penta(b.dataset.m);});
+  if(PMB)PMB.addEventListener('click',function(e){var b=e.target.closest('button');if(b)penta(b.dataset.m);});
   D.dirs.forEach(function(d){ring(document.querySelector('[data-ring="'+d.id+'"]'),D.totals[d.id]||0,null);});
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
