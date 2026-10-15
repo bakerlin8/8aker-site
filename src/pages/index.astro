@@ -8,13 +8,14 @@ import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
-import { allEntries } from '../data/journal';
+import { allEntries, SHOW_DRAFTS } from '../data/journal';
 import { workColor, colorVars } from '../data/work-colors';
 const endRing = buildRing(copy.birth_date);
 // 結尾區塊的文字：都可以在 Studio「首頁文案 → 結尾」修改；沒填就用這裡的預設
 const C0: Record<string, string> = {
   end_cd_before: '第 {n} 圈，還有', end_cd_after: '長完這一圈',
   subscribe_unit: '', subscribe_btn: 'Stripe 支持澆個水', subscribe_note: '單次支持・金額由你決定',
+  tw_bank_name: '', tw_bank_acct: '', tw_bank_holder: '', tw_bank_msg: '轉好了，歡迎 IG 私訊 @{ig} 告訴我帳號末五碼，讓我好好說聲謝謝。', tw_bank_sub: '點一下，顯示轉帳帳號',
   tw_show: 'on', tw_text: '在台灣？也可以轉帳**單筆支持**。',
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
   give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: '',
@@ -65,6 +66,11 @@ const useSum = flow.reduce((t, x) => t + x.pct, 0);
 if (!useSum && flow.length) flow.forEach((x) => (x.pct = Math.round((100 - givePct) / flow.length)));
 const flowAll = [...flow.map((x, i) => ({ ...x, c: SHADES[Math.min(i, SHADES.length - 1)], dark: i < 3 })), { name: "善的循環：台日災害救援單位捐贈", pct: givePct, c: '#8A2B3D', dark: true, give: true }];
 const giveHtml = escH(C.give_text.replaceAll('{rate}', C.give_rate).replaceAll('{org}', C.give_org)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+/* 台灣轉帳帳號：有填才用彈出視窗；預覽站沒填時用範例資料讓你看設計 */
+const bankDemo = SHOW_DRAFTS && !C.tw_bank_acct;
+const bank = bankDemo ? { name: '範例銀行（000）', acct: '0000-0000-0000-00', holder: '範例戶名' } : { name: C.tw_bank_name, acct: C.tw_bank_acct, holder: C.tw_bank_holder };
+const bankOn = !!bank.acct;
+const bankB64 = bankOn ? Buffer.from(JSON.stringify(bank), 'utf8').toString('base64') : '';
 const twHtml = escH(C.tw_text).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const aboutPhoto = /^\/(about|works)\/[\w./-]+\.(webp|png|jpe?g)$/i.test(String((copy as any).about_photo || '')) ? (copy as any).about_photo : '';
 const pageData = {
@@ -721,6 +727,24 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .end-card .give-cta{min-height:76px;}
 .gc-t small{line-height:1.5;text-wrap:balance;}
 .tw-note{margin-top:10px!important;}
+.tw-dlg{border:0;padding:0;background:transparent;max-width:min(420px,calc(100vw - 32px));width:100%;margin:auto;color:#1C0F14;}
+.tw-dlg::backdrop{background:rgba(20,8,12,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.tw-dlg[open]{animation:twin .35s var(--ease);}
+@keyframes twin{from{opacity:0;transform:translateY(12px) scale(.98);}to{opacity:1;transform:none;}}
+.twb-in{position:relative;background:#EFE5D6;border:1px solid rgba(212,162,76,.5);padding:28px 24px 22px;box-shadow:0 30px 60px -20px rgba(0,0,0,.7);}
+.twb-x{position:absolute;top:8px;right:8px;width:44px;height:44px;font-size:24px;line-height:1;color:#5B4B4E;}
+.twb-k{margin:0;font-size:11.5px;letter-spacing:.24em;color:#A07A3A;}
+.twb-in h3{margin-top:6px;font-family:var(--serif);font-weight:500;font-size:20px;}
+.twb-demo{margin-top:8px;font-size:12px;color:#8A2B3D;}
+.twb-dl{margin:18px 0 0;border-top:1px solid rgba(28,15,20,.14);}
+.twb-dl>div{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(28,15,20,.14);}
+.twb-dl dt{font-size:12px;letter-spacing:.12em;color:#7A6A6C;}
+.twb-dl dd{margin:0;font-size:15px;word-break:break-all;}
+.twb-dl .acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+.twb-dl .acct .num{white-space:nowrap;font-family:var(--latin);font-size:clamp(16px,4.6vw,20px);letter-spacing:.03em;}
+.twb-copy{flex:1 0 100%;min-height:44px;padding:0 14px;border:1px solid #1C0F14;font-size:13px;background:#1C0F14;color:#EFE5D6;transition:background .3s;}
+.twb-copy.ok{background:#3E6B4A;border-color:#3E6B4A;}
+.twb-msg{margin-top:16px;font-size:13px;line-height:1.75;color:#5B4B4E;}
 @media(max-width:400px){.give-cta{gap:10px;padding:12px 14px 12px 12px;grid-template-columns:40px minmax(0,1fr) auto;}.gc-ic{width:40px;height:40px;}.gc-t b{font-size:16px;letter-spacing:.03em;}.gc-t small{font-size:11.5px;letter-spacing:.01em;}}
 .tw-note{display:block;margin-top:8px;font-size:11.5px;line-height:1.7;color:#7A6A6C;}
 .gc-ic .cup{width:24px;height:24px;fill:none;stroke-linecap:round;stroke-linejoin:round;filter:none;}
@@ -993,11 +1017,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
             <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
             <span class="gc-ar" aria-hidden="true">↗</span>
           </a>}
-          {igUrl && C.tw_show !== 'off' && <div class="tw-wrap">
-            <a class="give-cta tw-cta" href={igUrl} target="_blank" rel="noopener">
+          {(igUrl || bankOn) && C.tw_show !== 'off' && <div class="tw-wrap">
+            <a class="give-cta tw-cta" href={bankOn ? '#tw-bank' : igUrl} target={bankOn ? undefined : '_blank'} rel="noopener" data-bank={bankOn ? '1' : undefined} aria-haspopup={bankOn ? 'dialog' : undefined}>
               <span class="gc-ic" aria-hidden="true"><svg class="cup" viewBox="0 0 28 28"><path class="stm" d="M10 3c-1.5 1.6 1.5 2.8 0 4.6M15 2.5c-1.5 1.6 1.5 2.8 0 4.6"/><path class="body" d="M5 11h15v6.5a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6Z"/><path class="hd" d="M20 13.2h1.6a2.6 2.6 0 0 1 0 5.2H19.6"/></svg></span>
-              <span class="gc-t"><b>{fillIg(C.tw_link)}</b>{C.tw_text && <small>{fillIg(C.tw_text).replace(/\*\*/g, '')}</small>}</span>
-              <span class="gc-ar" aria-hidden="true">↗</span>
+              <span class="gc-t"><b>{fillIg(C.tw_link)}</b>{bankOn ? <small>{C.tw_bank_sub}</small> : C.tw_text && <small>{fillIg(C.tw_text).replace(/\*\*/g, '')}</small>}</span>
+              <span class="gc-ar" aria-hidden="true">{bankOn ? '＋' : '↗'}</span>
             </a>
             {C.tw_note && <small class="tw-note">{fillIg(C.tw_note)}</small>}
           </div>}
@@ -1015,6 +1039,20 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           </div>
           </>}
         </aside>
+        {bankOn && <dialog class="tw-dlg" id="twBank" aria-labelledby="twb-h" data-b={bankB64}>
+          <form method="dialog" class="twb-in">
+            <button class="twb-x" value="close" aria-label="關閉">×</button>
+            <p class="twb-k">🇹🇼 台灣轉帳</p>
+            <h3 id="twb-h">{fillIg(C.tw_link)}</h3>
+            {bankDemo && <p class="twb-demo">預覽用範例資料・到 Studio 填入帳號後才會顯示真的</p>}
+            <dl class="twb-dl">
+              <div><dt>銀行</dt><dd data-f="name"></dd></div>
+              <div class="acct"><dt>帳號</dt><dd><span data-f="acct" class="num"></span><button type="button" class="twb-copy" data-copy>複製</button></dd></div>
+              <div><dt>戶名</dt><dd data-f="holder"></dd></div>
+            </dl>
+            {C.tw_bank_msg && <p class="twb-msg">{fillIg(C.tw_bank_msg)}</p>}
+          </form>
+        </dialog>}
     </div>
   </div>
 </section>
@@ -1303,6 +1341,14 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
 
+/* 台灣轉帳：點按鈕跳出帳號（帳號不直接寫在頁面文字裡，打開才解出來，降低被爬走的機率） */
+(function(){var D=document.getElementById('twBank'),B=document.querySelector('[data-bank]');if(!D||!B)return;var filled=false;
+  function fill(){if(filled)return;filled=true;try{var j=JSON.parse(decodeURIComponent(escape(atob(D.dataset.b))));D.querySelectorAll('[data-f]').forEach(function(e){e.textContent=j[e.dataset.f]||'';});}catch(e){}}
+  B.addEventListener('click',function(e){e.preventDefault();fill();if(D.showModal)D.showModal();else D.setAttribute('open','');});
+  D.addEventListener('click',function(e){if(e.target===D)D.close();});
+  var C=D.querySelector('[data-copy]');if(C)C.addEventListener('click',function(){var t=(D.querySelector('[data-f=acct]').textContent||'').replace(/[^0-9]/g,'');
+    var done=function(){C.textContent='已複製';C.classList.add('ok');setTimeout(function(){C.textContent='複製';C.classList.remove('ok');},1800);};
+    if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});else{var r=document.createRange();r.selectNodeContents(D.querySelector('[data-f=acct]'));var sel=getSelection();sel.removeAllRanges();sel.addRange(r);}});})();
 /* 服務卡：游標位置的聚光 */
 (function(){var H=document.getElementById('hats');if(!H)return;
   H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();
