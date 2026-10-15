@@ -466,7 +466,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .ecd b{font-family:var(--latin),var(--serif);font-weight:500;font-size:40px;line-height:1;color:var(--bone);font-variant-numeric:tabular-nums lining-nums;min-width:1.2ch;}
 .ecd span:first-child b{color:var(--gold);}
 .ecd i{font-style:normal;font-size:13px;color:var(--ash);}
-@media(max-width:720px){.ecd b{font-size:34px;}.ecd{gap:12px;}}
+@media(max-width:720px){.ecd b{font-size:30px;}.ecd{gap:10px;}}
+@media(max-width:380px){.ecd b{font-size:26px;}.ecd{gap:8px;}}
 .end-ring canvas{display:block;width:230px;height:170px;margin-left:-20px;}
 .end-ring span{font-family:var(--latin),var(--serif);font-size:14px;letter-spacing:.16em;color:var(--bone-2);}
 
@@ -702,7 +703,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div>
           <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas>
             <div class="end-cd"><small>第 <b id="ecN">{endRing.age}</b> 圈，還有</small>
-              <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span></p>
+              <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span><span><b id="ecS">—</b><i>秒</i></span></p>
               <small>長完這一圈</small></div></div>
       </div>
         <aside class="support rv" style="--i:4" id="support">
@@ -812,7 +813,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     if(u>G1-.2&&u<G1+1.4){var gl=Math.sin(Math.min(1,(u-G1+.2)/1.6)*Math.PI);ctx.beginPath();ctx.arc(a[0],a[1],(9+12*gl)*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,'+(.3*gl).toFixed(3)+')';ctx.fill();}
     if(u>G1&&u<G1+1.1){var ph=(u-G1)/1.1;ctx.beginPath();ctx.arc(a[0],a[1],ph*100*dpr,0,6.2832);ctx.strokeStyle='rgba(243,217,160,'+(.6*(1-ph)).toFixed(3)+')';ctx.lineWidth=2*dpr;ctx.stroke();}
     /* 集結之後，在「今」旁邊浮出現在的歲數（到小數點兩位） */
-    if(u>G1+1.2){var ta=Math.min(1,(u-G1-1.2)/1.2),ag=(full+frac).toFixed(2),fx=a[0]+30*dpr,fy=a[1]-14*dpr-6*dpr*(1-ta);
+    if(u>G1+1.2){var ta=Math.min(1,(u-G1-1.2)/1.2),ag=(full+(Date.now()-bd(y))/(bd(y+1)-bd(y))).toFixed(3),fx=a[0]+30*dpr,fy=a[1]-14*dpr-6*dpr*(1-ta);
       ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.font='500 '+(26*dpr)+'px "Cormorant Garamond",Georgia,serif';var w=ctx.measureText(ag).width,tw=w+22*dpr;
       if(fx+tw>W-14*dpr)fx=a[0]-30*dpr-tw;if(fx<14*dpr)fx=14*dpr;
       ctx.fillStyle='rgba(243,217,160,'+ta.toFixed(3)+')';ctx.fillText(ag,fx,fy);
@@ -832,12 +833,12 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   if(document.fonts&&document.fonts.ready){Promise.race([document.fonts.ready,new Promise(function(r){setTimeout(r,700);})]).then(function(){requestAnimationFrame(start);});}else requestAnimationFrame(start);})();
 
 
-/* 結尾倒數：距離下一個生日（這一圈長完）還有幾天、幾時、幾分，每 20 秒更新 */
-(function(){var eD=document.getElementById('ecD'),eH=document.getElementById('ecH'),eM=document.getElementById('ecM'),eN=document.getElementById('ecN');if(!eD||!D.birth)return;
+/* 結尾倒數：距離下一個生日（這一圈長完）還有幾天、幾時、幾分、幾秒，每秒更新 */
+(function(){var eD=document.getElementById('ecD'),eH=document.getElementById('ecH'),eM=document.getElementById('ecM'),eS=document.getElementById('ecS'),eN=document.getElementById('ecN');if(!eD||!D.birth)return;
   var b=D.birth.split('-').map(Number),bd=function(y){return new Date(y+'-'+pad(b[1])+'-'+pad(b[2])+'T00:00:00+09:00').getTime();};
   function tk(){var now=Date.now(),y=new Date(now+9*3600e3).getUTCFullYear();if(bd(y)>now)y--;var r=Math.max(0,bd(y+1)-now);
-    eN.textContent=y-b[0];eD.textContent=Math.floor(r/DAY);eH.textContent=pad(Math.floor(r%DAY/36e5));eM.textContent=pad(Math.floor(r%36e5/6e4));}
-  tk();setInterval(tk,20000);})();
+    eN.textContent=y-b[0];eD.textContent=Math.floor(r/DAY);eH.textContent=pad(Math.floor(r%DAY/36e5));eM.textContent=pad(Math.floor(r%36e5/6e4));eS.textContent=pad(Math.floor(r%6e4/1e3));}
+  tk();setInterval(tk,1000);})();
 
 /* 結尾小年輪：跟首頁同一套 3D 木頭切片，慢慢轉；只有今年這一圈（第 N 圈）亮起來，其他圈都調淡 */
 (function(){var cv=document.getElementById('endRing');if(!cv||!cv.getContext)return;var ctx=cv.getContext('2d'),W=0,H=0,dpr=1,t=0,last=0,raf=0,run=false;
