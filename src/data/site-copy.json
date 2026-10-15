@@ -48,7 +48,7 @@
   "motto_ja": "",
   "site_description": "39 歲・從零開始，一圈一圈・累積自己。\n日本不動產・日本行程規劃・AI 工作流。",
   "end_cd_before": "第 {n} 圈，還有",
-  "end_cd_after": "長完這一圈",
+  "end_cd_after": "",
   "subscribe_unit": "／月",
   "subscribe_btn": "前往 Stripe 訂閱",
   "tw_show": "on",
