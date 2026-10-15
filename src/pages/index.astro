@@ -10,6 +10,8 @@ import services from '../data/services.json';
 import { buildRing } from '../data/ring';
 import { allEntries } from '../data/journal';
 const endRing = buildRing(copy.birth_date);
+// 祈願所（未來祈願）暫時隱藏：資料與 Studio 都保留，改回 true 就會重新出現
+const SHOW_DREAMS = false;
 
 const all = await allEntries();
 const ymd = (d: Date) => d.toISOString().slice(0, 10);
@@ -668,7 +670,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Chapters</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.chapters_sub}</p><h2 id="ch-h" class="rv" style="--i:1">{copy.chapters_title}</h2></div>
-      <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">現在進度</button><button aria-pressed="false" data-v="dream">未來祈願</button></div>
+      {SHOW_DREAMS && <div class="mv-toggle rv" style="--i:2" role="group" aria-label="切換檢視"><button aria-pressed="true" data-v="one">現在進度</button><button aria-pressed="false" data-v="dream">未來祈願</button></div>}
       <div id="vOne">
         <div class="track-wrap rv" style="--i:3"><ol class="track" id="track" aria-label="連載時間軸"></ol></div><p class="swipe-hint" aria-hidden="true">← 左右滑動看全部 12 話 →</p>
         <div class="tale">
@@ -691,7 +693,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           </aside>
         </div>
       </div>
-      <div id="vDream" hidden>
+      {SHOW_DREAMS && <div id="vDream" hidden>
         <div class="cho-wrap">
           <div class="cho-head"><span class="t">祈願所</span><span class="y">40 歲生日（{fortieth}）前要完成的事</span><span class="s">{dreams.intro}</span></div>
           <div class="cho-scroll"><div class="cho-row">
@@ -707,7 +709,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           </div></div>
           <p class="cho-hint">← 左右滑動看全部 →</p>
         </div>
-      </div>
+      </div>}
     </div>
   </div>
 </section>
@@ -985,10 +987,10 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   Tr.addEventListener('click',function(e){var n=e.target.closest('.node');if(n)show(+n.dataset.i);});
   show(Math.min(nextIdx,list.length-1));
   requestAnimationFrame(function(){var w=Tr.parentElement,n=Tr.querySelector('.node.next');if(n&&w.scrollWidth>w.clientWidth){var li=n.closest('li');w.scrollLeft=Math.max(0,li.offsetLeft-w.clientWidth/2+li.offsetWidth/2);}});
-  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V3=document.getElementById('vDream');
+  var MV=document.querySelector('.mv-toggle'),V1=document.getElementById('vOne'),V3=document.getElementById('vDream');if(MV&&V3){
   function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V3.hidden=v!=='dream';}
   if(location.hash==='#dreams'||location.hash==='#kiganjo')view('dream');
-  MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});
+  MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});}
 })();
 
 
