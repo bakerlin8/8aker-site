@@ -632,9 +632,19 @@ const HOME_GROUPS = [
   ]},
   { title: '結尾・支持區', note: '右邊米白色的支持方塊（Stripe）', rows: [
     [['subscribe_title', '標題']],
-    [['subscribe_desc', '說明', 'area']],
+    [['subscribe_desc', '說明（可以換行）', 'area']],
     [['subscribe_price', '金額（可留空）'], ['subscribe_unit', '金額後面（例：／月，可留空）', 'short']],
     [['subscribe_url', 'Stripe 連結（留空就不顯示按鈕）'], ['subscribe_btn', '按鈕文字', 'short']],
+    [['subscribe_note', '按鈕下方小字（例：單次支持・金額由你決定）']],
+  ]},
+  { title: '結尾・善的循環', note: '每月撥出固定比例做災害救援；{rate}、{org} 會自動換成下面的比例和單位', rows: [
+    [['give_show', '這一段要不要顯示', 'onoff']],
+    [['give_rate', '撥出比例 %', 'short'], ['give_org', '捐款單位']],
+    [['give_url', '單位網址（留空就不顯示連結）']],
+    [['give_text', '說明（**粗體**）', 'area']],
+    [['give_use', '去向條：其餘用途（一行一項：名稱 空格 %，例：在日協助 30）', 'area']],
+    [['give_month', '月份（例：2026.10）', 'short'], ['give_received', '本月收到的支持（數字，不用加 NT$）']],
+    [['give_donated', '本月已捐出（數字）'], ['give_total', '累計捐出（數字）']],
   ]},
   { title: '結尾・台灣轉帳', note: '支持方塊下半部；{ig} 會自動換成你的 IG 帳號', rows: [
     [['tw_show', '這一段要不要顯示', 'onoff']],
