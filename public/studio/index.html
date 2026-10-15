@@ -303,6 +303,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="nav-item" data-view="works">有點樣子・作品</div>
       <div class="nav-item" data-view="chapters">連載・每月一話</div>
       <div class="nav-item" data-view="dreams">祈願所</div>
+      <div class="nav-item" data-view="home" data-only="結尾">結尾・支持贊助</div>
     </div>
 
     <div class="nav-group">
@@ -596,7 +597,7 @@ function showView(name) {
   });
 }
 
-document.querySelectorAll('.nav-item[data-view="home"]').forEach(el => el.addEventListener('click', () => loadHome()));
+document.querySelectorAll('.nav-item[data-view="home"]').forEach(el => el.addEventListener('click', () => loadHome(el.dataset.only || '')));
 document.querySelectorAll('.nav-item[data-view="chapters"]').forEach(el => el.addEventListener('click', () => loadChapters()));
 document.querySelectorAll('.nav-item[data-view="works"]').forEach(el => el.addEventListener('click', () => loadWorks()));
 document.querySelectorAll('.nav-item[data-view="inbox"]').forEach(el => el.addEventListener('click', () => loadInbox()));
@@ -626,14 +627,20 @@ const HOME_GROUPS = [
     [['chapters_sub', '参 連載｜小標'], ['chapters_title', '標題', 'short']],
     [['journal_sub', '肆 日常紀錄｜小標'], ['journal_title', '標題', 'short']],
   ]},
-  { title: '結尾', note: '首頁最後一屏：小年輪倒數＋支持贊助', rows: [
+  { title: '結尾・倒數', note: '小年輪旁邊的倒數字句', rows: [
     [['end_cd_before', '倒數上方（{n} 會換成歲數）'], ['end_cd_after', '倒數下方（留空就不顯示）']],
-    [['subscribe_title', '支持區｜標題']],
-    [['subscribe_desc', '支持區｜說明', 'area']],
-    [['subscribe_url', 'Stripe 連結（留空就不顯示按鈕）'], ['subscribe_btn', '按鈕文字', 'short']],
+  ]},
+  { title: '結尾・支持區', note: '右邊米白色的支持方塊（Stripe）', rows: [
+    [['subscribe_title', '標題']],
+    [['subscribe_desc', '說明', 'area']],
     [['subscribe_price', '金額（可留空）'], ['subscribe_unit', '金額後面（例：／月，可留空）', 'short']],
-    [['tw_show', '台灣轉帳區塊（填 off 就隱藏）', 'short'], ['tw_text', '台灣轉帳｜說明（**粗體** 會變粗）']],
-    [['tw_link', '台灣轉帳｜按鈕文字（{ig} 會換成 IG 帳號）'], ['tw_note', '台灣轉帳｜防詐提醒（可留空）']],
+    [['subscribe_url', 'Stripe 連結（留空就不顯示按鈕）'], ['subscribe_btn', '按鈕文字', 'short']],
+  ]},
+  { title: '結尾・台灣轉帳', note: '支持方塊下半部；{ig} 會自動換成你的 IG 帳號', rows: [
+    [['tw_show', '這一段要不要顯示', 'onoff']],
+    [['tw_text', '說明（用 **兩個星號** 包起來的字會變粗體）', 'area']],
+    [['tw_link', '按鈕文字']],
+    [['tw_note', '防詐提醒（可留空）', 'area']],
   ]},
   { title: '分享與聯絡', note: '分享到 LINE／FB 或 Google 搜尋時看到的介紹，以及聯絡資訊', rows: [
     [['site_description', '網站介紹（分享預覽／搜尋結果）', 'area']],
@@ -644,8 +651,15 @@ const HOME_GROUPS = [
   ]},
 ];
 
-async function loadHome() {
+async function loadHome(only = '') {
   showView('home');
+  /* 「結尾・支持贊助」有自己的入口：同一份文案檔，只顯示結尾那一組 */
+  const v = document.getElementById('view-home');
+  v.querySelector('.page-eyebrow').textContent = only ? 'Ending' : 'Site Copy';
+  v.querySelector('.page-title').textContent = only ? '結尾・支持贊助' : '首頁文案';
+  v.querySelector('.page-sub').textContent = only ? '首頁最後一屏：小年輪倒數、支持贊助（Stripe）、台灣轉帳。存檔後約 1 分鐘上線。' : '依網站由上到下的順序分組；只列出網站上會顯示的文字。結尾在左側「結尾・支持贊助」編輯。';
+  document.querySelectorAll('.nav-item[data-view="home"]').forEach(n => n.classList.toggle('active', (n.dataset.only || '') === only));
+  const groups = HOME_GROUPS.filter(g => only ? g.title.startsWith(only) : !g.title.startsWith('結尾'));
   const form = document.getElementById('homeForm');
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
   const file = await ghGetFile('src/data/site-copy.json');
@@ -654,13 +668,14 @@ async function loadHome() {
   const fieldHtml = ([key, label, type]) => {
     const v = data[key];
     let ctl;
-    if (type === 'area') ctl = `<textarea rows="2" data-key="${key}">${escapeHtml(v || '')}</textarea>`;
+    if (type === 'onoff') ctl = `<select data-key="${key}"><option value="on" ${v !== 'off' ? 'selected' : ''}>顯示</option><option value="off" ${v === 'off' ? 'selected' : ''}>隱藏</option></select>`;
+    else if (type === 'area') ctl = `<textarea rows="2" data-key="${key}">${escapeHtml(v || '')}</textarea>`;
     else if (type === 'story') ctl = `<textarea rows="13" data-key="${key}" data-story="1">${escapeHtml(storyText(v))}</textarea><div class="field-hint">段落之間空一行；同一段裡換行，網站上也會換行。</div>`;
     else if (type === 'photo') ctl = `<div class="photo-row"><img data-prev src="${escapeAttr(v || '')}" alt="" style="${v ? '' : 'display:none'}"><input type="hidden" data-key="${key}" value="${escapeAttr(v || '')}"><label class="btn btn-ghost" style="cursor:pointer">上傳照片<input type="file" accept="image/*" data-photo style="display:none"></label><button type="button" class="btn btn-ghost" data-nophoto>不放照片</button><span class="field-hint" style="margin:0">直式、臉清楚最好；留空就不顯示</span></div>`;
     else ctl = `<input type="text" data-key="${key}" value="${escapeAttr(v || '')}">`;
     return `<div class="field${type === 'short' ? ' is-short' : ''}"><label class="field-label">${label}</label>${ctl}</div>`;
   };
-  form.innerHTML = HOME_GROUPS.map(g => {
+  form.innerHTML = groups.map(g => {
     const body = g.rows.map(r => `<div class="frow frow-${r.length}">${r.map(fieldHtml).join('')}</div>`).join('');
     return g.advanced
       ? `<details class="fgroup fgroup-adv"><summary><span class="fg-title">${g.title}</span><span class="fg-note">${g.note}</span></summary><div class="fg-body">${body}</div></details>`
