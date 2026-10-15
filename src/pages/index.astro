@@ -8,7 +8,7 @@ import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
-import { allEntries } from '../data/journal';
+import { allEntries, SHOW_DRAFTS } from '../data/journal';
 import { workColor, colorVars } from '../data/work-colors';
 const endRing = buildRing(copy.birth_date);
 // 結尾區塊的文字：都可以在 Studio「首頁文案 → 結尾」修改；沒填就用這裡的預設
@@ -441,18 +441,56 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .support .r{display:flex;align-items:baseline;gap:10px;margin-top:18px;flex-wrap:wrap;}
 .support .r b{font-size:30px;font-weight:400;}
 .support .sdesc{white-space:pre-line;}
-/* 善的循環：每月撥出固定比例做災害救援 */
-.support .give{margin-top:20px;padding:16px 16px 14px;background:rgba(61,15,26,.06);border-left:2px solid #8A2B3D;}
-.support .give .gh{display:flex;align-items:center;gap:12px;margin:0;color:#1C0F14;}
-.support .give .gh b{font-family:var(--latin);font-weight:500;font-size:34px;line-height:1;color:#8A2B3D;}
-.support .give .gh b small{font-size:16px;margin-left:1px;}
-.support .give .gh span{font-family:var(--serif);font-size:15px;line-height:1.35;}
-.support .give .gh em{display:block;font-style:normal;font-family:var(--latin);font-size:12px;letter-spacing:.06em;color:#7A6A6C;}
-.support .give p{margin-top:10px;font-size:13px;line-height:1.75;color:#4A3A3D;}
+/* 善的循環：五種版型（data-gv） */
+.support .give{display:none;margin-top:20px;color:#1C0F14;}
+.support[data-gv="1"] .g1,.support[data-gv="2"] .g2,.support[data-gv="3"] .g3,.support[data-gv="4"] .g4,.support[data-gv="5"] .g5{display:block;}
+.support[data-gv="1"] .g1,.support[data-gv="4"] .g4{display:grid;}
+.support .give p{margin-top:8px;font-size:13px;line-height:1.75;color:#4A3A3D;}
+.support .give .gk{margin:0;font-family:var(--serif);font-size:15px;color:#1C0F14;}
 .support .gnum{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:10px;font-size:12px;}
 .support .gnum dt{color:#7A6A6C;}
 .support .gnum dd{font-family:var(--latin);font-size:17px;color:#1C0F14;}
-.support .give a{display:inline-block;margin-top:8px;font-size:13px;color:#1C0F14;border-bottom:1px solid #8A2B3D;padding-bottom:1px;}
+.support .glink{display:inline-block;margin-top:8px;font-size:13px;color:#1C0F14;border-bottom:1px solid #8A2B3D;padding-bottom:1px;}
+/* 1 年輪水滴 */
+.g1{grid-template-columns:84px minmax(0,1fr);gap:16px;align-items:start;padding:16px;background:rgba(61,15,26,.05);}
+.g1-ring{position:relative;width:84px;aspect-ratio:1;}
+.g1-ring svg{width:100%;height:100%;fill:none;stroke:#8A2B3D;stroke-width:.8;opacity:.55;}
+.g1-ring .drop{fill:#4F7DA8;stroke:none;opacity:1;transform:translateY(-28px);animation:gdrop 3.2s ease-in infinite;}
+@keyframes gdrop{0%{transform:translateY(-34px);opacity:0}25%{opacity:1}70%{transform:translateY(0);opacity:1}78%{opacity:0}100%{opacity:0}}
+.g1-ring b{position:absolute;inset:0;display:grid;place-content:center;font-family:var(--latin);font-weight:500;font-size:24px;color:#8A2B3D;}
+.g1-ring b small{font-size:12px;}
+/* 2 領收證 */
+.g2-slip{position:relative;padding:14px 16px;border:1px dashed rgba(28,15,20,.35);background:repeating-linear-gradient(0deg,transparent 0 23px,rgba(28,15,20,.05) 23px 24px),#F6EFE4;}
+.g2-t{margin:0 0 6px!important;text-align:center;font-family:var(--serif);font-size:14px!important;letter-spacing:.4em;color:#1C0F14!important;border-bottom:1px double rgba(28,15,20,.4);padding-bottom:6px;}
+.g2-l{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 0!important;font-size:12.5px!important;}
+.g2-l b{font-family:var(--serif);font-weight:500;font-size:14px;color:#1C0F14;}
+.g2-l b.num{font-family:var(--latin);font-size:18px;}
+.g2-stamp{position:absolute;right:-10px;top:-16px;width:48px;height:48px;border-radius:50%;border:2px solid #C0392B;color:#C0392B;display:grid;place-items:center;font-family:var(--serif);font-size:14px;letter-spacing:.05em;transform:rotate(-14deg);background:rgba(246,239,228,.7);}
+.g2>p{margin-top:20px!important;}
+/* 3 去向條 */
+.g3-bar{display:flex;height:40px;margin-top:10px;font-size:12px;overflow:hidden;}
+.g3-bar span{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 10px;white-space:nowrap;overflow:hidden;}
+.g3-bar .a{background:#1C0F14;color:#EFE5D6;}
+.g3-bar .b{background:#8A2B3D;color:#fff;justify-content:center;}
+.g3-bar b{font-family:var(--latin);font-weight:500;font-size:16px;}
+.g3-cap{display:flex;align-items:center;gap:6px;font-size:12px!important;color:#7A6A6C!important;margin-top:6px!important;}
+.g3-cap i{width:10px;height:10px;background:#8A2B3D;}
+/* 4 御守 */
+.g4{grid-template-columns:70px minmax(0,1fr);gap:16px;align-items:start;}
+.g4-omamori{display:flex;flex-direction:column;align-items:center;transform-origin:50% 0;animation:sway 5s ease-in-out infinite;}
+.g4-omamori .cord{width:14px;height:14px;border:2px solid #C0392B;border-radius:50%;border-bottom-color:transparent;}
+.g4-omamori .body{width:62px;height:96px;margin-top:-2px;border-radius:30px 30px 4px 4px/24px 24px 4px 4px;background:linear-gradient(#8A2B3D,#6A1C2C);border:2px solid #D4A24C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#F3D9A0;box-shadow:0 8px 16px -8px rgba(0,0,0,.5);}
+.g4-omamori em{display:flex;flex-direction:column;align-items:center;gap:2px;font-style:normal;font-family:var(--serif);font-size:16px;line-height:1.1;}
+.g4-omamori b{white-space:nowrap;font-family:var(--latin);font-weight:500;font-size:14px;}
+/* 5 一行 */
+.g5 p{display:block;margin:0!important;padding:12px 0;border-top:1px solid rgba(28,15,20,.14);border-bottom:1px solid rgba(28,15,20,.14);}
+.g5 b{color:#8A2B3D;font-weight:600;}
+.g5-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#8A2B3D;margin-right:8px;vertical-align:1px;box-shadow:0 0 0 4px rgba(138,43,61,.15);}
+.g5 .glink{margin:0 0 0 6px;}
+.gv-pick{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;background:rgba(28,15,20,.94);border:1px solid rgba(212,162,76,.4);max-width:calc(100vw - 32px);}
+.gv-pick small{font-size:11px;color:#B9A89E;margin-right:4px;}
+.gv-pick button{font-size:12.5px;padding:6px 10px;min-height:36px;border:1px solid rgba(239,229,214,.2);color:#EFE5D6;}
+.gv-pick button[aria-pressed=true]{border-color:#D4A24C;color:#D4A24C;}
 .support .tw{margin-top:20px;padding-top:16px;border-top:1px solid rgba(28,15,20,.14);}
 .support .tw p{margin-top:0;color:#1C0F14;}
 .support .tw b{font-weight:600;}
@@ -891,20 +929,46 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span><span><b id="ecS">—</b><i>秒</i></span></p>
               {C.end_cd_after && <small>{C.end_cd_after}</small>}</div></div>
       </div>
-        <aside class="support rv" style="--i:4" id="support">
+        <aside class="support rv" style="--i:4" id="support" data-gv="1">
+          {SHOW_DRAFTS && <div class="gv-pick" id="gvPick" role="group" aria-label="善的循環版型（只在預覽顯示）"><small>善的循環</small><button data-s="1">1 年輪水滴</button><button data-s="2">2 領收證</button><button data-s="3">3 去向條</button><button data-s="4">4 御守</button><button data-s="5">5 一行</button></div>}
           <h3>{copy.subscribe_title}</h3><p class="sdesc">{copy.subscribe_desc}</p>
           <div class="r">{copy.subscribe_price && <b>{copy.subscribe_price}</b>}{C.subscribe_unit && <span>{C.subscribe_unit}</span>}{safeHref(copy.subscribe_url) && <a class="btn-ink" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">{C.subscribe_btn}</a>}</div>
-          {C.give_show !== 'off' && <div class="give">
-            <p class="gh"><b class="num">{C.give_rate}<small>%</small></b><span>善的循環<em>{C.give_org}・災害救援</em></span></p>
-            <p><Fragment set:html={giveHtml} /></p>
-            {(C.give_donated || C.give_total) && <dl class="gnum">
+          {C.give_show !== 'off' && <>
+          <div class="give g1"><div class="g1-ring" aria-hidden="true"><svg viewBox="-40 -40 80 80"><circle r="36"/><circle r="28"/><circle r="20"/><circle r="12"/><path class="drop" d="M0,-9 C5,-2 6,2 6,4 A6,6 0 0 1 -6,4 C-6,2 -5,-2 0,-9Z"/></svg><b class="num">{C.give_rate}<small>%</small></b></div>
+            <div><p class="gk">善的循環・{C.give_org}</p><p><Fragment set:html={giveHtml} /></p>{(C.give_donated || C.give_total) && <dl class="gnum">
               {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
               {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
               {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
               {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
-            </dl>}
-            {safeHref(C.give_url) && <a href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}
-          </div>}
+            </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div></div>
+          <div class="give g2"><div class="g2-slip"><p class="g2-t">領　收　證</p><p class="g2-l"><span>每月支持的</span><b class="num">{C.give_rate}%</b></p><p class="g2-l"><span>捐贈對象</span><b>{C.give_org}</b></p><p class="g2-l"><span>用途</span><b>災害救援</b></p><span class="g2-stamp" aria-hidden="true">八起</span></div>
+            <p><Fragment set:html={giveHtml} /></p>{(C.give_donated || C.give_total) && <dl class="gnum">
+              {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
+              {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
+              {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
+              {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
+            </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div>
+          <div class="give g3"><p class="gk">你的支持會去哪裡</p><div class="g3-bar" role="img" aria-label={`${100 - (+C.give_rate || 8)}% 工具與實驗，${C.give_rate}% 災害救援`}><span class="a" style={`flex:${100 - (+C.give_rate || 8)}`}>工具・實驗・在日協助<b class="num">{100 - (+C.give_rate || 8)}%</b></span><span class="b" style={`flex:${Math.max(+C.give_rate || 8, 14)}`}><b class="num">{C.give_rate}%</b></span></div>
+            <p class="g3-cap"><i></i>{C.give_rate}% 捐給 {C.give_org}（災害救援）</p><p><Fragment set:html={giveHtml} /></p>{(C.give_donated || C.give_total) && <dl class="gnum">
+              {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
+              {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
+              {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
+              {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
+            </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div>
+          <div class="give g4"><div class="g4-omamori" aria-hidden="true"><span class="cord"></span><span class="body"><em><span>八</span><span>起</span></em><b class="num">{C.give_rate}%</b></span></div>
+            <div><p class="gk">善的循環</p><p><Fragment set:html={giveHtml} /></p>{(C.give_donated || C.give_total) && <dl class="gnum">
+              {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
+              {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
+              {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
+              {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
+            </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div></div>
+          <div class="give g5"><p><span class="g5-dot" aria-hidden="true"></span><b>每一筆支持的 {C.give_rate}%</b>，會捐給 {C.give_org} 做災害救援。{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</p>{(C.give_donated || C.give_total) && <dl class="gnum">
+              {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
+              {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
+              {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
+              {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
+            </dl>}</div>
+          </>}
           {igUrl && C.tw_show !== 'off' && <div class="tw">
             <p><span aria-hidden="true">🇹🇼</span> <Fragment set:html={twHtml} /></p>
             <a href={igUrl} target="_blank" rel="noopener">{fillIg(C.tw_link)} ↗</a>
@@ -1156,6 +1220,9 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
 
+/* 善的循環版型切換（只在預覽）：?gv=1~5 */
+(function(){var S=document.getElementById('support'),P=document.getElementById('gvPick');if(!S)return;var q=(location.search.match(/[?&]gv=([1-5])/)||[])[1];if(q)S.dataset.gv=q;
+  if(P){var pt=function(){P.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.s===S.dataset.gv);});};pt();P.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;S.dataset.gv=b.dataset.s;pt();});}})();
 /* 服務卡：游標位置的聚光 */
 (function(){var H=document.getElementById('hats');if(!H)return;
   H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();
