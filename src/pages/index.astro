@@ -8,7 +8,7 @@ import { safeImg } from '../data/work-utils';
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
-import { allEntries, SHOW_DRAFTS } from '../data/journal';
+import { allEntries } from '../data/journal';
 const endRing = buildRing(copy.birth_date);
 
 const all = await allEntries();
@@ -511,17 +511,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hat{position:relative;overflow:hidden;isolation:isolate;}
 .hat>*{position:relative;z-index:1;}
 .hat .hk,.hat h3,.hat p,.hitems li{transition:color .45s var(--ease),border-color .45s var(--ease),transform .55s var(--ease),text-shadow .45s;}
-/* 服務卡：光の縁＋三張卡各一色。配色由 data-pal 決定（1 五系呼應／2 酒・金・生成り／3 藍・朱・若竹） */
+/* 服務卡：光の縁＋三張卡各一色（酒・金・生成り：玫瑰紅／金／米白） */
 @property --ang{syntax:'<angle>';initial-value:0deg;inherits:false;}
-.hats[data-pal="1"] .hat:nth-child(3n+1){--hc:148,165,94;--hl:205,218,160;}
-.hats[data-pal="1"] .hat:nth-child(3n+2){--hc:212,162,76;--hl:243,217,160;}
-.hats[data-pal="1"] .hat:nth-child(3n+3){--hc:111,147,173;--hl:178,206,226;}
-.hats[data-pal="2"] .hat:nth-child(3n+1){--hc:196,86,107;--hl:236,160,176;}
-.hats[data-pal="2"] .hat:nth-child(3n+2){--hc:212,162,76;--hl:243,217,160;}
-.hats[data-pal="2"] .hat:nth-child(3n+3){--hc:214,196,172;--hl:245,234,218;}
-.hats[data-pal="3"] .hat:nth-child(3n+1){--hc:110,132,196;--hl:182,198,240;}
-.hats[data-pal="3"] .hat:nth-child(3n+2){--hc:214,104,70;--hl:246,170,140;}
-.hats[data-pal="3"] .hat:nth-child(3n+3){--hc:118,168,132;--hl:182,220,190;}
+.hats .hat:nth-child(3n+1){--hc:196,86,107;--hl:236,160,176;}
+.hats .hat:nth-child(3n+2){--hc:212,162,76;--hl:243,217,160;}
+.hats .hat:nth-child(3n+3){--hc:214,196,172;--hl:245,234,218;}
 .hats .hat{--hc:212,162,76;--hl:243,217,160;border-color:rgba(var(--hc),.26);background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(var(--hc),.20),transparent 70%),linear-gradient(160deg,rgba(var(--hc),.2),rgba(var(--hc),.05) 70%),var(--night-2);transition:transform .55s var(--ease),border-color .4s;}
 .hats .hat .hk{color:rgb(var(--hc));}
 .hats .hitems li{border-color:rgba(var(--hc),.42);}
@@ -533,10 +527,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 @keyframes hatSpin{to{--ang:360deg;}}
 @media(hover:none){.hats .hat{border-left:2px solid rgb(var(--hc));}}
 @media(prefers-reduced-motion:reduce){.hats .hat,.hats .hat::before,.hats .hat::after{transition:none!important;animation:none!important;}}
-.hat-pick{position:fixed;left:16px;bottom:16px;z-index:60;display:flex;gap:6px;align-items:center;padding:8px 10px;background:rgba(28,15,20,.92);border:1px solid rgba(212,162,76,.4);backdrop-filter:blur(6px);}
-.hat-pick small{font-size:11px;color:#B9A89E;margin-right:4px;}
-.hat-pick button{font-size:12.5px;padding:6px 10px;min-height:36px;border:1px solid rgba(239,229,214,.2);color:#EFE5D6;}
-.hat-pick button[aria-pressed=true]{border-color:#D4A24C;color:#D4A24C;}
 /* ── 實績數字：月台翻牌（Solari board） ── */
 .proof{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));}
 .proof .flap{display:flex!important;width:max-content;gap:3px;margin-bottom:8px;font-family:var(--latin)!important;font-size:32px!important;font-variant-numeric:lining-nums tabular-nums;}
@@ -640,13 +630,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       </div>}
       {aboutPhoto && <div class="me has-photo"><img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="林子翔（巴）" loading="lazy" decoding="async" /></div>}
       <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>我能幫上忙的事</h3></div>
-      <ol class="hats" id="hats" data-pal="1">
+      <ol class="hats" id="hats">
         {services.hats.map((h: any, i: number) => (
           <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
         ))}
       </ol>
       <ul class="proof rv" style="--i:6">{services.proof.map((x: any) => <li><b class="num flap" data-v={x.num} aria-label={x.num}>{x.num}</b><small>{x.label}</small></li>)}</ul>
-      {SHOW_DRAFTS && <div class="hat-pick" id="hatPick" role="group" aria-label="服務卡樣式（只在預覽顯示）"><small>配色</small><button data-s="1" aria-pressed="true">1 五系呼應</button><button data-s="2" aria-pressed="false">2 酒・金・生成り</button><button data-s="3" aria-pressed="false">3 藍・朱・若竹</button></div>}
     </div>
   </div>
 </section>
@@ -1015,11 +1004,8 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
 
-/* 服務卡配色：預覽時可用左下角切換（?pal=1|2|3）；游標位置的聚光 */
+/* 服務卡：游標位置的聚光 */
 (function(){var H=document.getElementById('hats');if(!H)return;
-  var q=(location.search.match(/[?&]pal=([123])/)||[])[1];if(q)H.dataset.pal=q;
-  var P=document.getElementById('hatPick');if(P){P.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.s===H.dataset.pal);});
-    P.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;H.dataset.pal=b.dataset.s;P.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b);});});}
   H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();
 
 /* 實績數字：月台翻牌。捲到時每一格從 0 一張一張翻到目標字；滑鼠移上去會再翻一次 */
