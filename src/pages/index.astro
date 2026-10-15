@@ -291,18 +291,21 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cc-cols::-webkit-scrollbar{display:none;}
 .cc-cols li{flex:1 0 64px;}
 .cc-cols li+li{border-left:1px solid var(--line);}
-.cc-cols button{position:relative;width:100%;height:300px;padding:16px 0 12px;display:flex;flex-direction:row-reverse;justify-content:center;align-items:flex-start;gap:6px;color:var(--bone-2);transition:background .35s,color .3s;}
+.cc-cols button{position:relative;width:100%;height:330px;padding:16px 0 12px;display:flex;flex-direction:row-reverse;justify-content:center;align-items:flex-start;gap:6px;color:var(--bone-2);transition:background .35s,color .3s;}
 .cc-cols button>span{writing-mode:vertical-rl;}
-.cc-cols .vn{font-family:var(--serif);font-size:15px;color:var(--bone);letter-spacing:.12em;}
+/* 直書：優先用內建、含直排字距的系統字型（網路字型在部分手機直排時字會疊在一起） */
+.cc-cols .vn,.cc-cols .vt{font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","Songti TC","Noto Serif CJK TC","Source Han Serif TC","Yu Mincho","YuMincho","MS Mincho",var(--serif)!important;}
+.cc-cols .vd{font-family:"Hiragino Sans","PingFang TC","Noto Sans CJK TC","Source Han Sans TC","Yu Gothic","Microsoft JhengHei",var(--sans,sans-serif)!important;}
+.cc-cols .vn{inline-size:4.6em;line-height:1.2;font-family:var(--serif);font-size:15px;color:var(--bone);letter-spacing:.12em;}
 .cc-cols button>span{flex:none;}
-.cc-cols .vt{inline-size:190px;font-family:var(--serif);font-size:13px;line-height:1.55;letter-spacing:.06em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.cc-cols .vd{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;}
+.cc-cols .vt{inline-size:176px;font-family:var(--serif);font-size:13px;line-height:1.55;letter-spacing:.06em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.cc-cols .vd{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;inline-size:5.6em;line-height:1.2;text-align:center;}
 .cc-cols .vd{font-size:11.5px;color:var(--ash);letter-spacing:.08em;}
 .cc-cols .future{opacity:.5;}
 .cc-cols button:hover{background:rgba(239,229,214,.04);opacity:1;}
 .cc-cols button.on{background:linear-gradient(rgba(212,162,76,.14),rgba(212,162,76,.05));}
 .cc-cols button.on .vn{color:var(--gold);}
-.cc-cols .hk{writing-mode:horizontal-tb;}
+.cc-cols .hk{writing-mode:horizontal-tb;bottom:86px;}
 .hk{position:absolute;bottom:56px;left:50%;transform:translateX(-50%) rotate(-8deg);writing-mode:horizontal-tb;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--jp);font-size:13px;border:1.5px solid currentColor;}
 .hk.done{color:#C8584A;background:rgba(200,88,74,.08);}
 .hk.next{color:var(--gold);}
@@ -312,7 +315,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cc-side .ca-nums{margin-top:6px;}
 @media(max-width:1100px){.cc-now{grid-template-columns:200px minmax(0,1fr);}.cc-side{grid-column:1/-1;}}
 @media(max-width:700px){.cc-now{grid-template-columns:1fr;gap:28px;}.cc-now .cb-ring{max-width:230px;margin:0 auto;}}
-@media(max-width:520px){.chd h3{font-size:21px;}.ca-nums b{font-size:24px;}.cc-cols li{flex-basis:56px;}.cc-cols button{height:260px;}}
+@media(max-width:520px){.chd h3{font-size:21px;}.ca-nums b{font-size:24px;}.cc-cols li{flex-basis:58px;}.cc-cols button{height:320px;}}
 .mv-toggle button{font-size:13px;padding:5px 16px;color:var(--bone-2);transition:background .3s,color .3s;}
 .mv-toggle button:hover{color:var(--bone);}
 .mv-toggle button[aria-pressed="true"]{background:var(--bone);color:var(--night);}
