@@ -695,14 +695,21 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .closing .about.end{margin-top:0;}
 /* 結尾：年輪倒數＋支持卡 合成一張 */
 .end-card{display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:stretch;border:1px solid rgba(239,229,214,.1);box-shadow:0 40px 80px -40px rgba(0,0,0,.8);}
-.end-card .support{align-self:stretch;}
+.end-card .support{align-self:stretch;display:flex;flex-direction:column;padding:32px 28px 26px;}
+.end-card .support .tw{margin-top:auto;padding-top:0;border-top:0;}
+.end-card .support .give-cta{margin-bottom:28px;}
+.end-card .tw-box{padding:16px 16px 14px;border:1px solid rgba(28,15,20,.14);background:rgba(255,255,255,.28);}
+.end-card .tw p{font-size:13.5px;}
+.end-card .tw a{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;border:1px solid rgba(28,15,20,.3);border-bottom-color:rgba(28,15,20,.3);font-size:13px;transition:border-color .3s,background .3s,color .3s;}
+.end-card .tw a:hover{border-color:#D4A24C;background:rgba(212,162,76,.1);color:#1C0F14;}
+.end-card .tw small{margin-top:10px;font-size:11.5px;}
 .ec-ring{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 28px 36px;background:radial-gradient(80% 60% at 50% 46%,#30182233 0%,transparent 70%),radial-gradient(100% 80% at 50% 40%,#2A1520,#1C0F14 80%);overflow:hidden;}
 .ec-k{margin:0;font-size:13px;letter-spacing:.16em;color:var(--bone-2);}
 .ec-k b{font-family:var(--latin);font-weight:500;font-size:16px;color:var(--gold);margin:0 4px;}
-.ec-ring canvas{display:block;width:100%;max-width:480px;height:340px;margin:0;}
-.ec-ring .ecd{justify-content:center;margin-top:-6px;}
+.ec-ring canvas{display:block;width:100%;max-width:480px;height:290px;margin:-8px 0 2px;}
+.ec-ring .ecd{justify-content:center;margin-top:8px;}
 .ec-after{margin:16px 0 0;font-family:var(--serif);font-size:14px;letter-spacing:.08em;color:var(--bone-2);}
-@media(max-width:900px){.end-card{grid-template-columns:1fr;}.ec-ring{padding:32px 16px 28px;}.ec-ring canvas{height:240px;}}
+@media(max-width:900px){.end-card{grid-template-columns:1fr;}.ec-ring{padding:24px 16px 28px;}.ec-ring canvas{height:220px;}}
 .hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
 /* ── 服務卡 ── */
 .hat{position:relative;overflow:hidden;isolation:isolate;}
@@ -935,8 +942,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
     <div class="side" aria-hidden="true"></div>
     <div class="end-card">
       <div class="ec-ring rv" style="--i:3">
-        <p class="ec-k">{endBefore[0]}<b id="ecN">{endRing.age}</b>{endBefore[1]}</p>
         <canvas id="endRing" aria-hidden="true"></canvas>
+        <p class="ec-k">{endBefore[0]}<b id="ecN">{endRing.age}</b>{endBefore[1]}</p>
         <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span><span><b id="ecS">—</b><i>秒</i></span></p>
         {C.end_cd_after && <p class="ec-after">{C.end_cd_after}</p>}
       </div>
@@ -962,8 +969,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           </div>
           </>}
           {igUrl && C.tw_show !== 'off' && <div class="tw">
-            <p><span aria-hidden="true">🇹🇼</span> <Fragment set:html={twHtml} /></p>
-            <a href={igUrl} target="_blank" rel="noopener">{fillIg(C.tw_link)} ↗</a>
+            <div class="tw-box"><p><span aria-hidden="true">🇹🇼</span> <Fragment set:html={twHtml} /></p>
+            <a href={igUrl} target="_blank" rel="noopener"><span aria-hidden="true">☕</span>{fillIg(C.tw_link)} ↗</a></div>
             {C.tw_note && <small>{fillIg(C.tw_note)}</small>}
           </div>}
         </aside>
