@@ -473,7 +473,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 /* —— 手機排版優化（2026-10-14）—— */
 .tale p,.story-echo,.sec-head .sub,.motto-card,.hat p{text-wrap:pretty;}
-.story-echo b,.tale .tale-end,.about.end .motto-card{word-break:keep-all;}
+.story-echo b,.about.end .motto-card{word-break:keep-all;}
+/* 金色收尾：只在標點後換行（iOS Safari 的 keep-all 會整句不斷行而超出版面） */
+.tale .tale-end{word-break:normal;overflow-wrap:anywhere;}
+.tale-end .nb{white-space:nowrap;}
+@media(max-width:340px){.tale-end .nb{white-space:normal;}}
 .jlist h3,#journal h3,.work h3{text-wrap:pretty;}
 @media(max-width:720px){
   .tale{padding-left:18px;font-size:16px;line-height:2;margin-top:26px;}
@@ -503,6 +507,41 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .closing{padding-top:24px;}
 .closing .about.end{margin-top:0;}
 .hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
+/* ── 服務卡 ── */
+.hat{position:relative;overflow:hidden;isolation:isolate;}
+.hat>*{position:relative;z-index:1;}
+.hat .hk,.hat h3,.hat p,.hitems li{transition:color .45s var(--ease),border-color .45s var(--ease),transform .55s var(--ease),text-shadow .45s;}
+/* 服務卡：光の縁＋三張卡各一色（酒・金・生成り：玫瑰紅／金／米白） */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false;}
+.hats .hat:nth-child(3n+1){--hc:196,86,107;--hl:236,160,176;}
+.hats .hat:nth-child(3n+2){--hc:212,162,76;--hl:243,217,160;}
+.hats .hat:nth-child(3n+3){--hc:214,196,172;--hl:245,234,218;}
+.hats .hat{--hc:212,162,76;--hl:243,217,160;border-color:rgba(var(--hc),.26);background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(var(--hc),.20),transparent 70%),linear-gradient(160deg,rgba(var(--hc),.2),rgba(var(--hc),.05) 70%),var(--night-2);transition:transform .55s var(--ease),border-color .4s;}
+.hats .hat .hk{color:rgb(var(--hc));}
+.hats .hitems li{border-color:rgba(var(--hc),.42);}
+.hats .hat::before{content:'';position:absolute;inset:0;padding:1.5px;z-index:0;background:conic-gradient(from var(--ang),transparent 0 60%,rgba(var(--hl),1) 78%,rgb(var(--hc)) 87%,transparent 97%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .4s;}
+.hats .hat:hover{transform:translateY(-3px);border-color:rgba(var(--hc),.5);}
+.hats .hat:hover::before{opacity:1;animation:hatSpin 2.4s linear infinite;}
+.hats .hat:hover .hk{text-shadow:0 0 18px rgba(var(--hl),.8);color:rgb(var(--hl));}
+.hats .hat:hover .hitems li{border-color:rgba(var(--hl),.6);}
+@keyframes hatSpin{to{--ang:360deg;}}
+@media(hover:none){.hats .hat{border-left:2px solid rgb(var(--hc));}}
+@media(prefers-reduced-motion:reduce){.hats .hat,.hats .hat::before,.hats .hat::after{transition:none!important;animation:none!important;}}
+/* ── 實績數字：月台翻牌（Solari board） ── */
+.proof{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));}
+.proof .flap{display:flex!important;width:max-content;gap:3px;margin-bottom:8px;font-family:var(--latin)!important;font-size:32px!important;font-variant-numeric:lining-nums tabular-nums;}
+.proof .flap+small{display:block;}
+@media(max-width:640px){.proof li{align-items:center!important;}.proof .flap{font-size:24px!important;margin-bottom:0;min-width:96px;}}
+.fc{position:relative;display:inline-block;width:.78em;height:1.18em;perspective:300px;font-size:1em;line-height:1.18em;text-align:center;color:#F3D9A0;}
+.fc>span{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:#1A0B10;backface-visibility:hidden;}
+.fc .t,.fc .ft{top:0;border-radius:3px 3px 0 0;transform-origin:50% 100%;background:linear-gradient(#24101A,#1C0C12);}
+.fc .b,.fc .fb{bottom:0;border-radius:0 0 3px 3px;transform-origin:50% 0;background:linear-gradient(#170A0E,#12070B);}
+.fc>span>i{position:absolute;left:0;right:0;height:1.18em;font-style:normal;}
+.fc .t>i,.fc .ft>i{top:0;}
+.fc .b>i,.fc .fb>i{top:-.59em;}
+.fc::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;margin-top:-.5px;background:rgba(0,0,0,.65);z-index:3;}
+.fc .ft,.fc .fb{z-index:2;}
+.fc .fb{transform:rotateX(90deg);}
 .hat h3{font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.5;}
 .hat p{font-size:13.5px;color:var(--bone-2);margin-top:6px;line-height:1.8;}
 .hat a{display:inline-block;margin-top:10px;font-size:13px;color:var(--gold);}
@@ -587,16 +626,16 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="sec-head"><p class="sub rv">{copy.about_meta}</p><h2 id="a-h" class="rv" style="--i:1">{copy.about_name}</h2></div>
       {Array.isArray(copy.about_story) && copy.about_story.length > 0 && <div class="tale">
         {copy.about_story.map((para: string, i: number) => <p class="rv" style={`--i:${Math.min(i + 2, 8)}`}>{para.split('\n').map((ln: string, j: number) => <>{j > 0 && <br />}{ln}</>)}</p>)}
-        {copy.about_story_end && <p class="tale-end rv" style="--i:8">{copy.about_story_end}</p>}
+        {copy.about_story_end && <p class="tale-end rv" style="--i:8">{String(copy.about_story_end).split(/(?<=[，。；、！？：])/).map((c: string) => <span class="nb">{c}</span>)}</p>}
       </div>}
       {aboutPhoto && <div class="me has-photo"><img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="林子翔（巴）" loading="lazy" decoding="async" /></div>}
       <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>我能幫上忙的事</h3></div>
-      <ol class="hats">
+      <ol class="hats" id="hats">
         {services.hats.map((h: any, i: number) => (
           <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
         ))}
       </ol>
-      <ul class="proof rv" style="--i:6">{services.proof.map((x) => <li><b class="num">{x.num}</b><small>{x.label}</small></li>)}</ul>
+      <ul class="proof rv" style="--i:6">{services.proof.map((x: any) => <li><b class="num flap" data-v={x.num} aria-label={x.num}>{x.num}</b><small>{x.label}</small></li>)}</ul>
     </div>
   </div>
 </section>
@@ -964,6 +1003,32 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .then(function(x){if(!x.ok)throw new Error(x.d&&x.d.error||'送出失敗');F.reset();M.className='fmsg ok';M.textContent='已收到，我們會在 2 個工作天內回覆你。';window.sfx&&sfx('success');})
       .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
+
+/* 服務卡：游標位置的聚光 */
+(function(){var H=document.getElementById('hats');if(!H)return;
+  H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();
+
+/* 實績數字：月台翻牌。捲到時每一格從 0 一張一張翻到目標字；滑鼠移上去會再翻一次 */
+(function(){var els=document.querySelectorAll('.flap');if(!els.length)return;
+  var SEQ='0123456789';
+  function cell(ch){var c=document.createElement('span');c.className='fc';c.setAttribute('aria-hidden','true');
+    c.innerHTML='<span class="t"><i></i></span><span class="b"><i></i></span><span class="ft"><i></i></span><span class="fb"><i></i></span>';set(c,ch);return c;}
+  function set(c,ch){c._ch=ch;c.querySelectorAll('i').forEach(function(i){i.textContent=ch;});}
+  function flip(c,to,dur){return new Promise(function(res){var from=c._ch;
+    c.querySelector('.t i').textContent=to;c.querySelector('.fb i').textContent=to;c.querySelector('.ft i').textContent=from;c.querySelector('.b i').textContent=from;
+    var ft=c.querySelector('.ft'),fb=c.querySelector('.fb');
+    ft.animate([{transform:'rotateX(0deg)'},{transform:'rotateX(-90deg)'}],{duration:dur/2,easing:'ease-in',fill:'forwards'});
+    fb.animate([{transform:'rotateX(90deg)'},{transform:'rotateX(0deg)'}],{duration:dur/2,delay:dur/2,easing:'ease-out',fill:'forwards'}).onfinish=function(){set(c,to);res();};});}
+  function path(to){var d=SEQ.indexOf(to);if(d>=0){var a=[];for(var k=0;k<=d;k++)a.push(SEQ[k]);return a.length>1?a:['9','0'].slice(1).concat(a);}return ['7','3',to];}
+  async function run(el){if(el._busy)return;el._busy=true;var cs=el._cells;
+    await Promise.all(cs.map(async function(c,i){await new Promise(function(r){setTimeout(r,i*120);});var steps=path(c._to);for(var k=0;k<steps.length;k++)await flip(c,steps[k],k===steps.length-1?220:140);}));
+    el._busy=false;}
+  var RMf=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  els.forEach(function(el){var v=el.dataset.v||el.textContent;el.textContent='';el._cells=[].map.call(v,function(ch){var c=cell(RMf?ch:' ');c._to=ch;el.appendChild(c);return c;});
+    if(RMf)return;el.closest('li').addEventListener('pointerenter',function(e){if(e.pointerType==='mouse'){el._cells.forEach(function(c){set(c,' ');});run(el);}});});
+  if(RMf)return;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);e.target.querySelectorAll('.flap').forEach(function(el,i){setTimeout(function(){run(el);},i*260);});}});},{threshold:.4});
+  var pr=document.querySelector('.proof');if(pr)io.observe(pr);})();
 
 /* journal filter */
 (function(){var F=document.getElementById('filters'),rows=[].slice.call(document.querySelectorAll('.jrow')),E=document.getElementById('jempty');

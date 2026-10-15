@@ -930,13 +930,17 @@ async function loadServices() {
           <div class="field"><label class="field-label">提供的服務（一行一項，保持精簡）</label><textarea rows="3" data-h="${i}" data-list="1" data-key="items">${escapeHtml((h.items || []).join('\n'))}</textarea></div></div>`).join('')}
       </div>
       <div class="hb-card"><h3>實績數字</h3>
-        <div class="field-hint" style="margin:-4px 0 10px">左：數字　右：說明（三格，顯示在服務卡下方）</div>
-        ${data.proof.map((x, i) => `<div style="display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;margin-bottom:8px">${inp('num', x.num, `data-p="${i}"`)}${inp('label', x.label, `data-p="${i}"`)}</div>`).join('')}
+        <div class="field-hint" style="margin:-4px 0 10px">左：數字　右：說明（顯示在服務卡下方，可新增或刪除）</div>
+        ${data.proof.map((x, i) => `<div style="display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:8px;margin-bottom:8px">${inp('num', x.num, `data-p="${i}"`)}${inp('label', x.label, `data-p="${i}"`)}<button type="button" class="btn btn-ghost" data-delp="${i}" title="刪除這一格">×</button></div>`).join('')}
+        <button type="button" class="btn btn-ghost" id="addProof" style="margin-top:4px">＋ 新增一格</button>
+        <div class="field-hint">數字會以翻牌動畫出現；數字欄可以放 4、250+、98% 這類短字（建議 4 個字以內）。</div>
       </div>` +
       `
       <div class="btn-row"><div class="spacer"></div><button class="btn btn-primary" id="saveSvc">儲存變更</button></div>`;
     form.querySelectorAll('[data-delst]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定移除這間住宿嗎？儲存後才會生效。')) return; collect(); data.stays.splice(+b.dataset.delst, 1); render(); }));
     form.querySelectorAll('[data-delf]').forEach(b => b.addEventListener('click', () => { collect(); data.faq.splice(+b.dataset.delf, 1); render(); }));
+    form.querySelectorAll('[data-delp]').forEach(btn => btn.addEventListener('click', () => { collect(); data.proof.splice(+btn.dataset.delp, 1); render(); }));
+    document.getElementById('addProof')?.addEventListener('click', () => { collect(); data.proof.push({ num: '', label: '' }); render(); });
     document.getElementById('addFaq')?.addEventListener('click', () => { collect(); (data.faq = data.faq || []).push({ q: '', a: '' }); render(); });
     document.getElementById('addStay')?.addEventListener('click', () => { collect(); data.stays.push({ name: '', desc: '', rating: '', url: '', img: '' }); render(); });
     document.getElementById('saveSvc').addEventListener('click', async (e) => {
@@ -945,6 +949,7 @@ async function loadServices() {
       if (bad) { toast('住宿連結請貼 Airbnb 的網址（https://www.airbnb.…）', 'err'); return; }
       if (data.stays.some(st => st.img && !/^https:\/\//i.test(st.img))) { toast('照片網址要用 https:// 開頭', 'err'); return; }
       data.stays = data.stays.filter(st => st.name.trim() && st.url.trim());
+      data.proof = data.proof.filter(x => String(x.num).trim() || String(x.label).trim());
       file.sha = await saveJson('src/data/services.json', data, file.sha, 'Update services via Studio', e.currentTarget);
       render();
     });
