@@ -737,7 +737,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .twb-dl dt{font-size:12px;letter-spacing:.12em;color:#7A6A6C;}
 .twb-dl dd{margin:0;font-size:15px;word-break:break-all;}
 .twb-dl .acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
-.twb-dl .acct .num{white-space:nowrap;font-family:ui-monospace,"SF Mono","Roboto Mono","Menlo","Consolas",monospace;font-weight:500;font-size:clamp(20px,6vw,25px);letter-spacing:.06em;font-variant-numeric:tabular-nums slashed-zero;color:#1C0F14;}
+@font-face{font-family:"Outfit";src:url("/fonts/outfit-500.woff2") format("woff2");font-weight:500;font-display:swap;unicode-range:U+0020-007F;}
+.twb-dl .acct .num{white-space:nowrap;font-family:"Outfit",var(--sans,sans-serif);font-weight:500;font-size:clamp(19px,5.8vw,27px);letter-spacing:.08em;font-variant-numeric:tabular-nums lining-nums;color:#1C0F14;}
 .twb-copy{flex:1 0 100%;min-height:44px;padding:0 14px;border:1px solid #1C0F14;font-size:13px;background:#1C0F14;color:#EFE5D6;transition:background .3s;}
 .twb-copy.ok{background:#3E6B4A;border-color:#3E6B4A;}
 .twb-lead{margin-top:10px;font-size:13.5px;line-height:1.8;color:#5B4B4E;}
