@@ -63,7 +63,7 @@ const SHADES = ['#1C0F14', '#3B2229', '#5C3D44', '#806268', '#A6898E', '#C2AAAE'
 const flow = C.give_use.split(/\n|・/).map((l) => l.trim()).filter(Boolean).map((l) => { const m = l.match(/^(.*?)[\s:：]*([\d.]+)\s*%?$/); return m ? { name: m[1].trim(), pct: Number(m[2]) } : { name: l, pct: 0 }; });
 const useSum = flow.reduce((t, x) => t + x.pct, 0);
 if (!useSum && flow.length) flow.forEach((x) => (x.pct = Math.round((100 - givePct) / flow.length)));
-const flowAll = [...flow.map((x, i) => ({ ...x, c: SHADES[Math.min(i, SHADES.length - 1)], dark: i < 3 })), { name: `${C.give_org}・災害救援`, pct: givePct, c: '#8A2B3D', dark: true, give: true }];
+const flowAll = [...flow.map((x, i) => ({ ...x, c: SHADES[Math.min(i, SHADES.length - 1)], dark: i < 3 })), { name: "善的循環：災害救援捐贈", pct: givePct, c: '#8A2B3D', dark: true, give: true }];
 const giveHtml = escH(C.give_text.replaceAll('{rate}', C.give_rate).replaceAll('{org}', C.give_org)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const twHtml = escH(C.tw_text).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const aboutPhoto = /^\/(about|works)\/[\w./-]+\.(webp|png|jpe?g)$/i.test(String((copy as any).about_photo || '')) ? (copy as any).about_photo : '';
