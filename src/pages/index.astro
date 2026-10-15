@@ -16,7 +16,10 @@ const C0: Record<string, string> = {
   end_cd_before: '第 {n} 圈，還有', end_cd_after: '長完這一圈',
   subscribe_unit: '／月', subscribe_btn: '前往 Stripe 訂閱',
   tw_show: 'on', tw_text: '在台灣？也可以用銀行轉帳**單筆支持**，金額隨意。',
-  tw_link: '私訊 @{ig} 索取轉帳資訊', tw_note: '轉帳資訊只會由 @{ig} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。',
+  tw_link: '私訊 @{ig} 索取轉帳資訊',
+  give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: 'https://www.civic-force.org/',
+  give_text: '每月收到的支持，固定撥出 {rate}% 捐給日本的災害救援團體 {org}。8 是 8AKER零 的 8，也是「七転び八起き」的八起——跌倒了，就一起站起來。捐了多少，都會寫在每月連載裡。',
+  give_month: '', give_received: '', give_donated: '', give_total: '', tw_note: '轉帳資訊只會由 @{ig} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。',
 };
 const C: Record<string, string> = Object.fromEntries(Object.keys(C0).map((k) => [k, (copy as any)[k] != null ? String((copy as any)[k]) : C0[k]]));
 const endBefore = (C.end_cd_before.includes('{n}') ? C.end_cd_before.split('{n}') : [C.end_cd_before + ' ', '']).slice(0, 2);
@@ -55,6 +58,7 @@ const kanjiYear = String(new Date().getFullYear()).split('').map((c) => '〇一�
 const igHandle = String((copy as any).instagram_handle || '').replace(/^@/, '').trim();
 const igUrl = /^[A-Za-z0-9._]{1,30}$/.test(igHandle) ? `https://ig.me/m/${igHandle}` : '';
 const fillIg = (x: string) => String(x || '').replaceAll('{ig}', igHandle);
+const giveHtml = escH(C.give_text.replaceAll('{rate}', C.give_rate).replaceAll('{org}', C.give_org)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const twHtml = escH(C.tw_text).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 const aboutPhoto = /^\/(about|works)\/[\w./-]+\.(webp|png|jpe?g)$/i.test(String((copy as any).about_photo || '')) ? (copy as any).about_photo : '';
 const pageData = {
@@ -436,6 +440,19 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .support p{font-size:13.5px;color:#5B4B4E;margin-top:8px;}
 .support .r{display:flex;align-items:baseline;gap:10px;margin-top:18px;flex-wrap:wrap;}
 .support .r b{font-size:30px;font-weight:400;}
+.support .sdesc{white-space:pre-line;}
+/* 善的循環：每月撥出固定比例做災害救援 */
+.support .give{margin-top:20px;padding:16px 16px 14px;background:rgba(61,15,26,.06);border-left:2px solid #8A2B3D;}
+.support .give .gh{display:flex;align-items:center;gap:12px;margin:0;color:#1C0F14;}
+.support .give .gh b{font-family:var(--latin);font-weight:500;font-size:34px;line-height:1;color:#8A2B3D;}
+.support .give .gh b small{font-size:16px;margin-left:1px;}
+.support .give .gh span{font-family:var(--serif);font-size:15px;line-height:1.35;}
+.support .give .gh em{display:block;font-style:normal;font-family:var(--latin);font-size:12px;letter-spacing:.06em;color:#7A6A6C;}
+.support .give p{margin-top:10px;font-size:13px;line-height:1.75;color:#4A3A3D;}
+.support .gnum{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:10px;font-size:12px;}
+.support .gnum dt{color:#7A6A6C;}
+.support .gnum dd{font-family:var(--latin);font-size:17px;color:#1C0F14;}
+.support .give a{display:inline-block;margin-top:8px;font-size:13px;color:#1C0F14;border-bottom:1px solid #8A2B3D;padding-bottom:1px;}
 .support .tw{margin-top:20px;padding-top:16px;border-top:1px solid rgba(28,15,20,.14);}
 .support .tw p{margin-top:0;color:#1C0F14;}
 .support .tw b{font-weight:600;}
@@ -875,8 +892,19 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               {C.end_cd_after && <small>{C.end_cd_after}</small>}</div></div>
       </div>
         <aside class="support rv" style="--i:4" id="support">
-          <h3>{copy.subscribe_title}</h3><p>{copy.subscribe_desc}</p>
+          <h3>{copy.subscribe_title}</h3><p class="sdesc">{copy.subscribe_desc}</p>
           <div class="r">{copy.subscribe_price && <b>{copy.subscribe_price}</b>}{C.subscribe_unit && <span>{C.subscribe_unit}</span>}{safeHref(copy.subscribe_url) && <a class="btn-ink" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">{C.subscribe_btn}</a>}</div>
+          {C.give_show !== 'off' && <div class="give">
+            <p class="gh"><b class="num">{C.give_rate}<small>%</small></b><span>善的循環<em>{C.give_org}・災害救援</em></span></p>
+            <p><Fragment set:html={giveHtml} /></p>
+            {(C.give_donated || C.give_total) && <dl class="gnum">
+              {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
+              {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
+              {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
+              {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
+            </dl>}
+            {safeHref(C.give_url) && <a href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}
+          </div>}
           {igUrl && C.tw_show !== 'off' && <div class="tw">
             <p><span aria-hidden="true">🇹🇼</span> <Fragment set:html={twHtml} /></p>
             <a href={igUrl} target="_blank" rel="noopener">{fillIg(C.tw_link)} ↗</a>

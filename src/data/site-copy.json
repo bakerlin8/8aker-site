@@ -54,5 +54,14 @@
   "tw_show": "on",
   "tw_text": "在台灣？也可以用銀行轉帳**單筆支持**，金額隨意。",
   "tw_link": "私訊 @{ig} 索取轉帳資訊",
-  "tw_note": "轉帳資訊只會由 @{ig} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。"
+  "tw_note": "轉帳資訊只會由 @{ig} 回覆，我不會主動私訊請你轉帳；收到其他帳號的訊息請直接忽略。",
+  "give_show": "on",
+  "give_rate": "8",
+  "give_org": "Civic Force",
+  "give_url": "https://www.civic-force.org/",
+  "give_text": "每月收到的支持，固定撥出 {rate}% 捐給日本的災害救援團體 {org}。8 是 8AKER零 的 8，也是「七転び八起き」的八起——跌倒了，就一起站起來。捐了多少，都會寫在每月連載裡。",
+  "give_month": "",
+  "give_received": "",
+  "give_donated": "",
+  "give_total": ""
 }
