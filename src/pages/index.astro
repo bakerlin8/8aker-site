@@ -479,6 +479,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .flow-k{margin:0 0 8px!important;font-size:11px!important;letter-spacing:.24em;color:#A07A3A!important;}
 .end-card .support .give{margin-top:0;margin-bottom:24px;padding:14px 16px;border-top:0;border-left:2px solid rgba(138,43,61,.35);background:rgba(138,43,61,.04);}
 .end-card .flow-key{margin-top:0;gap:5px;font-size:12.5px;}
+.end-card .flow-key li span{text-wrap:balance;}
+@media(max-width:400px){.end-card .flow-key{font-size:11.5px;}.end-card .support .give{padding:12px 12px;}}
 .support .give>div:empty{display:none;}
 .flow-bar{display:flex;gap:2px;height:30px;border-radius:2px;}
 .flow-bar span{display:flex;align-items:center;justify-content:center;min-width:3px;transform-origin:0 50%;}
@@ -706,10 +708,10 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .end-card{display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:stretch;border:1px solid rgba(239,229,214,.1);box-shadow:0 40px 80px -40px rgba(0,0,0,.8);}
 .end-card .support{align-self:stretch;display:flex;flex-direction:column;padding:32px 28px 26px;}
 .end-card .support .give{order:5;margin-top:auto!important;}
-.end-card .support .tw-wrap{order:4;margin-bottom:24px;}
+
 .tw-cta{margin-top:0;}
 .end-card .give-cta{min-height:76px;}
-.gc-t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gc-t small{line-height:1.5;text-wrap:balance;}
 .tw-note{margin-top:10px!important;}
 @media(max-width:400px){.give-cta{gap:10px;padding:12px 14px 12px 12px;grid-template-columns:40px minmax(0,1fr) auto;}.gc-ic{width:40px;height:40px;}.gc-t b{font-size:16px;letter-spacing:.03em;}.gc-t small{font-size:11.5px;letter-spacing:.01em;}}
 .tw-note{display:block;margin-top:8px;font-size:11.5px;line-height:1.7;color:#7A6A6C;}
@@ -720,7 +722,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .tw-cta:hover .gc-ic .cup{animation:none;}
 .tw-cta:hover .cup .stm{animation:steam 1.6s ease-in-out infinite;}
 @keyframes steam{0%{opacity:0;transform:translateY(2px);}40%{opacity:.9;}100%{opacity:0;transform:translateY(-3px);}}
-.end-card .support>.give-cta{order:3;margin-bottom:10px;}
+.end-card .cta-pair{order:3;display:grid;grid-auto-rows:1fr;gap:10px;margin:22px 0 24px;}
+.end-card .cta-pair .give-cta{margin:0;height:100%;}
+.end-card .cta-pair .tw-wrap{display:contents;}
 .end-card .support>.sup-k,.end-card .support>h3,.end-card .support>.sdesc,.end-card .support>.r{order:1;}
 .end-card .tw-box{padding:16px 16px 14px;border:1px solid rgba(28,15,20,.14);background:rgba(255,255,255,.28);}
 .end-card .tw p{font-size:13.5px;}
@@ -975,11 +979,21 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           <p class="sup-k">Support</p>
           <h3>{copy.subscribe_title}</h3>{copy.subscribe_desc && <p class="sdesc">{copy.subscribe_desc}</p>}
           {copy.subscribe_price && <div class="r"><b>{copy.subscribe_price}</b>{C.subscribe_unit && <span>{C.subscribe_unit}</span>}</div>}
+          <div class="cta-pair">
           {safeHref(copy.subscribe_url) && <a class="give-cta" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">
             <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
             <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
             <span class="gc-ar" aria-hidden="true">↗</span>
           </a>}
+          {igUrl && C.tw_show !== 'off' && <div class="tw-wrap">
+            <a class="give-cta tw-cta" href={igUrl} target="_blank" rel="noopener">
+              <span class="gc-ic" aria-hidden="true"><svg class="cup" viewBox="0 0 28 28"><path class="stm" d="M10 3c-1.5 1.6 1.5 2.8 0 4.6M15 2.5c-1.5 1.6 1.5 2.8 0 4.6"/><path class="body" d="M5 11h15v6.5a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6Z"/><path class="hd" d="M20 13.2h1.6a2.6 2.6 0 0 1 0 5.2H19.6"/></svg></span>
+              <span class="gc-t"><b>{fillIg(C.tw_link)}</b>{C.tw_text && <small>{fillIg(C.tw_text).replace(/\*\*/g, '')}</small>}</span>
+              <span class="gc-ar" aria-hidden="true">↗</span>
+            </a>
+            {C.tw_note && <small class="tw-note">{fillIg(C.tw_note)}</small>}
+          </div>}
+          </div>
           {C.give_show !== 'off' && <>
           <div class="give">
             <div>{C.give_text && <p class="gline"><Fragment set:html={giveHtml} /></p>}{(C.give_donated || C.give_total) && <dl class="gnum">
@@ -992,14 +1006,6 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span></li>)}</ul></div>
           </div>
           </>}
-          {igUrl && C.tw_show !== 'off' && <div class="tw-wrap">
-            <a class="give-cta tw-cta" href={igUrl} target="_blank" rel="noopener">
-              <span class="gc-ic" aria-hidden="true"><svg class="cup" viewBox="0 0 28 28"><path class="stm" d="M10 3c-1.5 1.6 1.5 2.8 0 4.6M15 2.5c-1.5 1.6 1.5 2.8 0 4.6"/><path class="body" d="M5 11h15v6.5a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6Z"/><path class="hd" d="M20 13.2h1.6a2.6 2.6 0 0 1 0 5.2H19.6"/></svg></span>
-              <span class="gc-t"><b>{fillIg(C.tw_link)}</b>{C.tw_text && <small>{fillIg(C.tw_text).replace(/\*\*/g, '')}</small>}</span>
-              <span class="gc-ar" aria-hidden="true">↗</span>
-            </a>
-            {C.tw_note && <small class="tw-note">{fillIg(C.tw_note)}</small>}
-          </div>}
         </aside>
     </div>
   </div>
