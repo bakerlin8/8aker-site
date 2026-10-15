@@ -60,7 +60,7 @@
   "give_org": "Civic Force",
   "give_url": "https://www.civic-force.org/",
   "give_text": "每一筆支持的 **{rate}%**，會捐給 {org} 做災害救援。",
-  "give_use": "在日協助 30\n公司／個人事業主營運 25\nAI 線上工具訂閱 20\n網站經營 10\nStripe 手續費 7",
+  "give_use": "在日協助 30\n公司／個人事業主營運 28\nAI 線上工具訂閱 20\n網站經營 10\nStripe 手續費 4",
   "give_month": "",
   "give_received": "",
   "give_donated": "",

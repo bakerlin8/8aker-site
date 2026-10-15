@@ -19,7 +19,7 @@ const C0: Record<string, string> = {
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
   give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: 'https://www.civic-force.org/',
   give_text: '每一筆支持的 **{rate}%**，會捐給 {org} 做災害救援。',
-  give_use: '在日協助 30\n公司／個人事業主營運 25\nAI 線上工具訂閱 20\n網站經營 10\nStripe 手續費 7', give_month: '', give_received: '', give_donated: '', give_total: '', tw_note: '轉帳資訊只由 @{ig} 回覆，其他帳號請忽略。',
+  give_use: '在日協助 30\n公司／個人事業主營運 28\nAI 線上工具訂閱 20\n網站經營 10\nStripe 手續費 4', give_month: '', give_received: '', give_donated: '', give_total: '', tw_note: '轉帳資訊只由 @{ig} 回覆，其他帳號請忽略。',
 };
 const C: Record<string, string> = Object.fromEntries(Object.keys(C0).map((k) => [k, (copy as any)[k] != null ? String((copy as any)[k]) : C0[k]]));
 const endBefore = (C.end_cd_before.includes('{n}') ? C.end_cd_before.split('{n}') : [C.end_cd_before + ' ', '']).slice(0, 2);
