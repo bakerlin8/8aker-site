@@ -15,7 +15,7 @@ const endRing = buildRing(copy.birth_date);
 const C0: Record<string, string> = {
   end_cd_before: '第 {n} 圈，還有', end_cd_after: '長完這一圈',
   subscribe_unit: '', subscribe_btn: 'Stripe 支持澆個水', subscribe_note: '單次支持・金額由你決定',
-  tw_bank_on: 'on', tw_bank_msg: '轉好了之後，我會用你留下的聯絡方式跟你說聲謝謝。', tw_bank_sub: '留下稱呼，就能看到轉帳帳號',
+  tw_bank_on: 'on', tw_bank_msg: '轉好了之後，我會用您留下的聯絡方式與您聯繫。', tw_bank_sub: '留下稱呼，就能看到轉帳帳號',
   tw_show: 'on', tw_text: '在台灣？也可以轉帳**單筆支持**。',
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
   give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: '',
@@ -737,7 +737,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .twb-dl dt{font-size:12px;letter-spacing:.12em;color:#7A6A6C;}
 .twb-dl dd{margin:0;font-size:15px;word-break:break-all;}
 .twb-dl .acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
-.twb-dl .acct .num{white-space:nowrap;font-family:var(--latin);font-size:clamp(16px,4.6vw,20px);letter-spacing:.03em;}
+@font-face{font-family:"Outfit";src:url("/fonts/outfit-500.woff2") format("woff2");font-weight:500;font-display:swap;unicode-range:U+0020-007F;}
+.twb-dl .acct .num{white-space:nowrap;font-family:"Outfit",var(--sans,sans-serif);font-weight:500;font-size:clamp(19px,5.8vw,27px);letter-spacing:.08em;font-variant-numeric:tabular-nums lining-nums;color:#1C0F14;}
 .twb-copy{flex:1 0 100%;min-height:44px;padding:0 14px;border:1px solid #1C0F14;font-size:13px;background:#1C0F14;color:#EFE5D6;transition:background .3s;}
 .twb-copy.ok{background:#3E6B4A;border-color:#3E6B4A;}
 .twb-lead{margin-top:10px;font-size:13.5px;line-height:1.8;color:#5B4B4E;}
