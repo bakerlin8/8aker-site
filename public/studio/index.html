@@ -154,6 +154,25 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 
 /* ── body data review ── */
 .hb-card{background:var(--warm-white);border:1px solid var(--border);padding:20px 22px;margin-bottom:22px;}
+/* ── grouped forms (首頁文案) ── */
+.fgroup{background:var(--warm-white);border:1px solid var(--border);margin-bottom:18px;}
+.fgroup>header,.fgroup>summary{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid var(--border-soft);}
+.fg-title{font-family:'Noto Serif TC',serif;font-weight:500;font-size:16px;color:var(--ink);}
+.fg-note{font-family:'Noto Sans TC',system-ui,sans-serif;font-size:11.5px;color:var(--ink-ghost);}
+.fg-body{padding:18px 22px 4px;}
+.frow{display:grid;gap:0 16px;}
+.frow-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+.frow-2:has(.is-short){grid-template-columns:minmax(0,1fr) 160px;}
+.frow .field{margin-bottom:16px;}
+.fgroup-adv{background:transparent;border-style:dashed;}
+.fgroup-adv>summary{cursor:pointer;list-style:none;border-bottom:0;}
+.fgroup-adv>summary::-webkit-details-marker{display:none;}
+.fgroup-adv>summary::before{content:'＋';font-size:12px;color:var(--ink-ghost);}
+.fgroup-adv[open]>summary::before{content:'－';}
+.fgroup-adv[open]>summary{border-bottom:1px solid var(--border-soft);}
+.photo-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.photo-row img{width:72px;aspect-ratio:4/5;object-fit:cover;background:#ddd;}
+@media(max-width:720px){.frow-2,.frow-2:has(.is-short){grid-template-columns:minmax(0,1fr);}.fgroup>header,.fgroup>summary{padding:12px 14px;}.fg-body{padding:14px 14px 2px;}}
 .hb-card h3{font-family:'Noto Serif TC',serif;font-weight:500;font-size:16px;margin-bottom:10px;}
 .hb-note{font-size:13px;color:var(--ink-mute);line-height:1.8;}
 .hb-code{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap;}
@@ -272,18 +291,22 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     </div>
 
     <div class="nav-group">
-      <div class="nav-group-label">網站</div>
-      <div class="nav-item" data-view="home">首頁文案</div>
+      <div class="nav-group-label">待處理</div>
       <div class="nav-item" data-view="inbox">需求收件匣 <span class="count" id="count-inbox"></span></div>
-      <div class="nav-item" data-view="chapters">連載・每月一話</div>
-      <div class="nav-item" data-view="dreams">祈願所</div>
-      <div class="nav-item" data-view="works">有點樣子（作品）</div>
-      <div class="nav-item" data-view="services">我在做什麼</div>
       <div class="nav-item" data-view="body">身體紀錄 <span class="count" id="count-body"></span></div>
     </div>
 
     <div class="nav-group">
-      <div class="nav-group-label">文章分類</div>
+      <div class="nav-group-label">首頁（由上到下）</div>
+      <div class="nav-item" data-view="home">首頁文案</div>
+      <div class="nav-item" data-view="services">初次見面・服務卡</div>
+      <div class="nav-item" data-view="works">有點樣子・作品</div>
+      <div class="nav-item" data-view="chapters">連載・每月一話</div>
+      <div class="nav-item" data-view="dreams">祈願所</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">日常紀錄・文章</div>
       <div class="nav-item" data-view="pillar" data-pillar="strengthen">強化・運動與健康 <span class="count" id="count-strengthen"></span></div>
       <div class="nav-item" data-view="pillar" data-pillar="emit">放出・輸出與分享 <span class="count" id="count-emit"></span></div>
       <div class="nav-item" data-view="pillar" data-pillar="operate">操作・AI 學習筆記 <span class="count" id="count-operate"></span></div>
@@ -306,7 +329,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-home">
       <div class="page-eyebrow">Site Copy</div>
       <div class="page-title">首頁文案</div>
-      <div class="page-sub">編輯首頁上會顯示的所有文字區塊</div>
+      <div class="page-sub">依網站由上到下的順序分組；只列出網站上會顯示的文字。</div>
       <div id="homeForm"></div>
     </section>
 
@@ -345,8 +368,8 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <!-- SERVICES -->
     <section class="view" id="view-services">
       <div class="page-eyebrow">What I do</div>
-      <div class="page-title">我在做什麼</div>
-      <div class="page-sub">首頁「初次見面」的三張卡（我在做什麼＋能提供的服務）與實績數字</div>
+      <div class="page-title">初次見面・服務卡</div>
+      <div class="page-sub">首頁「壱 初次見面」故事下方的三張服務卡與實績數字。故事文字在「首頁文案」編輯。</div>
       <div id="servicesForm"></div>
     </section>
 
@@ -585,25 +608,36 @@ document.querySelectorAll('.nav-item[data-pillar]').forEach(el => {
 });
 
 /* ══════════════════════════ HOME COPY VIEW ══════════════════════════ */
-const HOME_FIELDS = [
-  ['motto_line1', '首頁｜座右銘第一行', 'text'], ['motto_line2', '首頁｜座右銘第二行', 'text'],
-  ['hero_identity', '首頁｜座右銘下面的身分（一行）', 'text'],
-  ['hero_lede', '首頁｜座右銘下面的說明（留空就不顯示）', 'area'], ['site_description', '分享預覽／搜尋結果的介紹文字', 'area'], ['motto_ja', '結尾｜座右銘的日文小字', 'text'],
-  ['ring_label', '年輪倒數｜前半句（{n} 會換成歲數）', 'text'], ['ring_unit', '年輪倒數｜數字後面', 'text'], ['ring_sub', '年輪倒數｜下面的小字（留空就不顯示）', 'text'],
-  ['countdown_start', '倒數｜累積帳起算日（ISO 格式）', 'text'], ['countdown_target', '倒數｜第一卷發售日（ISO 格式）', 'text'],
-  ['chapters_sub', '参 連載｜小標', 'text'], ['chapters_title', '参 連載｜標題', 'text'],
-  ['pillar_strengthen_title', '五個方向｜強化 的副標', 'text'], ['pillar_emit_title', '五個方向｜放出 的副標', 'text'], ['pillar_operate_title', '五個方向｜操作 的副標', 'text'],
-  ['pillar_conjure_title', '五個方向｜具現 的副標', 'text'], ['pillar_transmute_title', '五個方向｜變化 的副標', 'text'],
-  ['journal_sub', '肆 日常紀錄｜小標', 'text'], ['journal_title', '肆 日常紀錄｜標題', 'text'],
-  ['works_sub', '弐 有點樣子｜小標', 'text'], ['works_title', '弐 有點樣子｜標題', 'text'],
-  ['about_meta', '壱 初次見面｜小標', 'text'], ['about_name', '壱 初次見面｜標題', 'text'],
-  ['about_intro', '壱 初次見面｜我在做什麼（開場）', 'area'], ['about_lede', '壱 初次見面｜名字的由來（小字）', 'area'],
-  ['about_photo', '壱 初次見面｜本人照片', 'photo'],
-  ['instagram_handle', 'Instagram 帳號（不用加 @）', 'text'],
-  ['services_sub', '伍 我能幫你｜小標', 'text'],
-  ['subscribe_title', '訂閱｜標題', 'text'], ['subscribe_desc', '訂閱｜說明', 'area'],
-  ['subscribe_price', '訂閱｜價格', 'text'], ['subscribe_url', '訂閱｜Stripe 連結', 'text'],
-  ['contact_email', '聯絡信箱（隱私權政策用，可空白）', 'text'],
+/* 首頁文案：依網站由上到下的順序分組。只列出網站上真的會顯示的欄位；
+   不再使用的舊欄位不顯示，但存檔時原樣保留在檔案裡（不會被刪掉）。 */
+const HOME_GROUPS = [
+  { title: '封面', note: '首頁第一屏，年輪上的大標與身分', rows: [
+    [['motto_line1', '大標第一行'], ['motto_line2', '大標第二行']],
+    [['hero_identity', '大標下面的身分']],
+  ]},
+  { title: '壱 初次見面', note: '服務卡與實績數字在左側「初次見面・服務卡」編輯', rows: [
+    [['about_meta', '小標'], ['about_name', '標題']],
+    [['about_photo', '本人照片', 'photo']],
+    [['about_story', '我的故事', 'story']],
+    [['about_story_end', '故事最後一句（金色收尾）']],
+  ]},
+  { title: '各區塊標題', note: '每個區塊的小標＋標題', rows: [
+    [['works_sub', '弐 有點樣子｜小標'], ['works_title', '標題', 'short']],
+    [['chapters_sub', '参 連載｜小標'], ['chapters_title', '標題', 'short']],
+    [['journal_sub', '肆 日常紀錄｜小標'], ['journal_title', '標題', 'short']],
+  ]},
+  { title: '支持贊助', note: '結尾「支持這個連載」的方塊', rows: [
+    [['subscribe_title', '標題']],
+    [['subscribe_desc', '說明', 'area']],
+    [['subscribe_url', 'Stripe 連結'], ['subscribe_price', '金額', 'short']],
+  ]},
+  { title: '分享與聯絡', note: '分享到 LINE／FB 或 Google 搜尋時看到的介紹，以及聯絡資訊', rows: [
+    [['site_description', '網站介紹（分享預覽／搜尋結果）', 'area']],
+    [['instagram_handle', 'Instagram 帳號（不用加 @）'], ['contact_email', '聯絡信箱（可空白）']],
+  ]},
+  { title: '進階設定', note: '影響年輪與倒數的計算，平常不用動', advanced: true, rows: [
+    [['countdown_start', '累積帳起算日（ISO 格式）'], ['birth_date', '生日（YYYY-MM-DD）', 'short']],
+  ]},
 ];
 
 async function loadHome() {
@@ -612,39 +646,45 @@ async function loadHome() {
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
   const file = await ghGetFile('src/data/site-copy.json');
   const data = JSON.parse(file.content);
-  form.innerHTML = '';
-  HOME_FIELDS.forEach(([key, label, type]) => {
-    const field = document.createElement('div');
-    field.className = 'field';
-    field.innerHTML = `<label class="field-label">${label}</label>` +
-      (type === 'area'
-        ? `<textarea rows="2" data-key="${key}">${escapeHtml(data[key] || '')}</textarea>`
-        : type === 'photo'
-        ? `<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><img data-prev src="${escapeAttr(data[key] || '')}" alt="" style="width:96px;aspect-ratio:4/5;object-fit:cover;background:#ddd;${data[key] ? '' : 'display:none'}"><input type="hidden" data-key="${key}" value="${escapeAttr(data[key] || '')}"><label class="btn btn-ghost" style="cursor:pointer">上傳照片<input type="file" accept="image/*" data-photo style="display:none"></label><button type="button" class="btn btn-ghost" data-nophoto>不放照片</button></div><div class="field-hint">直式、臉清楚、背景乾淨最好。上傳後按「儲存變更」，約 1 分鐘後網站更新。</div>`
-        : `<input type="text" data-key="${key}" value="${escapeAttr(data[key] || '')}">`);
-    form.appendChild(field);
-    const ph = field.querySelector('[data-photo]');
-    if (ph) {
-      const hid = field.querySelector('input[type=hidden]'), prev = field.querySelector('[data-prev]');
-      ph.addEventListener('change', async () => { const f = ph.files[0]; if (!f) return;
-        try { toast('上傳中…'); const b64 = await compressImage(f); const path = `public/about/${Date.now()}.webp`; await ghPutBinary(path, b64, 'Upload portrait via Studio'); hid.value = path.replace(/^public/, ''); prev.src = URL.createObjectURL(f); prev.style.display = ''; toast('已上傳，記得按「儲存變更」'); }
-        catch (e) { toast('上傳失敗：' + e.message, 'err'); } ph.value = ''; });
-      field.querySelector('[data-nophoto]').addEventListener('click', () => { hid.value = ''; prev.style.display = 'none'; });
-    }
-  });
-  const btnRow = document.createElement('div');
-  btnRow.className = 'btn-row';
-  btnRow.innerHTML = `<button class="btn btn-primary" id="saveHomeBtn">儲存變更</button>`;
-  form.appendChild(btnRow);
+  const storyText = v => (Array.isArray(v) ? v : []).join('\n\n');
+  const fieldHtml = ([key, label, type]) => {
+    const v = data[key];
+    let ctl;
+    if (type === 'area') ctl = `<textarea rows="2" data-key="${key}">${escapeHtml(v || '')}</textarea>`;
+    else if (type === 'story') ctl = `<textarea rows="13" data-key="${key}" data-story="1">${escapeHtml(storyText(v))}</textarea><div class="field-hint">段落之間空一行；同一段裡換行，網站上也會換行。</div>`;
+    else if (type === 'photo') ctl = `<div class="photo-row"><img data-prev src="${escapeAttr(v || '')}" alt="" style="${v ? '' : 'display:none'}"><input type="hidden" data-key="${key}" value="${escapeAttr(v || '')}"><label class="btn btn-ghost" style="cursor:pointer">上傳照片<input type="file" accept="image/*" data-photo style="display:none"></label><button type="button" class="btn btn-ghost" data-nophoto>不放照片</button><span class="field-hint" style="margin:0">直式、臉清楚最好；留空就不顯示</span></div>`;
+    else ctl = `<input type="text" data-key="${key}" value="${escapeAttr(v || '')}">`;
+    return `<div class="field${type === 'short' ? ' is-short' : ''}"><label class="field-label">${label}</label>${ctl}</div>`;
+  };
+  form.innerHTML = HOME_GROUPS.map(g => {
+    const body = g.rows.map(r => `<div class="frow frow-${r.length}">${r.map(fieldHtml).join('')}</div>`).join('');
+    return g.advanced
+      ? `<details class="fgroup fgroup-adv"><summary><span class="fg-title">${g.title}</span><span class="fg-note">${g.note}</span></summary><div class="fg-body">${body}</div></details>`
+      : `<section class="fgroup"><header><span class="fg-title">${g.title}</span><span class="fg-note">${g.note}</span></header><div class="fg-body">${body}</div></section>`;
+  }).join('') + `<div class="btn-row"><span class="field-hint" style="margin:0">存檔後約 1 分鐘網站更新</span><div class="spacer"></div><button class="btn btn-primary" id="saveHomeBtn">儲存變更</button></div>`;
+
+  const ph = form.querySelector('[data-photo]');
+  if (ph) {
+    const row = ph.closest('.photo-row'), hid = row.querySelector('input[type=hidden]'), prev = row.querySelector('[data-prev]');
+    ph.addEventListener('change', async () => { const f = ph.files[0]; if (!f) return;
+      try { toast('上傳中…'); const b64 = await compressImage(f); const path = `public/about/${Date.now()}.webp`; await ghPutBinary(path, b64, 'Upload portrait via Studio'); hid.value = path.replace(/^public/, ''); prev.src = URL.createObjectURL(f); prev.style.display = ''; toast('已上傳，記得按「儲存變更」'); }
+      catch (e) { toast('上傳失敗：' + e.message, 'err'); } ph.value = ''; });
+    row.querySelector('[data-nophoto]').addEventListener('click', () => { hid.value = ''; prev.style.display = 'none'; });
+  }
 
   document.getElementById('saveHomeBtn').addEventListener('click', async () => {
     const btn = document.getElementById('saveHomeBtn');
     btn.disabled = true; btn.textContent = '儲存中…';
     try {
       const updated = { ...data };
-      form.querySelectorAll('[data-key]').forEach(el => { updated[el.dataset.key] = el.value; });
+      form.querySelectorAll('[data-key]').forEach(el => {
+        updated[el.dataset.key] = el.dataset.story
+          ? el.value.replace(/\r/g, '').split(/\n\s*\n/).map(t => t.trim()).filter(Boolean)
+          : el.value;
+      });
       const result = await ghPutFile('src/data/site-copy.json', JSON.stringify(updated, null, 2) + '\n', file.sha, 'Update homepage copy via Studio');
       file.sha = result.content.sha;
+      Object.assign(data, updated);
       toast('已儲存，網站將在約一分鐘內更新');
     } catch (e) { toast('儲存失敗：' + e.message, 'err'); }
     btn.disabled = false; btn.textContent = '儲存變更';
@@ -883,15 +923,14 @@ async function loadServices() {
   }
   function render() {
     form.innerHTML = `
-      <div class="hb-card"><h3>壱 初次見面：我在做什麼・能幫你什麼（三張卡）</h3>
+      <div class="hb-card"><h3>服務卡（三張）</h3>
         ${(data.hats || []).map((h, i) => `<div style="border-top:1px solid var(--border-soft);padding-top:12px;margin-top:12px">
           <div style="display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px"><div class="field"><label class="field-label">代表字</label>${inp('k', h.k, `data-h="${i}"`)}</div><div class="field"><label class="field-label">標題</label>${inp('title', h.title, `data-h="${i}"`)}</div></div>
-          <div class="field"><label class="field-label">說明</label><textarea rows="2" data-h="${i}" data-key="desc">${escapeHtml(h.desc)}</textarea></div>
-          <div class="field"><label class="field-label">提供的服務（一行一項，保持精簡）</label><textarea rows="3" data-h="${i}" data-list="1" data-key="items">${escapeHtml((h.items || []).join('\n'))}</textarea></div>
-          <div class="field"><label class="field-label">由誰提供（小字）</label>${inp('provider', h.provider, `data-h="${i}"`)}</div></div>`).join('')}
+          <div class="field"><label class="field-label">說明（一句話）</label>${inp('desc', h.desc, `data-h="${i}"`)}</div>
+          <div class="field"><label class="field-label">提供的服務（一行一項，保持精簡）</label><textarea rows="3" data-h="${i}" data-list="1" data-key="items">${escapeHtml((h.items || []).join('\n'))}</textarea></div></div>`).join('')}
       </div>
       <div class="hb-card"><h3>實績數字</h3>
-        <label class="field-label">實績數字（三格，顯示在「初次見面」）</label>
+        <div class="field-hint" style="margin:-4px 0 10px">左：數字　右：說明（三格，顯示在服務卡下方）</div>
         ${data.proof.map((x, i) => `<div style="display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;margin-bottom:8px">${inp('num', x.num, `data-p="${i}"`)}${inp('label', x.label, `data-p="${i}"`)}</div>`).join('')}
       </div>` +
       `
