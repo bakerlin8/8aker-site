@@ -19,6 +19,7 @@ const path = Astro.url.pathname;
 const isHome = path === '/' || path === '';
 import { pillars } from '../data/pillars';
 import services from '../data/services.json';
+import { SHOW_DRAFTS } from '../data/journal';
 // The Japanese serif and the Latin display face only draw a small, known set of characters
 // (section numerals, pillar kanji, Japanese subtitles, vertical English labels), so request just those glyphs.
 const glyphs = [...new Set([
@@ -189,6 +190,10 @@ footer.site-foot{padding:32px max(40px,calc((100% - 1160px)/2)) 44px;background:
 footer.site-foot .sf-l{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;}
 footer.site-foot .sf-name{font-family:var(--latin),var(--serif);letter-spacing:.2em;color:#B9A89E;}
 footer.site-foot .sf-links{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;margin-right:56px;}
+.sfx-pick{position:fixed;left:16px;bottom:16px;z-index:90;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;background:rgba(28,15,20,.94);border:1px solid rgba(212,162,76,.4);max-width:calc(100vw - 32px);}
+.sfx-pick small{font-size:11px;color:#B9A89E;margin-right:4px;}
+.sfx-pick button{font-size:12.5px;padding:6px 10px;min-height:36px;border:1px solid rgba(239,229,214,.2);color:#EFE5D6;}
+.sfx-pick button[aria-pressed=true]{border-color:#D4A24C;color:#D4A24C;}
 footer.site-foot .sf-motto{margin-left:auto;font-family:var(--serif);color:#B9A89E;}
 @media(max-width:720px){footer.site-foot{align-items:center;}footer.site-foot a{display:inline-block;padding:10px 0;}}
 
@@ -220,6 +225,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
 
 <main><slot /></main>
 
+{SHOW_DRAFTS && <div class="sfx-pick" id="sfxPick" role="group" aria-label="音效組合（只在預覽顯示）"><small>音效</small><button data-s="0">現在</button><button data-s="a">A 茶室</button><button data-s="b">B 現代</button><button data-s="c">C 音樂盒</button></div>}
 <footer class="site-foot"><div class="sf-l"><span class="sf-name">{copy.site_name}</span><span>© 2026 林子翔・大阪</span></div><nav class="sf-links" aria-label="頁尾"><a href="/chat/">有空聊聊</a><a href="/#support">支持贊助</a>{copy.instagram_handle && <a href={`https://www.instagram.com/${copy.instagram_handle}/`} target="_blank" rel="noopener">Instagram</a>}<a href="/privacy/">隱私權政策</a></nav></footer>
 
 <script is:inline>
@@ -257,21 +263,49 @@ footer.site-foot a:hover{color:#EFE5D6;}
   function marimba(t,f,g,pan){partial(t,f,g,.28,'sine',0,.25,pan);partial(t,f*4,g*.18,.06,'sine',0,.1,pan);partial(t,f*10,g*.05,.02,'sine',0,0,pan);}
   function wood(t,f,g){partial(t,f,g,.07,'sine',f*.82,.15);partial(t,f*2.6,g*.35,.025,'triangle',0,.05);hiss(t,.018,g*.5,3800,0,2.2,'bandpass',.05);}
   function bell(t,f,g,len){var r=[1,2.76,5.4,8.93],a=[1,.45,.22,.08];r.forEach(function(m,i){partial(t,f*m,g*a[i],(len||1.2)/(1+i*.6),'sine',0,.45);});}
+  /* 追加樂器 */
+  function pluck(t,f,g,pan){var o=ctx.createOscillator(),lp=ctx.createBiquadFilter(),a=ctx.createGain();o.type='sawtooth';o.frequency.value=f;lp.type='lowpass';lp.Q.value=1.5;lp.frequency.setValueAtTime(f*7,t);lp.frequency.exponentialRampToValueAtTime(f*1.1,t+.35);
+    a.gain.setValueAtTime(0,t);a.gain.linearRampToValueAtTime(g,t+.003);a.gain.exponentialRampToValueAtTime(.0001,t+.7);o.connect(lp);lp.connect(a);bus(a,.35,pan);o.start(t);o.stop(t+.75);hiss(t,.01,g*.6,3000,0,1.5,'bandpass',0,pan);}
+  function drop(t,f,g){partial(t,f*1.7,g,.16,'sine',f,.4);}
+  function felt(t,g,f){hiss(t,.04,g,f||320,0,.8,'lowpass',.05);partial(t,(f||320)*.45,g*.5,.06,'sine',0,.05);}
+  function clk(t,g,pan){hiss(t,.006,g,6500,0,.7,'highpass',0,pan);partial(t,2100,g*.12,.012,'sine',0,0,pan);}
+  function blip(t,f,g,d,f2,pan){partial(t,f,g,d||.09,'sine',f2,.15,pan);}
+  function glass(t,f,g,len){[1,2.32,4.25].forEach(function(m,i){partial(t,f*m,g*[1,.35,.12][i],(len||.7)/(1+i*.5),'sine',0,.5);});}
+  function mbox(t,f,g,pan){partial(t,f,g,.9,'sine',0,.35,pan);partial(t,f*3,g*.28,.35,'sine',0,.2,pan);partial(t,f*5.04,g*.1,.15,'sine',0,.1,pan);hiss(t,.004,g*.4,7000,0,2,'bandpass',0,pan);}
+  /* 四套音色：0 木・紙・鈴（現在）／a 茶室・琴與水／b 現代・極簡／c 音樂盒 */
+  var TH={
+    '0':{hover:function(t,o,j){marimba(t,note(o.i,1)*j,.045,o.pan);},press:function(t,o,j){wood(t,note(2,1)*j,.32);},select:function(t,o,j){bell(t,note(3,2)*j,.06,.9);},
+      go:function(t){hiss(t,.26,.07,700,2600,.8,'bandpass',.2);marimba(t+.04,note(0,1),.05);marimba(t+.11,note(3,1),.045);},
+      open:function(t){hiss(t,.32,.08,400,1600,.7,'bandpass',.25);partial(t+.02,note(0,0),.07,.3,'sine',note(3,0),.3);},close:function(t){hiss(t,.28,.07,1600,420,.7,'bandpass',.2);partial(t+.02,note(3,0),.06,.26,'sine',note(0,0),.25);},
+      turn:function(t,o){hiss(t,.16,.06,1200,3400,1.4,'bandpass',.15,o.dir*.25);marimba(t+.05,note(o.dir<0?1:4,1),.035);},
+      success:function(t){bell(t,note(0,1),.09,2.2);bell(t+.12,note(3,1),.06,1.8);bell(t+.24,note(0,2),.05,1.6);},error:function(t){wood(t,note(0,0)*.9,.28);wood(t+.12,note(4,-1),.26);}},
+    'a':{hover:function(t,o,j){pluck(t,note(o.i,0)*j,.05,o.pan);},press:function(t){felt(t,.22,300);},select:function(t,o,j){drop(t,note(3,2)*j,.09);},
+      go:function(t){hiss(t,.3,.05,500,1800,.7,'bandpass',.25);pluck(t+.02,note(0,0),.06);pluck(t+.12,note(3,0),.055);},
+      open:function(t){hiss(t,.38,.07,300,1300,.6,'bandpass',.3);pluck(t+.05,note(1,0),.05);},close:function(t){hiss(t,.32,.06,1300,300,.6,'bandpass',.25);pluck(t+.05,note(4,-1),.05);},
+      turn:function(t,o){hiss(t,.2,.05,900,2600,1.1,'bandpass',.15,o.dir*.25);},
+      success:function(t){[0,2,3,0].forEach(function(n,k){pluck(t+k*.11,note(n,k===3?1:0),.06);});drop(t+.5,note(3,2),.06);},error:function(t){felt(t,.26,200);felt(t+.13,.24,160);}},
+    'b':{hover:function(t,o){clk(t,.07,o.pan);},press:function(t){clk(t,.25);blip(t,1180,.05,.05);},select:function(t){blip(t,880,.06,.07);blip(t+.06,1320,.06,.09);},
+      go:function(t){hiss(t,.18,.05,1500,5000,.9,'bandpass',.1);blip(t+.03,990,.035,.08,1480);},
+      open:function(t){blip(t,520,.07,.16,1040);},close:function(t){blip(t,1040,.06,.15,520);},
+      turn:function(t,o){hiss(t,.14,.05,2200,4800,1.2,'bandpass',.05,o.dir*.4);clk(t+.08,.12,o.dir*.4);},
+      success:function(t){glass(t,note(0,2),.07,.9);glass(t+.08,note(4,1)*1.5,.05,.9);glass(t+.16,note(0,3)*.75,.045,1);},error:function(t){partial(t,140,.12,.12,'square',120,.05);partial(t+.14,120,.12,.14,'square',100,.05);}},
+    'c':{hover:function(t,o,j){mbox(t,note(o.i,2)*j,.035,o.pan);},press:function(t){clk(t,.18);hiss(t+.012,.006,.08,5000,0,2,'bandpass',0);},select:function(t){glass(t,note(3,2),.06,.8);glass(t+.07,note(0,3),.045,.8);},
+      go:function(t){mbox(t,note(0,2),.05);mbox(t+.09,note(3,2),.045);},
+      open:function(t){[0,1,2,3].forEach(function(n,k){mbox(t+k*.04,note(n,2),.035);});},close:function(t){[3,2,1,0].forEach(function(n,k){mbox(t+k*.04,note(n,2),.03);});},
+      turn:function(t){clk(t,.14);clk(t+.05,.1);},
+      success:function(t){[0,2,3,4,0].forEach(function(n,k){mbox(t+k*.09,note(n,k===4?3:2),.05);});},error:function(t){mbox(t,note(1,1),.05);mbox(t+.1,note(0,1)*1.06,.05);}}
+  };
+  var THEME='0';try{THEME=localStorage.getItem('8aker-sfx-theme')||'0';}catch(e){}
+  var qs=(location.search.match(/[?&]sfx=([0abc])/)||[])[1];if(qs)THEME=qs;
+  window.sfxTheme=function(k){if(!TH[k])return;THEME=k;try{localStorage.setItem('8aker-sfx-theme',k);}catch(e){}};
   var last={},seq=0;
   function play(kind,opt){if(!on||!unlocked||!ctx||ctx.state!=='running')return;var t=ctx.currentTime+.005,j=1+(Math.random()-.5)*.012;
     var gap={hover:.07,press:.03}[kind]||.04;if(last[kind]&&t-last[kind]<gap)return;last[kind]=t;
-    switch(kind){
-      case 'hover':{var i=opt&&opt.i!=null?opt.i:(seq++);marimba(t,note(i,1)*j,.045,opt&&opt.pan||0);break;}
-      case 'press':wood(t,note(2,1)*j,.32);break;
-      case 'select':bell(t,note(3,2)*j,.06,.9);break;
-      case 'go':hiss(t,.26,.07,700,2600,.8,'bandpass',.2);marimba(t+.04,note(0,1),.05);marimba(t+.11,note(3,1),.045);break;
-      case 'open':hiss(t,.32,.08,400,1600,.7,'bandpass',.25);partial(t+.02,note(0,0),.07,.3,'sine',note(3,0),.3);break;
-      case 'close':hiss(t,.28,.07,1600,420,.7,'bandpass',.2);partial(t+.02,note(3,0),.06,.26,'sine',note(0,0),.25);break;
-      case 'turn':hiss(t,.16,.06,1200,3400,1.4,'bandpass',.15,(opt&&opt.dir||1)*.25);marimba(t+.05,note(opt&&opt.dir<0?1:4,1),.035);break;
-      case 'success':bell(t,note(0,1),.09,2.2);bell(t+.12,note(3,1),.06,1.8);bell(t+.24,note(0,2),.05,1.6);break;
-      case 'error':wood(t,note(0,0)*.9,.28);wood(t+.12,note(4,-1),.26);break;
-    }}
+    var o=opt||{};if(o.i==null)o.i=seq++;if(o.dir==null)o.dir=1;o.pan=o.pan||0;
+    var fn=(TH[THEME]||TH['0'])[kind];if(fn)fn(t,o,j);}
   window.sfx=play;
+  var SP=document.getElementById('sfxPick');if(SP){var paintP=function(){SP.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.s===THEME);});};paintP();
+    SP.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;e.stopPropagation();window.sfxTheme(b.dataset.s);paintP();unlock();setTimeout(function(){play('success');},40);});}
   var SEL='a[href],button,select,summary,label,input:not([type=hidden]),textarea,[role="button"],[role="tab"],[data-lb],.cho,.hat';
   /* 會依順序走音階的「一排」元素：卡片、列表列、燈籠、連載欄 */
   var ROW='.hat,.work,.jrow,.jr,.cho,.cc-cols button,.wn-ticks button,.chip,.nav a,.sf-links a,.arow';
