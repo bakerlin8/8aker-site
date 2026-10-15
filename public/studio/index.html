@@ -74,7 +74,7 @@ input,textarea,select{font-family:inherit;}
 .field{margin-bottom:22px;}
 .field-label{display:block;font-size:12px;letter-spacing:0.04em;color:var(--ink-mute);margin-bottom:7px;font-weight:500;}
 .field-hint{font-size:11px;color:var(--ink-ghost);margin-top:5px;}
-.field input[type=text],.field input[type=date],.field textarea{
+.field input[type=text],.field input[type=date],.field textarea,.field select{
   width:100%;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;
   padding:11px 13px;font-size:13.5px;color:var(--ink);transition:border-color 0.2s;
 }
@@ -800,10 +800,14 @@ async function loadWorks() {
         <div class="field"><label class="field-label">AFTER・做出來之後（現在變成怎樣，一句話）</label><textarea rows="2" data-w="${i}" data-key="result">${escapeHtml(w.result || '')}</textarea></div>
         <div class="field"><label class="field-label">作品頁的簡短介紹（選填）</label><textarea rows="3" data-w="${i}" data-key="intro">${escapeHtml(w.intro || '')}</textarea></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
-          <div class="field"><label class="field-label">影片連結（YouTube／Vimeo，選填）</label><input type="text" data-w="${i}" data-key="video" value="${escapeAttr(w.video || '')}" placeholder="https://youtu.be/…"></div>
-          <div class="field"><label class="field-label">工具網址（有公開才填，會出現「打開看看」）</label><input type="text" data-w="${i}" data-key="link" value="${escapeAttr(w.link || '')}" placeholder="https://…"></div>
+          <div class="field"><label class="field-label">介紹影片（Instagram Reels／YouTube／Vimeo 連結，選填）</label><input type="text" data-w="${i}" data-key="video" value="${escapeAttr(w.video || '')}" placeholder="https://www.instagram.com/reel/…"><div class="field-hint">IG Reels、YouTube Shorts 會用手機外框放在標題旁；一般 YouTube 會放成一整幅橫式。</div></div>
+          <div class="field"><label class="field-label">網站網址（有公開才填，作品頁會出現「前往網站使用」按鈕）</label><input type="text" data-w="${i}" data-key="link" value="${escapeAttr(w.link || '')}" placeholder="https://…"></div>
         </div>
-        <div class="field"><label class="field-label">截圖（第一張會當作品卡的縮圖）</label>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <div class="field"><label class="field-label">網站名稱（選填，空白就顯示網域）</label><input type="text" data-w="${i}" data-key="link_label" value="${escapeAttr(w.link_label || '')}" placeholder="例：8AKER零 官方網站"></div>
+          <div class="field"><label class="field-label">卡片色塊</label><select data-w="${i}" data-key="color">${[['', '自動（依順序輪替）'], ['wine', '葡萄酒'], ['pine', '松綠'], ['navy', '藏青'], ['chestnut', '栗色'], ['plum', '葡萄紫'], ['celadon', '青磁']].map(([k, n]) => `<option value="${k}" ${(w.color || '') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label class="field-label">截圖（第一張會當作品卡的縮圖；作品頁會放在「畫面」區）</label>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${(w.images || []).map((im, j) => `
             <div style="border:1px solid var(--border);padding:6px;background:var(--warm-white)"><img src="${escapeAttr(im.src)}" alt="" style="width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#ddd">
               <input type="text" data-cap="${i}:${j}" value="${escapeAttr(im.caption || '')}" placeholder="說明（選填）" style="margin-top:6px;font-size:13px;padding:6px">
@@ -929,7 +933,7 @@ async function loadServices() {
           <div class="field"><label class="field-label">說明（一句話）</label>${inp('desc', h.desc, `data-h="${i}"`)}</div>
           <div class="field"><label class="field-label">提供的服務（一行一項，保持精簡）</label><textarea rows="3" data-h="${i}" data-list="1" data-key="items">${escapeHtml((h.items || []).join('\n'))}</textarea></div></div>`).join('')}
       </div>
-      <div class="hb-card"><h3>實績數字</h3>
+      <div class="hb-card"><h3>實績數字 <small style="font-size:11.5px;color:var(--ink-ghost);font-weight:400">（目前首頁隱藏中，資料先保留）</small></h3>
         <div class="field-hint" style="margin:-4px 0 10px">左：數字　右：說明（顯示在服務卡下方，可新增或刪除）</div>
         ${data.proof.map((x, i) => `<div style="display:grid;grid-template-columns:84px minmax(0,1fr) auto;gap:8px;margin-bottom:8px">${inp('num', x.num, `data-p="${i}"`)}${inp('label', x.label, `data-p="${i}"`)}<button type="button" class="btn btn-ghost" data-delp="${i}" title="刪除這一格">×</button></div>`).join('')}
         <button type="button" class="btn btn-ghost" id="addProof" style="margin-top:4px">＋ 新增一格</button>
