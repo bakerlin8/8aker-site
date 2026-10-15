@@ -1036,7 +1036,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       el.classList.toggle('on',d===0);el.setAttribute('aria-hidden',d===0?'false':'true');el.tabIndex=d===0?0:-1;});
     T.forEach(function(b,k){b.setAttribute('aria-current',k===cur?'true':'false');});var t=T[cur];if(t&&t.scrollIntoView)t.parentElement.parentElement.scrollLeft=t.offsetLeft-60;
     NOW.textContent=pad(cur+1);if(VL)VL.textContent=pad(cur+1);}
-  function go(i){i=Math.max(0,Math.min(n-1,i));if(i===cur)return;cur=i;lay();}
+  function go(i){i=Math.max(0,Math.min(n-1,i));if(i===cur)return;var dir=i>cur?1:-1;cur=i;lay();window.sfx&&sfx('turn',{dir:dir});}
   document.getElementById('wPrev').addEventListener('click',function(){go(cur-1);});document.getElementById('wNext').addEventListener('click',function(){go(cur+1);});
   T.forEach(function(b){b.addEventListener('click',function(){go(+b.dataset.go);});});
   C.forEach(function(el,k){el.addEventListener('click',function(e){if(k!==cur){e.preventDefault();go(k);}});});

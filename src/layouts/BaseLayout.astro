@@ -223,56 +223,77 @@ footer.site-foot a:hover{color:#EFE5D6;}
 <footer class="site-foot"><div class="sf-l"><span class="sf-name">{copy.site_name}</span><span>© 2026 林子翔・大阪</span></div><nav class="sf-links" aria-label="頁尾"><a href="/chat/">有空聊聊</a><a href="/#support">支持贊助</a>{copy.instagram_handle && <a href={`https://www.instagram.com/${copy.instagram_handle}/`} target="_blank" rel="noopener">Instagram</a>}<a href="/privacy/">隱私權政策</a></nav></footer>
 
 <script is:inline>
-/* 介面音效：全部用 Web Audio 即時合成（不用下載音檔）。滑過＝輕點、按下＝木頭聲、切換＝鈴聲、換頁＝風聲、成功＝和弦。右上角喇叭可關閉，會記住。 */
+/* 介面音效（全部即時合成，不下載音檔）
+   聲音設計：整站統一在 D 調的日本「陽音階」（D E G A B），材質用「木、紙、鈴」三種，呼應年輪、燈籠、和紙。
+   ・滑過：極輕的木琴音，依卡片順序走音階——掃過一排卡片會變成一小段旋律
+   ・按下：拍子木般短促的木頭聲（只在按下時一聲，放開不再響）
+   ・切換／選取：小鈴（りん）
+   ・前往連結：和紙滑過的「沙」聲＋上行五度
+   ・開／關：紙門拉開／拉上
+   ・翻作品唱盤：輕輕的翻頁
+   ・成功：鈴缽長響；錯誤：兩聲悶木
+   全部經過同一個輕微的空間殘響與限幅器，音量統一、不刺耳。右上角喇叭可關閉，會記住。 */
 (function(){
   var KEY='8aker-sfx',on=true;try{on=localStorage.getItem(KEY)!=='off';}catch(e){}
-  var AC=window.AudioContext||window.webkitAudioContext,ctx=null,master=null,noiseBuf=null,unlocked=false;
-  function init(){if(ctx||!AC)return ctx;try{ctx=new AC();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);
-    noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.4,ctx.sampleRate);var d=noiseBuf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;}catch(e){ctx=null;}return ctx;}
+  var AC=window.AudioContext||window.webkitAudioContext,ctx=null,out=null,dry=null,wet=null,noiseBuf=null,unlocked=false;
+  var SCALE=[293.66,329.63,392,440,493.88];/* D E G A B */
+  var note=function(i,oct){i=((i%5)+5)%5;return SCALE[i]*Math.pow(2,oct||0);};
+  function init(){if(ctx||!AC)return ctx;try{ctx=new AC();
+    var comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.knee.value=12;comp.ratio.value=4;comp.attack.value=.003;comp.release.value=.15;
+    out=ctx.createGain();out.gain.value=.9;comp.connect(out);out.connect(ctx.destination);
+    dry=ctx.createGain();dry.connect(comp);
+    /* 小房間殘響：用衰減的雜訊即時做脈衝響應 */
+    var len=Math.floor(ctx.sampleRate*1.1),ir=ctx.createBuffer(2,len,ctx.sampleRate);for(var c=0;c<2;c++){var ch=ir.getChannelData(c);for(var k=0;k<len;k++)ch[k]=(Math.random()*2-1)*Math.pow(1-k/len,3.2)*.6;}
+    var cv=ctx.createConvolver();cv.buffer=ir;wet=ctx.createGain();wet.gain.value=.22;wet.connect(cv);cv.connect(comp);
+    noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.6,ctx.sampleRate);var d=noiseBuf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;}catch(e){ctx=null;}return ctx;}
   function unlock(){if(!init())return;if(ctx.state==='suspended')ctx.resume();unlocked=true;}
-  function tone(f,t0,dur,g,type,f2){var o=ctx.createOscillator(),a=ctx.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+dur);
-    a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+.006);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(a);a.connect(master);o.start(t0);o.stop(t0+dur+.02);}
-  function noise(t0,dur,g,f1,f2,q){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),a=ctx.createGain();n.buffer=noiseBuf;b.type='bandpass';b.Q.value=q||1.2;b.frequency.setValueAtTime(f1,t0);if(f2)b.frequency.exponentialRampToValueAtTime(f2,t0+dur);
-    a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+dur*.3);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);n.connect(b);b.connect(a);a.connect(master);n.start(t0);n.stop(t0+dur+.02);}
-  // 很短、很近、略帶左右位置的輕敲聲（ASMR 質感）
-  function tick(t0,dur,g,fr,q,p){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),h=ctx.createBiquadFilter(),a=ctx.createGain(),pn=ctx.createStereoPanner?ctx.createStereoPanner():null;
-    n.buffer=noiseBuf;b.type='bandpass';b.frequency.value=fr*(p||1);b.Q.value=q;h.type='highpass';h.frequency.value=900;
-    a.gain.setValueAtTime(g,t0);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);n.connect(h);h.connect(b);b.connect(a);
-    if(pn){pn.pan.value=(Math.random()-.5)*.35;a.connect(pn);pn.connect(master);}else a.connect(master);n.start(t0,Math.random()*.3);n.stop(t0+dur+.01);}
-  var last={};
-  function play(kind){if(!on||!unlocked||!ctx||ctx.state!=='running')return;var now=ctx.currentTime,p=1+(Math.random()-.5)*.06;
-    if(last[kind]&&now-last[kind]<(kind==='hover'?.045:.03))return;last[kind]=now;
+  function bus(node,rev,pan){var g=node;if(pan&&ctx.createStereoPanner){var p=ctx.createStereoPanner();p.pan.value=pan;g.connect(p);g=p;}g.connect(dry);if(rev){var s=ctx.createGain();s.gain.value=rev;g.connect(s);s.connect(wet);}}
+  /* 單一泛音：f 頻率、g 音量、d 長度、type 波形、f2 滑音目標 */
+  function partial(t,f,g,d,type,f2,rev,pan){var o=ctx.createOscillator(),a=ctx.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d*.8);
+    a.gain.setValueAtTime(0,t);a.gain.linearRampToValueAtTime(g,t+.004);a.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(a);bus(a,rev,pan);o.start(t);o.stop(t+d+.05);}
+  function hiss(t,d,g,f1,f2,q,type,rev,pan){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),a=ctx.createGain();n.buffer=noiseBuf;b.type=type||'bandpass';b.Q.value=q||1;b.frequency.setValueAtTime(f1,t);if(f2)b.frequency.exponentialRampToValueAtTime(f2,t+d);
+    a.gain.setValueAtTime(0,t);a.gain.linearRampToValueAtTime(g,t+Math.min(.02,d*.25));a.gain.exponentialRampToValueAtTime(.0001,t+d);n.connect(b);b.connect(a);bus(a,rev,pan);n.start(t,Math.random()*.4);n.stop(t+d+.05);}
+  /* 樂器 */
+  function marimba(t,f,g,pan){partial(t,f,g,.28,'sine',0,.25,pan);partial(t,f*4,g*.18,.06,'sine',0,.1,pan);partial(t,f*10,g*.05,.02,'sine',0,0,pan);}
+  function wood(t,f,g){partial(t,f,g,.07,'sine',f*.82,.15);partial(t,f*2.6,g*.35,.025,'triangle',0,.05);hiss(t,.018,g*.5,3800,0,2.2,'bandpass',.05);}
+  function bell(t,f,g,len){var r=[1,2.76,5.4,8.93],a=[1,.45,.22,.08];r.forEach(function(m,i){partial(t,f*m,g*a[i],(len||1.2)/(1+i*.6),'sine',0,.45);});}
+  var last={},seq=0;
+  function play(kind,opt){if(!on||!unlocked||!ctx||ctx.state!=='running')return;var t=ctx.currentTime+.005,j=1+(Math.random()-.5)*.012;
+    var gap={hover:.07,press:.03}[kind]||.04;if(last[kind]&&t-last[kind]<gap)return;last[kind]=t;
     switch(kind){
-      case 'hover':tone(1750*p,now,.05,.06,'sine');break;
-      case 'press':/* ASMR 風的近距離輕敲：清脆的指尖觸感＋一點木質的「咚」 */
-        tick(now,.012,.8,5200,2.5,p);tick(now+.002,.03,.4,2300,1.6,p);tone(170*p,now,.05,.16,'sine',120*p);break;
-      case 'release':tick(now,.008,.32,6500,3,p);tick(now+.001,.018,.15,3200,2,p);break;
-      case 'select':tone(1318*p,now,.34,.1,'sine');tone(1975*p,now+.07,.4,.08,'sine');tone(2637*p,now+.07,.22,.02,'sine');break;
-      case 'go':noise(now,.22,.09,500,1800,.9);tone(880*p,now+.03,.16,.035,'sine',1320*p);break;
-      case 'open':tone(330,now,.16,.11,'sine',660);break;
-      case 'close':tone(660,now,.16,.1,'sine',330);break;
-      case 'success':[1046,1318,1568,2093].forEach(function(f,i){tone(f,now+i*.08,.55,.09,'sine');});break;
-      case 'error':tone(220,now,.1,.15,'triangle');tone(196,now+.11,.13,.15,'triangle');break;
+      case 'hover':{var i=opt&&opt.i!=null?opt.i:(seq++);marimba(t,note(i,1)*j,.045,opt&&opt.pan||0);break;}
+      case 'press':wood(t,note(2,1)*j,.32);break;
+      case 'select':bell(t,note(3,2)*j,.06,.9);break;
+      case 'go':hiss(t,.26,.07,700,2600,.8,'bandpass',.2);marimba(t+.04,note(0,1),.05);marimba(t+.11,note(3,1),.045);break;
+      case 'open':hiss(t,.32,.08,400,1600,.7,'bandpass',.25);partial(t+.02,note(0,0),.07,.3,'sine',note(3,0),.3);break;
+      case 'close':hiss(t,.28,.07,1600,420,.7,'bandpass',.2);partial(t+.02,note(3,0),.06,.26,'sine',note(0,0),.25);break;
+      case 'turn':hiss(t,.16,.06,1200,3400,1.4,'bandpass',.15,(opt&&opt.dir||1)*.25);marimba(t+.05,note(opt&&opt.dir<0?1:4,1),.035);break;
+      case 'success':bell(t,note(0,1),.09,2.2);bell(t+.12,note(3,1),.06,1.8);bell(t+.24,note(0,2),.05,1.6);break;
+      case 'error':wood(t,note(0,0)*.9,.28);wood(t+.12,note(4,-1),.26);break;
     }}
   window.sfx=play;
-  var SEL='a[href],button,select,summary,label,input:not([type=hidden]),textarea,[role="button"],[role="tab"],[data-lb],.jrow,.node,.cell.done,.cell.today';
+  var SEL='a[href],button,select,summary,label,input:not([type=hidden]),textarea,[role="button"],[role="tab"],[data-lb],.cho,.hat';
+  /* 會依順序走音階的「一排」元素：卡片、列表列、燈籠、連載欄 */
+  var ROW='.hat,.work,.jrow,.jr,.cho,.cc-cols button,.wn-ticks button,.chip,.nav a,.sf-links a,.arow';
+  function idxOf(el){var r=el.closest(ROW);if(!r)return null;var p=r.parentElement;if(r.tagName!=='LI'&&p&&p.tagName==='LI'){r=p;p=p.parentElement;}return p?[].indexOf.call(p.children,r):null;}
   var hov=null;
-  document.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var el=e.target.closest&&e.target.closest(SEL);if(el===hov)return;hov=el;if(el&&!el.disabled)play('hover');},{passive:true});
-  document.addEventListener('pointerdown',function(e){unlock();var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))play('press');},{passive:true});
-  document.addEventListener('pointerup',function(e){var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))play('release');},{passive:true});
+  document.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var el=e.target.closest&&e.target.closest(SEL);if(el===hov)return;hov=el;if(!el||el.disabled||/^(INPUT|TEXTAREA|SELECT|LABEL)$/.test(el.tagName))return;
+    var i=idxOf(el),pan=Math.max(-.5,Math.min(.5,(e.clientX/innerWidth-.5)*.9));play('hover',{i:i,pan:pan});},{passive:true});
+  document.addEventListener('pointerdown',function(e){unlock();var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT|LABEL)$/.test(el.tagName))play('press');},{passive:true});
   document.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')unlock();},{passive:true});
   document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest(SEL);if(!el||el.disabled)return;
     if(el.id==='sfxBtn')return;
+    if(el.id==='wPrev'||el.id==='wNext'||el.closest('.wn-ticks'))return;/* 唱盤翻頁由 turn 處理 */
     if(el.id==='menuBtn'){setTimeout(function(){play(document.body.classList.contains('menu-open')?'open':'close');},0);return;}
     if(el.hasAttribute('data-lb')){play('open');return;}
     if(el.closest('dialog')&&el.classList.contains('x')){play('close');return;}
-    if(el.hasAttribute('aria-pressed')||el.getAttribute('role')==='tab'||el.closest('.filters,.mv-toggle,.tabs,[role="group"],[role="tablist"]')||el.matches('.node,input[type=checkbox],input[type=radio],select')){setTimeout(function(){play('select');},0);return;}
+    if(el.hasAttribute('aria-pressed')||el.getAttribute('role')==='tab'||el.closest('.filters,.tabs,[role="group"],[role="tablist"],.cc-cols')||el.matches('.cho,input[type=checkbox],input[type=radio],select,[data-i]')){setTimeout(function(){play('select');},0);return;}
     if(el.tagName==='A'){var h=el.getAttribute('href')||'';if(h&&h!=='#')play('go');}
   });
   var btn=document.getElementById('sfxBtn');
   function paint(){if(!btn)return;btn.setAttribute('aria-pressed',on?'true':'false');btn.setAttribute('aria-label',on?'音效：開（點一下關閉）':'音效：關（點一下開啟）');}
   paint();
-  if(btn)btn.addEventListener('click',function(){on=!on;try{localStorage.setItem(KEY,on?'on':'off');}catch(e){}paint();unlock();if(on)setTimeout(function(){play('select');},30);});
+  if(btn)btn.addEventListener('click',function(){on=!on;try{localStorage.setItem(KEY,on?'on':'off');}catch(e){}paint();unlock();if(on)setTimeout(function(){play('success');},30);});
 })();
 </script>
 
