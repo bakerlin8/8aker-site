@@ -480,6 +480,11 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .end-card .support .give{margin-top:0;margin-bottom:24px;padding:14px 16px;border-top:0;border-left:2px solid rgba(138,43,61,.35);background:rgba(138,43,61,.04);}
 .end-card .flow-key{margin-top:0;gap:5px;font-size:12.5px;}
 .end-card .flow-key li span{text-wrap:balance;}
+@media(max-width:400px){.end-card .support{padding:26px 18px 22px;}.ec-ring{padding:20px 12px 24px;}.ec-ring canvas{height:200px;}
+  .end-card .give-cta{grid-template-columns:36px minmax(0,1fr) auto;gap:10px;padding:12px 12px 12px 10px;}.end-card .gc-ic{width:36px;height:36px;}.end-card .gc-ic svg{width:13px;height:18px;}.end-card .gc-ic .cup{width:20px;height:20px;}
+  .end-card .gc-t b{font-size:15.5px;letter-spacing:.02em;white-space:nowrap;}.end-card .gc-ar{font-size:16px;}.end-card .support h3{font-size:19px;}}
+@media(max-width:340px){.sec.closing{padding-left:12px;padding-right:12px;}.end-card .gc-t b{font-size:14.5px;letter-spacing:0;}.end-card .gc-t small{font-size:11px;}}
+@media(hover:none){.give-cta:hover{transform:none;}.give-cta:active{transform:scale(.985);}}
 @media(max-width:400px){.end-card .flow-key{font-size:11.5px;}.end-card .support .give{padding:12px 12px;}}
 .support .give>div:empty{display:none;}
 .flow-bar{display:flex;gap:2px;height:30px;border-radius:2px;}
@@ -736,7 +741,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .ec-k b{font-family:var(--latin);font-weight:500;font-size:16px;color:var(--gold);margin:0 4px;}
 .ec-ring canvas{display:block;width:100%;max-width:480px;height:290px;margin:-8px 0 2px;}
 .ec-ring .ecd{justify-content:center;margin-top:8px;}
-.ec-after{margin:16px 0 0;font-family:var(--serif);font-size:14px;letter-spacing:.08em;color:var(--bone-2);}
+.ec-after{text-wrap:balance;margin:16px 0 0;font-family:var(--serif);font-size:14px;letter-spacing:.08em;color:var(--bone-2);}
 @media(max-width:900px){.end-card{grid-template-columns:1fr;}.ec-ring{padding:24px 16px 28px;}.ec-ring canvas{height:220px;}}
 .hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
 /* ── 服務卡 ── */
