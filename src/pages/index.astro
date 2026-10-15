@@ -19,7 +19,7 @@ const C0: Record<string, string> = {
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
   give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: '',
   give_text: '',
-  give_use: '站主在日協助雜經費 58\nAI 線上工具訂閱 20\n網站經營 14', give_month: '', give_received: '', give_donated: '', give_total: '', tw_note: '轉帳資訊只由 @{ig} 回覆，其他帳號請忽略。',
+  give_use: 'AI 線上工具訂閱 58\n網站經營 20\n站主在日協助雜經費 14', give_month: '', give_received: '', give_donated: '', give_total: '', tw_note: '轉帳資訊只由 @{ig} 回覆，其他帳號請忽略。',
 };
 const C: Record<string, string> = Object.fromEntries(Object.keys(C0).map((k) => [k, (copy as any)[k] != null ? String((copy as any)[k]) : C0[k]]));
 const endBefore = (C.end_cd_before.includes('{n}') ? C.end_cd_before.split('{n}') : [C.end_cd_before + ' ', '']).slice(0, 2);
@@ -493,8 +493,14 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .flow-key li{display:flex;align-items:baseline;gap:6px;}
 .flow-key i{flex:none;width:9px;height:9px;align-self:center;}
 .flow-key .kg{color:#8A2B3D;}.flow-key .kg b{color:#8A2B3D;}
+.flow-key .kg span,.flow-key .kg b{background:linear-gradient(100deg,#8A2B3D 0 40%,#E7B36A 50%,#8A2B3D 60% 100%);background-size:250% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:kgshine 4.2s ease-in-out 1s infinite;}
+.flow-key .kg i{position:relative;animation:kgbeat 4.2s ease-in-out 1s infinite;}
+.flow-key .kg i::after{content:"";position:absolute;inset:-1px;border:1px solid #8A2B3D;opacity:0;animation:kgring 4.2s ease-out 1s infinite;}
+@keyframes kgshine{0%,40%{background-position:100% 0;}75%,100%{background-position:0 0;}}
+@keyframes kgbeat{0%,38%,58%,100%{transform:none;}44%{transform:scale(1.25);}50%{transform:scale(1);}53%{transform:scale(1.15);}}
+@keyframes kgring{0%,40%{opacity:0;transform:scale(1);}45%{opacity:.8;}80%,100%{opacity:0;transform:scale(2.6);}}
 .flow-key b{font-family:var(--latin);font-weight:600;color:#1C0F14;min-width:2.4em;}
-@media(prefers-reduced-motion:reduce){.support.in .flow-bar span,.flow-bar .fb::before{animation:none;}}
+@media(prefers-reduced-motion:reduce){.flow-key .kg span,.flow-key .kg b,.flow-key .kg i,.flow-key .kg i::after{animation:none;}.support.in .flow-bar span,.flow-bar .fb::before{animation:none;}}
 .support .tw{margin-top:20px;padding-top:16px;border-top:1px solid rgba(28,15,20,.14);}
 .support .tw p{margin-top:0;color:#1C0F14;}
 .support .tw b{font-weight:600;}
@@ -983,7 +989,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
               {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
             </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div>
             <div class="flow">
-              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b>{x.name}</li>)}</ul></div>
+              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span></li>)}</ul></div>
           </div>
           </>}
           {igUrl && C.tw_show !== 'off' && <div class="tw-wrap">
