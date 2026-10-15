@@ -441,14 +441,13 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .motto-card{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--serif);font-size:18px;color:var(--bone);}
 .motto-card small{display:block;font-family:var(--sans);font-size:13px;color:var(--ash);margin-top:4px;}
 .support{background:#EFE5D6;color:#1C0F14;padding:28px;align-self:start;transition:transform .5s var(--ease),box-shadow .5s var(--ease);}
-.support:hover{transform:translateY(-4px);box-shadow:0 20px 40px -20px rgba(0,0,0,.6);}
 .support h3{font-family:var(--serif);font-weight:500;font-size:18px;}
 .support p{font-size:13.5px;color:#5B4B4E;margin-top:8px;}
 .support .r{display:flex;align-items:baseline;gap:10px;margin-top:18px;flex-wrap:wrap;}
 .support .r b{font-size:30px;font-weight:400;}
 .support .sdesc{white-space:pre-line;}
 /* 善的循環：3D 年輪木樁 + 一行說明 */
-.support .give{display:grid;grid-template-columns:92px minmax(0,1fr);gap:16px;align-items:center;margin-top:22px;padding:14px 16px 14px 10px;background:linear-gradient(135deg,rgba(138,43,61,.07),rgba(138,43,61,.02));border-top:1px solid rgba(28,15,20,.12);color:#1C0F14;}
+.support .give{display:grid;gap:12px;margin-top:22px;padding:16px;background:linear-gradient(135deg,rgba(138,43,61,.07),rgba(138,43,61,.02));border-top:1px solid rgba(28,15,20,.12);color:#1C0F14;}
 .support .gline{margin:0;font-size:13.5px;line-height:1.75;color:#3A2A2D;}
 .support .gline b{font-family:var(--latin);font-weight:600;font-size:17px;color:#8A2B3D;}
 .support .gnum{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:12px;}
@@ -456,7 +455,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .support .gnum dd{font-family:var(--latin);font-size:17px;color:#1C0F14;}
 .support .glink{display:inline-block;margin-top:6px;font-size:12.5px;color:#5B4B4E;border-bottom:1px solid #8A2B3D;padding-bottom:1px;transition:color .3s;}
 .support .glink:hover{color:#8A2B3D;}
-.flow{grid-column:1/-1;margin-top:2px;}
+.flow{margin-top:2px;}
 .flow-bar{display:flex;gap:2px;height:30px;overflow:hidden;border-radius:2px;}
 .flow-bar span{display:flex;align-items:center;justify-content:center;min-width:3px;transform-origin:0 50%;}
 .flow-bar .fb{box-shadow:inset 0 1px 0 rgba(255,255,255,.18);}
@@ -468,24 +467,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .flow-key i{flex:none;width:9px;height:9px;align-self:center;}
 .flow-key .kg{color:#8A2B3D;}.flow-key .kg b{color:#8A2B3D;}
 .flow-key b{font-family:var(--latin);font-weight:600;color:#1C0F14;min-width:2.4em;}
-.stump{position:relative;width:92px;height:92px;}
-.stump span{position:absolute;left:6px;right:6px;}
-.s-base{top:50px;height:34px;border-radius:50%;background:linear-gradient(90deg,#3E1C12,#7A4A2C 38%,#5C321E 70%,#2E140C);box-shadow:0 10px 14px -8px rgba(28,15,20,.55);}
-.s-side{top:57px;height:10px;background:linear-gradient(90deg,#3E1C12,#7A4A2C 38%,#5C321E 70%,#2E140C);}
-.s-side::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 5px,rgba(0,0,0,.18) 5px 6px);}
-.s-top{top:40px;height:34px;border-radius:50%;overflow:hidden;background:repeating-radial-gradient(closest-side,#F4E4C6 0 4px,#E2C59A 4px 5.2px,rgba(138,43,61,.55) 5.2px 6px),#F4E4C6;box-shadow:inset 0 0 0 2px #9A6A42,inset 0 -3px 6px rgba(90,40,20,.25),inset 0 3px 4px rgba(255,255,255,.5);}
-.s-top::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:3px;margin:-1.5px 0 0 -3px;border-radius:50%;background:#8A2B3D;}
-.s-top i{position:absolute;left:50%;top:50%;border-radius:50%;}
-.s-top .rp{width:76px;height:28px;margin:-14px 0 0 -38px;border:2px solid rgba(47,95,140,.9);box-shadow:0 0 4px rgba(111,163,207,.6);transform:scale(.05);opacity:0;animation:srip 3.2s ease-out infinite;}
-.s-top .r2{animation-delay:.25s;}
-.s-top .sh{width:18px;height:6px;margin:-3px 0 0 -9px;background:rgba(47,95,140,.35);filter:blur(1.5px);transform:scale(.2);opacity:0;animation:ssh 3.2s ease-in infinite;}
-.s-drop{position:absolute;left:50%;top:0;width:15px;height:21px;margin-left:-7.5px;filter:drop-shadow(0 2px 2px rgba(28,15,20,.25));animation:sdrop 3.2s cubic-bezier(.55,0,.9,.45) infinite;}
-@keyframes sdrop{0%{transform:translateY(-6px) scale(.6);opacity:0}15%{opacity:1;transform:translateY(0) scale(1)}62%{transform:translateY(38px) scaleY(1.08)}66%{transform:translateY(42px) scale(1.3,.4);opacity:.8}70%,100%{transform:translateY(42px) scale(1.6,.1);opacity:0}}
-@keyframes ssh{0%,15%{opacity:0;transform:scale(.2)}62%{opacity:1;transform:scale(1)}68%,100%{opacity:0;transform:scale(1.2)}}
-@keyframes srip{0%,64%{opacity:0;transform:scale(.05)}68%{opacity:1}100%{opacity:0;transform:scale(1)}}
-.support .give:hover .stump{transform:translateY(-2px);}
-.stump{transition:transform .5s var(--ease);}
-@media(prefers-reduced-motion:reduce){.s-drop,.s-top i,.support.in .flow-bar span{animation:none;}.s-drop{transform:translateY(16px);}}
+@media(prefers-reduced-motion:reduce){.support.in .flow-bar span{animation:none;}}
 .support .tw{margin-top:20px;padding-top:16px;border-top:1px solid rgba(28,15,20,.14);}
 .support .tw p{margin-top:0;color:#1C0F14;}
 .support .tw b{font-weight:600;}
@@ -687,6 +669,16 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hprov{display:block;margin-top:10px;font-size:11.5px;letter-spacing:.06em;color:var(--ash);}
 .closing{padding-top:24px;}
 .closing .about.end{margin-top:0;}
+/* 結尾：年輪倒數＋支持卡 合成一張 */
+.end-card{display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:stretch;border:1px solid rgba(239,229,214,.1);box-shadow:0 40px 80px -40px rgba(0,0,0,.8);}
+.end-card .support{align-self:stretch;}
+.ec-ring{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 28px 36px;background:radial-gradient(80% 60% at 50% 46%,#30182233 0%,transparent 70%),radial-gradient(100% 80% at 50% 40%,#2A1520,#1C0F14 80%);overflow:hidden;}
+.ec-k{margin:0;font-size:13px;letter-spacing:.16em;color:var(--bone-2);}
+.ec-k b{font-family:var(--latin);font-weight:500;font-size:16px;color:var(--gold);margin:0 4px;}
+.ec-ring canvas{display:block;width:100%;max-width:480px;height:340px;margin:0;}
+.ec-ring .ecd{justify-content:center;margin-top:-6px;}
+.ec-after{margin:16px 0 0;font-family:var(--serif);font-size:14px;letter-spacing:.08em;color:var(--bone-2);}
+@media(max-width:900px){.end-card{grid-template-columns:1fr;}.ec-ring{padding:32px 16px 28px;}.ec-ring canvas{height:240px;}}
 .hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
 /* ── 服務卡 ── */
 .hat{position:relative;overflow:hidden;isolation:isolate;}
@@ -917,20 +909,18 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 <section class="sec closing" id="support-end" aria-label="支持這個連載">
   <div class="sec-grid">
     <div class="side" aria-hidden="true"></div>
-    <div class="about end">
-      <div>
-          <div class="end-ring rv" style="--i:3"><canvas id="endRing" aria-hidden="true"></canvas>
-            <div class="end-cd"><small>{endBefore[0]}<b id="ecN">{endRing.age}</b>{endBefore[1]}</small>
-              <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span><span><b id="ecS">—</b><i>秒</i></span></p>
-              {C.end_cd_after && <small>{C.end_cd_after}</small>}</div></div>
+    <div class="end-card">
+      <div class="ec-ring rv" style="--i:3">
+        <p class="ec-k">{endBefore[0]}<b id="ecN">{endRing.age}</b>{endBefore[1]}</p>
+        <canvas id="endRing" aria-hidden="true"></canvas>
+        <p class="ecd num" aria-live="off"><span><b id="ecD">—</b><i>天</i></span><span><b id="ecH">—</b><i>時</i></span><span><b id="ecM">—</b><i>分</i></span><span><b id="ecS">—</b><i>秒</i></span></p>
+        {C.end_cd_after && <p class="ec-after">{C.end_cd_after}</p>}
       </div>
         <aside class="support rv" style="--i:4" id="support">
           <h3>{copy.subscribe_title}</h3><p class="sdesc">{copy.subscribe_desc}</p>
           <div class="r">{copy.subscribe_price && <b>{copy.subscribe_price}</b>}{C.subscribe_unit && <span>{C.subscribe_unit}</span>}{safeHref(copy.subscribe_url) && <a class="btn-ink" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">{C.subscribe_btn}</a>}</div>
           {C.give_show !== 'off' && <>
           <div class="give">
-            <div class="stump" aria-hidden="true"><span class="s-base"></span><span class="s-side"></span><span class="s-top"><i class="rp"></i><i class="rp r2"></i><i class="sh"></i></span>
-              <svg class="s-drop" viewBox="0 0 20 28"><defs><radialGradient id="gdw" cx="35%" cy="62%" r="70%"><stop offset="0" stop-color="#CFE6F7"/><stop offset=".45" stop-color="#6FA3CF"/><stop offset="1" stop-color="#2F5F8C"/></radialGradient></defs><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z" fill="url(#gdw)"/><ellipse cx="7" cy="17" rx="2" ry="3.2" fill="#fff" opacity=".75"/></svg></div>
             <div><p class="gline"><Fragment set:html={giveHtml} /></p>{(C.give_donated || C.give_total) && <dl class="gnum">
               {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
               {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
@@ -1086,7 +1076,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function P(px,py,pz){var X=px*cY-py*sY,Y=px*sY+py*cY,sy=Y*cT-pz*sT,d=Y*sT+pz*cT,q=3/(3+d*.7);return [CX+X*S*q,CY+sy*S*q];}
   function ring(i,z){var xs=RX[i],ys=RY[i],zs=(z||0)*sT,zc=(z||0)*cT;ctx.beginPath();
     for(var j=0;j<N;j++){var px=xs[j],py=ys[j],X=px*cY-py*sY,Y=px*sY+py*cY,q=S*3/(3+(Y*sT+zc)*.7),x=CX+X*q,y=CY+(Y*cT-zs)*q;j?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();}
-  function size(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);S=Math.min(W*.34,H*.5);CX=W*.5;CY=H*.44;}
+  function size(){dpr=Math.min(devicePixelRatio||1,2);var r=cv.getBoundingClientRect();W=cv.width=Math.round(r.width*dpr);H=cv.height=Math.round(r.height*dpr);S=Math.min(W*.36,H*.42);CX=W*.5;CY=H*.56;}
   function frame(){smx+=(mx-smx)*.05;smy+=(my-smy)*.05;var YAW=-.35+t*.06+smx*.4,TILT=1.0+smy*.2;cY=Math.cos(YAW);sY=Math.sin(YAW);cT=Math.cos(TILT);sT=Math.sin(TILT);
     ctx.clearRect(0,0,W,H);ctx.lineJoin='round';var xs=RX[full],ys=RY[full],a;
     ctx.beginPath();for(j=0;j<=N;j++){a=P(xs[j%N],ys[j%N],-TH);j?ctx.lineTo(a[0],a[1]):ctx.moveTo(a[0],a[1]);}for(j=N;j>=0;j--){a=P(xs[j%N],ys[j%N],0);ctx.lineTo(a[0],a[1]);}
@@ -1097,7 +1087,25 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var br=.5+.5*Math.sin(t*1.4);ring(full,0);ctx.strokeStyle='rgba(212,162,76,'+(.16+.12*br).toFixed(3)+')';ctx.lineWidth=7*dpr;ctx.stroke();
     ctx.strokeStyle='rgba(240,204,130,.98)';ctx.lineWidth=1.8*dpr;ctx.stroke();
     var kk=Math.floor(N*.12),p=P(RX[full][kk],RY[full][kk],0);ctx.beginPath();ctx.arc(p[0],p[1],7*dpr,0,6.2832);ctx.fillStyle='rgba(212,162,76,.22)';ctx.fill();
-    ctx.beginPath();ctx.arc(p[0],p[1],2.8*dpr,0,6.2832);ctx.fillStyle='rgb(243,217,160)';ctx.fill();}
+    ctx.beginPath();ctx.arc(p[0],p[1],2.8*dpr,0,6.2832);ctx.fillStyle='rgb(243,217,160)';ctx.fill();
+    drop();}
+  /* 一滴水（=一份支持）落在年輪中心，漣漪沿著年輪平面擴散 */
+  var PER=3.6,BT=document.querySelector('#support .btn-ink');
+  /* 滑到「每月自動澆水」按鈕：馬上再落一滴 */
+  if(BT)BT.addEventListener('pointerenter',function(){var ph=(t%PER)/PER;if(ph>.6)t+=PER-(t%PER);});
+  function ripple(k,al){ctx.beginPath();for(var j=0;j<=48;j++){var a=j/48*6.2832,q=P(Math.cos(a)*k,Math.sin(a)*k,0);j?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);}
+    ctx.strokeStyle='rgba(170,210,240,'+al.toFixed(3)+')';ctx.lineWidth=1.6*dpr;ctx.stroke();}
+  function drop(){if(RM)return;var ph=(t%PER)/PER,c=P(0,0,0),d=dpr*1.35,x=c[0],gy=c[1],FALL=.55;
+    if(ph<FALL){var u=ph/FALL,e=u*u,y=gy-(1-e)*(gy-34*dpr)-9*d,al=Math.min(1,u*5);
+      var sh=.25+.75*e;ctx.beginPath();ctx.ellipse(x,gy,9*d*sh,4*d*sh,0,0,6.2832);ctx.fillStyle='rgba(120,170,215,'+(.25*e).toFixed(3)+')';ctx.fill();
+      ctx.save();ctx.globalAlpha=al;ctx.translate(x,y);ctx.scale(1,1+e*.12);
+      ctx.beginPath();ctx.moveTo(0,-13*d);ctx.bezierCurveTo(2.5*d,-8*d,7*d,-3*d,7*d,1.5*d);ctx.arc(0,1.5*d,7*d,0,Math.PI);ctx.bezierCurveTo(-7*d,-3*d,-2.5*d,-8*d,0,-13*d);
+      var g=ctx.createRadialGradient(-2.5*d,0,1*d,0,1*d,9*d);g.addColorStop(0,'#E4F1FB');g.addColorStop(.45,'#7DB0DA');g.addColorStop(1,'#2F5F8C');ctx.fillStyle=g;ctx.shadowColor='rgba(125,176,218,.55)';ctx.shadowBlur=10*d;ctx.fill();
+      ctx.shadowBlur=0;ctx.beginPath();ctx.ellipse(-2.6*d,0,1.6*d,2.8*d,-.3,0,6.2832);ctx.fillStyle='rgba(255,255,255,.8)';ctx.fill();ctx.restore();}
+    else{var v=(ph-FALL)/(1-FALL);
+      if(v<.12){var sp=v/.12;ctx.beginPath();ctx.ellipse(x,gy,(4+10*sp)*d,(2+4*sp)*d,0,0,6.2832);ctx.fillStyle='rgba(190,222,245,'+(.7*(1-sp)).toFixed(3)+')';ctx.fill();}
+      for(var r=0;r<3;r++){var w=v-r*.12;if(w>0&&w<1){var k=.05+w*.95,al=(1-w)*(r?.45:.8);ripple(k*(1+(r*.0)),al);}}
+      var gl=Math.max(0,1-Math.abs(v-.8)/.2);if(gl>0){ring(full,0);ctx.strokeStyle='rgba(240,204,130,'+(.55*gl).toFixed(3)+')';ctx.lineWidth=6*dpr;ctx.stroke();}}}
   function loop(ts){if(!run)return;var dt=last?Math.min(.05,(ts-last)/1e3):0;last=ts;t+=dt;frame();raf=requestAnimationFrame(loop);}
   size();t=2;frame();var rz=0;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){size();frame();},150);});
   if(RM)return;
