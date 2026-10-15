@@ -13,6 +13,8 @@ const total: number = page.total;
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const counts = Object.fromEntries(pillars.map((p) => [p.slug, 0]));
 for (const a of await allEntries()) counts[a.dir]++;
+// 段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段
+const dan = (c: number) => (c >= 100 ? '四段' : c >= 60 ? '三段' : c >= 30 ? '二段' : c >= 10 ? '初段' : '見習');
 const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
 const href = (n: number) => (n === 1 ? '/journal/' : `/journal/${n}/`);
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
@@ -71,7 +73,7 @@ const schema = [
     <p class="count rv" style="--i:2">共<b>{total}</b>篇{page.lastPage > 1 && <>・第 {page.currentPage}／{page.lastPage} 頁</>}</p>
     <nav class="jcats rv" style="--i:3" aria-label="依方向瀏覽">
       <a href="/journal/" aria-current={page.currentPage === 1 ? 'page' : undefined}>全部<i>{total}</i></a>
-      {pillars.map((p) => <a href={`/pillars/${p.slug}/`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}<i>{counts[p.slug]}</i></a>)}
+      {pillars.map((p) => <a href={`/pillars/${p.slug}/`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}<i>{counts[p.slug]} 篇・{dan(counts[p.slug])}</i></a>)}
     </nav>
   </div>
 </section>
