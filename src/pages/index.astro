@@ -118,12 +118,25 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 
 /* ── 壱 連載：五角形能力值 ── */
 .story{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:44px;margin-top:26px;border-top:1px solid var(--line);padding-top:26px;align-items:start;}
-.stat{background:var(--night-2);border:1px solid var(--line);padding:18px 18px 14px;}
+.stat{padding:0;margin-top:8px;}
+/* 五角陣：雷達圖＋五個頂點直接標字、篇數、段位、小年輪（不再用列表） */
+.pent{position:relative;width:min(100%,440px);aspect-ratio:1;margin:6px auto 0;}
+.pent>svg{position:absolute;inset:16%;width:68%;height:68%;overflow:visible;}
+.pent .grow{transform:scale(.001);transition:transform 1.4s var(--ease) .3s;}
+.in .pent .grow{transform:none;}
+.pv{position:absolute;transform:translate(-50%,-50%);display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:6px;align-items:center;justify-items:start;padding:6px 8px;transition:transform .45s var(--ease);}
+.pv:hover{transform:translate(-50%,-50%) scale(1.08);}
+.pv .dring{grid-row:1/3;width:30px;height:30px;overflow:visible;}
+.pv .pk{font-family:var(--jp);font-size:20px;line-height:1;color:var(--dc);}
+.pv .pn{display:flex;align-items:baseline;gap:5px;line-height:1.2;white-space:nowrap;}
+.pv .pn b{font-weight:300;font-size:15px;color:var(--bone);}
+.pv .pn i{font-style:normal;font-size:11px;color:var(--ash);font-family:var(--serif);}
+@media(max-width:520px){.pv{padding:2px 4px;column-gap:4px;}.pv .dring{width:22px;height:22px;}.pv .pk{font-size:17px;}.pv .pn b{font-size:13px;}.pv .pn i{font-size:10px;}}
 .stat .tabs{display:flex;gap:4px;}
 .stat .tabs button{font-size:12.5px;padding:3px 11px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
 .stat .tabs button:hover{border-color:var(--bone-2);}
 .stat .tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
-.stat-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--bone-2);}
+.stat-top{display:flex;justify-content:center;align-items:center;gap:14px;font-size:13px;color:var(--bone-2);}
 .pgrid{display:grid;grid-template-columns:minmax(0,210px) minmax(0,1fr);gap:22px;align-items:center;margin-top:8px;}
 .penta{margin:0;max-width:210px;width:100%;}
 .penta svg{width:100%;height:auto;overflow:visible;display:block;}
@@ -179,6 +192,15 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho .cp2{width:38px;height:7px;background:#1a0f0a;border-radius:2px;}
 .cho .tas{width:2px;height:16px;background:#b0472a;}
 .cho .stamp{position:absolute;right:-12px;bottom:6px;width:30px;height:30px;border:1.6px solid #C0392B;color:#C0392B;border-radius:50%;display:grid;place-items:center;font-size:15px;background:rgba(255,240,220,.9);transform:rotate(-12deg);}
+.cho .pct{display:flex;align-items:baseline;font-family:var(--latin);line-height:1;}
+.cho .pct b{font-weight:500;font-size:30px;}
+.cho .pct small{font-size:13px;margin-left:1px;}
+/* 祈願所：平常只顯示標題與狀態；滑過（手機點一下）才展開說明 */
+.cho .more{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .5s var(--ease),opacity .4s;}
+.cho .more>*{overflow:hidden;min-height:0;}
+.cho .more{grid-template-columns:1fr;}
+.cho:hover .more,.cho:focus-within .more,.cho:focus .more,.cho.open .more{grid-template-rows:1fr;opacity:1;}
+.cho .more p:first-child{margin-top:8px;}
 .cho h4{margin-top:16px;font-family:var(--serif);font-weight:500;font-size:15px;line-height:1.55;color:var(--bone);}
 .cho .why{margin-top:6px;font-size:12.5px;line-height:1.75;color:var(--bone-2);}
 .cho .memo{margin-top:6px;font-size:12.5px;color:#E2A08F;}
@@ -198,7 +220,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .mv-toggle button[aria-pressed="true"]{background:var(--bone);color:var(--night);}
 .track-wrap{overflow-x:auto;margin-top:28px;padding:8px 2px 4px;scrollbar-width:none;}
 .track-wrap::-webkit-scrollbar{display:none;}
-.track{list-style:none;display:grid;grid-template-columns:repeat(13,minmax(64px,1fr));min-width:860px;position:relative;}
+.track{list-style:none;display:grid;grid-template-columns:repeat(13,minmax(48px,1fr));min-width:640px;position:relative;}
 .track::before{content:'';position:absolute;left:32px;right:32px;top:15px;height:1px;background:var(--line);}
 .track .fill{position:absolute;left:32px;top:15px;height:1px;background:var(--gold);transform-origin:left;transform:scaleX(0);transition:transform 1.6s var(--ease) .4s;}
 .in .track .fill{transform:scaleX(1);}
@@ -210,7 +232,10 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .node.break .dot{background:repeating-linear-gradient(45deg,var(--ash) 0 2px,transparent 2px 4px);}
 .node.next .dot{border:1.5px solid var(--gold);animation:breathe 2.6s ease-in-out infinite;}
 .node.final .dot{width:30px;height:30px;margin:0;display:grid;place-items:center;font-size:14px;color:var(--gold);border-color:var(--gold);font-family:var(--jp);}
-.node .d{font-size:12px;color:var(--ash);font-variant-numeric:tabular-nums;}
+.node .d{font-size:11.5px;color:var(--gold);font-variant-numeric:tabular-nums;visibility:hidden;transform:translateY(-4px);transition:transform .35s var(--ease);}
+.node[aria-current="true"] .d,.node:hover .d{visibility:visible;transform:none;}
+.node .r{font-family:var(--latin);font-size:15px!important;letter-spacing:.04em;}
+.node.final .r{font-family:var(--serif);font-size:12.5px!important;}
 .node .r{font-size:12.5px;color:var(--bone-2);white-space:nowrap;transition:color .3s;}
 .node:hover .r,.node[aria-current="true"] .r{color:var(--gold);}
 .node[aria-current="true"] .dot{transform:scale(1.25);}
@@ -228,6 +253,14 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .mdetail li .k{font-family:var(--jp);color:var(--dc,var(--ash));}
 .ch-link{display:inline-block;margin-top:22px;font-size:13.5px;color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s,padding .4s var(--ease);}
 .ch-link:hover{color:var(--bone);border-color:var(--gold);padding-left:6px;}
+/* 每月月報 */
+.mrep{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;margin-top:22px;padding:14px 16px;border:1px solid rgba(212,162,76,.3);background:linear-gradient(100deg,rgba(212,162,76,.08),transparent 70%);max-width:34em;}
+.mrep .mi{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--gold);color:var(--gold);font-family:var(--jp);font-size:16px;}
+.mrep b{display:block;font-weight:500;font-size:14.5px;color:var(--bone);}
+.mrep small{display:block;font-size:12.5px;color:var(--bone-2);line-height:1.6;margin-top:2px;}
+.mrep a{font-size:13px;color:var(--gold);white-space:nowrap;border-bottom:1px solid rgba(212,162,76,.4);padding-bottom:2px;}
+.mrep a:hover{border-color:var(--gold);}
+@media(max-width:520px){.mrep{grid-template-columns:auto minmax(0,1fr);}.mrep a{grid-column:2;justify-self:start;}}
 .mnums b{display:block;font-size:28px;font-weight:300;line-height:1.1;font-variant-numeric:tabular-nums;}
 .mnums small{font-size:12.5px;color:var(--ash);}
 .ygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-top:28px;padding:1px 0 0 1px;}
@@ -694,35 +727,37 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
           <div class="mdetail" id="mdetail" aria-live="polite"></div>
           <aside class="stat rv" style="--i:4" aria-label="五個方向的累積">
             <div class="stat-top"><span id="pLabel">全卷累計</span><div class="tabs" id="pMode" role="group" aria-label="切換累計範圍"><button aria-pressed="true" data-m="all">全卷</button><button aria-pressed="false" data-m="ch">這一話</button></div></div>
-            <div class="pgrid"><div class="penta">
+            <div class="pent">
               <svg id="penta" viewBox="-190 -190 380 380" role="img" aria-label="五個方向的累積雷達圖">
                 {rings.map((r) => <polygon points={r} fill="none" style="stroke:var(--line)" />)}
                 {pillars.map((_, i) => { const [x, y] = pt(i, 1); return <line x1="0" y1="0" x2={x.toFixed(1)} y2={y.toFixed(1)} style="stroke:var(--line)" />; })}
                 <g class="grow"><polygon class="shape" id="pShape" points={shape} />
                   {pillars.map((p, i) => { const [x, y] = pt(i, val(p.slug)); return <circle class="pdot" cx={x.toFixed(1)} cy={y.toFixed(1)} r="4.5" style={`fill:var(--c-${p.slug})`} />; })}</g>
-                {pillars.map((p, i) => { const [x, y] = pt(i, 1.2); return <a href={`/pillars/${p.slug}`}><text class="axis" x={x.toFixed(1)} y={(y + 7).toFixed(1)} text-anchor="middle">{p.kanji}</text></a>; })}
               </svg>
+              {pillars.map((p, i) => { const [x, y] = pt(i, 1.42); return (
+                <a class="pv" href={`/pillars/${p.slug}`} style={`--dc:var(--c-${p.slug});left:${(50 + x * 68 / 380).toFixed(2)}%;top:${(50 + y * 68 / 380).toFixed(2)}%`}>
+                  <svg class="dring" data-ring={p.slug} viewBox="-16 -16 32 32" aria-hidden="true"></svg>
+                  <span class="pk">{p.kanji}</span>
+                  <span class="pn"><b class="num" data-d={p.slug}>{counts[p.slug]}</b><i data-dan={p.slug}>{dan(counts[p.slug])}</i></span>
+                </a>); })}
             </div>
-            <ul class="plegend" id="pLegend">
-              {pillars.map((p) => <li style={`--dc:var(--c-${p.slug})`}><a href={`/pillars/${p.slug}`}><span class="k">{p.kanji}</span><span class="n">{p.type}<small>{p.title}</small></span><svg class="dring" data-ring={p.slug} viewBox="-16 -16 32 32" aria-hidden="true"></svg><span class="nd"><b class="num" data-d={p.slug}>{counts[p.slug]}</b><span class="dan" data-dan={p.slug}>{dan(counts[p.slug])}</span></span></a></li>)}
-            </ul></div>
-            <p class="dir-note" id="pNote">小年輪：每升一段長一圈，外圈的弧＝離下一段還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。</p>
           </aside>
         </div>
       </div>
       <div id="vDream" hidden>
         <div class="cho-wrap">
-          <div class="cho-head"><span class="t">祈願所</span><span class="y">40 歲生日（{fortieth}）前要完成的事</span><span class="s">{dreams.intro}</span></div>
+          <div class="cho-head"><span class="t">祈願所</span><span class="y">40 歲生日（{fortieth}）前要完成的事</span></div>
           <div class="cho-scroll"><div class="cho-row">
-          {dreams.items.filter((d: any) => d.public).map((d: any, i: number) => { const st = ({ idea: '許願', doing: '進行中', done: '已實現' } as any)[d.state] || '許願'; const raw = Number(d.progress); const hasPg = d.progress !== '' && d.progress != null && Number.isFinite(raw); const pg = d.state === 'done' ? 100 : d.state === 'idea' ? 0 : Math.max(5, Math.min(100, hasPg ? Math.round(raw) : 30)); const g = d.state === 'idea' ? 0 : (0.4 + pg / 100 * 0.6).toFixed(2);
+          {dreams.items.filter((d: any) => d.public).map((d: any) => ({ d, k: d.state === 'done' ? 1000 : d.state === 'doing' ? 100 + (Number.isFinite(Number(d.progress)) && d.progress !== '' && d.progress != null ? Number(d.progress) : 30) : 0 })).sort((a: any, b: any) => b.k - a.k).map(({ d }: any, i: number) => { const st = ({ idea: '許願', doing: '進行中', done: '已實現' } as any)[d.state] || '許願'; const raw = Number(d.progress); const hasPg = d.progress !== '' && d.progress != null && Number.isFinite(raw); const pg = d.state === 'done' ? 100 : d.state === 'idea' ? 0 : Math.max(5, Math.min(100, hasPg ? Math.round(raw) : 30)); const g = d.state === 'idea' ? 0 : (0.4 + pg / 100 * 0.6).toFixed(2);
             const href = safeHref(d.link); const cls = `cho ${d.state}${href ? ' go' : ''}`; const sty = `--n:${i};--g:${g}`;
-            const inner = (<><div class="lan" aria-hidden="true">{href ? <span class="pin" title="可以點開">↗</span> : <span class="pin-none"></span>}<span class="str"></span><span class="cp"></span><span class="bd">願{d.state === 'done' && <span class="stamp">叶</span>}</span><span class="cp2"></span><span class="tas"></span></div>
+            const inner = (<><div class="lan" aria-hidden="true">{href ? <span class="pin" title="可以點開">↗</span> : <span class="pin-none"></span>}<span class="str"></span><span class="cp"></span><span class="bd">{d.state === 'doing' ? <span class="pct"><b>{pg}</b><small>%</small></span> : '願'}{d.state === 'done' && <span class="stamp">叶</span>}</span><span class="cp2"></span><span class="tas"></span></div>
               <h4>{d.title}</h4>
+              <p class="st">{st}{d.state === 'doing' && `・${pg}%`}</p>
+              {(d.why || d.note || d.help) && <div class="more">
               {d.why && <p class="why">{d.why}</p>}
               {d.note && <p class="memo">── {d.note}</p>}
-              {d.help && <p class="needs">需要幫忙：{d.help}</p>}
-              <p class="st">{st}{d.state === 'doing' && hasPg && `・${pg}%`}</p></>);
-            return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty}>{inner}</article>; })}
+              {d.help && <p class="needs">需要幫忙：{d.help}</p>}</div>}</>);
+            return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty} tabindex="0">{inner}</article>; })}
           </div></div>
           <p class="cho-hint">← 左右滑動看全部 →</p>
         </div>
@@ -962,7 +997,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var nr=list[Math.min(nextIdx,list.length-1)];
   var nrEl=document.getElementById('nextRel');if(nrEl)nrEl.innerHTML=(nr.no===0?'新連載・':'連載中・')+label(nr)+'・'+(+nr.date.slice(5,7))+' 月 '+(+nr.date.slice(8))+' 日刊出 <b>'+(nr.days<=0?'今天':nr.days+' 天後')+'</b>';
   var Tr=document.getElementById('track'),Md=document.getElementById('mdetail');
-  Tr.innerHTML=list.map(function(r,i){return '<li><button class="node '+r.state+(r.final?' final':'')+'" data-i="'+i+'" aria-label="'+label(r)+'，'+md(r)+'"><span class="dot">'+(r.final?'巻':'')+'</span><span class="r">'+label(r)+'</span><span class="d">'+md(r)+'</span></button></li>';}).join('')
+  Tr.innerHTML=list.map(function(r,i){return '<li><button class="node '+r.state+(r.final?' final':'')+'" data-i="'+i+'" aria-label="'+label(r)+'，'+md(r)+'"><span class="dot">'+(r.final?'巻':'')+'</span><span class="r">'+(r.final?'第一卷':r.no)+'</span><span class="d">'+md(r)+'</span></button></li>';}).join('')
     +'<span class="fill" style="width:calc((100% - 64px) * '+Math.max(0,nextIdx-.5)/(list.length-1)+')"></span>';
 
   function items(arr,withDir){return '<ul>'+arr.map(function(x){var d=withDir&&x.dir?dirOf(x.dir):null;return '<li'+(d?' style="--dc:'+col(d.id)+'"':'')+'><span class="k">'+(d?d.k:'・')+'</span><span>'+esc(x.text||x)+'</span></li>';}).join('')+'</ul>';}
@@ -977,7 +1012,9 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var es=D.entries.filter(inRange),total=es.length,showT=!r.final&&(r.state!=='future');
     var cc={};D.dirs.forEach(function(d){cc[d.id]=es.filter(function(e){return e.dir===d.id;}).length;});
     var topD=D.dirs.slice().sort(function(a,b){return cc[b.id]-cc[a.id];})[0],hasTop=showT&&cc[topD.id]>0;
-    Md.innerHTML='<p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+'<div class="mnums"><div><b class="num">'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>'+(hasTop?'<span style="color:'+col(topD.id)+'">'+topD.k+'</span> '+topD.n:'—')+'</b><small>這一話寫最多的方向</small></div></div><a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>';
+    Md.innerHTML='<p class="tag">'+st+'・'+r.date.replace(/-/g,'.')+'</p><h3>'+label(r)+'　'+esc(r.title)+'</h3>'+b+'<div class="mnums"><div><b class="num">'+(showT?total:'—')+'</b><small>'+(r.state==='next'?'這一話目前的文章':'這一話的文章')+'</small></div><div><b>'+(hasTop?'<span style="color:'+col(topD.id)+'">'+topD.k+'</span> '+topD.n:'—')+'</b><small>這一話寫最多的方向</small></div></div><a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>'
+      +(r.final?'':'<div class="mrep"><span class="mi" aria-hidden="true">報</span><div><b>'+(r.state==='done'&&r.report?'這一話的月報':'每月 2 號・月報')+'</b><small>'+(r.state==='done'&&r.report?'整理成一份 PDF，可以直接下載。':(+r.date.slice(5,7))+' 月 2 日，這個月的日常紀錄會依方向自動整理成月報，寄給支持者。')+'</small></div>'
+      +(r.state==='done'&&r.report?'<a href="'+esc(r.report)+'" target="_blank" rel="noopener">下載 PDF ↓</a>':'<a href="#support">收月報 →</a>')+'</div>');
     CUR={counts:cc,label:showT?label(r)+'（'+from.slice(5).replace('-','.')+'–'+md(r)+'）':label(r)+'・尚未開始'};if(PM==='ch')penta('ch');}
   /* 五角形：全卷累計 ↔ 這一話 */
   var PM='all',CUR=null,PS=document.getElementById('pShape'),PD=[].slice.call(document.querySelectorAll('#penta .pdot')),PL=document.getElementById('pLabel'),PMB=document.getElementById('pMode');
@@ -996,7 +1033,6 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     PD.forEach(function(el,i){el.setAttribute('cx',pts[i][0].toFixed(1));el.setAttribute('cy',pts[i][1].toFixed(1));});
     var prog=function(n){var T=[0,10,30,60,100];if(n>=100)return 100;for(var k=1;k<T.length;k++)if(n<T[k])return Math.round((n-T[k-1])/(T[k]-T[k-1])*100);return 100;};
     D.dirs.forEach(function(d){var n=c[d.id]||0;document.querySelector('[data-d="'+d.id+'"]').textContent=n;document.querySelector('[data-dan="'+d.id+'"]').textContent=m==='all'?dan(n):(n?'+'+n:'—');ring(document.querySelector('[data-ring="'+d.id+'"]'),n,m==='all'?null:n/top);});
-    var PN=document.getElementById('pNote');if(PN)PN.textContent=m==='all'?'小年輪：每升一段長一圈，外圈的弧＝離下一段還差多少。段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段。':'小年輪的弧＝這一話各方向的比例。';
     PL.textContent=m==='all'?'全卷累計':(CUR?CUR.label:'這一話');
     PMB.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===m);});}
   PMB.addEventListener('click',function(e){var b=e.target.closest('button');if(b)penta(b.dataset.m);});
@@ -1008,6 +1044,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function view(v){MV.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});V1.hidden=v!=='one';V3.hidden=v!=='dream';}
   if(location.hash==='#dreams'||location.hash==='#kiganjo')view('dream');
   MV.addEventListener('click',function(e){var b=e.target.closest('button');if(b)view(b.dataset.v);});
+  document.querySelectorAll('article.cho').forEach(function(c){c.addEventListener('click',function(){c.classList.toggle('open');});});
 })();
 
 
