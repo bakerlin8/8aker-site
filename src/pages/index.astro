@@ -9,6 +9,7 @@ import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
 import { allEntries } from '../data/journal';
+import { workColor, colorVars } from '../data/work-colors';
 const endRing = buildRing(copy.birth_date);
 // 實績數字（三格）暫時隱藏：資料與 Studio 都保留，改回 true 就會重新出現
 const SHOW_PROOF = false;
@@ -584,13 +585,13 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .deck-stage{position:absolute;inset:0;transform-style:preserve-3d;}
 .deck .work{position:absolute;left:50%;top:70px;width:min(380px,78vw);margin-left:calc(min(380px,78vw) / -2);min-height:420px;transition:transform .8s var(--ease),opacity .6s var(--ease),filter .6s var(--ease),box-shadow .6s;will-change:transform;}
 .deck .work:not(.on){cursor:pointer;}
+.deck .work .wthumb{aspect-ratio:16/6;}
+.deck:has(.wthumb){height:640px;}
+@media(max-width:640px){.deck:has(.wthumb){height:620px;}}
 .deck .work:not(.on) .wmore{opacity:0;}
 .deck .work.on{box-shadow:0 30px 60px -30px rgba(0,0,0,.8);}
 .deck .work.on::before{transform:scaleX(1);}
-/* 作品卡色塊：三色輪替（葡萄酒／松綠／藏青），文字維持金與米白 */
-.deck.tint .work[data-c="0"]{--wb:#4A1424;--wb2:#2E0C16;--dc:#E0A2B0;}
-.deck.tint .work[data-c="1"]{--wb:#1E3A33;--wb2:#12241F;--dc:#9CC7B2;}
-.deck.tint .work[data-c="2"]{--wb:#1E2B47;--wb2:#121A2C;--dc:#A9BDE6;}
+/* 作品卡色塊：顏色在 src/data/work-colors.ts，依順序六色輪替，也可在 Studio 指定；文字維持金與米白 */
 .deck.tint .work{background:linear-gradient(165deg,var(--wb),var(--wb2));border-color:rgba(255,255,255,.08);}
 .deck.tint .work .wthumb{border-bottom-color:rgba(255,255,255,.08);}
 .deck.tint .work .meta span:first-child{color:var(--dc);}
@@ -666,7 +667,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="deck tint rv" style="--i:2" id="deck" tabindex="0" role="region" aria-roledescription="輪播" aria-label="作品唱盤：左右滑動或用方向鍵切換">
         <div class="deck-stage" id="deckStage">
         {worksData.works.map((w, i) => { return (
-          <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};--dc:var(--gold)`} data-c={i % 3} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看完整作品<i aria-hidden="true">→</i></span>}</a>
+          <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};${colorVars(workColor(w, i))}`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品日誌<i aria-hidden="true">→</i></span>}</a>
         ); })}
         </div>
       </div>
@@ -1022,8 +1023,6 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
 
-/* 作品卡色塊：預覽比較用，網址加 ?wc=0 看原本的單色版 */
-(function(){var d=document.getElementById('deck');if(d&&/[?&]wc=0/.test(location.search))d.classList.remove('tint');})();
 /* 服務卡：游標位置的聚光 */
 (function(){var H=document.getElementById('hats');if(!H)return;
   H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();

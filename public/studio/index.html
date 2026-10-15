@@ -74,7 +74,7 @@ input,textarea,select{font-family:inherit;}
 .field{margin-bottom:22px;}
 .field-label{display:block;font-size:12px;letter-spacing:0.04em;color:var(--ink-mute);margin-bottom:7px;font-weight:500;}
 .field-hint{font-size:11px;color:var(--ink-ghost);margin-top:5px;}
-.field input[type=text],.field input[type=date],.field textarea{
+.field input[type=text],.field input[type=date],.field textarea,.field select{
   width:100%;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;
   padding:11px 13px;font-size:13.5px;color:var(--ink);transition:border-color 0.2s;
 }
@@ -801,8 +801,16 @@ async function loadWorks() {
         <div class="field"><label class="field-label">作品頁的簡短介紹（選填）</label><textarea rows="3" data-w="${i}" data-key="intro">${escapeHtml(w.intro || '')}</textarea></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
           <div class="field"><label class="field-label">影片連結（YouTube／Vimeo，選填）</label><input type="text" data-w="${i}" data-key="video" value="${escapeAttr(w.video || '')}" placeholder="https://youtu.be/…"></div>
-          <div class="field"><label class="field-label">工具網址（有公開才填，會出現「打開看看」）</label><input type="text" data-w="${i}" data-key="link" value="${escapeAttr(w.link || '')}" placeholder="https://…"></div>
+          <div class="field"><label class="field-label">網站網址（有公開才填，作品頁會出現「網站」區塊）</label><input type="text" data-w="${i}" data-key="link" value="${escapeAttr(w.link || '')}" placeholder="https://…"></div>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <div class="field"><label class="field-label">網站名稱（選填，空白就顯示網域）</label><input type="text" data-w="${i}" data-key="link_label" value="${escapeAttr(w.link_label || '')}" placeholder="例：8AKER零 官方網站"></div>
+          <div class="field"><label class="field-label">卡片色塊</label><select data-w="${i}" data-key="color">${[['', '自動（依順序輪替）'], ['wine', '葡萄酒'], ['pine', '松綠'], ['navy', '藏青'], ['chestnut', '栗色'], ['plum', '葡萄紫'], ['celadon', '青磁']].map(([k, n]) => `<option value="${k}" ${(w.color || '') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+        </div>
+        <div class="field"><label class="field-label">網站截圖（作品頁「網站」區塊的畫面；直式長截圖最好，滑鼠移上去會慢慢往下捲）</label>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">${w.site_shot ? `<img src="${escapeAttr(w.site_shot)}" alt="" style="width:120px;aspect-ratio:16/10;object-fit:cover;object-position:top;background:#ddd;border:1px solid var(--border)">` : ''}
+            <label class="btn btn-ghost" style="cursor:pointer">${w.site_shot ? '換一張' : '上傳網站截圖'}<input type="file" accept="image/*" data-shot="${i}" style="display:none"></label>
+            ${w.site_shot ? `<button type="button" class="btn btn-ghost" data-noshot="${i}">不放截圖</button>` : '<span class="field-hint" style="margin:0">沒放的話，會用第一張截圖；都沒有就顯示網域名稱</span>'}</div></div>
         <div class="field"><label class="field-label">截圖（第一張會當作品卡的縮圖）</label>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${(w.images || []).map((im, j) => `
             <div style="border:1px solid var(--border);padding:6px;background:var(--warm-white)"><img src="${escapeAttr(im.src)}" alt="" style="width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#ddd">
@@ -817,6 +825,14 @@ async function loadWorks() {
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.works[i - 1], data.works[i]] = [data.works[i], data.works[i - 1]]; render(); }));
     form.querySelectorAll('[data-imup]').forEach(b => b.addEventListener('click', () => { collect(); const [i, j] = b.dataset.imup.split(':').map(Number); const a = data.works[i].images; [a[j - 1], a[j]] = [a[j], a[j - 1]]; render(); }));
     form.querySelectorAll('[data-imdel]').forEach(b => b.addEventListener('click', () => { collect(); const [i, j] = b.dataset.imdel.split(':').map(Number); data.works[i].images.splice(j, 1); render(); }));
+    form.querySelectorAll('[data-noshot]').forEach(btn => btn.addEventListener('click', () => { collect(); data.works[+btn.dataset.noshot].site_shot = ''; render(); }));
+    form.querySelectorAll('[data-shot]').forEach(inp => inp.addEventListener('change', async () => {
+      collect(); const w = data.works[+inp.dataset.shot]; const f = inp.files[0]; if (!f) return;
+      if (!/^[a-z0-9-]+$/.test(w.slug || '')) { toast('請先填「網址代號」（英文小寫、數字、-）再上傳', 'err'); inp.value = ''; return; }
+      try { toast('上傳中…'); const b64 = await compressImage(f); const path = `public/works/${w.slug}/site-${Date.now()}.webp`;
+        await ghPutBinary(path, b64, `Upload site screenshot for ${w.slug} via Studio`); w.site_shot = path.replace(/^public/, ''); toast('已上傳，記得按「儲存變更」'); render(); }
+      catch (e) { toast('上傳失敗：' + e.message, 'err'); }
+    }));
     form.querySelectorAll('[data-upload]').forEach(inp => inp.addEventListener('change', async () => {
       collect(); const i = +inp.dataset.upload, w = data.works[i];
       if (!/^[a-z0-9-]+$/.test(w.slug || '')) { toast('請先填「網址代號」（英文小寫、數字、-）再上傳', 'err'); inp.value = ''; return; }

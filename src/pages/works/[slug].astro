@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import worksData from '../../data/works.json';
 import { safeImg, safeLink, videoEmbed, entriesForWork } from '../../data/work-utils';
+import { workColor, colorVars } from '../../data/work-colors';
 
 export async function getStaticPaths() {
   const list = (worksData.works as any[]).filter((w) => /^[a-z0-9-]+$/.test(w.slug || ''));
@@ -12,6 +13,10 @@ const imgs: string[] = (w.images || []).map((x: any) => (typeof x === 'string' ?
 const caps: string[] = (w.images || []).map((x: any) => (typeof x === 'string' ? '' : x?.caption || ''));
 const vid = videoEmbed(w.video || '');
 const link = safeLink(w.link || '');
+const domain = link ? (() => { try { return new URL(link).host.replace(/^www\./, ''); } catch { return ''; } })() : '';
+const siteName = (w.link_label || '').trim() || domain;
+const shot = safeImg(w.site_shot || '') || imgs[0] || '';
+const C = workColor(w, no - 1);
 const log = await entriesForWork(w.slug);
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const NO = String(no).padStart(2, '0');
@@ -27,10 +32,40 @@ const schema = [
 ];
 ---
 <BaseLayout title={`${w.title} — 有點樣子 — 8AKER零`} description={desc} schema={schema} type="article">
+<div class="wpage" style={colorVars(C)}>
 <style is:global>
-.wh{position:relative;overflow:hidden;background:radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 56px;}
+.wh{position:relative;overflow:hidden;background:radial-gradient(90% 80% at 88% 0%,var(--wb) 0%,transparent 70%),radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 56px;}
 .wh-in{max-width:880px;margin:0 auto;position:relative;}
-.wh .no{position:absolute;right:-20px;top:-70px;font-family:var(--latin);font-size:220px;line-height:1;color:#D4A24C;opacity:.07;pointer-events:none;}
+.wh .no{position:absolute;right:-20px;top:-70px;font-family:var(--latin);font-size:240px;line-height:1;color:var(--dc);opacity:.12;pointer-events:none;}
+.wh .meta b{color:var(--dc)!important;}
+/* ── 網站區塊：瀏覽器外框＋截圖，滑過時畫面慢慢往下捲 ── */
+.site{display:block;color:inherit;}
+.bframe{display:block;border:1px solid rgba(255,255,255,.1);background:linear-gradient(165deg,var(--wb),var(--wb2));box-shadow:0 30px 60px -30px rgba(0,0,0,.7);transition:transform .6s var(--ease),box-shadow .6s var(--ease),border-color .4s;}
+.site:hover .bframe{transform:translateY(-4px);border-color:color-mix(in srgb,var(--dc) 55%,transparent);box-shadow:0 40px 70px -30px rgba(0,0,0,.8);}
+.bbar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
+.bbar i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.18);}
+.bbar i:first-child{background:var(--dc);opacity:.8;}
+.bbar .url{flex:1;margin:0 10px;padding:5px 12px;border-radius:20px;background:rgba(0,0,0,.28);font-family:var(--sans,system-ui);font-size:12.5px;color:rgba(239,229,214,.75);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bbar .url b{color:#EFE5D6;font-weight:400;}
+.bbar .go{font-size:15px;color:var(--dc);transition:transform .45s var(--ease);}
+.site:hover .bbar .go{transform:translate(3px,-3px);}
+.bview{display:block;position:relative;aspect-ratio:16/10;overflow:hidden;background:rgba(0,0,0,.22);}
+.bview:has(.bph){aspect-ratio:16/9;}
+.bview img{width:100%;height:100%;object-fit:cover;object-position:top;transition:object-position 6s ease-in-out;}
+.site:hover .bview img{object-position:bottom;}
+.bph{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:10px;text-align:center;background:radial-gradient(70% 70% at 50% 40%,color-mix(in srgb,var(--dc) 18%,transparent),transparent 70%),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 28px),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 28px);}
+.bph .dom{font-family:var(--latin);font-weight:500;font-size:clamp(30px,6vw,58px);letter-spacing:.04em;color:#EFE5D6;}
+.bph .sub{font-size:13px;letter-spacing:.2em;color:var(--dc);}
+.site-row{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap;}
+.site-row .nm{font-family:var(--serif);font-size:16px;color:var(--bone);}
+.site-row .nm small{display:block;font-family:var(--latin);font-size:13px;letter-spacing:.06em;color:var(--ash);}
+.site-go{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 20px;border:1px solid var(--gold);color:var(--bone);font-size:14px;position:relative;overflow:hidden;isolation:isolate;transition:color .4s var(--ease);}
+.site-go i{font-style:normal;}
+.site-go::before{content:'';position:absolute;inset:0;z-index:-1;background:#D4A24C;transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease);}
+.site:hover .site-go,.site-go:hover{color:#1C0F14;}
+.site:hover .site-go::before,.site-go:hover::before{transform:scaleX(1);}
+@media(max-width:720px){.bview{aspect-ratio:4/5;}.bview:has(.bph){aspect-ratio:4/3;}.site-go{flex:1 1 100%;justify-content:center;}}
+@media(prefers-reduced-motion:reduce){.bview img,.bframe{transition:none;}}
 .wh .crumb{font-size:13px;color:#86707A;display:flex;gap:10px;flex-wrap:wrap;}
 .wh .crumb a{border-bottom:1px solid rgba(239,229,214,.15);transition:color .3s,border-color .3s;}
 .wh .crumb a:hover{color:#EFE5D6;border-color:#D4A24C;}
@@ -84,11 +119,17 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       {w.why && <blockquote class="wq"><small>BEFORE</small>{w.why}</blockquote>}
       {w.result && <blockquote class="wq af"><small>AFTER</small>{w.result}</blockquote>}
     </div>}
-    {link && <a class="open" href={link} target="_blank" rel="noopener">打開看看 ↗</a>}
+    {link && <a class="open" href={link} target="_blank" rel="noopener">前往網站 ↗</a>}
   </div>
 </header>
 <main class="wb">
   <div class="wb-in">
+    {link && <section aria-label="網站"><h2>網站<small>WEBSITE</small></h2>
+      <a class="site" href={link} target="_blank" rel="noopener">
+        <span class="bframe"><span class="bbar" aria-hidden="true"><i></i><i></i><i></i><span class="url">https://<b>{domain}</b></span><span class="go">↗</span></span>
+          <span class="bview">{shot ? <img src={shot} alt={`${siteName} 的畫面`} loading="lazy" decoding="async" /> : <span class="bph"><span class="dom">{domain}</span><span class="sub">點開進入網站</span></span>}</span></span>
+        <span class="site-row"><span class="nm">{siteName}{siteName !== domain && <small>{domain}</small>}</span><span class="site-go">前往網站<i aria-hidden="true">↗</i></span></span>
+      </a></section>}
     {vid && <section aria-label="影片"><h2>影片<small>VIDEO</small></h2>
       <div class="vid">{vid.kind === 'iframe'
         ? <iframe src={vid.src} title={`${w.title} 影片`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -106,6 +147,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
   </div>
 </main>
 <dialog class="lb" id="lb" aria-label="放大畫面"><button class="x" type="button" aria-label="關閉">×</button><img alt="" /><p></p></dialog>
+</div>
 <script>
 (function(){var d=document.getElementById('lb') as HTMLDialogElement|null;if(!d||!d.showModal)return;var im=d.querySelector('img') as HTMLImageElement,cp=d.querySelector('p') as HTMLElement;
   document.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('[data-lb]') as HTMLElement|null;if(!b)return;im.src=b.dataset.lb||'';im.alt=b.dataset.cap||'';cp.textContent=b.dataset.cap||'';d.showModal();});
