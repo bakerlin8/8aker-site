@@ -750,6 +750,12 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .twb-err{margin-top:10px;font-size:13px;color:#8A2B3D;}
 .twb-go{width:100%;min-height:50px;margin-top:18px;background:linear-gradient(135deg,#4A1524,#1C0F14);color:#F3E9DA;border:1px solid rgba(212,162,76,.45);font-size:15px;letter-spacing:.1em;}
 .twb-go[disabled]{opacity:.6;}
+.twb-f small{display:block;margin-top:6px;font-size:11.5px;line-height:1.6;color:#7A6A6C;}
+.twb-f textarea{width:100%;padding:10px 12px;border:1px solid rgba(28,15,20,.25);background:#F7F0E5;font-size:16px;color:#1C0F14;border-radius:0;resize:vertical;font-family:inherit;}
+.twb-f textarea:focus{outline:2px solid #D4A24C;outline-offset:1px;}
+.twb-paid{margin-top:20px;}
+.twb-back{display:block;margin:12px auto 0;min-height:44px;padding:0 12px;font-size:13px;color:#5B4B4E;text-decoration:underline;text-underline-offset:3px;}
+.twb-thanks{margin-top:18px;font-family:var(--serif);font-size:20px;color:#1C0F14;}
 .twb-fine{margin-top:10px;font-size:11.5px;line-height:1.7;color:#7A6A6C;}
 .twb-msg{margin-top:16px;font-size:13px;line-height:1.75;color:#5B4B4E;}
 @media(max-width:400px){.give-cta{gap:10px;padding:12px 14px 12px 12px;grid-template-columns:40px minmax(0,1fr) auto;}.gc-ic{width:40px;height:40px;}.gc-t b{font-size:16px;letter-spacing:.03em;}.gc-t small{font-size:11.5px;letter-spacing:.01em;}}
@@ -1066,7 +1072,22 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
                 <div class="acct"><dt>帳號</dt><dd><span data-f="acct" class="num"></span><button type="button" class="twb-copy" data-copy>複製帳號</button></dd></div>
                 <div><dt>戶名</dt><dd data-f="holder"></dd></div>
               </dl>
-              {C.tw_bank_msg && <p class="twb-msg">{fillIg(C.tw_bank_msg)}</p>}
+              <button type="button" class="twb-go twb-paid" data-paid>我轉好了</button>
+              <p class="twb-fine">轉好之後按這裡，告訴我末五碼和金額，方便我對帳。晚點再回來按也可以。</p>
+            </div>
+            <form class="twb-form twb-rep" data-step="report" novalidate hidden>
+              <p class="twb-lead">謝謝您！填好這兩項，我就能對到您的轉帳。</p>
+              <label class="twb-f"><span>轉出帳號末五碼</span><input name="last5" inputmode="numeric" pattern="[0-9]*" maxlength="20" autocomplete="off" required placeholder="例：12345"><small>您轉出那個帳號的最後五個數字，網銀的轉帳完成畫面就看得到。</small></label>
+              <label class="twb-f"><span>金額（新台幣）</span><input name="amount" inputmode="numeric" maxlength="20" autocomplete="off" required placeholder="例：500"></label>
+              <label class="twb-f"><span>想說的話（選填）</span><textarea name="msg" rows="2" maxlength="300" placeholder="想對我說的話"></textarea></label>
+              <p class="twb-err" role="alert" hidden></p>
+              <button class="twb-go" type="submit">送出</button>
+              <button type="button" class="twb-back" data-back>← 回到帳號</button>
+            </form>
+            <div class="twb-done" data-step="done" hidden>
+              <p class="twb-thanks">收到了，謝謝您 🙏</p>
+              {C.tw_bank_msg && <p class="twb-msg">{C.tw_bank_msg.replace('轉好了之後，', '確認入帳後，')}</p>}
+              <button type="button" class="twb-back" data-close>關閉</button>
             </div>
           </div>
         </dialog>}
@@ -1358,24 +1379,43 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .catch(function(err){M.className='fmsg err';M.textContent=(err&&err.message)||'送出失敗，請稍後再試。';window.sfx&&sfx('error');})
       .then(function(){btn.disabled=false;});});})();
 
-/* 台灣轉帳：留下稱呼＋聯絡方式 → 由 Supabase tw-bank 回傳帳號（帳號不在網頁原始碼裡） */
+/* 台灣轉帳：留下稱呼＋聯絡方式 → 由 Supabase tw-bank 回傳帳號 → 轉好後回報末五碼＋金額（帳號不在網頁原始碼裡） */
 (function(){var D=document.getElementById('twBank'),B=document.querySelector('[data-bank]');if(!D||!B)return;
-  var F=D.querySelector('.twb-form'),S=D.querySelector('.twb-show'),E=D.querySelector('.twb-err'),G=D.querySelector('.twb-go'),t0=0,ig=B.dataset.ig||'';
-  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/tw-bank';
-  function open(e){e.preventDefault();t0=Date.now();if(D.showModal)D.showModal();else D.setAttribute('open','');setTimeout(function(){var i=F.querySelector('input[name=name]');if(i&&!S.hidden===false)i.focus();},60);}
-  B.addEventListener('click',open);
-  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();});
-  function err(m){E.textContent=m;E.hidden=false;}
-  F.addEventListener('submit',function(e){e.preventDefault();E.hidden=true;
+  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/tw-bank',KEY='twb1',ig=B.dataset.ig||'',t0=0,cur=null;
+  var F=D.querySelector('[data-step=ask]'),S=D.querySelector('[data-step=show]'),R=D.querySelector('[data-step=report]'),K=D.querySelector('[data-step=done]');
+  function step(x){[F,S,R,K].forEach(function(el){el.hidden=el!==x;});var i=x.querySelector('input');if(i&&x!==S)setTimeout(function(){i.focus();},60);}
+  function load(){try{var v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&Date.now()-v.ts<14*864e5)return v;}catch(e){}return null;}
+  function save(v){try{localStorage.setItem(KEY,JSON.stringify(v));}catch(e){}}
+  function fillBank(k){D.querySelectorAll('[data-f]').forEach(function(el){el.textContent=k[el.dataset.f]||'';});}
+  function err(form,m){var e=form.querySelector('.twb-err');e.textContent=m;e.hidden=!m;}
+  function post(body){return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){return {s:r.status,d:d};});});}
+  B.addEventListener('click',function(e){e.preventDefault();t0=Date.now();cur=load();
+    if(cur&&cur.bank&&!cur.done){fillBank(cur.bank);step(S);}else{if(cur&&cur.done){F.name.value=cur.name||'';F.contact.value=cur.contact||'';}step(F);}
+    if(D.showModal)D.showModal();else D.setAttribute('open','');});
+  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-paid]'))step(R);});
+  var G=F.querySelector('.twb-go');
+  F.addEventListener('submit',function(e){e.preventDefault();err(F,'');
     var name=F.name.value.trim(),contact=F.contact.value.trim();
-    if(!name){err('請填寫稱呼');F.name.focus();return;}if(contact.length<3){err('請填寫聯絡方式（IG、Email 或 LINE ID）');F.contact.focus();return;}
+    if(!name){err(F,'請填寫稱呼');F.name.focus();return;}if(contact.length<3){err(F,'請填寫聯絡方式（IG、Email 或 LINE ID）');F.contact.focus();return;}
     G.disabled=true;G.textContent='讀取中…';
-    fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name,contact:contact,website:F.website.value,t:Date.now()-t0,lang:navigator.language||''})})
-      .then(function(r){return r.json().then(function(d){return {s:r.status,d:d};});})
-      .then(function(x){if(x.d&&x.d.ok&&x.d.bank){var k=x.d.bank;D.querySelectorAll('[data-f]').forEach(function(el){el.textContent=k[el.dataset.f]||'';});F.hidden=true;S.hidden=false;return;}
-        if(x.d&&x.d.error==='not_ready'){err('轉帳帳號準備中，先請你 IG 私訊我，謝謝！');if(ig){G.textContent='改用 IG 私訊';G.disabled=false;G.onclick=function(ev){ev.preventDefault();window.open(ig,'_blank','noopener');};return;}}
-        else err((x.d&&x.d.error)||'暫時無法顯示，請稍後再試');G.disabled=false;G.textContent='顯示轉帳帳號';})
-      .catch(function(){err('網路好像不太穩，請再試一次');G.disabled=false;G.textContent='顯示轉帳帳號';});});
+    post({name:name,contact:contact,website:F.website.value,t:Date.now()-t0,lang:navigator.language||''}).then(function(x){
+      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
+      if(x.d&&x.d.error==='not_ready'){err(F,'轉帳帳號準備中，先請您 IG 私訊我，謝謝！');if(ig){G.textContent='改用 IG 私訊';G.disabled=false;G.onclick=function(ev){ev.preventDefault();window.open(ig,'_blank','noopener');};return;}}
+      else err(F,(x.d&&x.d.error)||'暫時無法顯示，請稍後再試');G.disabled=false;G.textContent='顯示轉帳帳號';})
+      .catch(function(){err(F,'網路好像不太穩，請再試一次');G.disabled=false;G.textContent='顯示轉帳帳號';});});
+  var H=R.querySelector('.twb-go');
+  R.last5.addEventListener('input',function(){var v=this.value.replace(/\D/g,'');if(v.length>5)v=v.slice(-5);this.value=v;});
+  R.amount.addEventListener('input',function(){this.value=this.value.replace(/[^\d]/g,'').slice(0,7);});
+  R.addEventListener('submit',function(e){e.preventDefault();err(R,'');
+    var l5=R.last5.value,am=R.amount.value;
+    if(!/^\d{5}$/.test(l5)){err(R,'末五碼請填 5 個數字');R.last5.focus();return;}if(!(+am>=1)){err(R,'請填寫轉帳金額');R.amount.focus();return;}
+    if(!cur||!cur.id){err(R,'找不到剛剛的紀錄，請重新索取帳號');return;}
+    H.disabled=true;H.textContent='送出中…';
+    post({action:'report',id:cur.id,last5:l5,amount:am,msg:R.msg.value,website:''}).then(function(x){H.disabled=false;H.textContent='送出';
+      if(x.d&&x.d.ok){cur.done=true;cur.ts=Date.now();save(cur);step(K);return;}
+      if(x.s===404||x.s===400&&/紀錄/.test(x.d.error||'')){try{localStorage.removeItem(KEY);}catch(e){}}
+      err(R,(x.d&&x.d.error)||'暫時無法送出，請稍後再試');})
+      .catch(function(){H.disabled=false;H.textContent='送出';err(R,'網路好像不太穩，請再試一次');});});
   var C=D.querySelector('[data-copy]');if(C)C.addEventListener('click',function(){var t=(D.querySelector('[data-f=acct]').textContent||'').replace(/[^0-9]/g,'');
     var done=function(){C.textContent='已複製';C.classList.add('ok');setTimeout(function(){C.textContent='複製帳號';C.classList.remove('ok');},1800);};
     if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});});})();
