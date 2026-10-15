@@ -27,6 +27,18 @@ Deno.serve(async (req) => {
       await db(`inquiries?id=eq.${b.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
       return reply({ ok: true });
     }
+    // 台灣轉帳帳號（私密）：只存在 app_config，不進 GitHub
+    if (b.action === 'bank_get') {
+      const cfg: any[] = await db('app_config?key=eq.tw_bank&select=value,updated_at');
+      return reply({ bank: cfg[0]?.value ? JSON.parse(cfg[0].value) : null, updated_at: cfg[0]?.updated_at || null });
+    }
+    if (b.action === 'bank_set') {
+      const c = (v: unknown, n: number) => String(v ?? '').trim().slice(0, n);
+      const bank = { name: c(b.name, 60), acct: c(b.acct, 40), holder: c(b.holder, 60) };
+      if (bank.acct && !/^[0-9 -]{6,40}$/.test(bank.acct)) return reply({ error: '帳號只能有數字、空格和 -' }, 400);
+      await db('app_config?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify([{ key: 'tw_bank', value: JSON.stringify(bank), updated_at: new Date().toISOString() }]) });
+      return reply({ ok: true });
+    }
     return reply({ error: 'bad_request' }, 400);
   } catch (e) { return reply({ error: 'server_error' }, 500); }
 });
