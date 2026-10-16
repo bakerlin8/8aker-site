@@ -89,7 +89,7 @@
   "hats": [
     {
       "k": "AI",
-      "title": "AI 工作流",
+      "title": "AI・優化工作流",
       "desc": "把重複的事交給 AI，省下時間。",
       "items": [
         "AI 小工具",
