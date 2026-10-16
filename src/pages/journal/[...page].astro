@@ -55,6 +55,9 @@ const schema = [
 .jr:hover h2{color:var(--gold);}
 .jr:hover .arrow{opacity:1;transform:none;}
 @media(hover:none){.jr:hover{padding-left:0;}.jr:hover h2{color:inherit;}}
+/* 圓章裡的字置中：正方形、不被擠壓；Safari 用表意字框裁切，讓漢字剛好落在圓心 */
+@media(max-width:640px){.jrow .k,.jr .k{box-sizing:border-box;flex:none;aspect-ratio:1;line-height:1;text-align:center;padding:0;}}
+@supports (text-box:trim-both ideographic){@media(max-width:640px){.jrow .k,.jr .k{text-box:trim-both ideographic;}}}
 @keyframes kping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--dc) 40%,transparent);}100%{box-shadow:0 0 0 10px color-mix(in srgb,var(--dc) 0%,transparent);}}
 @media(prefers-reduced-motion:reduce){.jr .k:not(.pop){transform:none;opacity:1;}}
 .dft{display:inline-block;font-family:var(--sans,inherit);font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px dashed var(--gold);color:var(--gold);vertical-align:2px;}

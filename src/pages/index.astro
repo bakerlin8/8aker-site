@@ -446,6 +446,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   .jrow .k.pop{animation:kping 1.4s ease-out .55s 1;}
   .jrow:active .k{background:var(--dc);color:var(--night);transform:scale(.92);}
 }
+/* 圓章裡的字置中：正方形、不被擠壓；Safari 用表意字框裁切，讓漢字剛好落在圓心 */
+@media(max-width:640px){.jrow .k,.jr .k{box-sizing:border-box;flex:none;aspect-ratio:1;line-height:1;text-align:center;padding:0;}}
+@supports (text-box:trim-both ideographic){@media(max-width:640px){.jrow .k,.jr .k{text-box:trim-both ideographic;}}}
 @keyframes kping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--dc) 40%,transparent);}100%{box-shadow:0 0 0 10px color-mix(in srgb,var(--dc) 0%,transparent);}}
 @media(hover:none){.jrow:hover h3{color:inherit;transform:none;}}
 @media(prefers-reduced-motion:reduce){.jrow .k:not(.pop){transform:none;opacity:1;}}
