@@ -849,7 +849,9 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 .svc-list li::before{content:'';position:absolute;left:0;top:.8em;width:6px;height:1px;background:rgb(var(--hc));}
 .svc-card .svc-ex{font-size:12.5px;color:#9C8790;}
 .svc-card .svc-price{font-size:13px;letter-spacing:.08em;color:rgb(var(--hl));}
-.svc-cta{display:inline-block;margin-top:24px;padding:12px 22px;border:1px solid rgb(var(--hc));color:rgb(var(--hl));letter-spacing:.12em;font-size:14px;transition:background .3s,color .3s;}
+.svc-ctas{margin-top:26px;padding-top:20px;border-top:1px solid rgba(var(--hc),.28);display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
+.svc-cta-col p{margin:0 0 8px;font-size:12px;letter-spacing:.16em;color:#B9A89E;}
+.svc-cta{display:block;text-align:center;padding:12px 14px;border:1px solid rgb(var(--hc));color:rgb(var(--hl));letter-spacing:.1em;font-size:14px;transition:background .3s,color .3s;}
 .svc-cta:hover{background:rgb(var(--hc));color:#1C0F14;}
 @media(max-width:640px){.svc-in{padding:30px 20px 24px;}.svc-dlg::after{font-size:150px;}}
 @media(prefers-reduced-motion:reduce){.svc-dlg[open]::backdrop,.svc-dlg.closing::backdrop{animation:none;}}
@@ -998,7 +1000,10 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
                   <p class="svc-ex">（樣品文字）每個流程都不一樣，先聊聊你現在怎麼做，再決定做什麼。</p>
                 </section>
               )}
-              <a class="svc-cta" href="/chat/">有空聊聊 →</a>
+              <div class="svc-ctas">
+                {igUrl && <div class="svc-cta-col"><p>已經有聯絡方式</p><a class="svc-cta" href={igUrl} target="_blank" rel="noopener">直接私訊 Instagram →</a></div>}
+                <div class="svc-cta-col"><p>初次見面</p><a class="svc-cta" href="/chat/">先填表打招呼 →</a></div>
+              </div>
             </div>
           </dialog>
         );
