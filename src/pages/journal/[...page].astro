@@ -54,7 +54,9 @@ const schema = [
 .jr:hover .k{background:var(--dc);color:var(--night);}
 .jr:hover h2{color:var(--gold);}
 .jr:hover .arrow{opacity:1;transform:none;}
-@media(hover:none){.jr:hover{padding-left:0;}.jr:hover .k{background:none;color:var(--dc);}.jr:hover h2{color:inherit;}}
+@media(hover:none){.jr:hover{padding-left:0;}.jr:hover h2{color:inherit;}}
+@keyframes kping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--dc) 40%,transparent);}100%{box-shadow:0 0 0 10px color-mix(in srgb,var(--dc) 0%,transparent);}}
+@media(prefers-reduced-motion:reduce){.jr .k:not(.pop){transform:none;opacity:1;}}
 .dft{display:inline-block;font-family:var(--sans,inherit);font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px dashed var(--gold);color:var(--gold);vertical-align:2px;}
 .pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:40px;font-size:14px;}
 .pager .nums{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
@@ -65,7 +67,7 @@ const schema = [
 .jl-foot{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);font-size:13.5px;}
 .jl-foot a{color:var(--bone-2);border-bottom:1px solid var(--line);padding-bottom:3px;transition:color .3s,border-color .3s;}
 .jl-foot a:hover{color:var(--bone);border-color:var(--gold);}
-@media(max-width:700px){.jh{padding:96px 20px 40px;}.jl-sec{padding:40px 20px 72px;}.jr{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;}.jr time{grid-column:1;grid-row:1;}.jr .k{grid-column:2;grid-row:1;width:28px;height:28px;font-size:16px;align-self:center;}.jr>div{grid-column:1/-1;grid-row:2;}.jr:hover{padding-left:0;}.jr .arrow{display:none;}.pager{font-size:13px;}}
+@media(max-width:700px){.jh{padding:96px 20px 40px;}.jl-sec{padding:40px 20px 72px;}.jr{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;}.jr time{grid-column:1;grid-row:1;}.jr .k{grid-column:2;grid-row:1;width:34px;height:34px;font-size:17px;align-self:center;background:color-mix(in srgb,var(--dc) 13%,transparent);border:1px solid color-mix(in srgb,var(--dc) 45%,transparent);}.jr .k:not(.pop){transform:scale(.4) rotate(-25deg);opacity:0;}.jr .k{transition:transform .7s cubic-bezier(.34,1.56,.64,1) .25s,opacity .4s ease .25s,background .25s,color .25s;}.jr .k.pop{animation:kping 1.4s ease-out .55s 1;}.jr:active .k{background:var(--dc);color:var(--night);}.jr>div{grid-column:1/-1;grid-row:2;}.jr:hover{padding-left:0;}.jr .arrow{display:none;}.pager{font-size:13px;}}
 </style>
 <section class="jh">
   <div class="jh-in">

@@ -302,6 +302,10 @@ footer.site-foot a:hover{color:#EFE5D6;}
   if(RM){targets.forEach(function(t){t.classList.add('in');});}
   else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
     targets.forEach(function(t){io.observe(t);});}
+  // 日常紀錄的類別圓章：各自滑進畫面時才彈出（手機版）
+  var ks=document.querySelectorAll('.jrow .k,.jr .k');
+  if(RM||!('IntersectionObserver' in window)){ks.forEach(function(k){k.classList.add('pop');});}
+  else{var ko=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('pop');ko.unobserve(e.target);}});},{threshold:.6});ks.forEach(function(k){ko.observe(k);});}
   // highlight current section in the nav
   var links=[].slice.call(document.querySelectorAll('.nav a'));
   var secs=links.map(function(a){var id=a.getAttribute('href').split('#')[1];return id&&document.getElementById(id);});
