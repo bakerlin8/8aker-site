@@ -1,4 +1,4 @@
-// 結尾小年輪：每一歲一圈，30 歲前玫瑰色（台灣）、之後金色（日本）、往右上偏移；只有今年這一圈亮起來。
+// 結尾小年輪：每一歲一圈，30 歲前梅花粉紅（台灣）、之後金色（日本）、往右上偏移；只有今年這一圈亮起來。
 export function buildRing(birth: string) {
   const [by, bm, bd] = String(birth || '1987-10-02').split('-').map(Number);
   const now = new Date(Date.now() + 9 * 3600e3);
