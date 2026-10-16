@@ -814,6 +814,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .hats .hat:hover::before{opacity:1;animation:hatSpin 2.4s linear infinite;}
 .hats .hat:hover .hk{text-shadow:0 0 18px rgba(var(--hl),.8);color:rgb(var(--hl));}
 .hats .hat:hover .hitems li{border-color:rgba(var(--hl),.6);}
+/* 字標浮水印：大字淡淡地從卡底浮上來 */
+.hats .hat::after{content:attr(data-k);position:absolute;right:-6px;bottom:-26px;font-family:var(--jp);font-size:120px;line-height:1;color:rgba(var(--hc),.16);z-index:0;transform:translateY(24px) scale(.9);opacity:0;transition:transform .7s var(--ease),opacity .5s;pointer-events:none;}
+.hats .hat:hover::after{transform:none;opacity:1;}
 @keyframes hatSpin{to{--ang:360deg;}}
 @media(hover:none){.hats .hat{border-left:2px solid rgb(var(--hc));}}
 @media(prefers-reduced-motion:reduce){.hats .hat,.hats .hat::before,.hats .hat::after{transition:none!important;animation:none!important;}}
@@ -931,7 +934,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>我能幫上忙的事</h3></div>
       <ol class="hats" id="hats">
         {services.hats.map((h: any, i: number) => (
-          <li class="hat rv" style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
+          <li class="hat rv" data-k={h.k} style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
         ))}
       </ol>
       {SHOW_PROOF && <ul class="proof rv" style="--i:6">{services.proof.map((x: any) => <li><b class="num flap" data-v={x.num} aria-label={x.num}>{x.num}</b><small>{x.label}</small></li>)}</ul>}
