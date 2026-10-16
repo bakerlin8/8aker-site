@@ -301,7 +301,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cc-cols .vd{font-family:"Hiragino Sans","PingFang TC","Noto Sans CJK TC","Source Han Sans TC","Yu Gothic","Microsoft JhengHei",var(--sans,sans-serif)!important;}
 .cc-cols .vn{inline-size:4.6em;line-height:1.2;font-family:var(--serif);font-size:15px;color:var(--bone);letter-spacing:.12em;}
 .cc-cols button>span{flex:none;}
-.cc-cols .vt{inline-size:176px;font-family:var(--serif);font-size:13px;line-height:1.55;letter-spacing:.06em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.cc-cols .vt{display:block;inline-size:176px;block-size:calc(2 * 1.6em);max-block-size:calc(2 * 1.6em);font-family:var(--serif);font-size:13px;line-height:1.6;letter-spacing:.06em;overflow:hidden;word-break:break-all;}
 .cc-cols .vd{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;inline-size:5.6em;line-height:1.2;text-align:center;}
 .cc-cols .vd{font-size:11.5px;color:var(--ash);letter-spacing:.08em;}
 .cc-cols .future{opacity:.5;}
@@ -438,7 +438,20 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .jrow:hover h3{color:var(--gold);transform:translateX(4px);}
 .jrow:hover .arrow{opacity:1;transform:none;}
 .jempty{padding:20px 0;color:var(--ash);}
-@media(max-width:640px){.jrow{grid-template-columns:1fr;gap:2px;}.jrow .arrow{display:none;}}
+@media(max-width:640px){.jrow{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;}.jrow time{grid-column:1;grid-row:1;}.jrow .k{grid-column:2;grid-row:1;width:34px;height:34px;font-size:17px;align-self:center;}.jrow>div{grid-column:1/-1;grid-row:2;}.jrow .arrow{display:none;}}
+@media(max-width:640px){
+  .jrow .k{background:color-mix(in srgb,var(--dc) 13%,transparent);border:1px solid color-mix(in srgb,var(--dc) 45%,transparent);box-shadow:0 0 0 0 color-mix(in srgb,var(--dc) 35%,transparent);}
+  .jrow .k:not(.pop){transform:scale(.4) rotate(-25deg);opacity:0;}
+  .jrow .k{transition:transform .7s cubic-bezier(.34,1.56,.64,1) .25s,opacity .4s ease .25s,background .25s,color .25s;}
+  .jrow .k.pop{animation:kping 1.4s ease-out .55s 1;}
+  .jrow:active .k{background:var(--dc);color:var(--night);transform:scale(.92);}
+}
+/* 圓章裡的字置中：正方形、不被擠壓；Safari 用表意字框裁切，讓漢字剛好落在圓心 */
+@media(max-width:640px){.jrow .k,.jr .k{box-sizing:border-box;flex:none;aspect-ratio:1;line-height:1;text-align:center;padding:0;}}
+@supports (text-box:trim-both ideographic){@media(max-width:640px){.jrow .k,.jr .k{text-box:trim-both ideographic;}}}
+@keyframes kping{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--dc) 40%,transparent);}100%{box-shadow:0 0 0 10px color-mix(in srgb,var(--dc) 0%,transparent);}}
+@media(hover:none){.jrow:hover h3{color:inherit;transform:none;}}
+@media(prefers-reduced-motion:reduce){.jrow .k:not(.pop){transform:none;opacity:1;}}
 
 /* ── 陸 about ── */
 .about{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;margin-top:36px;}
