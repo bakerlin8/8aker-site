@@ -79,6 +79,10 @@ const pageData = {
 };
 const safeHref = (u: string) => (/^(\/(?!\/)|https:\/\/)/.test(u || '') ? u : '');
 const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url || '') && st.name).map((st) => ({ ...st, img: /^https:\/\//.test(st.img || '') ? st.img : '' }));
+// 服務卡燈箱：每張卡對應哪幾張服務內容（樣品）、每張卡的色調（與 .hats .hat:nth-child 一致）
+const HAT_SVC: Record<string, string[]> = { '築': ['property', 'owner'], '旅': ['omakase'] };
+const svcById: Record<string, any> = Object.fromEntries((services.services as any[]).map((x) => [x.id, x]));
+const HAT_COL = [['196,86,107', '236,160,176'], ['212,162,76', '243,217,160'], ['214,196,172', '245,234,218']];
 const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 ---
 <BaseLayout>
@@ -817,6 +821,38 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 /* 字標浮水印：大字淡淡地從卡底浮上來 */
 .hats .hat::after{content:attr(data-k);position:absolute;right:-6px;bottom:-26px;font-family:var(--jp);font-size:120px;line-height:1;color:rgba(var(--hc),.16);z-index:0;transform:translateY(24px) scale(.9);opacity:0;transition:transform .7s var(--ease),opacity .5s;pointer-events:none;}
 .hats .hat:hover::after{transform:none;opacity:1;}
+/* 服務卡燈箱 */
+.hat-hit{position:absolute;inset:0;z-index:2;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.hat-hit:focus-visible{outline:2px solid rgba(var(--hl),.85);outline-offset:3px;}
+.hmore{display:inline-block;margin-top:14px;font-size:12px;letter-spacing:.18em;color:rgb(var(--hc));opacity:.85;transition:transform .4s var(--ease),opacity .3s,color .3s;}
+.hats .hat:hover .hmore{transform:translateX(4px);opacity:1;color:rgb(var(--hl));}
+html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
+.svc-dlg{border:1px solid rgba(var(--hc),.5);padding:0;margin:auto;width:min(580px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:hidden;color:#EFE5D6;background:radial-gradient(420px circle at 85% 0%,rgba(var(--hc),.22),transparent 70%),linear-gradient(160deg,rgba(var(--hc),.2),rgba(var(--hc),.05) 70%),#26141B;box-shadow:0 40px 80px -24px rgba(0,0,0,.75);}
+.svc-dlg::backdrop{background:rgba(20,8,12,.66);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);}
+.svc-dlg[open]::backdrop{animation:svcbd .45s ease both;}
+.svc-dlg.closing::backdrop{animation:svcbd .38s ease reverse both;}
+@keyframes svcbd{from{opacity:0;}to{opacity:1;}}
+.svc-dlg::after{content:attr(data-k);position:absolute;right:-8px;bottom:-40px;font-family:var(--jp);font-size:190px;line-height:1;color:rgba(var(--hc),.14);pointer-events:none;z-index:0;}
+.svc-in{position:relative;z-index:1;max-height:calc(100dvh - 42px);overflow:auto;overscroll-behavior:contain;padding:34px 30px 28px;}
+.svc-x{position:absolute;top:8px;right:8px;width:44px;height:44px;font-size:26px;line-height:1;color:#B9A89E;background:none;border:0;cursor:pointer;transition:color .3s;}
+.svc-x:hover{color:rgb(var(--hl));}
+.svc-k{margin:0;font-size:12px;letter-spacing:.2em;color:rgb(var(--hc));}
+.svc-in h3{margin-top:8px;font-family:var(--serif);font-weight:500;font-size:clamp(22px,3vw,26px);color:#EFE5D6;}
+.svc-desc{margin-top:8px;color:#B9A89E;line-height:1.8;}
+.svc-card{margin-top:20px;padding-top:18px;border-top:1px solid rgba(var(--hc),.28);}
+.svc-card h4{font-family:var(--serif);font-weight:500;font-size:18px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;color:#EFE5D6;}
+.svc-card h4 small{font-size:12px;letter-spacing:.14em;color:rgb(var(--hc));}
+.svc-card p{margin-top:8px;font-size:14.5px;line-height:1.8;color:#D8CABD;}
+.svc-card .svc-for{font-size:13.5px;color:#B9A89E;}
+.svc-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:7px;}
+.svc-list li{position:relative;padding-left:16px;font-size:14px;line-height:1.7;color:#EFE5D6;}
+.svc-list li::before{content:'';position:absolute;left:0;top:.8em;width:6px;height:1px;background:rgb(var(--hc));}
+.svc-card .svc-ex{font-size:12.5px;color:#9C8790;}
+.svc-card .svc-price{font-size:13px;letter-spacing:.08em;color:rgb(var(--hl));}
+.svc-cta{display:inline-block;margin-top:24px;padding:12px 22px;border:1px solid rgb(var(--hc));color:rgb(var(--hl));letter-spacing:.12em;font-size:14px;transition:background .3s,color .3s;}
+.svc-cta:hover{background:rgb(var(--hc));color:#1C0F14;}
+@media(max-width:640px){.svc-in{padding:30px 20px 24px;}.svc-dlg::after{font-size:150px;}}
+@media(prefers-reduced-motion:reduce){.svc-dlg[open]::backdrop,.svc-dlg.closing::backdrop{animation:none;}}
 @keyframes hatSpin{to{--ang:360deg;}}
 @media(hover:none){.hats .hat{border-left:2px solid rgb(var(--hc));}}
 @media(prefers-reduced-motion:reduce){.hats .hat,.hats .hat::before,.hats .hat::after{transition:none!important;animation:none!important;}}
@@ -934,9 +970,39 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
       <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>有聯絡直接聊，初見面先填表</h3></div>
       <ol class="hats" id="hats">
         {services.hats.map((h: any, i: number) => (
-          <li class="hat rv" data-k={h.k} style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}</div></li>
+          <li class="hat rv" data-k={h.k} style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}<span class="hmore" aria-hidden="true">看內容 ＋</span></div><button type="button" class="hat-hit" data-open={`svc-${i}`} aria-haspopup="dialog" aria-label={`${h.title}：查看服務內容`}></button></li>
         ))}
       </ol>
+      {services.hats.map((h: any, i: number) => {
+        const list = (HAT_SVC[h.k] || []).map((id) => svcById[id]).filter(Boolean);
+        const c = HAT_COL[i % 3];
+        return (
+          <dialog class="svc-dlg" id={`svc-${i}`} data-k={h.k} aria-labelledby={`svc-h-${i}`} style={`--hc:${c[0]};--hl:${c[1]}`}>
+            <div class="svc-in">
+              <button type="button" class="svc-x" data-close aria-label="關閉">×</button>
+              <p class="svc-k">{h.provider}</p>
+              <h3 id={`svc-h-${i}`}>{h.title}</h3>
+              <p class="svc-desc">{h.desc}</p>
+              {list.length ? list.map((x: any) => (
+                <section class="svc-card">
+                  <h4>{x.name}{x.name_jp && <small>{x.name_jp}</small>}</h4>
+                  <p class="svc-for">{x.for}</p>
+                  <p>{x.desc}</p>
+                  <ul class="svc-list">{(x.items || []).map((t: string) => <li>{t}</li>)}</ul>
+                  {x.excludes && x.excludes.length > 0 && <p class="svc-ex">不含：{x.excludes.join('、')}</p>}
+                  <p class="svc-price">{x.price}</p>
+                </section>
+              )) : (
+                <section class="svc-card">
+                  <ul class="svc-list">{(h.items || []).map((t: string) => <li>{t}</li>)}</ul>
+                  <p class="svc-ex">（樣品文字）每個流程都不一樣，先聊聊你現在怎麼做，再決定做什麼。</p>
+                </section>
+              )}
+              <a class="svc-cta" href="/chat/">有空聊聊 →</a>
+            </div>
+          </dialog>
+        );
+      })}
       {SHOW_PROOF && <ul class="proof rv" style="--i:6">{services.proof.map((x: any) => <li><b class="num flap" data-v={x.num} aria-label={x.num}>{x.num}</b><small>{x.label}</small></li>)}</ul>}
     </div>
   </div>
@@ -1438,6 +1504,28 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 /* 服務卡：游標位置的聚光 */
 (function(){var H=document.getElementById('hats');if(!H)return;
   H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();
+
+/* 服務卡燈箱：從被點的卡片放大展開，關閉時縮回去（樣品） */
+(function(){var H=document.getElementById('hats');if(!H||typeof HTMLDialogElement==='undefined')return;
+  var RM=matchMedia('(prefers-reduced-motion:reduce)').matches,busy=false,from=null;
+  function openD(btn){var li=btn.closest('.hat'),d=document.getElementById(btn.dataset.open);if(!d||d.open||busy||typeof d.showModal!=='function')return;
+    from=li;d.showModal();if(RM)return;
+    var a=li.getBoundingClientRect(),b=d.getBoundingClientRect(),inn=d.querySelector('.svc-in');
+    var sx=a.width/b.width,sy=a.height/b.height,dx=a.left-b.left,dy=a.top-b.top;busy=true;
+    var an=d.animate([{transformOrigin:'0 0',transform:'translate('+dx+'px,'+dy+'px) scale('+sx+','+sy+')',opacity:.35},{transformOrigin:'0 0',transform:'none',opacity:1}],{duration:520,easing:'cubic-bezier(.16,1,.3,1)'});
+    inn.animate([{opacity:0},{opacity:0,offset:.45},{opacity:1}],{duration:520,easing:'ease-out'});
+    an.finished.then(function(){busy=false;},function(){busy=false;});}
+  function closeD(d){if(!d.open||busy)return;
+    if(RM||!from){d.close();return;}
+    var a=from.getBoundingClientRect(),b=d.getBoundingClientRect(),inn=d.querySelector('.svc-in');
+    var sx=a.width/b.width,sy=a.height/b.height,dx=a.left-b.left,dy=a.top-b.top;busy=true;d.classList.add('closing');
+    inn.animate([{opacity:1},{opacity:0}],{duration:160,fill:'forwards'});
+    var an=d.animate([{transformOrigin:'0 0',transform:'none',opacity:1},{transformOrigin:'0 0',transform:'translate('+dx+'px,'+dy+'px) scale('+sx+','+sy+')',opacity:.3}],{duration:380,easing:'cubic-bezier(.5,0,.2,1)',fill:'forwards'});
+    an.finished.then(function(){d.close();an.cancel();inn.getAnimations().forEach(function(x){x.cancel();});d.classList.remove('closing');busy=false;var h=from&&from.querySelector('.hat-hit');if(h)h.focus({preventScroll:true});},function(){d.classList.remove('closing');busy=false;});}
+  H.addEventListener('click',function(e){var b=e.target.closest('.hat-hit');if(b)openD(b);});
+  document.querySelectorAll('.svc-dlg').forEach(function(d){
+    d.addEventListener('click',function(e){if(e.target===d||e.target.closest('[data-close]'))closeD(d);});
+    d.addEventListener('cancel',function(e){e.preventDefault();closeD(d);});});})();
 
 /* 實績數字：月台翻牌。捲到時每一格從 0 一張一張翻到目標字；滑鼠移上去會再翻一次 */
 (function(){var els=document.querySelectorAll('.flap');if(!els.length)return;
