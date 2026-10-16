@@ -853,6 +853,16 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 .svc-cta-col p{margin:0 0 8px;font-size:12px;letter-spacing:.16em;color:#B9A89E;}
 .svc-cta{display:block;text-align:center;padding:12px 14px;border:1px solid rgb(var(--hc));color:rgb(var(--hl));letter-spacing:.1em;font-size:14px;transition:background .3s,color .3s;}
 .svc-cta:hover{background:rgb(var(--hc));color:#1C0F14;}
+/* 箭頭：細線＋雙層尖角；hover 時線伸長、尖角往前滑（可重複使用，任何有 hover 的按鈕裡放 <span class="arw"><i></i></span>） */
+.arw{display:inline-block;position:relative;width:34px;height:12px;margin-left:8px;vertical-align:middle;}
+.arw::before{content:'';position:absolute;left:0;top:50%;width:26px;height:1px;background:currentColor;transform:translateY(-.5px);transition:width .5s var(--ease);}
+.arw::after,.arw i{content:'';position:absolute;top:50%;width:7px;height:7px;border-top:1px solid currentColor;border-right:1px solid currentColor;transform:translateY(-50%) rotate(45deg);transition:transform .5s var(--ease),opacity .4s;}
+.arw::after{left:18px;}
+.arw i{left:13px;opacity:.5;transition-delay:.05s;}
+.svc-cta:hover .arw::before,.svc-cta:focus-visible .arw::before,.svc-cta:active .arw::before{width:32px;}
+.svc-cta:hover .arw::after,.svc-cta:focus-visible .arw::after,.svc-cta:active .arw::after,.svc-cta:hover .arw i,.svc-cta:focus-visible .arw i,.svc-cta:active .arw i{transform:translate(6px,-50%) rotate(45deg);}
+.svc-cta:hover .arw i,.svc-cta:focus-visible .arw i,.svc-cta:active .arw i{opacity:1;}
+@media(prefers-reduced-motion:reduce){.arw::before,.arw::after,.arw i{transition:none;}}
 @media(max-width:640px){.svc-in{padding:30px 20px 24px;}.svc-dlg::after{font-size:150px;}}
 @media(prefers-reduced-motion:reduce){.svc-dlg[open]::backdrop,.svc-dlg.closing::backdrop{animation:none;}}
 @keyframes hatSpin{to{--ang:360deg;}}
@@ -1001,8 +1011,8 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
                 </section>
               )}
               <div class="svc-ctas">
-                {igUrl && <div class="svc-cta-col"><p>已有聯絡</p><a class="svc-cta" href={igUrl} target="_blank" rel="noopener">私訊講 →</a></div>}
-                <div class="svc-cta-col"><p>初次見面</p><a class="svc-cta" href="/chat/">先填表 →</a></div>
+                {igUrl && <div class="svc-cta-col"><p>已有聯絡</p><a class="svc-cta" href={igUrl} target="_blank" rel="noopener">私訊講<span class="arw" aria-hidden="true"><i></i></span></a></div>}
+                <div class="svc-cta-col"><p>初次見面</p><a class="svc-cta" href="/chat/">先填表<span class="arw" aria-hidden="true"><i></i></span></a></div>
               </div>
             </div>
           </dialog>
