@@ -301,7 +301,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cc-cols .vd{font-family:"Hiragino Sans","PingFang TC","Noto Sans CJK TC","Source Han Sans TC","Yu Gothic","Microsoft JhengHei",var(--sans,sans-serif)!important;}
 .cc-cols .vn{inline-size:4.6em;line-height:1.2;font-family:var(--serif);font-size:15px;color:var(--bone);letter-spacing:.12em;}
 .cc-cols button>span{flex:none;}
-.cc-cols .vt{inline-size:176px;font-family:var(--serif);font-size:13px;line-height:1.55;letter-spacing:.06em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.cc-cols .vt{display:block;inline-size:176px;block-size:calc(2 * 1.6em);max-block-size:calc(2 * 1.6em);font-family:var(--serif);font-size:13px;line-height:1.6;letter-spacing:.06em;overflow:hidden;word-break:break-all;}
 .cc-cols .vd{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;inline-size:5.6em;line-height:1.2;text-align:center;}
 .cc-cols .vd{font-size:11.5px;color:var(--ash);letter-spacing:.08em;}
 .cc-cols .future{opacity:.5;}
@@ -438,7 +438,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .jrow:hover h3{color:var(--gold);transform:translateX(4px);}
 .jrow:hover .arrow{opacity:1;transform:none;}
 .jempty{padding:20px 0;color:var(--ash);}
-@media(max-width:640px){.jrow{grid-template-columns:1fr;gap:2px;}.jrow .arrow{display:none;}}
+@media(max-width:640px){.jrow{grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;}.jrow time{grid-column:1;grid-row:1;}.jrow .k{grid-column:2;grid-row:1;width:28px;height:28px;font-size:16px;align-self:center;}.jrow>div{grid-column:1/-1;grid-row:2;}.jrow .arrow{display:none;}}
+@media(hover:none){.jrow:hover .k{background:none;color:var(--dc);}.jrow:hover h3{color:inherit;transform:none;}}
 
 /* ── 陸 about ── */
 .about{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:56px;margin-top:36px;}
