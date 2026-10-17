@@ -753,6 +753,8 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .twb-dl>div{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(28,15,20,.14);}
 .twb-dl dt{font-size:12px;letter-spacing:.12em;color:#7A6A6C;}
 .twb-dl dd{margin:0;font-size:15px;word-break:break-all;}
+.twb-dl dd[data-f=name],.twb-dl dd[data-f=holder]{font-size:20px;letter-spacing:.04em;}
+.twb-dl dt{font-size:13px;}
 .twb-dl .acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
 @font-face{font-family:"Outfit";src:url("/fonts/outfit-500.woff2") format("woff2");font-weight:500;font-display:swap;unicode-range:U+0020-007F;}
 .twb-dl .acct .num{white-space:nowrap;font-family:"Outfit",var(--sans,sans-serif);font-weight:500;font-size:clamp(19px,5.8vw,27px);letter-spacing:.08em;font-variant-numeric:tabular-nums lining-nums;color:#1C0F14;}
@@ -1161,7 +1163,6 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
               <p class="twb-lead">留下稱呼和聯絡方式，就會顯示轉帳帳號。<br>收到後我會親自跟你說謝謝。</p>
               <label class="twb-f"><span>稱呼</span><input name="name" autocomplete="nickname" maxlength="60" required placeholder="怎麼稱呼你"></label>
               <label class="twb-f"><span>聯絡方式</span><input name="contact" autocomplete="email" maxlength="120" required placeholder="IG 帳號、Email 或 LINE ID"></label>
-              <label class="twb-f"><span>想說的話（選填）</span><textarea name="msg" rows="2" maxlength="300" placeholder="想對我說的話，轉好之後我會看到"></textarea></label>
               <label class="twb-hp" aria-hidden="true">網站<input name="website" tabindex="-1" autocomplete="off"></label>
               <p class="twb-err" role="alert" hidden></p>
               <button class="twb-go" type="submit">顯示轉帳帳號</button>
@@ -1170,10 +1171,11 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             <div class="twb-show" data-step="show" hidden>
               <dl class="twb-dl">
                 <div><dt>銀行</dt><dd data-f="name"></dd></div>
-                <div class="acct"><dt>帳號</dt><dd><span data-f="acct" class="num" data-copy role="button" tabindex="0" title="點一下複製"></span><button type="button" class="twb-copy" data-copy>一鍵複製帳號</button></dd></div>
+
                 <div><dt>戶名</dt><dd data-f="holder"></dd></div>
+                <div class="acct"><dt>帳號</dt><dd><span data-f="acct" class="num" data-copy role="button" tabindex="0" title="點一下複製"></span><button type="button" class="twb-copy" data-copy>一鍵複製帳號</button></dd></div>
               </dl>
-              <button type="button" class="twb-go twb-paid" data-paid>我轉好了</button>
+              <button type="button" class="twb-go twb-paid" data-paid>轉好了</button>
               <p class="twb-fine">點帳號或按上面的按鈕就能複製，貼到網銀即可。轉好之後按這裡，告訴我末五碼和金額，方便我對帳。晚點再回來按也可以。</p>
             </div>
             <form class="twb-form twb-rep" data-step="report" novalidate hidden>
@@ -1496,14 +1498,14 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   B.addEventListener('click',function(e){e.preventDefault();t0=Date.now();cur=load();
     if(cur&&cur.bank&&!cur.done){fillBank(cur.bank);step(S);}else{if(cur&&cur.done){F.name.value=cur.name||'';F.contact.value=cur.contact||'';}step(F);}
     if(D.showModal)D.showModal();else D.setAttribute('open','');});
-  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-paid]')){if(cur&&cur.msg&&!R.msg.value)R.msg.value=cur.msg;step(R);}});
+  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-paid]')){step(R);}});
   var G=F.querySelector('.twb-go');
   F.addEventListener('submit',function(e){e.preventDefault();err(F,'');
     var name=F.name.value.trim(),contact=F.contact.value.trim();
     if(!name){err(F,'請填寫稱呼');F.name.focus();return;}if(contact.length<3){err(F,'請填寫聯絡方式（IG、Email 或 LINE ID）');F.contact.focus();return;}
     G.disabled=true;G.textContent='讀取中…';
     post({name:name,contact:contact,website:F.website.value,t:Date.now()-t0,lang:navigator.language||''}).then(function(x){
-      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,msg:F.msg.value.trim(),ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
+      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
       if(x.d&&x.d.error==='not_ready'){err(F,'轉帳帳號準備中，先請您 IG 私訊我，謝謝！');if(ig){G.textContent='改用 IG 私訊';G.disabled=false;G.onclick=function(ev){ev.preventDefault();window.open(ig,'_blank','noopener');};return;}}
       else err(F,(x.d&&x.d.error)||'暫時無法顯示，請稍後再試');G.disabled=false;G.textContent='顯示轉帳帳號';})
       .catch(function(){err(F,'網路好像不太穩，請再試一次');G.disabled=false;G.textContent='顯示轉帳帳號';});});
