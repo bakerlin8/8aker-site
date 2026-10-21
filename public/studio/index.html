@@ -376,7 +376,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-links">
       <div class="page-eyebrow">Short links</div>
       <div class="page-title">短網址・自訂短碼</div>
-      <div class="page-sub">8aker0.com/後面接一個短碼，就會轉到你指定的地方。作品頁的短網址會自動產生（下方「作品自動」），其他想用的可以自己新增。存檔後約 1～2 分鐘生效。</div>
+      <div class="page-sub">8aker0.com/後面接一個短碼，就會轉到你指定的地方。作品頁的短網址會自動產生（標示「作品自動」），其他想用的按「新增短碼」；要改自訂的，點那一列的「編輯」。存檔後約 1～2 分鐘生效。</div>
       <div id="linksForm"></div>
     </section>
 
@@ -970,65 +970,91 @@ async function loadLinks() {
   if (!Array.isArray(data.links)) data.links = [];
   const works = wfile ? (JSON.parse(wfile.content).works || []).filter(w => /^[a-z0-9-]+$/.test(w.slug || '')) : [];
   const norm = v => String(v || '').trim().replace(/^\/+/, '').toLowerCase();
-  function collect() {
-    form.querySelectorAll('[data-l]').forEach(el => { const l = data.links[+el.dataset.l]; l[el.dataset.key] = el.value; });
-  }
-  function check(l, i) {
+  const full = c => `${SITE_ORIGIN}/${c}`;
+  let openSet = new Set(); // 目前展開編輯的列（用物件參照，刪除／新增後不會錯位）
+  data.links.forEach(l => { l._k = Math.random().toString(36).slice(2); });
+  function check(l) {
     const c = norm(l.code), to = String(l.to || '').trim();
     if (!c) return '請填短碼';
     if (!LINK_CODE.test(c)) return '短碼只能用小寫英文、數字、連字號（最多 41 字）';
     if (LINK_RESERVED.includes(c)) return `「${c}」已是網站頁面的名稱，請換一個`;
     if (works.some(w => w.slug === c)) return `「${c}」已被作品短網址使用`;
-    if (data.links.some((o, j) => j !== i && norm(o.code) === c)) return '短碼重複了';
+    if (data.links.some(o => o !== l && norm(o.code) === c)) return '短碼重複了';
     if (!to) return '請填要轉去的網址';
     if (!/^(https?:\/\/|\/(?!\/))/.test(to)) return '網址要以 https:// 開頭，或以 / 開頭（站內頁面）';
     return '';
   }
-  const full = c => `${SITE_ORIGIN}/${c}`;
-  const row = (code, to, note, tag, extra) => `<div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-      <span style="flex:0 0 auto;font-size:11px;letter-spacing:.1em;padding:2px 8px;border:1px solid var(--border)">${tag}</span>
-      <span style="flex:1 1 220px;min-width:0"><b style="word-break:break-all">${escapeHtml(full(code))}</b><br><span style="font-size:12.5px;color:#7A6A6C;word-break:break-all">→ ${escapeHtml(to)}${note ? '　' + escapeHtml(note) : ''}</span></span>
-      <span style="display:flex;gap:6px">${extra || ''}<button class="btn btn-ghost" data-copy="${escapeAttr(full(code))}">複製</button><a class="btn btn-ghost" href="${escapeAttr(full(code))}" target="_blank" rel="noopener">開啟</a></span>
-    </div>`;
+  const rowBox = 'padding:12px 0;border-bottom:1px solid var(--border)';
+  const tagCss = 'flex:0 0 auto;font-size:11px;letter-spacing:.1em;padding:2px 8px;border:1px solid var(--border)';
+  function collect() {
+    form.querySelectorAll('[data-l]').forEach(el => { const l = data.links.find(x => x._k === el.dataset.l); if (l) l[el.dataset.key] = el.value; });
+  }
+  /* 只更新文字，不重畫（重畫會吃掉正在填的欄位和按下去的按鈕） */
+  function refreshRow(l) {
+    const e = check(l), root = form.querySelector(`[data-row="${l._k}"]`); if (!root) return;
+    const c = norm(l.code);
+    root.querySelector('[data-url]').textContent = c ? full(c) : '（還沒填短碼）';
+    root.querySelector('[data-to]').textContent = '→ ' + (String(l.to || '').trim() || '（還沒填網址）') + (l.note ? '　' + l.note : '');
+    const st = root.querySelector('[data-status]'); st.textContent = e ? '✗ ' + e : '✓ 可用'; st.style.color = e ? '#B23A48' : '#3E6B4A';
+    const badge = root.querySelector('[data-badge]'); badge.textContent = e ? '有問題' : ''; badge.hidden = !e;
+    root.querySelector('[data-copy]').dataset.copy = c ? full(c) : '';
+    const a = root.querySelector('[data-open]'); a.href = c ? full(c) : '#';
+  }
   function render() {
-    const errs = data.links.map(check);
+    const total = data.links.length + works.length;
     form.innerHTML = `
       <div class="hb-card">
-        <div class="field-label" style="margin-bottom:6px">全部短網址（${errs.filter(e => !e).length + works.length} 條）</div>
-        <div style="font-size:12.5px;color:#7A6A6C;line-height:1.7;margin-bottom:6px">自訂 ${errs.filter(e => !e).length} 條、作品自動 ${works.length} 條。目前網站沒有點擊統計。</div>
-        ${data.links.filter((l, i) => !errs[i]).map(l => row(norm(l.code), l.to, l.note, '自訂')).join('')}
-        ${works.map(w => row(w.slug, `/works/${w.slug}/`, w.title, '作品自動')).join('')}
-      </div>
-      <div class="hb-card">
-        <div class="field-label" style="margin-bottom:12px">編輯自訂短碼</div>
-        ${data.links.length ? data.links.map((l, i) => `
-        <div style="padding:12px 0;border-bottom:1px solid var(--border)">
-          <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:10px">
-            <div class="field" style="margin:0"><label class="field-label">短碼　${SITE_ORIGIN.replace('https://', '')}/</label><input type="text" data-l="${i}" data-key="code" value="${escapeAttr(l.code || '')}" maxlength="41" placeholder="例：ig" autocapitalize="off" spellcheck="false"></div>
-            <div class="field" style="margin:0"><label class="field-label">轉去哪裡（完整網址，或以 / 開頭的站內頁面）</label><input type="text" data-l="${i}" data-key="to" value="${escapeAttr(l.to || '')}" placeholder="https://…" autocapitalize="off" spellcheck="false"></div>
-            <div class="field" style="margin:0"><label class="field-label">備註（只有你看得到）</label><input type="text" data-l="${i}" data-key="note" value="${escapeAttr(l.note || '')}" maxlength="60"></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px"><div class="field-label" style="margin:0">全部短網址（${total} 條）</div><div class="spacer"></div><button class="btn btn-ghost" id="addLink">＋ 新增短碼</button></div>
+        <div style="font-size:12.5px;color:#7A6A6C;line-height:1.7">自訂 ${data.links.length} 條、作品自動 ${works.length} 條。點「編輯」會就地展開。目前網站沒有點擊統計。</div>
+        ${data.links.map(l => { const open = openSet.has(l._k); return `
+        <div data-row="${l._k}" style="${rowBox}">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center">
+            <span style="${tagCss}">自訂</span>
+            <span style="flex:1 1 220px;min-width:0"><b data-url style="word-break:break-all"></b> <span data-badge hidden style="font-size:11px;color:#B23A48;border:1px solid #B23A48;padding:0 6px"></span><br><span data-to style="font-size:12.5px;color:#7A6A6C;word-break:break-all"></span></span>
+            <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-toggle="${l._k}">${open ? '收合' : '編輯'}</button><button class="btn btn-ghost" data-copy="">複製</button><a class="btn btn-ghost" data-open href="#" target="_blank" rel="noopener">開啟</a></span>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap"><span data-status="${i}" style="font-size:12.5px;color:${errs[i] ? '#B23A48' : '#3E6B4A'}">${errs[i] ? '✗ ' + escapeHtml(errs[i]) : '✓ 可用'}</span><div class="spacer"></div><button class="btn btn-danger" data-del="${i}">移除</button></div>
-        </div>`).join('') : '<div style="font-size:13px;color:#7A6A6C;padding:6px 0">還沒有自訂短碼。</div>'}
-        <div class="btn-row" style="margin-top:14px"><button class="btn btn-ghost" id="addLink">＋ 新增短碼</button><div class="spacer"></div><button class="btn btn-primary" id="saveLinks">儲存變更</button></div>
-        <div style="font-size:12px;color:#7A6A6C;line-height:1.7;margin-top:10px">有紅字的短碼儲存會被擋下，避免網站建置失敗。</div>
+          <div data-panel ${open ? '' : 'hidden'} style="margin-top:12px;padding:14px;background:rgba(0,0,0,.03);border:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr);gap:10px">
+              <div class="field" style="margin:0"><label class="field-label">短碼　${SITE_ORIGIN.replace('https://', '')}/</label><input type="text" data-l="${l._k}" data-key="code" value="${escapeAttr(l.code || '')}" maxlength="41" placeholder="例：sunny-jp" autocapitalize="off" spellcheck="false"></div>
+              <div class="field" style="margin:0"><label class="field-label">轉去哪裡（完整網址，或以 / 開頭的站內頁面）</label><input type="text" data-l="${l._k}" data-key="to" value="${escapeAttr(l.to || '')}" placeholder="https://…" autocapitalize="off" spellcheck="false"></div>
+              <div class="field" style="margin:0"><label class="field-label">備註（只有你看得到）</label><input type="text" data-l="${l._k}" data-key="note" value="${escapeAttr(l.note || '')}" maxlength="60"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap"><span data-status style="font-size:12.5px"></span><div class="spacer"></div><button class="btn btn-danger" data-del="${l._k}">移除這條</button></div>
+          </div>
+        </div>`; }).join('')}
+        ${works.map(w => `
+        <div style="${rowBox}"><div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center">
+          <span style="${tagCss}">作品自動</span>
+          <span style="flex:1 1 220px;min-width:0"><b style="word-break:break-all">${escapeHtml(full(w.slug))}</b><br><span style="font-size:12.5px;color:#7A6A6C;word-break:break-all">→ /works/${escapeHtml(w.slug)}/　${escapeHtml(w.title || '')}</span></span>
+          <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-copy="${escapeAttr(full(w.slug))}">複製</button><a class="btn btn-ghost" href="${escapeAttr(full(w.slug))}" target="_blank" rel="noopener">開啟</a></span>
+        </div></div>`).join('')}
+        <div class="btn-row" style="margin-top:16px"><div style="font-size:12px;color:#7A6A6C;line-height:1.7">有紅字的短碼儲存會被擋下，避免網站建置失敗。作品自動的短網址跟著作品代號走，要改請到「有點樣子・作品」。</div><div class="spacer"></div><button class="btn btn-primary" id="saveLinks">儲存變更</button></div>
       </div>`;
-    form.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText(b.dataset.copy); toast('已複製：' + b.dataset.copy); } catch (e) { toast('複製失敗，請手動選取', 'err'); } }));
-    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定移除這條短碼嗎？儲存後才會生效，之後這個短網址就打不開了。')) return; collect(); data.links.splice(+b.dataset.del, 1); render(); }));
-    /* 輸入時只更新每一條旁邊的「可用／錯誤」提示，不重畫表單（重畫會吃掉正在填的欄位和按下去的按鈕） */
-    form.querySelectorAll('input[data-key]').forEach(inp => inp.addEventListener('input', () => {
-      collect();
-      data.links.forEach((l, i) => { const e = check(l, i), el = form.querySelector(`[data-status="${i}"]`); if (!el) return; el.textContent = e ? '✗ ' + e : '✓ 可用'; el.style.color = e ? '#B23A48' : '#3E6B4A'; });
+    data.links.forEach(refreshRow);
+    form.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => { if (!b.dataset.copy) return; try { await navigator.clipboard.writeText(b.dataset.copy); toast('已複製：' + b.dataset.copy); } catch (e) { toast('複製失敗，請手動選取', 'err'); } }));
+    form.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.toggle, panel = form.querySelector(`[data-row="${k}"] [data-panel]`), show = panel.hidden;
+      panel.hidden = !show; b.textContent = show ? '收合' : '編輯'; show ? openSet.add(k) : openSet.delete(k);
+      if (show) { const f = panel.querySelector('input'); if (f) f.focus(); }
     }));
-    document.getElementById('addLink').addEventListener('click', () => { collect(); data.links.push({ code: '', to: '', note: '' }); render(); const ins = form.querySelectorAll('input[data-key="code"]'); if (ins.length) ins[ins.length - 1].focus(); });
+    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+      if (!confirm('確定移除這條短碼嗎？儲存後才會生效，之後這個短網址就打不開了。')) return;
+      collect(); const i = data.links.findIndex(x => x._k === b.dataset.del); if (i >= 0) data.links.splice(i, 1); openSet.delete(b.dataset.del); render();
+    }));
+    form.querySelectorAll('input[data-l]').forEach(inp => inp.addEventListener('input', () => {
+      collect(); data.links.forEach(refreshRow);
+    }));
+    document.getElementById('addLink').addEventListener('click', () => {
+      collect(); const l = { code: '', to: '', note: '', _k: Math.random().toString(36).slice(2) }; data.links.unshift(l); openSet.add(l._k); render();
+      const f = form.querySelector(`[data-row="${l._k}"] input`); if (f) f.focus();
+    });
     document.getElementById('saveLinks').addEventListener('click', async (e) => {
       collect();
-      const bad = data.links.map((l, i) => [i, check(l, i)]).find(x => x[1]);
-      if (bad) { toast(`第 ${bad[0] + 1} 條：${bad[1]}`, 'err'); return; }
-      data.links.forEach(l => { l.code = norm(l.code); l.to = String(l.to).trim(); l.note = String(l.note || '').trim(); if (!l.note) delete l.note; });
-      const sha = await saveJson('src/data/shortlinks.json', data, file ? file.sha : undefined, 'Update short links via Studio', e.currentTarget);
+      const bad = data.links.find(l => check(l));
+      if (bad) { openSet.add(bad._k); const root = form.querySelector(`[data-row="${bad._k}"]`); if (root) { root.querySelector('[data-panel]').hidden = false; root.querySelector('[data-toggle]').textContent = '收合'; root.scrollIntoView({ block: 'center', behavior: 'smooth' }); } toast(check(bad), 'err'); return; }
+      const out = { ...data, links: data.links.map(l => { const o = { code: norm(l.code), to: String(l.to).trim() }; const n = String(l.note || '').trim(); if (n) o.note = n; return o; }) };
+      const sha = await saveJson('src/data/shortlinks.json', out, file ? file.sha : undefined, 'Update short links via Studio', e.currentTarget);
       if (sha) file = { sha };
-      render();
     });
   }
   render();
