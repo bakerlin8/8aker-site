@@ -31,6 +31,22 @@ function shortRedirects() {
   return out;
 }
 
+/* 選填：自訂短碼可加 title / description / image，轉址頁會帶 LINE、FB 等的連結預覽（標題、說明、縮圖）。沒填的短碼維持原樣。 */
+const PREVIEWS = {};
+for (const l of readJson('./src/data/shortlinks.json').links || []) {
+  if (l && l.code && (l.title || l.description || l.image)) PREVIEWS['/' + String(l.code).trim().toLowerCase()] = l;
+}
+const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const absUrl = (v) => (String(v).startsWith('/') ? new URL(String(v), 'https://8aker0.com').href : String(v));
+const previewTags = (pv) => {
+  if (!pv) return { title: '8AKER零', tags: '' };
+  const title = pv.title ? String(pv.title) : '8AKER零';
+  let t = `<meta property="og:type" content="website"><meta property="og:site_name" content="8AKER零"><meta property="og:title" content="${esc(title)}">`;
+  if (pv.description) t += `<meta name="description" content="${esc(pv.description)}"><meta property="og:description" content="${esc(pv.description)}">`;
+  if (pv.image) t += `<meta property="og:image" content="${esc(absUrl(pv.image))}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="${esc(absUrl(pv.image))}">`;
+  return { title, tags: t };
+};
+
 /* Astro 預設的轉址頁會閃出「Redirecting from …」的字樣。建置完成後把這些頁面換成「沒有任何文字、底色同網站」的版本，並用 JS 立刻轉走。 */
 const silentRedirects = (map) => ({
   name: 'silent-short-links',
@@ -39,9 +55,10 @@ const silentRedirects = (map) => ({
       for (const [from, to] of Object.entries(map)) {
         const f = new URL(`.${from}/index.html`, dir);
         if (!fs.existsSync(f)) continue;
+        const pvw = previewTags(PREVIEWS[from]);
         const u = to.startsWith('/') ? new URL(to, 'https://8aker0.com').href : to;
         const j = JSON.stringify(to).replace(/</g, '\\u003c');
-        fs.writeFileSync(f, `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>8AKER零</title><meta name="robots" content="noindex"><link rel="canonical" href="${u.replace(/"/g, '&quot;')}"><meta http-equiv="refresh" content="0;url=${to.replace(/"/g, '&quot;')}"><style>html,body{margin:0;background:#1C0F14;}</style><script>location.replace(${j});</script></head><body></body></html>`);
+        fs.writeFileSync(f, `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(pvw.title)}</title>${pvw.tags}<meta name="robots" content="noindex"><link rel="canonical" href="${u.replace(/"/g, '&quot;')}"><meta http-equiv="refresh" content="0;url=${to.replace(/"/g, '&quot;')}"><style>html,body{margin:0;background:#1C0F14;}</style><script>location.replace(${j});</script></head><body></body></html>`);
       }
     },
   },
