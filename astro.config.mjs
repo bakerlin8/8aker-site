@@ -31,8 +31,27 @@ function shortRedirects() {
   return out;
 }
 
+/* Astro 預設的轉址頁會閃出「Redirecting from …」的字樣。建置完成後把這些頁面換成「沒有任何文字、底色同網站」的版本，並用 JS 立刻轉走。 */
+const silentRedirects = (map) => ({
+  name: 'silent-short-links',
+  hooks: {
+    'astro:build:done': ({ dir }) => {
+      for (const [from, to] of Object.entries(map)) {
+        const f = new URL(`.${from}/index.html`, dir);
+        if (!fs.existsSync(f)) continue;
+        const u = to.startsWith('/') ? new URL(to, 'https://8aker0.com').href : to;
+        const j = JSON.stringify(to).replace(/</g, '\\u003c');
+        fs.writeFileSync(f, `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>8AKER零</title><meta name="robots" content="noindex"><link rel="canonical" href="${u.replace(/"/g, '&quot;')}"><meta http-equiv="refresh" content="0;url=${to.replace(/"/g, '&quot;')}"><style>html,body{margin:0;background:#1C0F14;}</style><script>location.replace(${j});</script></head><body></body></html>`);
+      }
+    },
+  },
+});
+
+const REDIRECTS = shortRedirects();
+
 export default defineConfig({
   site: 'https://8aker0.com',
   output: 'static',
-  redirects: shortRedirects(),
+  redirects: REDIRECTS,
+  integrations: [silentRedirects(REDIRECTS)],
 });
