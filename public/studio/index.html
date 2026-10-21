@@ -1052,7 +1052,7 @@ async function loadLinks() {
       collect();
       const bad = data.links.find(l => check(l));
       if (bad) { openSet.add(bad._k); const root = form.querySelector(`[data-row="${bad._k}"]`); if (root) { root.querySelector('[data-panel]').hidden = false; root.querySelector('[data-toggle]').textContent = '收合'; root.scrollIntoView({ block: 'center', behavior: 'smooth' }); } toast(check(bad), 'err'); return; }
-      const out = { ...data, links: data.links.map(l => { const o = { code: norm(l.code), to: String(l.to).trim() }; const n = String(l.note || '').trim(); if (n) o.note = n; return o; }) };
+      const out = { ...data, links: data.links.map(l => { const { _k, ...rest } = l; const o = { ...rest, code: norm(l.code), to: String(l.to).trim() }; const n = String(l.note || '').trim(); if (n) o.note = n; else delete o.note; return o; }) };
       const sha = await saveJson('src/data/shortlinks.json', out, file ? file.sha : undefined, 'Update short links via Studio', e.currentTarget);
       if (sha) file = { sha };
     });
