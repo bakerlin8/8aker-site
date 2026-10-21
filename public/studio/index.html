@@ -376,7 +376,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-links">
       <div class="page-eyebrow">Short links</div>
       <div class="page-title">短網址・自訂短碼</div>
-      <div class="page-sub">8aker0.com/後面接一個短碼，就會轉到你指定的地方。作品頁的短網址會自動產生（標示「作品自動」），其他想用的按「新增短碼」；要改自訂的，點那一列的「編輯」。存檔後約 1～2 分鐘生效。</div>
+      <div class="page-sub">8aker0.com/後面接一個短碼，就會轉到你指定的地方。想用的短網址按「新增短碼」；要改的話，點那一列的「編輯」。存檔後約 1～2 分鐘生效。</div>
       <div id="linksForm"></div>
     </section>
 
@@ -965,10 +965,9 @@ async function loadLinks() {
   showView('links');
   const form = document.getElementById('linksForm');
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
-  let [file, wfile] = await Promise.all([ghGetFile('src/data/shortlinks.json'), ghGetFile('src/data/works.json')]);
+  let file = await ghGetFile('src/data/shortlinks.json');
   const data = file ? JSON.parse(file.content) : { links: [] };
   if (!Array.isArray(data.links)) data.links = [];
-  const works = wfile ? (JSON.parse(wfile.content).works || []).filter(w => /^[a-z0-9-]+$/.test(w.slug || '')) : [];
   const norm = v => String(v || '').trim().replace(/^\/+/, '').toLowerCase();
   const full = c => `${SITE_ORIGIN}/${c}`;
   let openSet = new Set(); // 目前展開編輯的列（用物件參照，刪除／新增後不會錯位）
@@ -978,7 +977,6 @@ async function loadLinks() {
     if (!c) return '請填短碼';
     if (!LINK_CODE.test(c)) return '短碼只能用小寫英文、數字、連字號（最多 41 字）';
     if (LINK_RESERVED.includes(c)) return `「${c}」已是網站頁面的名稱，請換一個`;
-    if (works.some(w => w.slug === c)) return `「${c}」已被作品短網址使用`;
     if (data.links.some(o => o !== l && norm(o.code) === c)) return '短碼重複了';
     if (!to) return '請填要轉去的網址';
     if (!/^(https?:\/\/|\/(?!\/))/.test(to)) return '網址要以 https:// 開頭，或以 / 開頭（站內頁面）';
@@ -1001,11 +999,11 @@ async function loadLinks() {
     const a = root.querySelector('[data-open]'); a.href = c ? full(c) : '#';
   }
   function render() {
-    const total = data.links.length + works.length;
+    const total = data.links.length;
     form.innerHTML = `
       <div class="hb-card">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px"><div class="field-label" style="margin:0">全部短網址（${total} 條）</div><div class="spacer"></div><button class="btn btn-ghost" id="addLink">＋ 新增短碼</button></div>
-        <div style="font-size:12.5px;color:#7A6A6C;line-height:1.7">自訂 ${data.links.length} 條、作品自動 ${works.length} 條。點「編輯」會就地展開。目前網站沒有點擊統計。</div>
+        <div style="font-size:12.5px;color:#7A6A6C;line-height:1.7">點「編輯」會就地展開。目前網站沒有點擊統計。</div>
         ${data.links.map(l => { const open = openSet.has(l._k); return `
         <div data-row="${l._k}" style="${rowBox}">
           <div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center">
@@ -1022,13 +1020,8 @@ async function loadLinks() {
             <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap"><span data-status style="font-size:12.5px"></span><div class="spacer"></div><button class="btn btn-danger" data-del="${l._k}">移除這條</button></div>
           </div>
         </div>`; }).join('')}
-        ${works.map(w => `
-        <div style="${rowBox}"><div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center">
-          <span style="${tagCss}">作品自動</span>
-          <span style="flex:1 1 220px;min-width:0"><b style="word-break:break-all">${escapeHtml(full(w.slug))}</b><br><span style="font-size:12.5px;color:#7A6A6C;word-break:break-all">→ /works/${escapeHtml(w.slug)}/　${escapeHtml(w.title || '')}</span></span>
-          <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-copy="${escapeAttr(full(w.slug))}">複製</button><a class="btn btn-ghost" href="${escapeAttr(full(w.slug))}" target="_blank" rel="noopener">開啟</a></span>
-        </div></div>`).join('')}
-        <div class="btn-row" style="margin-top:16px"><div style="font-size:12px;color:#7A6A6C;line-height:1.7">有紅字的短碼儲存會被擋下，避免網站建置失敗。作品自動的短網址跟著作品代號走，要改請到「有點樣子・作品」。</div><div class="spacer"></div><button class="btn btn-primary" id="saveLinks">儲存變更</button></div>
+
+        <div class="btn-row" style="margin-top:16px"><div style="font-size:12px;color:#7A6A6C;line-height:1.7">有紅字的短碼儲存會被擋下，避免網站建置失敗。</div><div class="spacer"></div><button class="btn btn-primary" id="saveLinks">儲存變更</button></div>
       </div>`;
     data.links.forEach(refreshRow);
     form.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => { if (!b.dataset.copy) return; try { await navigator.clipboard.writeText(b.dataset.copy); toast('已複製：' + b.dataset.copy); } catch (e) { toast('複製失敗，請手動選取', 'err'); } }));
