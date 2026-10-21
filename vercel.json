@@ -2,35 +2,312 @@
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "8aker-site.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker-site.vercel.app"
+        }
+      ],
       "destination": "https://8aker0.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/site",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/site/",
+      "statusCode": 302
+    },
+    {
+      "source": "/checkin",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/checkin/",
+      "statusCode": 302
+    },
+    {
+      "source": "/dashboard",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/dashboard/",
+      "statusCode": 302
+    },
+    {
+      "source": "/quests",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/quests/",
+      "statusCode": 302
+    },
+    {
+      "source": "/five-orbs",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/five-orbs/",
+      "statusCode": 302
+    },
+    {
+      "source": "/ig-cards",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/ig-cards/",
+      "statusCode": 302
+    },
+    {
+      "source": "/sns-playbook",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/sns-playbook/",
+      "statusCode": 302
+    },
+    {
+      "source": "/crypto-score",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/crypto-score/",
+      "statusCode": 302
+    },
+    {
+      "source": "/ig",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://www.instagram.com/baker_tw/",
+      "statusCode": 302
+    },
+    {
+      "source": "/chat",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/chat/",
+      "statusCode": 302
+    },
+    {
+      "source": "/site",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/site/",
+      "statusCode": 302
+    },
+    {
+      "source": "/checkin",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/checkin/",
+      "statusCode": 302
+    },
+    {
+      "source": "/dashboard",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/dashboard/",
+      "statusCode": 302
+    },
+    {
+      "source": "/quests",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/quests/",
+      "statusCode": 302
+    },
+    {
+      "source": "/five-orbs",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/five-orbs/",
+      "statusCode": 302
+    },
+    {
+      "source": "/ig-cards",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/ig-cards/",
+      "statusCode": 302
+    },
+    {
+      "source": "/sns-playbook",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/sns-playbook/",
+      "statusCode": 302
+    },
+    {
+      "source": "/crypto-score",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/crypto-score/",
+      "statusCode": 302
+    },
+    {
+      "source": "/ig",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://www.instagram.com/baker_tw/",
+      "statusCode": 302
+    },
+    {
+      "source": "/chat",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/chat/",
+      "statusCode": 302
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com",
+      "statusCode": 302
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com",
+      "statusCode": 302
     }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
-        { "key": "Content-Security-Policy", "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests" }
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests"
+        }
       ]
     },
     {
       "source": "/(studio|admin)/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     },
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     }
   ]
