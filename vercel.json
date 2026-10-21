@@ -100,28 +100,6 @@
       "statusCode": 302
     },
     {
-      "source": "/ig",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://www.instagram.com/baker_tw/",
-      "statusCode": 302
-    },
-    {
-      "source": "/chat",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/chat/",
-      "statusCode": 302
-    },
-    {
       "source": "/site",
       "has": [
         {
@@ -207,28 +185,6 @@
         }
       ],
       "destination": "https://8aker0.com/works/crypto-score/",
-      "statusCode": 302
-    },
-    {
-      "source": "/ig",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://www.instagram.com/baker_tw/",
-      "statusCode": 302
-    },
-    {
-      "source": "/chat",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/chat/",
       "statusCode": 302
     },
     {

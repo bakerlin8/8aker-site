@@ -7,11 +7,11 @@ const TOPICS = [
   ['property', '在日本置產陪跑（Second House／投資）'],
   ['owner', '海外屋主代管'],
   ['guide', '大阪地陪・隨行翻譯・在地推薦'],
-  ['ai', 'AI 小工具・網站'],
+  ['ai', 'AI・工作流優化'],
   ['other', '其他，或只是想聊聊'],
 ];
 ---
-<BaseLayout title="有空聊聊 — 8AKER零" description="想聊置產、代管、大阪地陪翻譯或 AI 工具？先填幾個問題，整理好之後一鍵複製或存成圖片，直接傳到 Instagram 私訊。">
+<BaseLayout title="需求填表 — 8AKER零" description="想聊置產、代管、大阪地陪翻譯或 AI 工具？先填幾個問題，整理好之後一鍵複製或存成圖片，直接傳到 Instagram 私訊。">
 <style is:global>
 .chat{min-height:100vh;padding:140px 40px 96px;background:radial-gradient(110% 80% at 80% 0%,#3D0F1A 0%,#1C0F14 60%);color:#EFE5D6;}
 .chat-in{max-width:720px;margin:0 auto;}
@@ -52,8 +52,8 @@ const TOPICS = [
 </style>
 <main class="chat">
   <div class="chat-in">
-    <nav class="crumb" aria-label="麵包屑"><a href="/">首頁</a> / 有空聊聊</nav>
-    <h1>有空聊聊</h1>
+    <nav class="crumb" aria-label="麵包屑"><a href="/">首頁</a> / 需求填表</nav>
+    <h1>需求填表</h1>
     <p class="lede">先回答幾個問題，我會更快知道怎麼幫你。填好後可以一鍵複製文字、或存成一張圖片，直接傳到我的 Instagram 私訊，不用再自己整理。</p>
     <p class="steps"><span><b>1</b> 填寫</span><span>→</span><span><b>2</b> 確認</span><span>→</span><span><b>3</b> 傳到 IG 私訊</span></p>
 
@@ -113,7 +113,7 @@ const TOPICS = [
     c.strokeStyle='rgba(212,162,76,.5)';c.lineWidth=2;c.strokeRect(48,48,W-96,H-96);
     for(var k=0;k<9;k++){c.beginPath();c.arc(W-150,170,26+k*13,0,6.283);c.strokeStyle='rgba(212,162,76,'+(.08+k*.05)+')';c.lineWidth=1.5;c.stroke();}
     var serif='"Noto Serif TC","Noto Serif JP",serif',sans='"Noto Sans TC",system-ui,sans-serif';
-    c.fillStyle='#D4A24C';c.font='28px '+sans;c.fillText('有空聊聊・需求確認',110,150);
+    c.fillStyle='#D4A24C';c.font='28px '+sans;c.fillText('需求填表・內容確認',110,150);
     c.fillStyle='#EBD3A8';c.font='500 64px '+serif;c.fillText(data.name?('我是 '+data.name):'你好',110,250);
     var y=340,rows=[['想聊',data.topic],['時間',data.dates],[data.label,data.people],['內容',data.message],['從哪裡知道',data.source]];
     rows.forEach(function(r){if(!r[1])return;c.fillStyle='#D4A24C';c.font='26px '+sans;c.fillText(r[0],110,y);y+=46;c.fillStyle='#EFE5D6';c.font='36px '+sans;
@@ -122,15 +122,15 @@ const TOPICS = [
     return new Promise(function(res){CV.toBlob(function(b){blob=b;res(b);},'image/png');});}
   function copy(s){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(s);return new Promise(function(res,rej){var t=document.createElement('textarea');t.value=s;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');res();}catch(e){rej(e);}t.remove();});}
   F.addEventListener('submit',function(e){e.preventDefault();if(!val('name')||val('message').length<4){E.textContent='請填寫稱呼和想聊的內容。';window.sfx&&sfx('error');return;}E.textContent='';build();TX.textContent=text;OK.textContent='';
-    (document.fonts?document.fonts.ready:Promise.resolve()).then(draw).then(function(b){var f=b&&new File([b],'8aker0-有空聊聊.png',{type:'image/png'});document.getElementById('shareImg').hidden=!(f&&navigator.canShare&&navigator.canShare({files:[f]}));});
+    (document.fonts?document.fonts.ready:Promise.resolve()).then(draw).then(function(b){var f=b&&new File([b],'8aker0-需求填表.png',{type:'image/png'});document.getElementById('shareImg').hidden=!(f&&navigator.canShare&&navigator.canShare({files:[f]}));});
     F.hidden=true;PV.hidden=false;window.sfx&&sfx('success');PV.scrollIntoView({behavior:'smooth',block:'start'});});
   document.getElementById('back').addEventListener('click',function(){PV.hidden=true;F.hidden=false;F.scrollIntoView({behavior:'smooth',block:'start'});});
   document.getElementById('goIg').addEventListener('click',function(){var p=copy(text);var w=IG?window.open('https://ig.me/m/'+IG,'_blank','noopener'):null;
     p.then(function(){OK.textContent='已複製！在 Instagram 私訊裡長按輸入框「貼上」就好。';}).catch(function(){OK.textContent='沒辦法自動複製，請長按下方文字手動複製。';});
     if(IG&&!w)location.href='https://ig.me/m/'+IG;});
   document.getElementById('copyTxt').addEventListener('click',function(){copy(text).then(function(){OK.textContent='已複製文字。';}).catch(function(){OK.textContent='沒辦法自動複製，請長按下方文字手動複製。';});});
-  document.getElementById('saveImg').addEventListener('click',function(){if(!blob)return;var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='8aker0-有空聊聊.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);OK.textContent='圖片已儲存（手機上若開啟新頁，長按圖片「加入照片」）。';});
-  document.getElementById('shareImg').addEventListener('click',function(){if(!blob)return;var f=new File([blob],'8aker0-有空聊聊.png',{type:'image/png'});navigator.share({files:[f],text:text}).catch(function(){});});
+  document.getElementById('saveImg').addEventListener('click',function(){if(!blob)return;var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='8aker0-需求填表.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);OK.textContent='圖片已儲存（手機上若開啟新頁，長按圖片「加入照片」）。';});
+  document.getElementById('shareImg').addEventListener('click',function(){if(!blob)return;var f=new File([blob],'8aker0-需求填表.png',{type:'image/png'});navigator.share({files:[f],text:text}).catch(function(){});});
 })();
 </script>
 </BaseLayout>

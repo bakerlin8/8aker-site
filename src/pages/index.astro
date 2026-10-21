@@ -805,6 +805,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .ec-ring .ecd{justify-content:center;margin-top:8px;}
 .ec-after{text-wrap:balance;margin:16px 0 0;font-family:var(--serif);font-size:14px;letter-spacing:.08em;color:var(--bone-2);}
 @media(max-width:900px){.end-card{grid-template-columns:1fr;}.ec-ring{padding:24px 16px 28px;}.ec-ring canvas{height:220px;}}
+.hat p .dl,.svc-desc .dl{display:block;text-wrap:balance;}
 .hat .hk{font-family:var(--jp);font-size:24px;color:var(--gold);line-height:1.1;}
 /* ── 服務卡 ── */
 .hat{position:relative;overflow:hidden;isolation:isolate;}
@@ -987,7 +988,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
       <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>有聯絡直接聊，初見面先填表</h3></div>
       <ol class="hats" id="hats">
         {services.hats.map((h: any, i: number) => (
-          <li class="hat rv" data-k={h.k} style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{h.desc}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}<span class="hmore" aria-hidden="true">看內容 ＋</span></div><button type="button" class="hat-hit" data-open={`svc-${i}`} aria-haspopup="dialog" aria-label={`${h.title}：查看服務內容`}></button></li>
+          <li class="hat rv" data-k={h.k} style={`--i:${i + 3}`}><span class="hk">{h.k}</span><div><h3>{h.title}</h3><p>{String(h.desc).split(/(?<=。)/).map((t: string) => <span class="dl">{t}</span>)}</p>{h.items && <ul class="hitems">{h.items.map((t: string) => <li>{t}</li>)}</ul>}<span class="hmore" aria-hidden="true">看內容 ＋</span></div><button type="button" class="hat-hit" data-open={`svc-${i}`} aria-haspopup="dialog" aria-label={`${h.title}：查看服務內容`}></button></li>
         ))}
       </ol>
       {services.hats.map((h: any, i: number) => {
@@ -999,7 +1000,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
               <button type="button" class="svc-x" data-close aria-label="關閉">×</button>
               <p class="svc-k">{h.provider}</p>
               <h3 id={`svc-h-${i}`}>{h.title}</h3>
-              <p class="svc-desc">{h.desc}</p>
+              <p class="svc-desc">{String(h.desc).split(/(?<=。)/).map((t: string) => <span class="dl">{t}</span>)}</p>
               {list.length ? list.map((x: any) => (
                 <section class="svc-card">
                   <h4>{x.name}{x.name_jp && <small>{x.name_jp}</small>}</h4>
