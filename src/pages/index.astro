@@ -753,11 +753,16 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .twb-dl>div{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(28,15,20,.14);}
 .twb-dl dt{font-size:12px;letter-spacing:.12em;color:#7A6A6C;}
 .twb-dl dd{margin:0;font-size:15px;word-break:break-all;}
+.twb-dl dd[data-f=name],.twb-dl dd[data-f=holder]{font-size:20px;letter-spacing:.04em;}
+.twb-dl dt{font-size:13px;}
 .twb-dl .acct dd{display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
 @font-face{font-family:"Outfit";src:url("/fonts/outfit-500.woff2") format("woff2");font-weight:500;font-display:swap;unicode-range:U+0020-007F;}
 .twb-dl .acct .num{white-space:nowrap;font-family:"Outfit",var(--sans,sans-serif);font-weight:500;font-size:clamp(19px,5.8vw,27px);letter-spacing:.08em;font-variant-numeric:tabular-nums lining-nums;color:#1C0F14;}
 .twb-copy{flex:1 0 100%;min-height:44px;padding:0 14px;border:1px solid #1C0F14;font-size:13px;background:#1C0F14;color:#EFE5D6;transition:background .3s;}
 .twb-copy.ok{background:#3E6B4A;border-color:#3E6B4A;}
+.twb-dl .acct .num[data-copy]{cursor:pointer;border-bottom:1px dashed rgba(28,15,20,.35);}
+.twb-copy{min-height:52px;font-size:15px;letter-spacing:.06em;}
+.twb-copy:active{transform:scale(.99);}
 .twb-lead{margin-top:10px;font-size:13.5px;line-height:1.8;color:#5B4B4E;}
 .twb-f{display:block;margin-top:14px;}
 .twb-f span{display:block;font-size:12px;letter-spacing:.12em;color:#7A6A6C;margin-bottom:6px;}
@@ -1166,11 +1171,12 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             <div class="twb-show" data-step="show" hidden>
               <dl class="twb-dl">
                 <div><dt>銀行</dt><dd data-f="name"></dd></div>
-                <div class="acct"><dt>帳號</dt><dd><span data-f="acct" class="num"></span><button type="button" class="twb-copy" data-copy>複製帳號</button></dd></div>
+
                 <div><dt>戶名</dt><dd data-f="holder"></dd></div>
+                <div class="acct"><dt>帳號</dt><dd><span data-f="acct" class="num" data-copy role="button" tabindex="0" title="點一下複製"></span><button type="button" class="twb-copy" data-copy>一鍵複製帳號</button></dd></div>
               </dl>
-              <button type="button" class="twb-go twb-paid" data-paid>我轉好了</button>
-              <p class="twb-fine">轉好之後按這裡，告訴我末五碼和金額，方便我對帳。晚點再回來按也可以。</p>
+              <button type="button" class="twb-go twb-paid" data-paid>轉好了</button>
+              <p class="twb-fine">點帳號或按上面的按鈕就能複製，貼到網銀即可。轉好之後按這裡，告訴我末五碼和金額，方便我對帳。晚點再回來按也可以。</p>
             </div>
             <form class="twb-form twb-rep" data-step="report" novalidate hidden>
               <p class="twb-lead">謝謝您！填好這兩項，我就能對到您的轉帳。</p>
@@ -1492,7 +1498,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   B.addEventListener('click',function(e){e.preventDefault();t0=Date.now();cur=load();
     if(cur&&cur.bank&&!cur.done){fillBank(cur.bank);step(S);}else{if(cur&&cur.done){F.name.value=cur.name||'';F.contact.value=cur.contact||'';}step(F);}
     if(D.showModal)D.showModal();else D.setAttribute('open','');});
-  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-paid]'))step(R);});
+  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-paid]')){step(R);}});
   var G=F.querySelector('.twb-go');
   F.addEventListener('submit',function(e){e.preventDefault();err(F,'');
     var name=F.name.value.trim(),contact=F.contact.value.trim();
@@ -1516,9 +1522,13 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       if(x.s===404||x.s===400&&/紀錄/.test(x.d.error||'')){try{localStorage.removeItem(KEY);}catch(e){}}
       err(R,(x.d&&x.d.error)||'暫時無法送出，請稍後再試');})
       .catch(function(){H.disabled=false;H.textContent='送出';err(R,'網路好像不太穩，請再試一次');});});
-  var C=D.querySelector('[data-copy]');if(C)C.addEventListener('click',function(){var t=(D.querySelector('[data-f=acct]').textContent||'').replace(/[^0-9]/g,'');
-    var done=function(){C.textContent='已複製';C.classList.add('ok');setTimeout(function(){C.textContent='複製帳號';C.classList.remove('ok');},1800);};
-    if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,function(){});});})();
+  var C=D.querySelector('button[data-copy]'),tm=0;
+  function copyAcct(){var t=(D.querySelector('[data-f=acct]').textContent||'').replace(/[^0-9]/g,'');if(!t)return;
+    var done=function(){C.textContent='已複製 ✓ 去網銀貼上';C.classList.add('ok');clearTimeout(tm);tm=setTimeout(function(){C.textContent='一鍵複製帳號';C.classList.remove('ok');},2200);};
+    var fb=function(){var a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;opacity:0;top:0;left:0;';D.appendChild(a);a.select();a.setSelectionRange(0,99);try{if(document.execCommand('copy'))done();}catch(e){}a.remove();};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();}
+  if(C){D.querySelectorAll('[data-copy]').forEach(function(el){el.addEventListener('click',copyAcct);});
+    var N=D.querySelector('span[data-copy]');if(N)N.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();copyAcct();}});}})();
 /* 服務卡：游標位置的聚光 */
 (function(){var H=document.getElementById('hats');if(!H)return;
   H.addEventListener('pointermove',function(e){var c=e.target.closest('.hat');if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px');},{passive:true});})();
