@@ -1,6 +1,15 @@
 {
   "_說明": "自訂短網址：8aker0.com/<code> → 目標。code 只能用小寫英文、數字、連字號。作品頁的短網址（8aker0.com/<作品代號>）會自動產生，不用寫在這裡。",
   "links": [
-    { "code": "ig", "to": "https://www.instagram.com/baker_tw/", "note": "IG 個人帳號（範例，可改可刪）" }
+    {
+      "code": "ig",
+      "to": "https://www.instagram.com/baker_tw/",
+      "note": "IG 個人帳號（範例，可改可刪）"
+    },
+    {
+      "code": "sunny-jp",
+      "to": "https://claude.ai/artifact/Nquoy3g4QxqZrj6qNSCTho",
+      "note": "Sunny 日本電信"
+    }
   ]
 }
