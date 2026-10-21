@@ -4,7 +4,10 @@
     {
       "code": "sunny-jp-phone",
       "to": "https://claude.ai/artifact/Nquoy3g4QxqZrj6qNSCTho",
-      "note": "Sunny 日本電信"
+      "note": "Sunny 日本電信",
+      "title": "Sunny 對帳",
+      "description": "電信費與代墊款明細",
+      "image": "/previews/sunny-jp.jpg"
     },
     {
       "code": "ig",
