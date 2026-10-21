@@ -772,6 +772,15 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .twb-err{margin-top:10px;font-size:13px;color:#8A2B3D;}
 .twb-go{width:100%;min-height:50px;margin-top:18px;background:linear-gradient(135deg,#4A1524,#1C0F14);color:#F3E9DA;border:1px solid rgba(212,162,76,.45);font-size:15px;letter-spacing:.1em;}
 .twb-go[disabled]{opacity:.6;}
+.twb-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.twb-opts label{position:relative;display:flex;align-items:center;justify-content:center;min-height:46px;border:1px solid rgba(28,15,20,.25);background:#F7F0E5;cursor:pointer;transition:border-color .2s,background .2s;}
+.twb-opts b{font-weight:400;font-size:14px;color:#1C0F14;}
+.twb-f .twb-opts input{position:absolute;inset:0;width:100%;min-height:0;height:100%;opacity:0;margin:0;cursor:pointer;}
+.twb-opts label:has(input:checked){border-color:#A07A3A;background:#F3E3C4;box-shadow:inset 0 0 0 1px #A07A3A;}
+.twb-opts label:has(input:focus-visible){outline:2px solid #D4A24C;outline-offset:2px;}
+.twb-cin{display:block;margin-top:12px;}
+.twb-cin[hidden]{display:none;}
+.twb-cin em{display:block;font-style:normal;font-size:12px;letter-spacing:.12em;color:#7A6A6C;margin-bottom:6px;}
 .twb-f small{display:block;margin-top:6px;font-size:11.5px;line-height:1.6;color:#7A6A6C;}
 .twb-f textarea{width:100%;padding:10px 12px;border:1px solid rgba(28,15,20,.25);background:#F7F0E5;font-size:16px;color:#1C0F14;border-radius:0;resize:vertical;font-family:inherit;}
 .twb-f textarea:focus{outline:2px solid #D4A24C;outline-offset:1px;}
@@ -1163,7 +1172,14 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             <form class="twb-form" data-step="ask" novalidate>
               <p class="twb-lead">留下稱呼和聯絡方式，就會顯示轉帳帳號。<br>收到後我會親自跟你說謝謝。</p>
               <label class="twb-f"><span>稱呼</span><input name="name" autocomplete="nickname" maxlength="60" required placeholder="怎麼稱呼你"></label>
-              <label class="twb-f"><span>聯絡方式</span><input name="contact" autocomplete="email" maxlength="120" required placeholder="IG 帳號、Email 或 LINE ID"></label>
+              <div class="twb-f twb-ct" role="group" aria-labelledby="twb-ct-l"><span id="twb-ct-l">聯絡方式</span>
+                <div class="twb-opts">
+                  <label><input type="radio" name="ctype" value="ig"><b>Instagram</b></label>
+                  <label><input type="radio" name="ctype" value="line"><b>LINE</b></label>
+                  <label><input type="radio" name="ctype" value="email"><b>Email</b></label>
+                </div>
+                <label class="twb-cin" hidden><em data-cl></em><input name="contact" maxlength="120" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+              </div>
               <label class="twb-hp" aria-hidden="true">網站<input name="website" tabindex="-1" autocomplete="off"></label>
               <p class="twb-err" role="alert" hidden></p>
               <button class="twb-go" type="submit">顯示轉帳帳號</button>
@@ -1178,6 +1194,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
               </dl>
               <button type="button" class="twb-go twb-paid" data-paid>轉好了</button>
               <p class="twb-fine">點帳號或按上面的按鈕就能複製，貼到網銀即可。轉好之後按這裡，告訴我末五碼和金額，方便我對帳。晚點再回來按也可以。</p>
+              <button type="button" class="twb-back" data-edit>← 修改稱呼／聯絡方式</button>
             </div>
             <form class="twb-form twb-rep" data-step="report" novalidate hidden>
               <p class="twb-lead">謝謝您！填好這兩項，我就能對到您的轉帳。</p>
@@ -1496,17 +1513,30 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function fillBank(k){D.querySelectorAll('[data-f]').forEach(function(el){el.textContent=k[el.dataset.f]||'';});}
   function err(form,m){var e=form.querySelector('.twb-err');e.textContent=m;e.hidden=!m;}
   function post(body){return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){return {s:r.status,d:d};});});}
+  var T={ig:{l:'Instagram 帳號',ph:'例：baker_tw',pre:'Instagram @'},line:{l:'LINE ID',ph:'你的 LINE ID',pre:'LINE '},email:{l:'Email',ph:'例：name@example.com',pre:'Email '}};
+  var CI=F.querySelector('.twb-cin'),CL=F.querySelector('[data-cl]');
+  function pick(t,focus){var m=T[t];if(!m)return;CI.hidden=false;CL.textContent=m.l;F.contact.placeholder=m.ph;F.contact.type=t==='email'?'email':'text';F.contact.setAttribute('inputmode',t==='email'?'email':'text');if(focus)setTimeout(function(){F.contact.focus();},30);}
+  F.querySelectorAll('input[name=ctype]').forEach(function(r){r.addEventListener('change',function(){pick(r.value,true);});});
+  function fill(c){F.name.value=(c&&c.name)||'';var t=c&&c.ctype,v=c&&c.cval;
+    if(!t&&c&&c.contact){var m=String(c.contact).match(/^(Instagram @|LINE |Email )(.*)$/);if(m){t=m[1].charAt(0)==='I'?'ig':m[1].charAt(0)==='L'?'line':'email';v=m[2];}}
+    var r=t&&F.querySelector('input[name=ctype][value='+t+']');if(r){r.checked=true;pick(t);F.contact.value=v||'';}}
   B.addEventListener('click',function(e){e.preventDefault();t0=Date.now();cur=load();
-    if(cur&&cur.bank&&!cur.done){fillBank(cur.bank);step(S);}else{if(cur&&cur.done){F.name.value=cur.name||'';F.contact.value=cur.contact||'';}step(F);}
+    if(cur&&cur.bank&&!cur.done){fillBank(cur.bank);step(S);}else{if(cur&&cur.done)fill(cur);step(F);}
     if(D.showModal)D.showModal();else D.setAttribute('open','');});
-  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-paid]')){step(R);}});
+  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-edit]')){fill(cur||load());step(F);}if(e.target.closest('[data-paid]')){step(R);}});
   var G=F.querySelector('.twb-go');
   F.addEventListener('submit',function(e){e.preventDefault();err(F,'');
-    var name=F.name.value.trim(),contact=F.contact.value.trim();
-    if(!name){err(F,'請填寫稱呼');F.name.focus();return;}if(contact.length<3){err(F,'請填寫聯絡方式（IG、Email 或 LINE ID）');F.contact.focus();return;}
+    var name=F.name.value.trim(),cv=F.contact.value.trim(),rc=F.querySelector('input[name=ctype]:checked'),ct=rc?rc.value:'';
+    if(!name){err(F,'請填寫稱呼');F.name.focus();return;}
+    if(!ct){err(F,'請選一種聯絡方式');return;}
+    if(ct==='ig'){cv=cv.replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/[\/?#].*$/,'').replace(/^@+/,'');if(!/^[A-Za-z0-9._]{1,30}$/.test(cv)){err(F,'Instagram 帳號只會有英文、數字、底線和點');F.contact.focus();return;}}
+    else if(ct==='line'){if(cv.length<2||/\s/.test(cv)){err(F,'請填寫 LINE ID（不含空格）');F.contact.focus();return;}}
+    else{if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cv)){err(F,'Email 格式好像不太對，請再確認');F.contact.focus();return;}}
+    F.contact.value=cv;var contact=T[ct].pre+cv;
+    if(cur&&cur.bank&&!cur.done&&cur.name===name&&cur.contact===contact){fillBank(cur.bank);step(S);return;}
     G.disabled=true;G.textContent='讀取中…';
     post({name:name,contact:contact,website:F.website.value,t:Date.now()-t0,lang:navigator.language||''}).then(function(x){
-      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
+      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,ctype:ct,cval:cv,ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
       if(x.d&&x.d.error==='not_ready'){err(F,'轉帳帳號準備中，先請您 IG 私訊我，謝謝！');if(ig){G.textContent='改用 IG 私訊';G.disabled=false;G.onclick=function(ev){ev.preventDefault();window.open(ig,'_blank','noopener');};return;}}
       else err(F,(x.d&&x.d.error)||'暫時無法顯示，請稍後再試');G.disabled=false;G.textContent='顯示轉帳帳號';})
       .catch(function(){err(F,'網路好像不太穩，請再試一次');G.disabled=false;G.textContent='顯示轉帳帳號';});});
