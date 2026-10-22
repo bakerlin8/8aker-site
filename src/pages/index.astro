@@ -589,12 +589,13 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .gv-pop .gv-k{font-size:11px;letter-spacing:.24em;color:#D4A24C;}
 .gv-pop .gv-l{font-size:13.5px;line-height:1.65;color:#F1E4D2;}
 .gv-pop .gv-l strong{font-family:var(--latin);font-weight:600;font-size:17px;color:#F0B9A0;}
-.gv-pop a{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid rgba(240,185,160,.35);background:rgba(255,255,255,.05);color:#F1E4D2;text-decoration:none;transition:border-color .3s,background .3s;}
+.gv-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.gv-pop a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 8px 10px;text-align:center;border:1px solid rgba(240,185,160,.35);background:rgba(255,255,255,.05);color:#F1E4D2;text-decoration:none;transition:border-color .3s,background .3s;}
 .gv-pop a:hover,.gv-pop a:focus-visible{border-color:#D4A24C;background:rgba(255,255,255,.12);outline:none;}
 .gv-flag{width:28px;height:19px;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.25);}
-.gv-pop a em{font-style:normal;display:grid;gap:1px;font-size:13.5px;line-height:1.35;min-width:0;}
+.gv-pop a em{font-style:normal;display:grid;gap:2px;font-size:12.5px;line-height:1.35;min-width:0;justify-items:center;}
 .gv-pop a em strong{font-weight:400;font-size:10.5px;letter-spacing:.18em;color:#BFA894;}
-.gv-pop a small{margin-left:auto;font-size:13px;color:#D4A24C;}
+.gv-pop a small{display:none;}
 .gv-pop .gv-n{font-size:12.5px;line-height:1.7;color:#D9C8B6;}
 .gv-pop .gv-n strong{font-weight:600;color:#F0B9A0;}
 @media(prefers-reduced-motion:reduce){.gv-pop{transition:none;}}
@@ -1273,7 +1274,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
               {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
             </dl>}</div>
             <div class="flow">
-              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''} tabindex={x.give ? 0 : undefined} data-give={x.give ? '1' : undefined}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span>{x.give && <div class="gv-pop" role="tooltip"><div class="gv-k">善的循環</div><div class="gv-l">每份支持撥出 <strong class="num">{C.give_rate}%</strong>，捐給台日災害救援</div>{C.give_tw_org && <a href={safeHref(C.give_tw_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#D1162B"/><rect width="12" height="8" fill="#0B2C86"/><circle cx="6" cy="4" r="2.3" fill="#fff"/><circle cx="6" cy="4" r="1.5" fill="#0B2C86"/><circle cx="6" cy="4" r="1.1" fill="#fff"/></svg><em><strong>台灣</strong>{C.give_tw_org}</em><small aria-hidden="true">↗</small></a>}{C.give_org && <a href={safeHref(C.give_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/><circle cx="12" cy="8" r="4.6" fill="#BC002D"/></svg><em><strong>日本</strong>{C.give_org}</em><small aria-hidden="true">↗</small></a>}{C.give_next && <div class="gv-n">下次捐贈 <strong>{C.give_next}</strong>・每 3 個月一次，證明會公開在日常紀錄</div>}</div>}</li>)}</ul></div>
+              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''} tabindex={x.give ? 0 : undefined} data-give={x.give ? '1' : undefined}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span>{x.give && <div class="gv-pop" role="tooltip"><div class="gv-k">善的循環</div><div class="gv-l">每份支持撥出 <strong class="num">{C.give_rate}%</strong>，捐給台日災害救援</div><div class="gv-row">{C.give_tw_org && <a href={safeHref(C.give_tw_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#D1162B"/><rect width="12" height="8" fill="#0B2C86"/><circle cx="6" cy="4" r="2.3" fill="#fff"/><circle cx="6" cy="4" r="1.5" fill="#0B2C86"/><circle cx="6" cy="4" r="1.1" fill="#fff"/></svg><em><strong>台灣</strong>{C.give_tw_org}</em><small aria-hidden="true">↗</small></a>}{C.give_org && <a href={safeHref(C.give_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/><circle cx="12" cy="8" r="4.6" fill="#BC002D"/></svg><em><strong>日本</strong>{C.give_org}</em><small aria-hidden="true">↗</small></a>}</div>{C.give_next && <div class="gv-n">下次捐贈 <strong>{C.give_next}</strong>・每 3 個月一次</div>}</div>}</li>)}</ul></div>
           </div>
           </>}
         </aside>
