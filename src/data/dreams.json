@@ -1,4 +1,109 @@
 {
   "intro": "明年生日之前想完成的事，一件一件掛在這裡。點燈籠，看它現在走到哪。",
-  "items": []
+  "items": [
+    {
+      "id": "w1",
+      "kind": "habit",
+      "title": "自媒體經營：8AKER零",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w2",
+      "kind": "goal",
+      "title": "日本手配師：行程規劃與代訂",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w3",
+      "kind": "goal",
+      "title": "AI 變現去：把興趣變成收入",
+      "state": "doing",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w4",
+      "kind": "goal",
+      "title": "BJT 400 分：商務日語檢定",
+      "state": "doing",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w5",
+      "kind": "idea",
+      "title": "軟裝系統化：可複製的品味流程",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w6",
+      "kind": "fun",
+      "title": "雪具好推薦：幫你挑到合腳的板與靴",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w7",
+      "kind": "idea",
+      "title": "美學雲神社：心的另一扇窗",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w8",
+      "kind": "idea",
+      "title": "最後的禮物：留給家人的最後交代",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": false,
+      "updated": "2026-10-22",
+      "why": ""
+    }
+  ]
 }
