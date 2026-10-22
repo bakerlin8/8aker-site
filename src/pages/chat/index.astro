@@ -104,6 +104,11 @@ const TOPICS = [
   var PEOPLE={property:['物件概況（選填）','例如：想在大阪市內買 2LDK，自住兼出租'],owner:['物件概況（選填）','例如：大阪市西成區一戶建，一年回去兩次'],guide:['人數（選填）','例如：2 大 1 小，想吃在地的燒肉'],ai:['你的工作類型（選填）','例如：一人經營的咖啡店'],other:['補充（選填）','']};
   function syncPeople(){var v=(F.querySelector('input[name=topic]:checked')||{}).value||'other',p=PEOPLE[v];document.getElementById('peopleT').textContent=p[0];document.getElementById('people').placeholder=p[1];}
   F.addEventListener('change',function(e){if(e.target.name==='topic')syncPeople();});syncPeople();
+  // 從祈願所「我可以幫忙」進來：預先帶入是哪個願望、需要什麼
+  try{var Q=new URLSearchParams(location.search);if(Q.get('from')==='wish'){var ab=(Q.get('about')||'').slice(0,80),hp=(Q.get('help')||'').slice(0,120);
+    var oth=F.querySelector('input[name=topic][value=other]');if(oth){oth.checked=true;syncPeople();}
+    if(ab&&F.elements.message&&!F.elements.message.value){F.elements.message.value='我看到祈願所的「'+ab+'」'+(hp?'，你需要：'+hp:'')+'。我可以幫忙的是：';}
+    if(F.elements.source){for(var i=0;i<F.elements.source.options.length;i++){if(F.elements.source.options[i].text==='其他'){F.elements.source.selectedIndex=i;break;}}}}}catch(e){}
   var data={},text='',blob=null;
   function val(n){var el=F.elements[n];return el?String(el.value||'').trim():'';}
   function build(){data={topic:TN[(F.querySelector('input[name=topic]:checked')||{}).value]||'',name:val('name'),dates:val('dates'),people:val('people'),message:val('message'),source:val('source'),label:document.getElementById('peopleT').textContent.replace('（選填）','')};
