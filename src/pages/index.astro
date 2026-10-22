@@ -582,20 +582,22 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 @media(prefers-reduced-motion:reduce){.give-cta:hover .gc-ic svg,.give-cta:hover .gc-ic i{animation:none;}}
 /* 善的循環：3D 年輪木樁 + 一行說明 */
 .support .give{display:grid;gap:12px;margin-top:22px;padding:16px;background:linear-gradient(135deg,rgba(138,43,61,.07),rgba(138,43,61,.02));border-top:1px solid rgba(28,15,20,.12);color:#1C0F14;}
-.support .gv{display:grid;gap:9px;}
-.support .gv-k{margin:0;font-size:11px;letter-spacing:.24em;color:#A07A3A;}
-.support .gv-l{margin:0;font-size:14px;line-height:1.7;color:#3A2A2D;}
-.support .gv-l b{font-family:var(--latin);font-weight:600;font-size:18px;color:#8A2B3D;}
-.support .gv-org{list-style:none;margin:2px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;}
-.support .gv-org a{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid rgba(138,43,61,.28);background:rgba(255,255,255,.35);color:#1C0F14;text-decoration:none;transition:border-color .3s,background .3s,transform .3s;}
-.support .gv-org a:hover{border-color:#8A2B3D;background:rgba(255,255,255,.65);transform:translateY(-1px);}
-.support .gv-org a:focus-visible{outline:2px solid #8A2B3D;outline-offset:2px;}
-.support .gv-flag{width:28px;height:19px;flex:none;box-shadow:0 0 0 1px rgba(28,15,20,.18);}
-.support .gv-org span{display:grid;gap:1px;font-size:13px;line-height:1.35;min-width:0;}
-.support .gv-org span b{font-weight:400;font-size:10.5px;letter-spacing:.18em;color:#7A6A6C;}
-.support .gv-org i{margin-left:auto;font-style:normal;color:#8A2B3D;font-size:13px;}
-.support .gv-n{margin:0;font-size:12.5px;line-height:1.7;color:#5B4B4E;}
-.support .gv-n b{font-weight:600;color:#8A2B3D;}
+.flow-key li.kg{position:relative;cursor:help;}
+.gv-pop{position:absolute;left:-6px;bottom:calc(100% + 10px);z-index:30;width:min(300px,86vw);display:grid;gap:9px;padding:14px;background:#2A1219;border:1px solid rgba(212,162,76,.55);box-shadow:0 22px 40px -14px rgba(20,6,10,.75);color:#F1E4D2;opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .25s,transform .25s,visibility .25s;pointer-events:none;text-align:left;}
+.gv-pop::after{content:"";position:absolute;left:26px;bottom:-6px;width:10px;height:10px;background:#2A1219;border-right:1px solid rgba(212,162,76,.55);border-bottom:1px solid rgba(212,162,76,.55);transform:rotate(45deg);}
+.flow-key li.kg:hover .gv-pop,.flow-key li.kg:focus-within .gv-pop,.flow-key li.kg.open .gv-pop{opacity:1;visibility:visible;transform:none;pointer-events:auto;}
+.gv-pop .gv-k{font-size:11px;letter-spacing:.24em;color:#D4A24C;}
+.gv-pop .gv-l{font-size:13.5px;line-height:1.65;color:#F1E4D2;}
+.gv-pop .gv-l strong{font-family:var(--latin);font-weight:600;font-size:17px;color:#F0B9A0;}
+.gv-pop a{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid rgba(240,185,160,.35);background:rgba(255,255,255,.05);color:#F1E4D2;text-decoration:none;transition:border-color .3s,background .3s;}
+.gv-pop a:hover,.gv-pop a:focus-visible{border-color:#D4A24C;background:rgba(255,255,255,.12);outline:none;}
+.gv-flag{width:28px;height:19px;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.25);}
+.gv-pop a em{font-style:normal;display:grid;gap:1px;font-size:13.5px;line-height:1.35;min-width:0;}
+.gv-pop a em strong{font-weight:400;font-size:10.5px;letter-spacing:.18em;color:#BFA894;}
+.gv-pop a small{margin-left:auto;font-size:13px;color:#D4A24C;}
+.gv-pop .gv-n{font-size:12.5px;line-height:1.7;color:#D9C8B6;}
+.gv-pop .gv-n strong{font-weight:600;color:#F0B9A0;}
+@media(prefers-reduced-motion:reduce){.gv-pop{transition:none;}}
 .support .gline{margin:0;font-size:13.5px;line-height:1.75;color:#3A2A2D;}
 .support .gline b{font-family:var(--latin);font-weight:600;font-size:17px;color:#8A2B3D;}
 .support .gnum{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:12px;}
@@ -1264,24 +1266,14 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
           </div>
           {C.give_show !== 'off' && <>
           <div class="give">
-            <div class="gv">
-              <p class="gv-k">善的循環</p>
-              <p class="gv-l">每份支持，撥出 <b class="num">{C.give_rate}%</b> 捐給台日兩地的災害救援。</p>
-              {C.give_text && <p class="gline"><Fragment set:html={giveHtml} /></p>}
-              <ul class="gv-org">
-                {C.give_tw_org && <li><a href={safeHref(C.give_tw_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#D1162B"/><rect width="12" height="8" fill="#0B2C86"/><circle cx="6" cy="4" r="2.3" fill="#fff"/><circle cx="6" cy="4" r="1.5" fill="#0B2C86"/><circle cx="6" cy="4" r="1.1" fill="#fff"/></svg><span><b>台灣</b>{C.give_tw_org}</span><i aria-hidden="true">↗</i></a></li>}
-                {C.give_org && <li><a href={safeHref(C.give_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/><circle cx="12" cy="8" r="4.6" fill="#BC002D"/></svg><span><b>日本</b>{C.give_org}</span><i aria-hidden="true">↗</i></a></li>}
-              </ul>
-              {C.give_next && <p class="gv-n">下次捐贈 <b>{C.give_next}</b>・每 3 個月一次，證明會公開在日常紀錄</p>}
-              {(C.give_donated || C.give_total) && <dl class="gnum">
+            <div>{C.give_text && <p class="gline"><Fragment set:html={giveHtml} /></p>}{(C.give_donated || C.give_total) && <dl class="gnum">
               {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
               {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
               {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
               {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
-              </dl>}
-            </div>
+            </dl>}</div>
             <div class="flow">
-              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span></li>)}</ul></div>
+              <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''} tabindex={x.give ? 0 : undefined} data-give={x.give ? '1' : undefined}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span>{x.give && <div class="gv-pop" role="tooltip"><div class="gv-k">善的循環</div><div class="gv-l">每份支持撥出 <strong class="num">{C.give_rate}%</strong>，捐給台日災害救援</div>{C.give_tw_org && <a href={safeHref(C.give_tw_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#D1162B"/><rect width="12" height="8" fill="#0B2C86"/><circle cx="6" cy="4" r="2.3" fill="#fff"/><circle cx="6" cy="4" r="1.5" fill="#0B2C86"/><circle cx="6" cy="4" r="1.1" fill="#fff"/></svg><em><strong>台灣</strong>{C.give_tw_org}</em><small aria-hidden="true">↗</small></a>}{C.give_org && <a href={safeHref(C.give_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/><circle cx="12" cy="8" r="4.6" fill="#BC002D"/></svg><em><strong>日本</strong>{C.give_org}</em><small aria-hidden="true">↗</small></a>}{C.give_next && <div class="gv-n">下次捐贈 <strong>{C.give_next}</strong>・每 3 個月一次，證明會公開在日常紀錄</div>}</div>}</li>)}</ul></div>
           </div>
           </>}
         </aside>
@@ -1801,4 +1793,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 })();
 </script>
 
+<script is:inline>
+(function(){var l=document.querySelector('.flow-key li[data-give]');if(!l)return;l.addEventListener('click',function(e){if(e.target.closest('.gv-pop a'))return;l.classList.toggle('open');});document.addEventListener('click',function(e){if(!l.contains(e.target))l.classList.remove('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')l.classList.remove('open');});})();
+</script>
 </BaseLayout>
