@@ -3,9 +3,9 @@
   "items": [
     {
       "id": "w1",
-      "kind": "habit",
+      "kind": "fun",
       "title": "自媒體經營：8AKER零",
-      "state": "idea",
+      "state": "doing",
       "note": "",
       "next": "",
       "help": "",
@@ -29,7 +29,7 @@
     },
     {
       "id": "w3",
-      "kind": "goal",
+      "kind": "fun",
       "title": "AI 變現去：把興趣變成收入",
       "state": "doing",
       "note": "",
@@ -108,7 +108,7 @@
     {
       "id": "w9",
       "kind": "goal",
-      "title": "英文配音：自媒體影片自己說英文",
+      "title": "英文練口說：輸出影片用英文配音",
       "state": "idea",
       "note": "",
       "next": "",
@@ -121,7 +121,7 @@
     {
       "id": "w10",
       "kind": "fun",
-      "title": "跳舞：跟著短影音自學編舞",
+      "title": "身體好誠實：挑喜歡的舞序偷偷跳",
       "state": "idea",
       "note": "",
       "next": "",
