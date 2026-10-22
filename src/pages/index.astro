@@ -1624,7 +1624,6 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     return {r:r,total:es.length,live:live,cc:cc,pct:pct,dayN:dayN,dayT:dayT,body:body,st:{done:'刊出',break:'休載',next:'製作中',future:'預定'}[r.state],
       link:'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>'};}
   var dirLine=function(c){return '<p class="dline">'+D.dirs.map(function(d){return '<a href="/pillars/'+d.id+'/" style="--dc:'+col(d.id)+'"><b>'+d.k+'</b>'+(c[d.id]||0)+'</a>';}).join('')+'</p>';};
-  var repLine='<p class="rline"><span>報</span>每月 2 號，這個月的日常紀錄會依方向整理成月報，寄給天使投資人。</p>';
   var knum=function(r){return r.final?'巻':KN[r.no]||r.no;};
   /* 年輪：每一話是一圈，刊出的圈描金，這一話依月份進度畫到一半並發光 */
   function ringSvg(){var n=list.length,R0=44,R1=150,sv='';
@@ -1639,7 +1638,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="vn">'+(q.final?'第一卷':'第'+KN[q.no]+'話')+'</span><span class="vt">'+esc(q.final?'四十歲・發售':q.title)+'</span><span class="vd">'+(+q.date.slice(5,7))+'月'+(+q.date.slice(8))+'日</span>'+stamp+'</button></li>';}).join('');
     return '<div class="cc"><ol class="cc-cols" aria-label="連載帳">'+cols+'</ol>'
       +'<article class="cc-now">'+ringSvg()
-      +'<div class="cc-side"><div class="ca-nums"><div><b class="num">'+(x.live?x.total:'—')+'</b><small>這一話</small></div><div><b class="num">'+D.entries.length+'</b><small>全卷累積</small></div><div><b class="num">'+streak+'</b><small>連續紀錄</small></div></div>'+dirLine(D.totals)+'</div></article></div>'+repLine;}
+      +'<div class="cc-side"><div class="ca-nums"><div><b class="num">'+(x.live?x.total:'—')+'</b><small>這一話</small></div><div><b class="num">'+D.entries.length+'</b><small>全卷累積</small></div><div><b class="num">'+streak+'</b><small>連續紀錄</small></div></div>'+dirLine(D.totals)+'</div></article></div>';}
   function render(){CD.innerHTML=vC();
     var cc=CD.querySelector('.cc-cols');if(cc){var on=cc.querySelector('.on');if(on)cc.scrollLeft=on.parentElement.offsetLeft-cc.clientWidth/2;}}
   CD.addEventListener('click',function(e){var b=e.target.closest('[data-i]');if(!b)return;SEL=+b.getAttribute('data-i');render();});
