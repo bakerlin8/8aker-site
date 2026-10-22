@@ -907,15 +907,15 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .tw-cta:hover .gc-ic .cup{animation:none;}
 .tw-cta:hover .cup .stm{animation:steam 1.6s ease-in-out infinite;}
 @keyframes steam{0%{opacity:0;transform:translateY(2px);}40%{opacity:.9;}100%{opacity:0;transform:translateY(-3px);}}
-.pay-morph{position:relative;display:grid;min-height:118px;--pm-e:cubic-bezier(.22,.8,.24,1);}
+.pay-morph{position:relative;display:grid;--pm-e:cubic-bezier(.22,.8,.24,1);}
 .pay-morph>*{grid-area:1/1;}
 .pay-morph .pm-face{width:100%;margin:0;text-align:left;cursor:pointer;height:100%;will-change:transform,opacity;}
 .pay-morph .pm-tiers{display:grid;align-items:stretch;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;pointer-events:none;}
 .pay-morph .pm-tiers .pay-t{opacity:0;will-change:transform,opacity;}
-.give-cta.pay-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;padding:10px 6px;min-height:118px;text-align:center;}
-.pay-t .pt-ic{flex:none;width:54px;height:54px;max-width:none;object-fit:cover;border-radius:50%;display:block;margin-bottom:3px;box-shadow:0 2px 10px rgba(0,0,0,.35);}
-.pay-t .pt-n{font-size:16px;letter-spacing:.05em;white-space:nowrap;color:var(--bone);font-weight:600;}
-.pay-a{font-style:normal;font-size:15px;letter-spacing:.04em;color:#E7B36A;}
+.give-cta.pay-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;padding:7px 4px;text-align:center;}
+.pay-t .pt-ic{flex:none;width:44px;height:44px;max-width:none;object-fit:cover;border-radius:50%;display:block;margin-bottom:2px;box-shadow:0 2px 8px rgba(0,0,0,.35);}
+.pay-t .pt-n{font-size:15px;line-height:1.3;letter-spacing:.05em;white-space:nowrap;color:var(--bone);font-weight:600;}
+.pay-a{font-style:normal;font-size:14px;line-height:1.3;letter-spacing:.04em;color:#E7B36A;}
 .pay-t.t3{border-color:rgba(212,162,76,.55);}
 /* 通用：開啟狀態（hover / 點擊 / 鍵盤） */
 .pay-morph .pm-face,.pay-morph .pm-tiers .pay-t{transition:opacity .38s var(--pm-e),transform .5s var(--pm-e),filter .38s var(--pm-e),clip-path .55s var(--pm-e);}
@@ -1295,7 +1295,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             </button>
             <div class="pm-tiers" id="pmTiers" role="group" aria-label="Stripe 單次支持，選一個金額">
               {payTiers.map((t, i) => <a class={`give-cta pay-t t${i + 1}`} href={t.url} target="_blank" rel="noopener" aria-label={`${t.name} ${t.amt || ''}`}>
-                <img class="pt-ic" src={`/img/pay-${i + 1}.webp`} alt="" width="54" height="54" loading="lazy" />
+                <img class="pt-ic" src={`/img/pay-${i + 1}.webp`} alt="" width="44" height="44" loading="lazy" />
                 <span class="pt-n">{t.name}</span>
                 {t.amt && <em class="pay-a num">{t.amt}</em>}
               </a>)}
