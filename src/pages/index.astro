@@ -1238,7 +1238,8 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
   </div>
 </section>
 
-<section class="sec band-wine" id="chapters" aria-labelledby="ch-h">
+<!-- 連載區：暫時隱藏（要恢復時，刪掉下一行 section 的 hidden 與 style，並把 BaseLayout 的導覽項目打開，以及把祈願所的「肆」改回「伍」） -->
+<section class="sec band-wine" id="chapters" aria-labelledby="ch-h" hidden style="display:none">
   <div class="sec-grid">
     <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Chapters</span></div>
     <div>
@@ -1251,7 +1252,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 
 <section class="sec" id="kiganjo" aria-labelledby="kg-h">
   <div class="sec-grid">
-    <div class="side" aria-hidden="true"><span class="sn">伍</span><span class="sl"></span><span class="se">Wishes</span></div>
+    <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Wishes</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">40 歲生日（{fortieth}）前，想做的、想試的、想養成的事</p><h2 id="kg-h" class="rv" style="--i:1">祈願所</h2></div>
       <div class="rv" style="--i:2">
