@@ -18,13 +18,12 @@ const jsonld = JSON.stringify({ '@context': 'https://schema.org', '@graph': [web
 const path = Astro.url.pathname;
 const isHome = path === '/' || path === '';
 import { pillars } from '../data/pillars';
-import services from '../data/services.json';
 // The Japanese serif and the Latin display face only draw a small, known set of characters
 // (section numerals, pillar kanji, Japanese subtitles, vertical English labels), so request just those glyphs.
 const glyphs = [...new Set([
   '壱弐参肆伍陸序結巻零・、。', 'したことは残す。済んだことは手放す。', String((copy as any).motto_ja || ''),
   ...pillars.flatMap((p) => [p.kanji, p.titleJp]),
-  ...services.services.map((x) => x.name_jp), 'お品書き松竹梅祈願所築歩旅',
+  'お品書き松竹梅祈願所築歩旅',
   'StatusChaptersJournalWorksBodyHelloDirections', 'BEFOREAFTNo.VIDSCRNUBLGService', '0123456789',
 ].join(''))].join('');
 const nav = [

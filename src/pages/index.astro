@@ -80,9 +80,6 @@ const pageData = {
 const safeHref = (u: string) => (/^(\/(?!\/)|https:\/\/)/.test(u || '') ? u : '');
 const payTiers = [1, 2, 3].map((n) => ({ name: C[`pay${n}_name`], sub: C[`pay${n}_sub`], amt: C[`pay${n}_amt`], url: safeHref(C[`pay${n}_url`]) })).filter((t) => t.name && t.url);
 const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url || '') && st.name).map((st) => ({ ...st, img: /^https:\/\//.test(st.img || '') ? st.img : '' }));
-// 服務卡燈箱：每張卡對應哪幾張服務內容（樣品）、每張卡的色調（與 .hats .hat:nth-child 一致）
-const HAT_SVC: Record<string, string[]> = { '築': ['property', 'owner'], '旅': ['omakase'] };
-const svcById: Record<string, any> = Object.fromEntries((services.services as any[]).map((x) => [x.id, x]));
 // 祈願所：「我可以幫忙」連到需求填表，並帶入是哪個願望、需要什麼
 // 祈願所：四種燈籠（Goal／Habit／Fun／Idea），不用百分比，亮度由「階段」決定
 const WISH_KINDS: Record<string, string> = { goal: 'Goal', fun: 'Fun', idea: 'Idea' };
@@ -1010,6 +1007,20 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 .svc-list li::before{content:'';position:absolute;left:0;top:.8em;width:6px;height:1px;background:rgb(var(--hc));}
 .svc-card .svc-ex{font-size:12.5px;color:#9C8790;}
 .svc-card .svc-price{font-size:13px;letter-spacing:.08em;color:rgb(var(--hl));}
+.svc-sec{margin-top:22px;padding-top:16px;border-top:1px solid rgba(var(--hc),.28);}
+.svc-sec h4{margin:0 0 10px;font-family:var(--sans,inherit);font-size:12px;font-weight:500;letter-spacing:.2em;color:rgb(var(--hc));}
+.svc-blocks{list-style:none;margin:0;padding:0;display:grid;gap:18px;}
+.svc-blk{display:grid;grid-template-columns:30px minmax(0,1fr);gap:8px;}
+.svc-no{font-family:var(--latin);font-size:14px;letter-spacing:.06em;color:rgb(var(--hc));padding-top:3px;}
+.svc-bn{margin:0;font-family:var(--serif);font-weight:500;font-size:17px;color:#EFE5D6;}
+.svc-blk .svc-list{margin-top:8px;}
+.svc-get{margin:10px 0 0;font-size:13.5px;line-height:1.7;color:#D8CABD;}
+.svc-get b{display:inline-block;margin-right:8px;padding:0 7px;border:1px solid rgba(var(--hc),.55);font-size:11.5px;font-weight:500;letter-spacing:.12em;color:rgb(var(--hl));}
+.svc-more{display:inline-block;margin-top:8px;font-size:13px;color:rgb(var(--hl));border-bottom:1px solid rgba(var(--hc),.55);}
+.svc-more:hover{color:#fff;}
+.svc-note{margin:16px 0 0;}
+.svc-price{margin:18px 0 0;font-size:14px;letter-spacing:.06em;color:#EFE5D6;}
+.svc-price b{margin-right:10px;font-size:12px;font-weight:500;letter-spacing:.2em;color:rgb(var(--hc));}
 .svc-ctas{margin-top:26px;padding-top:20px;border-top:1px solid rgba(var(--hc),.28);display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
 .svc-cta-col p{margin:0 0 8px;font-size:12px;letter-spacing:.16em;color:#B9A89E;}
 .svc-cta{display:block;text-align:center;padding:12px 14px;border:1px solid rgb(var(--hc));color:rgb(var(--hl));letter-spacing:.1em;font-size:14px;transition:background .3s,color .3s;}
@@ -1147,30 +1158,27 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
         ))}
       </ol>
       {services.hats.map((h: any, i: number) => {
-        const list = (HAT_SVC[h.k] || []).map((id) => svcById[id]).filter(Boolean);
         const c = HAT_COL[i % 3];
         return (
           <dialog class="svc-dlg" id={`svc-${i}`} data-k={h.k} aria-labelledby={`svc-h-${i}`} style={`--hc:${c[0]};--hl:${c[1]}`}>
             <div class="svc-in">
               <button type="button" class="svc-x" data-close aria-label="關閉">×</button>
-              <p class="svc-k">{h.provider}</p>
+              {(() => { const D = h.detail || {}; return (<>
               <h3 id={`svc-h-${i}`}>{h.title}</h3>
-              <p class="svc-desc">{String(h.desc).split(/(?<=。)/).map((t: string) => <span class="dl">{t}</span>)}</p>
-              {list.length ? list.map((x: any) => (
-                <section class="svc-card">
-                  <h4>{x.name}{x.name_jp && <small>{x.name_jp}</small>}</h4>
-                  <p class="svc-for">{x.for}</p>
-                  <p>{x.desc}</p>
-                  <ul class="svc-list">{(x.items || []).map((t: string) => <li>{t}</li>)}</ul>
-                  {x.excludes && x.excludes.length > 0 && <p class="svc-ex">不含：{x.excludes.join('、')}</p>}
-                  <p class="svc-price">{x.price}</p>
-                </section>
-              )) : (
-                <section class="svc-card">
-                  <ul class="svc-list">{(h.items || []).map((t: string) => <li>{t}</li>)}</ul>
-                  <p class="svc-ex">每個流程都不一樣，先聊聊你現在怎麼做，再決定做什麼。</p>
-                </section>
-              )}
+              {D.tagline && <p class="svc-desc">{D.tagline}</p>}
+              {D.for && D.for.length > 0 && <section class="svc-sec"><h4>適合你，如果</h4><ul class="svc-list">{D.for.map((t: string) => <li>{t}</li>)}</ul></section>}
+              {D.blocks && D.blocks.length > 0 && <section class="svc-sec"><h4>服務內容</h4>
+                <ol class="svc-blocks">{D.blocks.map((x: any, n: number) => (
+                  <li class="svc-blk"><span class="svc-no">{String(n + 1).padStart(2, '0')}</span><div>
+                    <p class="svc-bn">{x.name}</p>
+                    <ul class="svc-list">{(x.do || []).map((t: string) => <li>{t}</li>)}</ul>
+                    {x.get && <p class="svc-get"><b>你會拿到</b>{x.get}</p>}
+                    {x.link && safeHref(x.link.href) && <a class="svc-more" href={safeHref(x.link.href)}>{x.link.text} →</a>}
+                  </div></li>))}</ol></section>}
+              {D.excludes && D.excludes.length > 0 && <section class="svc-sec"><h4>不包含</h4><ul class="svc-list svc-ex">{D.excludes.map((t: string) => <li>{t}</li>)}</ul></section>}
+              {D.note && <p class="svc-ex svc-note">{D.note}</p>}
+              {D.price && <p class="svc-price"><b>費用</b>{D.price}</p>}
+              </>); })()}
               <div class="svc-ctas">
                 {igUrl && <div class="svc-cta-col"><p>已有聯絡</p><a class="svc-cta" href={igUrl} target="_blank" rel="noopener">私訊講<span class="arw" aria-hidden="true"><i></i></span></a></div>}
                 <div class="svc-cta-col"><p>初次見面</p><a class="svc-cta" href="/chat/">先填表<span class="arw" aria-hidden="true"><i></i></span></a></div>
@@ -1754,7 +1762,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     an.finished.then(function(){d.close();an.cancel();inn.getAnimations().forEach(function(x){x.cancel();});d.classList.remove('closing');busy=false;var h=from&&from.querySelector('.hat-hit');if(h)h.focus({preventScroll:true});},function(){d.classList.remove('closing');busy=false;});}
   H.addEventListener('click',function(e){var b=e.target.closest('.hat-hit');if(b)openD(b);});
   document.querySelectorAll('.svc-dlg').forEach(function(d){
-    d.addEventListener('click',function(e){if(e.target===d||e.target.closest('[data-close]'))closeD(d);});
+    d.addEventListener('click',function(e){if(e.target===d||e.target.closest('[data-close]')||e.target.closest('.svc-more'))closeD(d);});
     d.addEventListener('cancel',function(e){e.preventDefault();closeD(d);});});})();
 
 /* 實績數字：月台翻牌。捲到時每一格從 0 一張一張翻到目標字；滑鼠移上去會再翻一次 */
