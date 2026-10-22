@@ -260,6 +260,50 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho .st{margin-top:10px;font-size:11.5px;letter-spacing:.1em;color:var(--gold);}
 .cho.dim .st{color:var(--ash);}
 .cho-hint{display:none!important;}
+/* 祈願所：燈籠互動（有興趣／想法與建議） */
+.cho-act{position:absolute;left:0;right:0;top:84px;display:flex;justify-content:space-between;padding:0 8px;pointer-events:none;z-index:3;}
+.ca{pointer-events:auto;width:30px;height:30px;padding:0;border-radius:50%;border:1px solid rgba(212,162,76,.6);background:rgba(28,15,20,.9);color:var(--gold);display:grid;place-items:center;cursor:pointer;opacity:0;transform:scale(.6);transition:opacity .3s,transform .4s var(--ease),background .3s,color .3s;}
+.ca svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.cho:hover .ca,.cho:focus-within .ca,.cho.open .ca{opacity:1;transform:none;}
+.ca:hover,.ca:focus-visible{background:var(--gold);color:#1C0F14;outline:none;}
+.ca.like.on{background:var(--gold);color:#1C0F14;}.ca.like.on svg{fill:currentColor;}
+@media(hover:none){.ca{opacity:1;transform:none;}}
+.cho.hearted .bd{box-shadow:0 0 70px 20px rgba(255,170,80,.6),0 0 0 3px rgba(212,162,76,.55)!important;}
+.wp{position:absolute;z-index:60;width:min(300px,calc(100vw - 24px));background:#241218;border:1px solid rgba(212,162,76,.5);padding:16px 16px 14px;color:var(--bone);box-shadow:0 18px 50px -12px rgba(0,0,0,.8);font-size:13.5px;line-height:1.7;animation:wpIn .35s var(--ease) both;}
+.wp::before{content:'';position:absolute;top:-6px;left:var(--ax,50%);width:10px;height:10px;background:#241218;border-left:1px solid rgba(212,162,76,.5);border-top:1px solid rgba(212,162,76,.5);transform:translateX(-50%) rotate(45deg);}
+.wp.up::before{top:auto;bottom:-6px;transform:translateX(-50%) rotate(225deg);}
+.wp.bub{border-radius:16px;}
+@keyframes wpIn{from{opacity:0;transform:translateY(6px) scale(.97);}}
+.wp-h{font-family:var(--serif);font-size:15px;color:#EBD3A8;line-height:1.5;}
+.wp-s{margin-top:4px;color:var(--bone-2);font-size:12.5px;}
+.wp-l{margin-top:10px;font-size:11.5px;letter-spacing:.12em;color:var(--gold);}
+.wp-opts{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;}
+.wp-opts label,.wp-chips label{cursor:pointer;}
+.wp-opts input,.wp-chips input{position:absolute;opacity:0;pointer-events:none;}
+.wp-opts b,.wp-chips b{display:inline-block;font-weight:400;font-size:12.5px;padding:3px 11px;border:1px solid rgba(239,229,214,.28);border-radius:99px;color:var(--bone-2);transition:all .25s;}
+.wp-opts input:checked+b,.wp-chips input:checked+b{border-color:var(--gold);color:#1C0F14;background:var(--gold);}
+.wp-opts input:focus-visible+b,.wp-chips input:focus-visible+b{outline:1px solid var(--gold);outline-offset:2px;}
+.wp-chips{display:flex;gap:6px;margin-top:8px;}
+.wp-in,.wp-ta,.wp-sel{display:block;width:100%;margin-top:6px;padding:7px 10px;background:#1a0d12;border:1px solid rgba(239,229,214,.25);color:var(--bone);font:inherit;font-size:13.5px;border-radius:2px;box-sizing:border-box;}
+.wp-ta{min-height:76px;resize:vertical;}
+.wp-in[hidden],.wp [hidden]{display:none;}
+.wp-in:focus,.wp-ta:focus,.wp-sel:focus{outline:none;border-color:var(--gold);}
+.wp-go{margin-top:12px;width:100%;padding:8px 12px;border:1px solid var(--gold);background:transparent;color:var(--gold);font:inherit;font-size:13.5px;letter-spacing:.1em;cursor:pointer;transition:background .3s,color .3s;}
+.wp-go:hover,.wp-go:focus-visible{background:var(--gold);color:#1C0F14;outline:none;}
+.wp-ok{font-family:var(--serif);font-size:15px;color:#EBD3A8;}
+.wp-demo{margin-top:8px;font-size:11.5px;color:#E2A08F;}
+.wp-more{margin-top:8px;background:none;border:0;padding:0;color:var(--gold);font:inherit;font-size:12.5px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+.wp-x{position:absolute;top:4px;right:6px;width:28px;height:28px;border:0;background:none;color:var(--bone-2);font-size:18px;cursor:pointer;}
+dialog.wp-dlg{border:1px solid rgba(212,162,76,.5);background:#241218;color:var(--bone);padding:26px 24px 22px;width:min(420px,calc(100vw - 24px));margin:auto;}
+dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
+.wp-tabs{display:flex;gap:6px;margin:12px 0 4px;border-bottom:1px solid rgba(239,229,214,.15);}
+.wp-tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--bone-2);font:inherit;font-size:13.5px;padding:6px 12px;cursor:pointer;display:flex;gap:6px;align-items:center;}
+.wp-tabs button[aria-selected=true]{color:var(--gold);border-bottom-color:var(--gold);}
+.wp-tabs svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.wp-toast{position:absolute;left:50%;top:30px;transform:translateX(-50%);white-space:nowrap;z-index:4;background:#241218;border:1px solid rgba(212,162,76,.5);color:#EBD3A8;font-size:12px;padding:5px 12px;border-radius:99px;animation:wpIn .4s var(--ease) both;}
+.spark{position:absolute;left:50%;top:150px;width:6px;height:6px;border-radius:50%;background:#ffd98a;pointer-events:none;z-index:4;animation:sparkUp 1.1s ease-out forwards;}
+@keyframes sparkUp{to{transform:translate(var(--dx),-110px) scale(.2);opacity:0;}}
+@media(prefers-reduced-motion:reduce){.wp,.wp-toast,.spark{animation:none!important;}}
 .cho h4{text-wrap:balance;}
 .cho .kd{font-family:var(--latin);font-size:15px;font-weight:600;letter-spacing:.12em;line-height:1;}
 .cho-empty{margin-top:28px;color:var(--bone-2);font-size:14.5px;letter-spacing:.06em;}
@@ -1146,8 +1190,9 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
               {d.next && V.stamp === '' && <p class="next"><b>下一步</b>{d.next}</p>}
               {d.help && <p class="needs">需要幫忙：{d.help}</p>}
               {d.help && !href && V.stamp === '' && <a class="hlp" href={wishHelpHref(d)}>我可以幫忙 →</a>}
-              {wishDate(d.updated) && <p class="upd">更新於 {wishDate(d.updated)}</p>}</div></div>}</>);
-            return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty} tabindex="0">{inner}</article>; })}
+              {wishDate(d.updated) && <p class="upd">更新於 {wishDate(d.updated)}</p>}</div></div>}
+              {!href && <div class="cho-act"><button type="button" class="ca like" data-act="like" aria-label="我有興趣"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.7a4.3 4.3 0 0 1 7.5 2.6c0 5.6-7.5 10.2-7.5 10.2Z"/></svg></button><button type="button" class="ca idea" data-act="idea" aria-label="我有想法或建議"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg></button></div>}</>);
+            return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty} tabindex="0" data-id={d.id} data-t={d.title}>{inner}</article>; })}
           </div></div>
           <p class="cho-hint">← 左右滑動看全部 →</p>
         </div>
@@ -1652,4 +1697,66 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       else{M.href='/pillars/'+f+'/';M.firstChild.textContent='看「'+c.t+'」全部 '+c.n+' 篇';M.hidden=c.n===0;}}});})();
 })();
 </script>
+
+<script is:inline>
+/* 祈願所互動樣品：?wish=a（小卡片）／b（跳出視窗）／c（燈籠自己亮） ── 預覽版：不送出任何資料 */
+(function(){
+  var SEC=document.getElementById('kiganjo');if(!SEC)return;
+  var S=(new URLSearchParams(location.search).get('wish')||'a').toLowerCase();if('abc'.indexOf(S)<0)S='a';
+  var K='wish-liked:';
+  function got(id){try{return localStorage.getItem(K+id)==='1';}catch(e){return false;}}
+  function mark(id){try{localStorage.setItem(K+id,'1');}catch(e){}}
+  function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  var BULB='<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg>';
+  var HEART='<svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.7a4.3 4.3 0 0 1 7.5 2.6c0 5.6-7.5 10.2-7.5 10.2Z"/></svg>';
+  var T={ig:['Instagram 帳號','例：baker_tw'],line:['LINE ID','你的 LINE ID'],email:['Email','例：name@example.com']};
+  function contact(){return '<p class="wp-l">聯絡方式（選填）</p><div class="wp-opts"><label><input type="radio" name="wc" value="ig"><b>Instagram</b></label><label><input type="radio" name="wc" value="line"><b>LINE</b></label><label><input type="radio" name="wc" value="email"><b>Email</b></label></div><input class="wp-in" name="wv" hidden maxlength="80">';}
+  function likeBody(t,compact){return '<p class="wp-h">對「'+esc(t)+'」有興趣</p><p class="wp-s">'+(compact?'已經點亮了。':'點一下就算數。')+'想收到後續進度，留個聯絡方式就好（選填）。</p>'+contact()+'<button type="button" class="wp-go" data-go="like">'+(compact?'送出聯絡方式':'我有興趣')+'</button>';}
+  function ideaBody(t,bub){return '<p class="wp-h">對「'+esc(t)+'」的想法或建議</p><div class="wp-chips"><label><input type="radio" name="wk" value="idea" checked><b>想法</b></label><label><input type="radio" name="wk" value="advice"><b>建議</b></label></div><textarea class="wp-ta" name="wm" maxlength="500" placeholder="一句話也可以"></textarea>'+(bub?'<button type="button" class="wp-more" data-more>要留聯絡方式嗎？</button><div hidden data-ct>'+contact()+'</div>':contact())+'<p class="wp-l">可以寫進連載嗎？</p><select class="wp-sel" name="ws"><option>不用</option><option>可以，匿名</option><option>可以，署名</option></select><button type="button" class="wp-go" data-go="idea">送出</button>';}
+  function doneBody(kind){return '<p class="wp-ok">'+(kind==='like'?'謝謝，已經記下來了。':'謝謝你的'+(kind==='idea'?'想法':'建議')+'！')+'</p><p class="wp-demo">（預覽版：還沒接上後台，內容不會真的送出）</p>';}
+  var cur=null;
+  function closeAll(){var o=document.querySelectorAll('.wp');for(var i=0;i<o.length;i++)o[i].remove();var d=document.querySelector('dialog.wp-dlg');if(d){if(d.open)d.close();d.remove();}cur=null;}
+  function wire(root,card,kind){
+    root.addEventListener('change',function(e){if(e.target.name==='wc'){var m=T[e.target.value],i=root.querySelector('[name=wv]');i.hidden=false;i.placeholder=m[1];i.type=e.target.value==='email'?'email':'text';i.focus();}});
+    root.addEventListener('click',function(e){
+      var more=e.target.closest('[data-more]');if(more){var c=root.querySelector('[data-ct]');c.hidden=false;more.remove();return;}
+      var go=e.target.closest('[data-go]');if(!go)return;var k=go.getAttribute('data-go');
+      var kk=k==='idea'?((root.querySelector('[name=wk]:checked')||{}).value||'idea'):'like';
+      if(k==='like'){mark(card.getAttribute('data-id'));setLiked(card);}
+      var body=root.querySelector('.wp-body')||root;body.innerHTML=doneBody(kk);});
+  }
+  function setLiked(card){card.classList.add('hearted');var b=card.querySelector('.ca.like');if(b)b.classList.add('on');}
+  function spark(card){for(var i=0;i<9;i++){var s=document.createElement('i');s.className='spark';s.style.setProperty('--dx',(Math.random()*70-35)+'px');s.style.left=(42+Math.random()*16)+'%';s.style.animationDelay=(i*50)+'ms';card.appendChild(s);setTimeout(function(x){x.remove();}.bind(null,s),1500);}}
+  function pop(card,btn,html,cls){
+    closeAll();var p=document.createElement('div');p.className='wp '+(cls||'');p.innerHTML='<button type="button" class="wp-x" aria-label="關閉">×</button><div class="wp-body">'+html+'</div>';document.body.appendChild(p);
+    var r=btn.getBoundingClientRect(),pw=p.offsetWidth,ph=p.offsetHeight,x=r.left+r.width/2,left=Math.max(12,Math.min(window.innerWidth-pw-12,x-pw/2));
+    var below=r.bottom+10+ph<window.innerHeight||r.top-ph-10<0;p.style.left=(left+window.scrollX)+'px';p.style.setProperty('--ax',(x-left)+'px');
+    if(below){p.style.top=(r.bottom+10+window.scrollY)+'px';}else{p.classList.add('up');p.style.top=(r.top-ph-10+window.scrollY)+'px';}
+    p.querySelector('.wp-x').onclick=closeAll;cur=p;wire(p,card,'');var f=p.querySelector('textarea,input:not([type=radio])');if(f&&f.type!=='hidden')setTimeout(function(){try{f.focus({preventScroll:true});}catch(e){}},50);
+  }
+  function dlg(card,start){
+    closeAll();var t=card.getAttribute('data-t'),d=document.createElement('dialog');d.className='wp-dlg';
+    d.innerHTML='<button type="button" class="wp-x" aria-label="關閉">×</button><p class="wp-h" style="font-size:17px">'+esc(t)+'</p><div class="wp-tabs" role="tablist"><button type="button" role="tab" data-tab="like" aria-selected="false">'+HEART+'我有興趣</button><button type="button" role="tab" data-tab="idea" aria-selected="false">'+BULB+'想法與建議</button></div><div class="wp-body"></div>';
+    document.body.appendChild(d);var body=d.querySelector('.wp-body');
+    function show(k){var tabs=d.querySelectorAll('[data-tab]');for(var i=0;i<tabs.length;i++)tabs[i].setAttribute('aria-selected',tabs[i].getAttribute('data-tab')===k?'true':'false');body.innerHTML=k==='like'?likeBody(t,false):ideaBody(t,false);}
+    d.addEventListener('click',function(e){var tb=e.target.closest('[data-tab]');if(tb){show(tb.getAttribute('data-tab'));return;}if(e.target===d)closeAll();});
+    d.querySelector('.wp-x').onclick=closeAll;wire(d,card,'');show(start);d.showModal();
+  }
+  SEC.addEventListener('click',function(e){
+    var b=e.target.closest('.ca');if(!b)return;e.stopPropagation();e.preventDefault();var card=b.closest('.cho'),act=b.getAttribute('data-act'),t=card.getAttribute('data-t');
+    if(S==='b'){dlg(card,act);return;}
+    if(S==='c'){
+      if(act==='like'){
+        if(!got(card.getAttribute('data-id'))){mark(card.getAttribute('data-id'));setLiked(card);spark(card);closeAll();var old=card.querySelector('.wp-toast');if(old)old.remove();var ts=document.createElement('div');ts.className='wp-toast';ts.innerHTML='已為它點亮 ✦ <button type="button" class="wp-more" style="margin:0 0 0 6px">留聯絡方式</button>';card.appendChild(ts);ts.querySelector('button').onclick=function(ev){ev.stopPropagation();ts.remove();pop(card,b,likeBody(t,true),'bub');};setTimeout(function(){if(ts.parentNode)ts.remove();},5000);}
+        else pop(card,b,likeBody(t,true),'bub');}
+      else pop(card,b,ideaBody(t,true),'bub');
+      return;}
+    pop(card,b,act==='like'?likeBody(t,false):ideaBody(t,false),'');
+  },true);
+  document.addEventListener('click',function(e){if(!cur||!document.contains(e.target))return;if(!e.target.closest('.wp')&&!e.target.closest('.ca'))closeAll();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAll();});
+  var cs=SEC.querySelectorAll('article.cho');for(var i=0;i<cs.length;i++){if(got(cs[i].getAttribute('data-id')))setLiked(cs[i]);}
+})();
+</script>
+
 </BaseLayout>
