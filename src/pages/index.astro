@@ -86,9 +86,9 @@ const svcById: Record<string, any> = Object.fromEntries((services.services as an
 // 祈願所：四種燈籠（Goal／Habit／Fun／Idea），不用百分比，亮度由「階段」決定
 const WISH_KINDS: Record<string, string> = { goal: 'Goal', fun: 'Fun', idea: 'Idea' };
 const WISH_ST: Record<string, Record<string, [string, number]>> = {
-  goal: { idea: ['想做', 0], doing: ['進行中', 0.7], done: ['已實現', 1] },
-  idea: { idea: ['點子', 0], test: ['驗證中', 0.55], build: ['動工', 0.8], done: ['已實現', 1] },
-  fun: { idea: ['想試', 0], doing: ['進行中', 0.7], done: ['試過了', 1] },
+  goal: { idea: ['規劃中', 0], doing: ['進行中', 0.7], done: ['已完成', 1] },
+  idea: { idea: ['規劃中', 0], test: ['進行中', 0.55], build: ['進行中', 0.8], done: ['已完成', 1] },
+  fun: { idea: ['規劃中', 0], doing: ['進行中', 0.7], done: ['已完成', 1] },
 };
 const wishView = (d: any) => {
   const legacyHabit = d.kind === 'habit'; // 舊的 Habit 併入 Fun
@@ -1720,7 +1720,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 /* 祈願所互動（預覽版）：♡ 為它點亮、💡 想法與建議。?count=a／b／c 預覽三種人數顯示（數字是示範用假數字）。尚未接後台，不送出任何資料 */
 (function(){
   var SEC=document.getElementById('kiganjo');if(!SEC)return;
-  var CV=(new URLSearchParams(location.search).get('count')||'').toLowerCase();if('abc'.indexOf(CV)<0)CV='';
+  var CV=(new URLSearchParams(location.search).get('count')||'').toLowerCase();if('abc'.indexOf(CV)<0)CV='';if(!CV){var ib=document.querySelectorAll('.cho .ca.idea');for(var q=0;q<ib.length;q++)ib[q].remove();}
   var K='wish-liked:';
   function st(id){try{var v=JSON.parse(localStorage.getItem(K+id)||'null');if(v&&typeof v==='object')return v;if(localStorage.getItem(K+id)==='1')return {lit:true,c:0,lock:false};}catch(e){}return {lit:false,c:0,lock:false};}
   function save(id,v){try{localStorage.setItem(K+id,JSON.stringify(v));}catch(e){}}
