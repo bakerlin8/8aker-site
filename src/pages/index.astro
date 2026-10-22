@@ -413,11 +413,16 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .hk.done{color:#C8584A;background:rgba(200,88,74,.08);}
 .hk.next{color:var(--gold);}
 .hk.fin{color:var(--gold);border-radius:3px;}
-.cc-now{display:grid;grid-template-columns:240px minmax(0,1fr);gap:44px;margin-top:30px;align-items:start;}
-.cc-now .cb-ring{width:100%;}
-.cc-side .ca-nums{margin-top:6px;}
-@media(max-width:1100px){.cc-now{grid-template-columns:200px minmax(0,1fr);}}
-@media(max-width:700px){.cc-now{grid-template-columns:1fr;gap:28px;}.cc-now .cb-ring{max-width:230px;margin:0 auto;}}
+
+/* ── 下方詳情區：5 種版型（?cl=1…5 預覽）── */
+.cc-now{display:block;margin-top:30px;}
+.cc-now{display:grid;grid-template-columns:150px minmax(0,1fr);gap:34px;align-items:center;}
+.l1-t{font-family:var(--serif);font-size:clamp(18px,2.4vw,24px);line-height:1.9;color:var(--bone);letter-spacing:.04em;}
+.l1-t b{font-family:var(--latin);font-weight:300;font-size:1.5em;color:var(--gold);padding:0 .12em;}
+.l1 .dline{margin-top:14px;}
+@media(max-width:700px){
+.cc-now{grid-template-columns:1fr;gap:18px;}.cc-now .cb-ring{max-width:150px;margin:0 auto;}.l1{text-align:center;}.l1 .dline{justify-content:center;}
+}
 @media(max-width:520px){.chd h3{font-size:21px;}.ca-nums b{font-size:24px;}.cc-cols li{flex-basis:58px;}.cc-cols button{height:320px;}}
 .mv-toggle button{font-size:13px;padding:5px 16px;color:var(--bone-2);transition:background .3s,color .3s;}
 .mv-toggle button:hover{color:var(--bone);}
@@ -1633,12 +1638,20 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var r=list[SEL];
     return '<div class="cb-ring"><svg viewBox="-160 -160 320 320" role="img" aria-label="連載年輪：每一話一圈">'+sv+'</svg><div class="cb-c"><b>'+knum(r)+'</b><small>'+(r.final?'第一卷':'話')+'</small></div></div>';}
   /* 連載帳：由左往右，一話一欄直書，刊出的蓋朱印；下方左邊是年輪，每一話一圈 */
+  /* 下方詳情區：5 種版型（?cl=1…5 預覽），資料都一樣：這一話／全卷累積／連續紀錄＋五方向小計＋年輪 */
+  function nowHtml(x,r){var thisN=x.live?x.total:0,allN=D.entries.length,dirs=D.dirs,T=D.totals,sum=0,mx=1;dirs.forEach(function(d){sum+=T[d.id]||0;mx=Math.max(mx,T[d.id]||0);});
+    var nm=function(n,l){return '<div><b class="num">'+n+'</b><small>'+l+'</small></div>';};
+    var chip=function(d){return '<a href="/pillars/'+d.id+'/" style="--dc:'+col(d.id)+'"><b>'+d.k+'</b>'+(T[d.id]||0)+'</a>';};
+    var h='<article class="cc-now">';
+    { /* 一句話：像手帳上的一行字 */
+      h+=ringSvg()+'<div class="l1"><p class="l1-t">'+label(r)+(x.live?'，這個月寫了 <b class="num">'+thisN+'</b> 則；':'；')+'整卷累積 <b class="num">'+allN+'</b> 則，已連續記錄 <b class="num">'+streak+'</b> 天。</p><p class="dline">'+dirs.map(chip).join('')+'</p></div>';
+    }
+    return h+'</article>';}
   function vC(){var x=info(SEL),r=x.r;
     var cols=list.map(function(q,i){var stamp=q.state==='done'?'<span class="hk done">刊</span>':q.state==='next'?'<span class="hk next">今</span>':q.final?'<span class="hk fin">巻</span>':'';
       return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="vn">'+(q.final?'第一卷':'第'+KN[q.no]+'話')+'</span><span class="vt">'+esc(q.final?'四十歲・發售':q.title)+'</span><span class="vd">'+(+q.date.slice(5,7))+'月'+(+q.date.slice(8))+'日</span>'+stamp+'</button></li>';}).join('');
     return '<div class="cc"><ol class="cc-cols" aria-label="連載帳">'+cols+'</ol>'
-      +'<article class="cc-now">'+ringSvg()
-      +'<div class="cc-side"><div class="ca-nums"><div><b class="num">'+(x.live?x.total:'—')+'</b><small>這一話</small></div><div><b class="num">'+D.entries.length+'</b><small>全卷累積</small></div><div><b class="num">'+streak+'</b><small>連續紀錄</small></div></div>'+dirLine(D.totals)+'</div></article></div>';}
+      +nowHtml(x,r)+'</div>';}
   function render(){CD.innerHTML=vC();
     var cc=CD.querySelector('.cc-cols');if(cc){var on=cc.querySelector('.on');if(on)cc.scrollLeft=on.parentElement.offsetLeft-cc.clientWidth/2;}}
   CD.addEventListener('click',function(e){var b=e.target.closest('[data-i]');if(!b)return;SEL=+b.getAttribute('data-i');render();});
