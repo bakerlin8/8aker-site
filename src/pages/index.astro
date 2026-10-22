@@ -907,15 +907,20 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .tw-cta:hover .gc-ic .cup{animation:none;}
 .tw-cta:hover .cup .stm{animation:steam 1.6s ease-in-out infinite;}
 @keyframes steam{0%{opacity:0;transform:translateY(2px);}40%{opacity:.9;}100%{opacity:0;transform:translateY(-3px);}}
-.pay3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
-.give-cta.pay-t{grid-template-columns:1fr;justify-items:center;text-align:center;gap:7px;margin:0;padding:14px 8px 12px;}
-.pay-t .gc-t{align-items:center;}
+.pay-morph{position:relative;display:grid;}
+.pay-morph>*{grid-area:1/1;}
+.pay-morph .pm-face{width:100%;margin:0;text-align:left;cursor:pointer;transition:opacity .3s,transform .35s var(--ease),visibility .3s;}
+.pay-morph .pm-tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;opacity:0;visibility:hidden;transform:scale(.96);transition:opacity .3s,transform .35s var(--ease),visibility .3s;}
+.pay-morph.open .pm-face,.pay-morph:has(:focus-visible) .pm-face{opacity:0;visibility:hidden;transform:scale(1.03);pointer-events:none;}
+.pay-morph.open .pm-tiers,.pay-morph:has(:focus-visible) .pm-tiers{opacity:1;visibility:visible;transform:none;}
+@media(hover:hover){.pay-morph:hover .pm-face{opacity:0;visibility:hidden;transform:scale(1.03);pointer-events:none;}.pay-morph:hover .pm-tiers{opacity:1;visibility:visible;transform:none;}}
+.give-cta.pay-t{grid-template-columns:1fr;justify-items:center;align-content:center;text-align:center;gap:3px;margin:0;padding:10px 6px;min-height:76px;height:100%;}
+.pay-t .gc-t{align-items:center;gap:1px;}
 .pay-t .gc-t b{font-size:16px;letter-spacing:.04em;white-space:nowrap;}
-.pay-t .gc-t small{font-size:11.5px;}
-.pay-a{font-style:normal;font-size:15px;letter-spacing:.05em;color:#E7B36A;}
-.pay-t.t1 .gc-ic svg{width:13px;height:18px;}.pay-t.t2 .gc-ic svg{width:16px;height:22px;}.pay-t.t3 .gc-ic svg{width:20px;height:27px;}
+.pay-t .gc-t small{font-size:11.5px;letter-spacing:.1em;}
+.pay-a{font-style:normal;font-size:15px;letter-spacing:.04em;color:#E7B36A;}
 .pay-t.t3{border-color:rgba(212,162,76,.55);}
-@media(max-width:520px){.pay3{grid-template-columns:1fr;gap:8px;}.give-cta.pay-t{grid-template-columns:40px minmax(0,1fr) auto;justify-items:stretch;text-align:left;gap:12px;padding:10px 14px 10px 10px;}.pay-t .gc-t{align-items:flex-start;}.pay-t .gc-ic{width:40px;height:40px;}}
+@media(prefers-reduced-motion:reduce){.pay-morph .pm-face,.pay-morph .pm-tiers{transition:opacity .01s;transform:none!important;}}
 .end-card .cta-pair{order:3;display:grid;grid-auto-rows:auto;gap:10px;margin:22px 0 24px;}
 .end-card .cta-pair .give-cta{margin:0;height:100%;}
 .end-card .cta-pair .tw-wrap{display:contents;}
@@ -1261,12 +1266,18 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
           <h3>{copy.subscribe_title}</h3>{copy.subscribe_desc && <p class="sdesc">{copy.subscribe_desc}</p>}
           {copy.subscribe_price && <div class="r"><b>{copy.subscribe_price}</b>{C.subscribe_unit && <span>{C.subscribe_unit}</span>}</div>}
           <div class="cta-pair">
-          {payTiers.length > 0 ? <div class="pay3" role="group" aria-label="Stripe 單次支持">
-            {payTiers.map((t, i) => <a class={`give-cta pay-t t${i + 1}`} href={t.url} target="_blank" rel="noopener">
+          {payTiers.length > 0 ? <div class="pay-morph" id="payMorph">
+            <button type="button" class="give-cta pm-face" aria-expanded="false" aria-controls="pmTiers">
               <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
-              <span class="gc-t"><b>{t.name}</b>{t.sub && <small>{t.sub}</small>}</span>
-              {t.amt && <em class="pay-a num">{t.amt}</em>}
-            </a>)}
+              <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
+              <span class="gc-ar" aria-hidden="true">↗</span>
+            </button>
+            <div class="pm-tiers" id="pmTiers" role="group" aria-label="Stripe 單次支持，選一個金額">
+              {payTiers.map((t, i) => <a class={`give-cta pay-t t${i + 1}`} href={t.url} target="_blank" rel="noopener">
+                <span class="gc-t"><b>{t.name}</b>{t.sub && <small>{t.sub}</small>}</span>
+                {t.amt && <em class="pay-a num">{t.amt}</em>}
+              </a>)}
+            </div>
           </div> : (safeHref(copy.subscribe_url) && <a class="give-cta" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">
   <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
             <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
@@ -1812,5 +1823,11 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 
 <script is:inline>
 (function(){var l=document.querySelector('.flow-key li[data-give]');if(!l)return;l.addEventListener('click',function(e){if(e.target.closest('.gv-pop a'))return;l.classList.toggle('open');});document.addEventListener('click',function(e){if(!l.contains(e.target))l.classList.remove('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')l.classList.remove('open');});})();
+</script>
+<script is:inline>
+(function(){var m=document.getElementById('payMorph');if(!m)return;var f=m.querySelector('.pm-face');
+f.addEventListener('click',function(e){e.stopPropagation();var o=m.classList.toggle('open');f.setAttribute('aria-expanded',o?'true':'false');if(o){var a=m.querySelector('.pay-t');if(a&&!window.matchMedia('(hover:hover)').matches){}}});
+document.addEventListener('click',function(e){if(!m.contains(e.target)){m.classList.remove('open');f.setAttribute('aria-expanded','false');}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){m.classList.remove('open');f.setAttribute('aria-expanded','false');}});})();
 </script>
 </BaseLayout>
