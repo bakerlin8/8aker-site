@@ -230,7 +230,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
   var AC=window.AudioContext||window.webkitAudioContext,ctx=null,master=null,noiseBuf=null,unlocked=false;
   function init(){if(ctx||!AC)return ctx;try{ctx=new AC();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);
     noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.4,ctx.sampleRate);var d=noiseBuf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;}catch(e){ctx=null;}return ctx;}
-  function unlock(){if(!init())return;if(ctx.state==='suspended')ctx.resume();unlocked=true;}
+  function unlock(){if(!init())return;if(ctx.state!=='running'){try{var r=ctx.resume();if(r&&r.catch)r.catch(function(){});}catch(e){}}unlocked=true;}
   function tone(f,t0,dur,g,type,f2){var o=ctx.createOscillator(),a=ctx.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+dur);
     a.gain.setValueAtTime(0,t0);a.gain.linearRampToValueAtTime(g,t0+.006);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(a);a.connect(master);o.start(t0);o.stop(t0+dur+.02);}
   function noise(t0,dur,g,f1,f2,q){var n=ctx.createBufferSource(),b=ctx.createBiquadFilter(),a=ctx.createGain();n.buffer=noiseBuf;b.type='bandpass';b.Q.value=q||1.2;b.frequency.setValueAtTime(f1,t0);if(f2)b.frequency.exponentialRampToValueAtTime(f2,t0+dur);
@@ -241,7 +241,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
     a.gain.setValueAtTime(g,t0);a.gain.exponentialRampToValueAtTime(.0001,t0+dur);n.connect(h);h.connect(b);b.connect(a);
     if(pn){pn.pan.value=(Math.random()-.5)*.35;a.connect(pn);pn.connect(master);}else a.connect(master);n.start(t0,Math.random()*.3);n.stop(t0+dur+.01);}
   var last={};
-  function play(kind){if(!on||!unlocked||!ctx||ctx.state!=='running')return;var now=ctx.currentTime,p=1+(Math.random()-.5)*.06;
+  function play(kind){if(!on||!unlocked||!ctx)return;if(ctx.state!=='running'){unlock();return;}var now=ctx.currentTime,p=1+(Math.random()-.5)*.06;
     if(last[kind]&&now-last[kind]<(kind==='hover'?.045:.03))return;last[kind]=now;
     switch(kind){
       case 'hover':tone(1750*p,now,.05,.06,'sine');break;
@@ -261,6 +261,9 @@ footer.site-foot a:hover{color:#EFE5D6;}
   document.addEventListener('pointerover',function(e){if(e.pointerType!=='mouse')return;var el=e.target.closest&&e.target.closest(SEL);if(el===hov)return;hov=el;if(el&&!el.disabled)play('hover');},{passive:true});
   document.addEventListener('pointerdown',function(e){unlock();var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))play('press');},{passive:true});
   document.addEventListener('pointerup',function(e){var el=e.target.closest&&e.target.closest(SEL);if(el&&!el.disabled&&!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))play('release');},{passive:true});
+  /* 手機（尤其 iPhone）要在 touchend／click 時才允許開聲音，閒置或切 App 回來也會被系統暫停，所以每次互動都重新喚醒 */
+  ['touchend','click'].forEach(function(n){document.addEventListener(n,unlock,{passive:true,capture:true});});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&unlocked&&ctx&&ctx.state!=='running')unlock();});
   document.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')unlock();},{passive:true});
   document.addEventListener('click',function(e){var el=e.target.closest&&e.target.closest(SEL);if(!el||el.disabled)return;
     if(el.id==='sfxBtn')return;
