@@ -372,21 +372,22 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .rline{display:flex;align-items:center;gap:12px;margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--bone-2);}
 .rline span{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--gold);color:var(--gold);font-family:var(--jp);font-size:14px;flex:none;}
 /* B 年輪帳 */
-.cb-ring{position:relative;}
+.cb-ring{position:relative;container-type:inline-size;}
+.cc-now .cb-ring{width:100%;}
 .cb-ring svg{width:100%;height:auto;display:block;overflow:visible;}
 .rg{fill:none;stroke:rgba(239,229,214,.24);stroke-width:1;cursor:pointer;transition:stroke .3s,stroke-width .3s;}
 .rg.future{stroke-dasharray:2 5;}
 .rg.done{stroke:rgba(212,162,76,.7);stroke-width:1.6;}
 .rg.next{stroke:#F3D9A0;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(212,162,76,.6));}
 .rg.fin{stroke:rgba(212,162,76,.35);stroke-dasharray:1 4;}
-.rg.on{stroke-width:3.2;animation:rgGlow 2.4s ease-in-out infinite;}
-@keyframes rgGlow{0%,100%{filter:drop-shadow(0 0 2px rgba(243,217,160,.35));}50%{filter:drop-shadow(0 0 9px rgba(243,217,160,.95));}}
-@media(prefers-reduced-motion:reduce){.rg.on{animation:none;filter:drop-shadow(0 0 6px rgba(243,217,160,.7));}}
+.rg.on{stroke:#FFE9B8;stroke-width:3.4;animation:rgGlow 2.4s ease-in-out infinite;}
+@keyframes rgGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(255,226,160,.7));}50%{filter:drop-shadow(0 0 13px rgba(255,226,160,1)) drop-shadow(0 0 4px rgba(255,240,200,.9));}}
+@media(prefers-reduced-motion:reduce){.rg.on{animation:none;filter:drop-shadow(0 0 9px rgba(255,226,160,.95));}}
 .rg:hover{stroke:var(--bone);}
 .rg-hit{fill:none;stroke:none;}
 .cb-c{position:absolute;left:50%;top:0;width:100%;aspect-ratio:1;transform:translateX(-50%);display:grid;place-content:center;justify-items:center;pointer-events:none;}
-.cb-c b{font-family:var(--jp);font-weight:400;font-size:30px;color:var(--gold);line-height:1;}
-.cb-c small{font-size:11px;color:var(--ash);margin-top:4px;letter-spacing:.2em;}
+.cb-c b{font-family:var(--jp);font-weight:400;font-size:clamp(13px,10.5cqw,30px);color:var(--gold);line-height:1;}
+.cb-c small{font-size:clamp(9px,5cqw,12px);color:var(--ash);margin-top:2px;letter-spacing:.2em;}
 /* C 縦書き帳 */
 .cc-cols{list-style:none;display:flex;flex-direction:row;border-top:1.5px solid var(--bone);border-bottom:1.5px solid var(--bone);overflow-x:auto;scrollbar-width:none;}
 .cc-cols::-webkit-scrollbar{display:none;}

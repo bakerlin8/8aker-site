@@ -847,10 +847,21 @@ async function loadChapters(pick) {
   const textToPlan = t => t.split('\n').map(s => s.trim()).filter(Boolean).map(s => DIR_BY_KANJI[s[0]] && s[1] === ' ' ? { dir: DIR_BY_KANJI[s[0]], text: s.slice(2).trim() } : { text: s });
   const lines = t => t.split('\n').map(s => s.trim()).filter(Boolean);
   function render() {
-    const c = data.chapters[cur];
-    form.innerHTML = `
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px;">${data.chapters.map((x, i) =>
-        `<button class="btn ${i === cur ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px" data-pick="${i}">第 ${x.no + 1} 話</button>`).join('')}</div>
+    const c = cur === -1 ? null : data.chapters[cur];
+    const picker = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px;">${data.chapters.map((x, i) =>
+        `<button class="btn ${i === cur ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px" data-pick="${i}">第 ${x.no + 1} 話</button>`).join('')}<button class="btn ${cur === -1 ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 14px" data-pick="-1">第一卷</button></div>`;
+    if (!c) {
+      const v = data.volume || (data.volume = { date: '', title: '', summary: '' });
+      form.innerHTML = picker + `
+      <div class="field"><label class="field-label">第一卷・標題（網站上「第一卷」那一欄和目次的名稱）</label><input type="text" id="v-title" value="${escapeAttr(v.title || '')}"></div>
+      <div class="field"><label class="field-label">發售日（倒數的終點）</label><input type="date" id="v-date" value="${escapeAttr(v.date || '')}"></div>
+      <div class="field"><label class="field-label">第一卷的一段話（目次最下面那張卡）</label><textarea id="v-summary" rows="4">${escapeHtml(v.summary || '')}</textarea></div>
+      <div class="btn-row"><button class="btn btn-primary" id="saveChBtn">儲存第一卷</button></div>`;
+      form.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => { collect(); cur = +b.dataset.pick; render(); }));
+      document.getElementById('saveChBtn').addEventListener('click', save);
+      return;
+    }
+    form.innerHTML = picker + `
       <div class="field"><label class="field-label">第 ${c.no + 1} 話・標題</label><input type="text" id="c-title" value="${escapeAttr(c.title)}"></div>
       <div class="field"><label class="field-label">刊出日</label><input type="date" id="c-date" value="${escapeAttr(c.date)}"></div>
       <div class="field field-checkbox"><input type="checkbox" id="c-break" ${c.on_break ? 'checked' : ''}><label for="c-break">這個月休載</label></div>
@@ -863,6 +874,7 @@ async function loadChapters(pick) {
     document.getElementById('saveChBtn').addEventListener('click', save);
   }
   function collect() {
+    if (cur === -1) { const t = document.getElementById('v-title'); if (!t) return; const v = data.volume; v.title = t.value.trim(); v.date = document.getElementById('v-date').value || v.date; v.summary = document.getElementById('v-summary').value.trim(); return; }
     const c = data.chapters[cur]; if (!document.getElementById('c-title')) return;
     c.title = document.getElementById('c-title').value.trim();
     c.date = document.getElementById('c-date').value || c.date;
@@ -876,7 +888,7 @@ async function loadChapters(pick) {
     const btn = document.getElementById('saveChBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = '儲存中…';
     try {
       collect();
-      const result = await ghPutFile('src/data/chapters.json', JSON.stringify(data, null, 2) + '\n', file.sha, `Update chapter ${data.chapters[cur].no} via Studio`);
+      const result = await ghPutFile('src/data/chapters.json', JSON.stringify(data, null, 2) + '\n', file.sha, cur === -1 ? 'Update volume via Studio' : `Update chapter ${data.chapters[cur].no} via Studio`);
       file.sha = result.content.sha;
       toast('已儲存，網站將在約一分鐘內更新');
     } catch (e) { toast('儲存失敗：' + e.message, 'err'); }
