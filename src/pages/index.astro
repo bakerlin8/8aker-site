@@ -93,8 +93,10 @@ const wishView = (d: any) => {
   const kind = legacyHabit ? 'fun' : (WISH_KINDS[d.kind] ? d.kind : 'goal');
   const t = WISH_ST[kind][legacyHabit && (!d.state || d.state === 'idea') ? 'doing' : d.state] || WISH_ST[kind].idea;
   const n = Number(d.count); const has = kind === 'fun' && d.count !== '' && d.count != null && Number.isFinite(n) && n > 0;
-  return { kind, label: WISH_KINDS[kind], st: t[0] + (has ? `・累積 ${n} ${String(d.unit || '次').slice(0, 4)}` : ''), g: t[1], lit: t[1] > 0, stamp: d.state === 'done' ? (kind === 'fun' ? '趣' : '叶') : '' };
+  const es = legacyHabit && (!d.state || d.state === 'idea') ? 'doing' : d.state; const grp = es === 'done' ? 'done' : (es === 'doing' || es === 'test' || es === 'build') ? 'doing' : 'plan';
+  return { grp, kind, label: WISH_KINDS[kind], st: t[0] + (has ? `・累積 ${n} ${String(d.unit || '次').slice(0, 4)}` : ''), g: t[1], lit: t[1] > 0, stamp: d.state === 'done' ? (kind === 'fun' ? '趣' : '叶') : '' };
 };
+const wishGroups = ([['doing', '進行中'], ['plan', '規劃中'], ['done', '已完成']] as [string, string][]).map(([g, t]) => ({ g, t, items: dreams.items.filter((d: any) => d.public && wishView(d).grp === g) })).filter((x: any) => x.items.length);
 const wishHelpHref = (d: any) => `/chat/?from=wish&about=${encodeURIComponent(String(d.title || ''))}&help=${encodeURIComponent(String(d.help || ''))}`;
 const wishDate = (u: any) => { const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(String(u || '')); return m ? `${+m[1]}/${+m[2]}` : ''; };
 const HAT_COL = [['196,86,107', '236,160,176'], ['212,162,76', '243,217,160'], ['214,196,172', '245,234,218']];
@@ -215,7 +217,21 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho-head .s{flex-basis:100%;font-size:13px;color:var(--bone-2);}
 .cho-scroll{position:relative;}
 /* 祈願所：燈籠沿著一串串垂下的繩子排列，自動換行，不用橫向捲動 */
-.cho-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:40px 0;position:relative;}
+.cho-grp{margin-top:30px;}.cho-grp:first-of-type{margin-top:6px;}
+.cho-gh{display:flex;align-items:baseline;gap:10px;padding:0 4px;}
+.cho-gt{font-family:var(--serif);font-size:17px;letter-spacing:.14em;color:#EBD3A8;}
+.cho-gc{font-family:var(--latin);font-size:12.5px;color:var(--ash);}
+.cho-gl{flex:1;height:1px;background:rgba(239,229,214,.14);align-self:center;}
+.cho-gm{display:none;font-size:11.5px;color:var(--ash);letter-spacing:.08em;}
+.cho-grp.can .cho-gm{display:block;}.cho-grp.end .cho-gm{visibility:hidden;}
+.cho-grp.g-done .cho-gt{color:var(--bone-2);}
+.cho-scroll{overflow-x:auto;padding:36px 0 40px;margin:-20px 0 -14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.cho-scroll::-webkit-scrollbar{display:none;}
+.cho-scroll.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent);}
+.cho-scroll.fl{-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px);mask-image:linear-gradient(90deg,transparent,#000 40px);}
+.cho-scroll.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);}
+.cho-row{display:flex;align-items:flex-start;width:max-content;min-width:100%;position:relative;}
+.cho-row>.cho{flex:0 0 172px;scroll-snap-align:start;}
 .cho::before{content:'';position:absolute;top:0;left:0;right:0;height:26px;border-bottom:1.2px solid rgba(239,229,214,.28);border-radius:0 0 50% 50%/0 0 100% 100%;pointer-events:none;}
 .cho{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 14px 0;color:inherit;}
 .cho h4,.cho .more{align-self:stretch;}.cho .st{align-self:center;}
@@ -336,7 +352,7 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 #kiganjo.in .cho{animation:choIn .7s var(--ease) both;animation-delay:calc(var(--n) * 90ms);}
 @keyframes choIn{from{opacity:0;transform:translateY(-12px);}}
 @media(prefers-reduced-motion:reduce){.cho .lan,#kiganjo.in .cho{animation:none;}}
-@media(max-width:640px){.cho-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 0;}.cho{padding:26px 8px 0;}.cho .bd{width:70px;height:100px;}}
+@media(max-width:640px){.cho-row>.cho{flex-basis:140px;}.cho{padding:26px 8px 0;}.cho .bd{width:70px;height:100px;}}
 
 /* ── 弐 連載 ── */
 .mv-toggle{display:inline-flex;margin-top:28px;border:1px solid var(--line);}
@@ -1250,6 +1266,14 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
   </div>
 </section>
 
+<script is:inline>
+document.addEventListener('DOMContentLoaded',function(){var S=document.querySelectorAll('.cho-scroll');
+  function upd(el){var g=el.closest('.cho-grp'),max=el.scrollWidth-el.clientWidth,x=el.scrollLeft;
+    el.classList.toggle('fr',max>4&&x<max-4);el.classList.toggle('fl',x>4);g.classList.toggle('can',max>4);g.classList.toggle('end',max>4&&x>=max-4);}
+  S.forEach(function(el){upd(el);el.addEventListener('scroll',function(){upd(el);},{passive:true});});
+  addEventListener('resize',function(){S.forEach(upd);});addEventListener('load',function(){S.forEach(upd);});
+});
+</script>
 <section class="sec" id="kiganjo" aria-labelledby="kg-h">
   <div class="sec-grid">
     <div class="side" aria-hidden="true"><span class="sn">肆</span><span class="sl"></span><span class="se">Wishes</span></div>
@@ -1259,8 +1283,9 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
         <div class="cho-wrap">
           
           {dreams.items.filter((d: any) => d.public).length === 0 && <p class="cho-empty">燈籠正在重新掛上，過幾天再來看看。</p>}
+          {wishGroups.map((G: any) => <div class={`cho-grp g-${G.g}`}><div class="cho-gh"><span class="cho-gt">{G.t}</span><span class="cho-gc">{G.items.length}</span><span class="cho-gl"></span><span class="cho-gm">滑動看更多 →</span></div>
           <div class="cho-scroll"><div class="cho-row">
-          {dreams.items.filter((d: any) => d.public).map((d: any, i: number) => { const V = wishView(d);
+          {G.items.map((d: any, i: number) => { const V = wishView(d);
             const href = safeHref(d.link); const cls = `cho k-${V.kind} ${V.lit ? 'lit' : 'dim'}${href ? ' go' : ''}`; const sty = `--n:${i};--g:${V.g}`;
             const inner = (<><div class="lan" aria-hidden="true">{href ? <span class="pin" title="可以點開">↗</span> : <span class="pin-none"></span>}<span class="str"></span><span class="cp"></span><span class="bd"><span class="kd">{V.label}</span>{V.stamp && <span class="stamp">{V.stamp}</span>}</span><span class="cp2"></span><span class="tas"></span></div>
               <h4>{d.title}</h4>
@@ -1275,8 +1300,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
               {wishDate(d.updated) && <p class="upd">更新於 {wishDate(d.updated)}</p>}</div></div>}
               {!href && <div class="cho-act"><button type="button" class="ca like" data-act="like" aria-label="我有興趣"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.7a4.3 4.3 0 0 1 7.5 2.6c0 5.6-7.5 10.2-7.5 10.2Z"/></svg></button><button type="button" class="ca idea" data-act="idea" aria-label="我有想法或建議"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg></button></div>}</>);
             return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty} tabindex="0" data-id={d.id} data-t={d.title}>{inner}</article>; })}
-          </div></div>
-          <p class="cho-hint">← 左右滑動看全部 →</p>
+          </div></div></div>)}
         </div>
       </div>
     </div>
