@@ -189,8 +189,8 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .hb-preview{white-space:pre-wrap;font-size:13.5px;background:var(--parchment);padding:14px 16px;line-height:1.8;max-height:360px;overflow:auto;}
 .hb-checks{display:flex;flex-direction:column;gap:6px;margin:8px 0 14px;}
 .hb-checks label{display:flex;gap:8px;align-items:center;font-size:13.5px;}
-.hb-card input[type=text]{width:100%;min-width:0;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:11px 13px;font-size:13.5px;color:var(--ink);}
-.hb-card input[type=text]:focus{border-color:var(--rose);outline:none;box-shadow:0 0 0 3px rgba(158,111,34,.12);}
+.hb-card input[type=text],.hb-card input[type=number]{width:100%;min-width:0;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:11px 13px;font-size:13.5px;color:var(--ink);}
+.hb-card input[type=text]:focus,.hb-card input[type=number]:focus{border-color:var(--rose);outline:none;box-shadow:0 0 0 3px rgba(158,111,34,.12);}
 
 /* ── icons ── */
 .login-mark{width:72px;height:72px;border-radius:16px;display:block;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);}
@@ -277,6 +277,31 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .sl-t{margin-top:10px;font-size:12.5px;line-height:1.5;color:#EFE5D6;max-width:112px;}
 .sl-s{font-size:11px;color:#C9A66B;margin-top:2px;}
 .sl-mini{display:flex;justify-content:center;background:radial-gradient(120% 90% at 50% 0%,#4A1524,#24101A);padding:6px 14px 8px;}
+
+
+/* 祈願所分頁 */
+.we-wall{margin-bottom:18px;}
+.sl-btn{position:relative;display:flex;flex-direction:column;align-items:center;padding:6px 4px 10px;border:1px solid transparent;background:none;cursor:pointer;color:inherit;font-family:inherit;border-radius:4px;}
+.sl-btn:hover{background:rgba(255,255,255,.05);}.sl-btn.on{border-color:var(--vermillion);background:rgba(212,162,76,.12);}
+.sl-no{position:absolute;top:4px;left:6px;font-size:11px;color:#C9A66B;font-family:'Cinzel',serif;}
+.sl-add{justify-content:center;min-height:170px;border:1px dashed rgba(239,229,214,.35);color:#EFE5D6;}.sl-plus{font-size:30px;color:#C9A66B;line-height:1;margin-bottom:6px;}
+.we-tip{font-size:12.5px;color:var(--ink-mute);margin:2px 0 10px;}
+.we-intro{margin-bottom:8px;}.we-intro summary,.we-more summary{cursor:pointer;font-size:13px;color:var(--ink-mute);padding:6px 0;}
+.we-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px;}
+.we-title{font-size:18px;font-family:'Noto Serif TC',serif;margin-top:2px;}
+.we-tools{display:flex;gap:6px;flex-wrap:wrap;}.we-tools .btn{padding:8px 14px;}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;}
+.seg button{text-align:left;padding:10px 14px;border:1px solid var(--border);border-radius:3px;background:var(--warm-white);font-family:inherit;cursor:pointer;color:var(--ink-mute);}
+.seg button b{display:block;font-weight:500;font-size:14px;color:var(--ink);}.seg button small{font-size:11.5px;color:var(--ink-ghost);}
+.seg button:hover{border-color:var(--ink-mute);}.seg button.on{background:var(--emerald-deep);border-color:var(--emerald-deep);color:var(--warm-white);}.seg button.on b,.seg button.on small{color:var(--warm-white);}
+.seg.st button{text-align:center;font-size:13.5px;}
+.we-more{border-top:1px solid var(--border-soft);margin-top:8px;padding-top:4px;}.we-more[open]{padding-bottom:6px;}
+.we-two{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;}
+.we-ideas{margin-top:14px;padding-top:14px;border-top:1px solid var(--border-soft);}
+.we-idea{font-size:13.5px;line-height:1.8;background:rgba(42,24,30,.04);padding:8px 12px;margin-top:8px;border-radius:3px;display:flex;justify-content:space-between;gap:12px;}.we-idea time{font-size:11.5px;color:var(--ink-ghost);flex:none;}
+.we-save{position:sticky;bottom:0;display:flex;justify-content:flex-end;align-items:center;gap:16px;padding:12px 0;background:linear-gradient(transparent,var(--cream) 30%);}
+#weDirty{font-size:12.5px;color:#C8584A;}
+@media(max-width:600px){.we-wall{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 0;padding:24px 4px 14px;}.sl-bd{width:58px;height:86px;}.sl-t{font-size:11.5px;}.we-two{grid-template-columns:1fr;}.we-tools .btn{flex:1;}}
 
 /* 需求收件匣 */
 #view-inbox button{font-family:inherit;background:none;border:0;color:inherit;cursor:pointer;}
@@ -419,9 +444,6 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="page-sub">首頁「需求填表」和祈願所燈籠收到的內容都在這裡，由新到舊。只有你看得到。</div>
       <div class="ib-bar" id="ibBar"></div>
       <div id="ibList"></div>
-      <details class="ib-set" open><summary>祈願所燈籠：點亮人數（上）與想法數量（下）</summary>
-        <div id="ibWall"></div>
-      </details>
       <details class="ib-set"><summary>設定：台灣轉帳帳號</summary>
         <div id="bankBox"></div>
       </details>
@@ -431,7 +453,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-dreams">
       <div class="page-eyebrow">Kiganjo</div>
       <div class="page-title">祈願所</div>
-      <div class="page-sub">40 歲生日前想做的事，網站上以一排燈籠由左到右呈現。<b>三種燈籠</b>：Goal 目標・Fun 好玩・Idea 點子。<b>三種狀態</b>：規劃中（燈籠是灰的）→ 進行中（點亮）→ 已完成（最亮並蓋章）。每盞燈籠上的 ✦ 是點亮的人數、💡 是想法與建議的則數，由訪客操作，這裡看得到、不能改。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#kiganjo" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
+      <div class="page-sub">40 歲生日前想做的事。點一盞燈籠就能編輯；燈籠上的 ✦ 是點亮人數、💡 是想法數，由訪客操作。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#kiganjo" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
       <div id="dreamsForm"></div>
     </section>
 
@@ -985,6 +1007,7 @@ async function saveJson(path, data, sha, msg, btn) {
 
 /* ══════════════════════════ 祈願所 ══════════════════════════ */
 const WISH_STATES = { goal: [['idea', '規劃中'], ['doing', '進行中'], ['done', '已完成']], idea: [['idea', '規劃中'], ['test', '進行中（驗證中）'], ['build', '進行中（動工）'], ['done', '已完成']], fun: [['idea', '規劃中'], ['doing', '進行中'], ['done', '已完成']] };
+let DREAM_SEL = 0;
 async function loadDreams() {
   showView('dreams');
   const form = document.getElementById('dreamsForm');
@@ -992,47 +1015,79 @@ async function loadDreams() {
   const file = await ghGetFile('src/data/dreams.json');
   const data = JSON.parse(file.content);
   data.items.forEach(x => { if (x.kind === 'habit') { x.kind = 'fun'; if (!x.state || x.state === 'idea') x.state = 'doing'; } }); // 舊的 Habit 併入 Fun
-  let wishCounts = {}; try { const w = await inboxApi('POST', { action: 'wish_ideas' }); (w.counts || []).forEach(c => { wishCounts[c.wish_id] = c; }); } catch (e) {}
+  let wishCounts = {}, wishIdeas = [];
+  try { const w = await inboxApi('POST', { action: 'wish_ideas' }); (w.counts || []).forEach(c => { wishCounts[c.wish_id] = c; }); wishIdeas = (w.items || []).filter(x => x.status !== 'spam'); } catch (e) {}
   const norm = (o) => JSON.stringify(Object.keys(o).filter(k => k !== 'updated' && o[k] !== '' && o[k] != null).sort().map(k => [k, o[k]]));
   const origById = Object.fromEntries(data.items.map(x => [x.id, norm(x)]));
-  const dirs = Object.entries(KANJI_BY_DIR).map(([d, k]) => [d, `${k}・${PILLARS[d].jp}`]);
-  function collect() {
-    data.intro = form.querySelector('[data-intro]').value;
-    form.querySelectorAll('[data-d]').forEach(el => { if (el.disabled) return; const it = data.items[+el.dataset.d]; const k = el.dataset.key;
-      if (el.type === 'checkbox') it[k] = el.checked;
-      else if (k === 'progress') { const v = el.value.trim(); if (v === '') delete it.progress; else it.progress = Math.max(0, Math.min(100, Math.round(+v) || 0)); }
-      else it[k] = el.value; });
+  let dirty = false;
+  if (DREAM_SEL >= data.items.length) DREAM_SEL = Math.max(0, data.items.length - 1);
+  const KINDS = [['goal', 'Goal', '目標：做到就算數'], ['fun', 'Fun', '好玩：會持續做的事'], ['idea', 'Idea', '點子：從日常小卡關來']];
+  const setDirty = () => { dirty = true; const m = document.getElementById('weDirty'); if (m) m.textContent = '● 有尚未儲存的變更'; };
+  const inp = (i, key, label, ph = '', max = '') => `<div class="field"><label class="field-label">${label}</label><input type="text" data-key="${key}" value="${escapeAttr(data.items[i][key] || '')}" ${max ? `maxlength="${max}"` : ''} placeholder="${escapeAttr(ph)}"></div>`;
+
+  function wallHTML() {
+    return `<div class="sl-wall we-wall">${data.items.map((d, i) => `<button type="button" class="sl-btn ${i === DREAM_SEL ? 'on' : ''}" data-sel="${i}" aria-pressed="${i === DREAM_SEL}"><span class="sl-no">${i + 1}</span>${lanternHTML(d.kind, d.title || '（還沒命名）', wishCounts[d.id])}</button>`).join('')}<button type="button" class="sl-btn sl-add" id="addDream"><span class="sl-plus">＋</span><div class="sl-t">掛一盞新燈籠</div></button></div>`;
   }
-  function render() {
-    form.innerHTML = `<div class="field"><label class="field-label">祈願所開頭的一句話</label><input type="text" data-intro value="${escapeAttr(data.intro || '')}"></div>` +
-      data.items.map((d, i) => `
-      <div class="hb-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="field-label" style="margin:0">第 ${i + 1} 盞燈籠（網站上由左到右）</span>
-          <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" data-del="${i}">移除</button></span></div>
-        <div class="sl-mini">${lanternHTML(d.kind, d.title, wishCounts[d.id], false)}</div>
-        <div class="field"><label class="field-label">想完成的事（做完時能判斷「實現了」）</label><input type="text" data-d="${i}" data-key="title" value="${escapeAttr(d.title)}"></div>
-        <div class="field"><label class="field-label">為什麼想做</label><textarea rows="2" data-d="${i}" data-key="why">${escapeHtml(d.why || '')}</textarea></div>
-        <div class="field"><label class="field-label">種類</label><select data-d="${i}" data-key="kind" style="${SEL_STYLE}">${opt([['goal', 'Goal・目標（做到就算數）'], ['fun', 'Fun・好玩（有趣、會持續做的事）'], ['idea', 'Idea・點子（從日常小卡關來的想法）']], d.kind || 'goal')}</select></div>
-        <div class="field"><label class="field-label">狀態（網站上只顯示：規劃中／進行中／已完成；越後面燈籠越亮）</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt(WISH_STATES[d.kind || 'goal'], d.state)}</select></div>
-        ${(d.kind || 'goal') === 'fun' ? `<div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px"><div class="field"><label class="field-label">已累積（選填，數字）</label><input type="number" min="0" step="1" data-d="${i}" data-key="count" value="${d.count ?? ''}" placeholder="例：12"></div><div class="field"><label class="field-label">單位（例：天、次、週）</label><input type="text" data-d="${i}" data-key="unit" value="${escapeAttr(d.unit || '')}" maxlength="4" placeholder="次"></div></div>` : ''}
-        <div class="field"><label class="field-label">旁註（紅色小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
-        <div class="field"><label class="field-label">下一步（可空白，一句話：接下來要做什麼，展開燈籠時會顯示）</label><input type="text" data-d="${i}" data-key="next" value="${escapeAttr(d.next || '')}" maxlength="60"></div>
-        <div class="field"><label class="field-label">需要幫忙（可空白；有填的燈籠會出現「需要幫忙」標記和「我可以幫忙」按鈕）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
-        <div class="field"><label class="field-label">點燈籠要連到哪裡（例：/chapters/3/、/works/checkin/；空白＝燈籠不能點）</label><input type="text" data-d="${i}" data-key="link" value="${escapeAttr(d.link || '')}"></div>
-        
-      </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 掛一盞新燈籠</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
-    form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定取下這盞燈籠嗎？儲存後才會生效。')) return; collect(); data.items.splice(+b.dataset.del, 1); render(); }));
-    form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.items[i - 1], data.items[i]] = [data.items[i], data.items[i - 1]]; render(); }));
-    form.querySelectorAll('select[data-key="kind"]').forEach(sel => sel.addEventListener('change', () => { collect(); const it = data.items[+sel.dataset.d]; if (!WISH_STATES[it.kind].some(x => x[0] === it.state)) it.state = 'idea'; render(); }));
-    document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.push({ id: 'd' + Date.now(), kind: 'goal', title: '', why: '', state: 'idea', note: '', next: '', help: '', link: '', public: true }); render(); });
-    document.getElementById('saveDreams').addEventListener('click', async (e) => {
-      collect(); if (data.items.some(x => !x.title.trim())) { toast('有一盞燈籠還沒填「想完成的事」', 'err'); return; }
-      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // 日本時間
-      data.items.forEach(x => { if (origById[x.id] !== norm(x)) x.updated = today; }); // 有改動的燈籠自動記「更新於」
-      file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update 祈願所 via Studio', e.currentTarget);
-    });
+  function editorHTML() {
+    const i = DREAM_SEL, d = data.items[i]; if (!d) return '<div class="empty-state">還沒有燈籠，按上面的「＋」掛第一盞。</div>';
+    const kind = d.kind || 'goal', more1 = d.why || d.note || d.next, more2 = d.help || d.link || d.count;
+    const ideas = wishIdeas.filter(x => x.wish_id === d.id).slice(0, 5), c = wishCounts[d.id] || {};
+    return `<div class="hb-card we-ed">
+      <div class="we-head"><div><span class="field-label" style="margin:0">第 ${i + 1} 盞（網站上由左到右）</span><div class="we-title">${escapeHtml(d.title || '（還沒命名）')}</div></div>
+        <div class="we-tools"><button class="btn btn-ghost" data-mv="-1" ${i === 0 ? 'disabled' : ''} aria-label="往左移">← 往左</button><button class="btn btn-ghost" data-mv="1" ${i === data.items.length - 1 ? 'disabled' : ''} aria-label="往右移">往右 →</button><button class="btn btn-danger" data-del>取下</button></div></div>
+      ${inp(i, 'title', '想完成的事（做完時能判斷「實現了」）', '例：BJT 400 分：商務日語檢定')}
+      <div class="field"><label class="field-label">種類</label><div class="seg" data-seg="kind">${KINDS.map(k => `<button type="button" class="${kind === k[0] ? 'on' : ''}" data-v="${k[0]}"><b>${k[1]}</b><small>${k[2]}</small></button>`).join('')}</div></div>
+      <div class="field"><label class="field-label">狀態（燈籠越後面越亮）</label><div class="seg st" data-seg="state">${WISH_STATES[kind].map(([v, t]) => `<button type="button" class="${d.state === v ? 'on' : ''}" data-v="${v}">${t}</button>`).join('')}</div></div>
+      <details class="we-more" ${more1 ? 'open' : ''}><summary>說明文字：為什麼想做、旁註、下一步</summary>
+        <div class="field"><label class="field-label">為什麼想做</label><textarea rows="2" data-key="why">${escapeHtml(d.why || '')}</textarea></div>
+        ${inp(i, 'note', '旁註（紅色小字，例：卡在報價、下個月開工）', '', 60)}
+        ${inp(i, 'next', '下一步（一句話，展開燈籠時顯示）', '', 60)}</details>
+      <details class="we-more" ${more2 ? 'open' : ''}><summary>互動設定：需要幫忙、連結${kind === 'fun' ? '、累積次數' : ''}</summary>
+        ${inp(i, 'help', '需要幫忙（有填會出現「需要幫忙」標記和按鈕）')}
+        ${inp(i, 'link', '點燈籠要連到哪裡（例：/chapters/3/；空白＝不能點）', '/chapters/3/')}
+        ${kind === 'fun' ? `<div class="we-two"><div class="field"><label class="field-label">已累積（數字）</label><input type="number" min="0" step="1" data-key="count" value="${d.count ?? ''}" placeholder="12"></div><div class="field"><label class="field-label">單位（天、次、週）</label><input type="text" data-key="unit" value="${escapeAttr(d.unit || '')}" maxlength="4" placeholder="次"></div></div>` : ''}</details>
+      <div class="we-ideas"><div class="field-label">訪客的反應</div>
+        <p class="hb-note">✦ ${c.likes || 0} 人點亮・💡 ${c.ideas || 0} 則想法與建議（由訪客操作，這裡不能改）</p>
+        ${ideas.map(x => `<div class="we-idea">${escapeHtml(x.body || '')}<time>${new Date(x.created_at).toLocaleDateString('zh-TW', { timeZone: 'Asia/Tokyo' })}</time></div>`).join('')}
+        ${(c.ideas || 0) > ideas.length ? '<p class="hb-note">更多想法請到「需求收件匣」處理。</p>' : ''}</div>
+    </div>`;
   }
-  render();
+  function renderWall() { form.querySelector('#weWall').innerHTML = wallHTML(); bindWall(); }
+  function bindWall() {
+    form.querySelectorAll('[data-sel]').forEach(b => b.addEventListener('click', () => { DREAM_SEL = +b.dataset.sel; renderWall(); renderEditor(); document.getElementById('weEd').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }));
+    form.querySelector('#addDream').addEventListener('click', () => { data.items.push({ id: 'd' + Date.now(), kind: 'goal', title: '', why: '', state: 'idea', note: '', next: '', help: '', link: '', public: true }); DREAM_SEL = data.items.length - 1; setDirty(); renderWall(); renderEditor(); const t = form.querySelector('[data-key="title"]'); t && t.focus(); });
+  }
+  function renderEditor() {
+    const box = form.querySelector('#weEd'); box.innerHTML = editorHTML();
+    const d = data.items[DREAM_SEL]; if (!d) return;
+    box.querySelectorAll('[data-key]').forEach(el => el.addEventListener('input', () => {
+      const k = el.dataset.key;
+      if (k === 'count') { const v = el.value.trim(); if (v === '') delete d.count; else d.count = Math.max(0, Math.round(+v) || 0); }
+      else d[k] = el.value;
+      setDirty(); if (k === 'title') { box.querySelector('.we-title').textContent = d.title || '（還沒命名）'; const l = form.querySelector(`[data-sel="${DREAM_SEL}"] .sl-t`); if (l) l.textContent = d.title || '（還沒命名）'; }
+    }));
+    box.querySelectorAll('[data-seg] [data-v]').forEach(b => b.addEventListener('click', () => {
+      const k = b.closest('[data-seg]').dataset.seg; d[k] = b.dataset.v;
+      if (k === 'kind' && !WISH_STATES[d.kind].some(x => x[0] === d.state)) d.state = 'idea';
+      setDirty(); renderWall(); renderEditor();
+    }));
+    box.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => { const j = DREAM_SEL + +b.dataset.mv; [data.items[j], data.items[DREAM_SEL]] = [data.items[DREAM_SEL], data.items[j]]; DREAM_SEL = j; setDirty(); renderWall(); renderEditor(); }));
+    box.querySelector('[data-del]').addEventListener('click', () => { if (!confirm(`確定取下「${d.title || '這盞燈籠'}」嗎？儲存後才會生效。`)) return; data.items.splice(DREAM_SEL, 1); DREAM_SEL = Math.max(0, DREAM_SEL - 1); setDirty(); renderWall(); renderEditor(); });
+  }
+  form.innerHTML = `
+    <div class="we-intro"><details><summary>祈願所開頭的一句話</summary><div class="field" style="margin-top:10px"><input type="text" id="weIntro" value="${escapeAttr(data.intro || '')}"></div></details></div>
+    <div class="we-tip">點一盞燈籠就能編輯它。燈籠上：✦ 點亮人數（上）、💡 想法數（下）。</div>
+    <div id="weWall"></div><div id="weEd"></div>
+    <div class="we-save"><span id="weDirty"></span><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
+  form.querySelector('#weIntro').addEventListener('input', e => { data.intro = e.target.value; setDirty(); });
+  renderWall(); renderEditor();
+  document.getElementById('saveDreams').addEventListener('click', async (e) => {
+    if (data.items.some(x => !String(x.title || '').trim())) { const j = data.items.findIndex(x => !String(x.title || '').trim()); DREAM_SEL = j; renderWall(); renderEditor(); toast('有一盞燈籠還沒填「想完成的事」', 'err'); return; }
+    const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // 日本時間
+    data.items.forEach(x => { if (origById[x.id] !== norm(x)) x.updated = today; }); // 有改動的燈籠自動記「更新於」
+    file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update 祈願所 via Studio', e.currentTarget);
+    data.items.forEach(x => { origById[x.id] = norm(x); }); dirty = false; document.getElementById('weDirty').textContent = '';
+  });
 }
 
 /* ══════════════════════════ 短網址・自訂短碼 ══════════════════════════ */
@@ -1232,9 +1287,6 @@ async function loadInbox() {
     ...(w.items || []).map(x => ({ ...x, kind: 'idea' }))
   ].sort((p, q) => new Date(q.created_at) - new Date(p.created_at));
   if (!IB.items.some(x => x.status === 'new')) IB.filter = 'all';
-  const cm = {}; IB.counts.forEach(c => { cm[c.wish_id] = c; });
-  const src = IB.dreams.length ? IB.dreams.filter(d => d.public !== false) : IB.counts.map(c => ({ id: c.wish_id, title: c.wish_id, kind: 'goal' }));
-  document.getElementById('ibWall').innerHTML = src.length ? `<div class="sl-wall">${src.map(d => lanternHTML(d.kind === 'habit' ? 'fun' : d.kind, d.title, cm[d.id])).join('')}</div>` : '<p class="hb-note">還沒有燈籠。</p>';
   ibUpdateBadge(); ibRender();
 }
 
