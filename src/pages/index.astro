@@ -304,18 +304,13 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .spark{position:absolute;left:50%;top:150px;width:6px;height:6px;border-radius:50%;background:#ffd98a;pointer-events:none;z-index:4;animation:sparkUp 1.1s ease-out forwards;}
 @keyframes sparkUp{to{transform:translate(var(--dx),-110px) scale(.2);opacity:0;}}
 @media(prefers-reduced-motion:reduce){.wp,.wp-toast,.spark{animation:none!important;}}
-/* 人數顯示（預覽 a／b／c） */
-.has-cnt .cho{padding-top:50px;}.has-cnt .cho-act{top:108px;}
+/* 人數顯示：點亮人數在燈籠裡面上方、想法與建議數量在燈籠裡面下方；周圍的光點＝點亮的人 */
 .cnt-note{margin-top:14px;font-size:12px;color:#E2A08F;letter-spacing:.06em;}
-.cnt-top{position:absolute;left:50%;top:26px;transform:translateX(-50%);z-index:3;white-space:nowrap;pointer-events:none;color:var(--gold);}
-.cnt-top.a{font-size:12.5px;padding:1px 10px;border:1px solid rgba(212,162,76,.55);border-radius:99px;background:#1C0F14;font-family:var(--latin);}
-.cnt-top.a i{font-style:normal;margin-right:4px;font-size:11px;}
-.cnt-top.b{font-size:11.5px;letter-spacing:.08em;color:#EBD3A8;}
-.cnt-top.c{font-size:11.5px;font-family:var(--latin);letter-spacing:.1em;opacity:.85;}
-.cnt-bot{margin-top:6px;display:flex;align-items:center;justify-content:center;gap:3px;font-size:11.5px;color:var(--bone-2);letter-spacing:.06em;}
-.cnt-bot svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:var(--gold);}
-.cnt-bot b{font-weight:500;font-family:var(--latin);margin-left:2px;color:var(--bone);}
-.ffs{position:absolute;left:50%;top:136px;width:0;height:0;pointer-events:none;z-index:1;}
+.cnt-in{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:3px;font-family:var(--latin);font-size:11px;font-weight:600;letter-spacing:.05em;color:inherit;opacity:.85;pointer-events:none;line-height:1;}
+.cnt-up{top:13px;}.cnt-dn{bottom:13px;}
+.cnt-in i{font-style:normal;font-size:9px;}
+.cnt-in svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.ffs{position:absolute;left:50%;top:111px;width:0;height:0;pointer-events:none;z-index:1;}
 .ffs b{position:absolute;width:4px;height:4px;margin:-2px;border-radius:50%;background:#ffd98a;box-shadow:0 0 8px 2px rgba(255,200,110,.7);animation:ffTw 3s ease-in-out infinite;}
 @keyframes ffTw{0%,100%{opacity:.15;transform:translateY(0) scale(.7);}50%{opacity:1;transform:translateY(-6px) scale(1);}}
 @media(prefers-reduced-motion:reduce){.ffs b{animation:none;opacity:.7;}}
@@ -1725,17 +1720,13 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var BULB='<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg>';
   var DL=[12,0,7,24,1,3,0,9,5,2],DI=[3,0,1,5,0,0,0,2,1,0];
   var cards=SEC.querySelectorAll('article.cho');
-  if(CV){SEC.classList.add('has-cnt');var nb=document.createElement('p');nb.className='cnt-note';nb.textContent='預覽：畫面上的人數是示範用假數字，正式上線會是真的。';var row=SEC.querySelector('.cho-wrap');if(row)row.parentNode.insertBefore(nb,row);}
+  if(CV){var nb=document.createElement('p');nb.className='cnt-note';nb.textContent='預覽：畫面上的人數是示範用假數字，正式上線會是真的。';var row=SEC.querySelector('.cho-wrap');if(row)row.parentNode.insertBefore(nb,row);}
   function render(card){
-    var o=card.querySelectorAll('.cnt-top,.cnt-bot,.ffs');for(var i=0;i<o.length;i++)o[i].remove();if(!CV)return;
-    var l=card._l,n=card._n,top=null,bot=null;
-    if(l>0){top=document.createElement('div');top.className='cnt-top '+CV;
-      if(CV==='a')top.innerHTML='<i>✦</i>'+l;else if(CV==='b')top.textContent='已有 '+l+' 人為它點亮';else{top.textContent=l;
-        var f=document.createElement('div');f.className='ffs';var m=Math.min(l,20),h='';for(var j=0;j<m;j++){var ang=j*2.39996,rad=46+((j*37)%28),x=Math.cos(ang)*rad,y=Math.sin(ang)*58;h+='<b style="left:'+x.toFixed(0)+'px;top:'+y.toFixed(0)+'px;animation-delay:'+((j*370)%2600)+'ms;animation-duration:'+(2200+(j*190)%1800)+'ms"></b>';}f.innerHTML=h;card.appendChild(f);}
-      card.appendChild(top);}
-    if(n>0){bot=document.createElement('p');bot.className='cnt-bot '+CV;
-      if(CV==='a')bot.innerHTML=BULB+'<b>'+n+'</b>';else if(CV==='b')bot.textContent=n+' 則想法與建議';else{var bh='',k=Math.min(n,5);for(var q=0;q<k;q++)bh+=BULB;bot.innerHTML=bh+(n>5?'<b>+'+(n-5)+'</b>':'');}
-      var st=card.querySelector('.st');if(st)st.insertAdjacentElement('afterend',bot);}
+    var o=card.querySelectorAll('.cnt-in,.ffs');for(var i=0;i<o.length;i++)o[i].remove();if(!CV)return;
+    var l=card._l,n=card._n,bd=card.querySelector('.bd');if(!bd)return;
+    if(l>0){var t=document.createElement('span');t.className='cnt-in cnt-up';t.title=l+' 人為它點亮';t.innerHTML='<i>✦</i>'+l;bd.appendChild(t);
+      var f=document.createElement('div');f.className='ffs';f.setAttribute('aria-hidden','true');var m=Math.min(l,20),h='';for(var j=0;j<m;j++){var ang=j*2.39996,rad=46+((j*37)%28),x=Math.cos(ang)*rad,y=Math.sin(ang)*58;h+='<b style="left:'+x.toFixed(0)+'px;top:'+y.toFixed(0)+'px;animation-delay:'+((j*370)%2600)+'ms;animation-duration:'+(2200+(j*190)%1800)+'ms"></b>';}f.innerHTML=h;card.appendChild(f);}
+    if(n>0){var u=document.createElement('span');u.className='cnt-in cnt-dn';u.title=n+' 則想法與建議';u.innerHTML=BULB+n;bd.appendChild(u);}
   }
   for(var ci=0;ci<cards.length;ci++){cards[ci]._l=DL[ci%10];cards[ci]._n=DI[ci%10];if(got(cards[ci].getAttribute('data-id'))){setLiked(cards[ci]);cards[ci]._l+=1;}render(cards[ci]);}
   function setLiked(card){card.classList.add('hearted');var b=card.querySelector('.ca.like');if(b)b.classList.add('on');}
