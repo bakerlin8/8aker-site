@@ -69,5 +69,17 @@
   "tw_bank_msg": "",
   "give_tw_org": "中華民國紅十字會",
   "give_tw_url": "https://www.redcross.org.tw/",
-  "give_next": "12 月 31 日前"
+  "give_next": "12 月 31 日前",
+  "pay1_name": "一勺水",
+  "pay1_sub": "潤一分",
+  "pay1_amt": "¥1,000",
+  "pay1_url": "https://buy.stripe.com/eVq4gyarLbQl95Y1bu1Jm02",
+  "pay2_name": "桶裝水",
+  "pay2_sub": "養一寸",
+  "pay2_amt": "¥5,000",
+  "pay2_url": "https://buy.stripe.com/7sY5kCarL5rX1Dw7zS1Jm03",
+  "pay3_name": "及時雨",
+  "pay3_sub": "長一尺",
+  "pay3_amt": "¥10,000",
+  "pay3_url": "https://buy.stripe.com/4gM14m57rcUpbe66vO1Jm04"
 }

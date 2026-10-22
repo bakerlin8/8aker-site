@@ -14,7 +14,7 @@ const endRing = buildRing(copy.birth_date);
 // 結尾區塊的文字：都可以在 Studio「首頁文案 → 結尾」修改；沒填就用這裡的預設
 const C0: Record<string, string> = {
   end_cd_before: '第 {n} 圈，還有', end_cd_after: '長完這一圈',
-  subscribe_unit: '', subscribe_btn: 'Stripe 支持澆個水', subscribe_note: '單次支持・金額由你決定',
+  subscribe_unit: '', pay1_name: '', pay1_sub: '', pay1_amt: '', pay1_url: '', pay2_name: '', pay2_sub: '', pay2_amt: '', pay2_url: '', pay3_name: '', pay3_sub: '', pay3_amt: '', pay3_url: '', subscribe_btn: 'Stripe 支持澆個水', subscribe_note: '單次支持・金額由你決定',
   tw_bank_on: 'on', tw_bank_msg: '轉好了之後，我會用您留下的聯絡方式與您聯繫。', tw_bank_sub: '留下稱呼，就能看到轉帳帳號',
   tw_show: 'on', tw_text: '在台灣？也可以轉帳**單筆支持**。',
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
@@ -78,6 +78,7 @@ const pageData = {
   start: copy.countdown_start, target: copy.countdown_target, birth: copy.birth_date, ringLabel: copy.ring_label,
 };
 const safeHref = (u: string) => (/^(\/(?!\/)|https:\/\/)/.test(u || '') ? u : '');
+const payTiers = [1, 2, 3].map((n) => ({ name: C[`pay${n}_name`], sub: C[`pay${n}_sub`], amt: C[`pay${n}_amt`], url: safeHref(C[`pay${n}_url`]) })).filter((t) => t.name && t.url);
 const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url || '') && st.name).map((st) => ({ ...st, img: /^https:\/\//.test(st.img || '') ? st.img : '' }));
 // 服務卡燈箱：每張卡對應哪幾張服務內容（樣品）、每張卡的色調（與 .hats .hat:nth-child 一致）
 const HAT_SVC: Record<string, string[]> = { '築': ['property', 'owner'], '旅': ['omakase'] };
@@ -906,7 +907,16 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .tw-cta:hover .gc-ic .cup{animation:none;}
 .tw-cta:hover .cup .stm{animation:steam 1.6s ease-in-out infinite;}
 @keyframes steam{0%{opacity:0;transform:translateY(2px);}40%{opacity:.9;}100%{opacity:0;transform:translateY(-3px);}}
-.end-card .cta-pair{order:3;display:grid;grid-auto-rows:1fr;gap:10px;margin:22px 0 24px;}
+.pay3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.give-cta.pay-t{grid-template-columns:1fr;justify-items:center;text-align:center;gap:7px;margin:0;padding:14px 8px 12px;}
+.pay-t .gc-t{align-items:center;}
+.pay-t .gc-t b{font-size:16px;letter-spacing:.04em;white-space:nowrap;}
+.pay-t .gc-t small{font-size:11.5px;}
+.pay-a{font-style:normal;font-size:15px;letter-spacing:.05em;color:#E7B36A;}
+.pay-t.t1 .gc-ic svg{width:13px;height:18px;}.pay-t.t2 .gc-ic svg{width:16px;height:22px;}.pay-t.t3 .gc-ic svg{width:20px;height:27px;}
+.pay-t.t3{border-color:rgba(212,162,76,.55);}
+@media(max-width:520px){.pay3{grid-template-columns:1fr;gap:8px;}.give-cta.pay-t{grid-template-columns:40px minmax(0,1fr) auto;justify-items:stretch;text-align:left;gap:12px;padding:10px 14px 10px 10px;}.pay-t .gc-t{align-items:flex-start;}.pay-t .gc-ic{width:40px;height:40px;}}
+.end-card .cta-pair{order:3;display:grid;grid-auto-rows:auto;gap:10px;margin:22px 0 24px;}
 .end-card .cta-pair .give-cta{margin:0;height:100%;}
 .end-card .cta-pair .tw-wrap{display:contents;}
 .end-card .support>.sup-k,.end-card .support>h3,.end-card .support>.sdesc,.end-card .support>.r{order:1;}
@@ -1251,11 +1261,17 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
           <h3>{copy.subscribe_title}</h3>{copy.subscribe_desc && <p class="sdesc">{copy.subscribe_desc}</p>}
           {copy.subscribe_price && <div class="r"><b>{copy.subscribe_price}</b>{C.subscribe_unit && <span>{C.subscribe_unit}</span>}</div>}
           <div class="cta-pair">
-          {safeHref(copy.subscribe_url) && <a class="give-cta" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">
-            <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
+          {payTiers.length > 0 ? <div class="pay3" role="group" aria-label="Stripe 單次支持">
+            {payTiers.map((t, i) => <a class={`give-cta pay-t t${i + 1}`} href={t.url} target="_blank" rel="noopener">
+              <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
+              <span class="gc-t"><b>{t.name}</b>{t.sub && <small>{t.sub}</small>}</span>
+              {t.amt && <em class="pay-a num">{t.amt}</em>}
+            </a>)}
+          </div> : (safeHref(copy.subscribe_url) && <a class="give-cta" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">
+  <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
             <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
             <span class="gc-ar" aria-hidden="true">↗</span>
-          </a>}
+          </a>)}
           {(igUrl || bankOn) && C.tw_show !== 'off' && <div class="tw-wrap">
             <a class="give-cta tw-cta" href={bankOn ? '#tw-bank' : igUrl} target={bankOn ? undefined : '_blank'} rel="noopener" data-bank={bankOn ? '1' : undefined} data-ig={igUrl || undefined} aria-haspopup={bankOn ? 'dialog' : undefined}>
               <span class="gc-ic" aria-hidden="true"><svg class="cup" viewBox="0 0 28 28"><path class="stm" d="M10 3c-1.5 1.6 1.5 2.8 0 4.6M15 2.5c-1.5 1.6 1.5 2.8 0 4.6"/><path class="body" d="M5 11h15v6.5a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6Z"/><path class="hd" d="M20 13.2h1.6a2.6 2.6 0 0 1 0 5.2H19.6"/></svg></span>

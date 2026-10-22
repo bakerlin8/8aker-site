@@ -646,11 +646,17 @@ const HOME_GROUPS = [
   { title: '結尾・倒數', note: '小年輪旁邊的倒數字句', rows: [
     [['end_cd_before', '倒數上方（{n} 會換成歲數）'], ['end_cd_after', '倒數下方（留空就不顯示）']],
   ]},
-  { title: '結尾・支持區', note: '右邊米白色的支持方塊（Stripe）', rows: [
+  { title: '結尾・支持區', note: '右邊米白色的支持方塊：三個金額按鈕（Stripe 付款連結）＋台灣轉帳', rows: [
     [['subscribe_title', '標題']],
     [['subscribe_desc', '說明（可以換行）', 'area']],
     [['subscribe_price', '金額（可留空）'], ['subscribe_unit', '金額後面（例：／月，可留空）', 'short']],
-    [['subscribe_url', 'Stripe 連結（留空就不顯示按鈕）'], ['subscribe_btn', '按鈕文字', 'short']],
+    [['pay1_name', '第 1 個金額按鈕｜名稱', 'short'], ['pay1_sub', '小字（例：潤一分）', 'short'], ['pay1_amt', '金額（例：¥1,000）', 'short']],
+    [['pay1_url', '第 1 個按鈕的 Stripe 付款連結（名稱或連結留空就不顯示）']],
+    [['pay2_name', '第 2 個金額按鈕｜名稱', 'short'], ['pay2_sub', '小字（例：潤一分）', 'short'], ['pay2_amt', '金額（例：¥1,000）', 'short']],
+    [['pay2_url', '第 2 個按鈕的 Stripe 付款連結（名稱或連結留空就不顯示）']],
+    [['pay3_name', '第 3 個金額按鈕｜名稱', 'short'], ['pay3_sub', '小字（例：潤一分）', 'short'], ['pay3_amt', '金額（例：¥1,000）', 'short']],
+    [['pay3_url', '第 3 個按鈕的 Stripe 付款連結（名稱或連結留空就不顯示）']],
+    [['subscribe_url', '（備用）單一 Stripe 連結：上面三個按鈕都沒填時才會用'], ['subscribe_btn', '備用按鈕文字', 'short']],
     [['subscribe_note', '按鈕下方小字（例：單次支持・金額由你決定）']],
   ]},
   { title: '結尾・善的循環', note: '網站上滑過「善的循環」那一行，會浮出台灣與日本兩個單位的連結和下次捐贈日。比例、單位、日期都在這裡改。', rows: [
