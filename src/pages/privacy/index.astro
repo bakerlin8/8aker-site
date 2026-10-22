@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import copy from '../../data/site-copy.json';
-const updated = '2026.10.13';
+const updated = '2026.10.22';
 const contact = (copy as any).contact_email;
 ---
-<BaseLayout title={`隱私權政策 — ${copy.site_name}`} description={`${copy.site_name} 如何處理造訪者的資料。`}>
+<BaseLayout title={`隱私權政策 / プライバシーポリシー / Privacy Policy — ${copy.site_name}`} description={`${copy.site_name} 如何處理造訪者的資料。／ 訪問者のデータの取り扱いについて。／ How this site handles visitor data.`}>
 <style is:global>
 .pvh{background:radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 70%);color:#EFE5D6;padding:150px 40px 56px;}
 .pvh-in,.pvb-in{max-width:720px;margin:0 auto;}
@@ -15,12 +15,22 @@ const contact = (copy as any).contact_email;
 .pvb h2:first-child{margin-top:0;padding-top:0;border-top:0;}
 .pvb p,.pvb li{font-size:15px;line-height:2;color:var(--bone);}
 .pvb ul{margin:6px 0 0 1.3em;}
-.pvb .ja{margin-top:48px;padding:22px 24px;background:var(--night-2);font-family:var(--jp);font-size:14px;}
-.pvb .ja p{font-size:14px;}
+.pvl{display:flex;gap:8px;margin:0 0 34px;flex-wrap:wrap;}
+.pvl button{font:inherit;font-size:14px;letter-spacing:.08em;padding:8px 18px;border:1px solid var(--line);background:transparent;color:var(--bone);cursor:pointer;border-radius:999px;transition:background .25s,color .25s,border-color .25s;}
+.pvl button[aria-pressed="true"]{background:#D4A24C;color:#1C0F14;border-color:#D4A24C;}
+.pvb section[lang="ja"]{font-family:var(--jp);}
+.pvb section[hidden]{display:none;}
 @media(max-width:700px){.pvh{padding:120px 20px 40px;}.pvb{padding:36px 20px 72px;}}
 </style>
-<header class="pvh"><div class="pvh-in"><h1 class="rv">隱私權政策</h1><p class="rv" style="--i:1">最後更新：{updated}</p></div></header>
+<header class="pvh"><div class="pvh-in"><h1 class="rv">隱私權政策<span style="display:block;font-size:.5em;margin-top:8px;color:#B9A89E;font-family:var(--jp)">プライバシーポリシー ／ Privacy Policy</span></h1><p class="rv" style="--i:1">最後更新 ／ 最終更新 ／ Last updated：{updated}</p></div></header>
 <article class="pvb band-light"><div class="pvb-in">
+  <div class="pvl" role="group" aria-label="Language / 語言 / 言語">
+    <button type="button" data-l="zh" aria-pressed="true">中文</button>
+    <button type="button" data-l="ja" aria-pressed="false">日本語</button>
+    <button type="button" data-l="en" aria-pressed="false">English</button>
+  </div>
+
+  <section lang="zh-Hant" data-sec="zh">
   <h2>這個網站是誰在經營</h2>
   <p>{copy.site_name}（8aker0.com）由林子翔（Baker Lin）個人經營，所在地為日本大阪。本政策說明你造訪這個網站時，會有哪些資料被記錄、用在哪裡。</p>
 
@@ -28,9 +38,10 @@ const contact = (copy as any).contact_email;
   <ul>
     <li><b>瀏覽統計</b>：使用 Vercel Web Analytics，只看「多少人看了哪些頁面、從哪裡來、用什麼裝置」這類匯總數字。不使用 cookie，不會追蹤你在其他網站的行為，也無法用來辨識你是誰。</li>
     <li><b>主機紀錄</b>：網站主機 Vercel 為了安全與維運，會自動記錄連線的技術資訊（例如 IP 位址、瀏覽器類型、造訪時間）。</li>
-    <li><b>訂閱付款</b>：支持訂閱由 Stripe 處理，信用卡資料直接交給 Stripe，本網站不會接觸或保存。</li>
-    <li><b>需求表</b>：在「我能幫你的事」填寫需求時，會收集你填寫的稱呼、聯絡方式、日期、人數或物件概況、需求內容、（選填的）從哪裡知道我，以及送出時間。這些資料存放在不公開的私人資料庫，只用來回覆你與提供服務；為了防止濫用，另會保存一段無法還原的 IP 雜湊值。你可以隨時再次透過需求表要求查詢或刪除你的資料。</li>
-    <li><b>祈願所</b>：按下燈籠的「點亮」時，只會記錄被點亮的燈籠，以及一段無法還原的 IP 雜湊值（用來讓同一個人只算一次）；在「想法與建議」寫下的純文字也會被保存，只有我看得到，不會公開，請不要在裡面留下個人聯絡資料。你的瀏覽器會記住你點亮過哪些燈籠，不需要登入。</li>
+    <li><b>支持付款</b>：「Stripe 支持」（一勺水、桶裝水、及時雨等單次金額）由 Stripe 處理，信用卡資料直接交給 Stripe，本網站不會接觸或保存。若你選擇匯款到台灣帳戶，僅顯示收款資訊，本網站不會收集你的銀行資料。</li>
+    <li><b>需求表</b>：在「我能幫你的事」填寫需求時，會收集你填寫的稱呼、聯絡方式、日期、人數或物件概況、需求內容、（選填的）從哪裡知道我，以及送出時間。這些資料存放在不公開的私人資料庫（Supabase），只用來回覆你與提供服務；為了防止濫用，另會保存一段無法還原的 IP 雜湊值。</li>
+    <li><b>祈願所</b>：按下燈籠的「點亮」時，只會記錄被點亮的燈籠，以及一段無法還原的 IP 雜湊值（用來讓同一個人只算一次）；取消點亮也會同步更新。在「想法與建議」寫下的純文字會被保存，只有我看得到，不會公開，請不要在裡面留下個人聯絡資料。你的瀏覽器會把你點亮過哪些燈籠記在本機（localStorage），不需要登入，也不會傳給任何人。</li>
+    <li><b>音效與動畫</b>：網站的音效與動畫都在你的瀏覽器內產生，不會收集任何資料。</li>
   </ul>
 
   <h2>不會做的事</h2>
@@ -41,20 +52,91 @@ const contact = (copy as any).contact_email;
   </ul>
 
   <h2>外部服務</h2>
-  <p>網站中有連到 Strava、Stripe 等外部服務的連結，點進去之後適用各服務自己的隱私權政策。網站使用 Google Fonts 顯示字體，瀏覽器載入字體時會連線到 Google 的伺服器。</p>
+  <p>本網站使用 Vercel（網站主機與瀏覽統計）、Supabase（需求表與祈願所的資料庫）、Stripe（付款）。網站中也有連到 Strava、各公益團體等外部網站的連結，點進去之後適用各服務自己的隱私權政策。網站使用 Google Fonts 顯示字體，瀏覽器載入字體時會連線到 Google 的伺服器。</p>
 
   <h2>站長本人的身體紀錄</h2>
   <p>「身體紀錄」區塊的數據是站長本人的健康資料，存放在私人資料庫中，只有站長本人確認過的內容才會公開成文章。這與造訪者的資料無關。</p>
 
-  <h2>你的權利</h2>
-  <p>如果你想查詢、更正或刪除與你有關的資料，{contact ? <>請寫信到 <a href={`mailto:${contact}`}>{contact}</a>。</> : <>請透過本網站日後公布的聯絡方式與我聯繫。</>}我會在合理的時間內回覆。</p>
+  <h2>資料保存與你的權利</h2>
+  <p>需求表的資料只保存到服務結束或你要求刪除為止。如果你想查詢、更正或刪除與你有關的資料，{contact ? <>請寫信到 <a href={`mailto:${contact}`}>{contact}</a>。</> : <>請透過本網站日後公布的聯絡方式與我聯繫。</>}我會在合理的時間內回覆。因祈願所的紀錄只保存無法還原的雜湊值，無法回頭辨識是誰，所以無法針對個人刪除。</p>
 
   <h2>政策更新</h2>
   <p>本政策如有修改，會更新在這一頁，並修改上方的「最後更新」日期。</p>
+  </section>
 
-  <div class="ja" lang="ja">
-    <p><b>プライバシーポリシー（要約）</b></p>
-    <p>本サイト（8aker0.com）は林子翔（Baker Lin、大阪在住）が個人で運営しています。アクセス解析には Cookie を使用しない Vercel Web Analytics を利用し、個人を特定しない集計データのみを確認しています。サブスクリプションの決済は Stripe が処理し、本サイトはカード情報を保持しません。お問い合わせフォームに入力された情報は非公開のデータベースに保存し、ご返信とサービス提供のためにのみ利用します。取得した情報を販売・第三者提供することはありません（法令に基づく場合を除く）。願いの灯籠の「灯す」を押すと、その灯籠と、元に戻せないハッシュ化したIP（同じ方を1回と数えるため）のみを記録し、「アイデア・ご提案」に書かれたテキストは非公開で保存します。連絡先などの個人情報は書かないでください。</p>
-  </div>
+  <section lang="ja" data-sec="ja" hidden>
+  <h2>運営者について</h2>
+  <p>{copy.site_name}（8aker0.com）は、林子翔（Baker Lin、大阪在住）が個人で運営しています。このポリシーでは、サイトご利用時にどのような情報が記録され、何に使われるかを説明します。</p>
+
+  <h2>取得する情報</h2>
+  <ul>
+    <li><b>アクセス解析</b>：Vercel Web Analytics を利用し、「どのページが何人に見られたか、どこから来たか、どの端末か」といった集計データのみを確認します。Cookie は使用せず、他サイトでの行動を追跡することも、個人を特定することもできません。</li>
+    <li><b>サーバーログ</b>：ホスティングの Vercel が、セキュリティと運用のため接続情報（IPアドレス、ブラウザの種類、アクセス日時など）を自動的に記録します。</li>
+    <li><b>お支払い</b>：「Stripe で応援」（一勺水・桶装水・及時雨などの単発の金額）は Stripe が処理し、カード情報は直接 Stripe に渡されます。本サイトがカード情報に触れる、または保存することはありません。台湾の口座への振込をご希望の場合も、表示するのは受取口座の情報のみで、あなたの銀行情報を収集することはありません。</li>
+    <li><b>お問い合わせフォーム</b>：「お手伝いできること」にご入力いただいた呼び名、連絡先、日付、人数または物件の概要、ご要望、（任意の）このサイトを知った経路、送信日時を取得します。非公開のデータベース（Supabase）に保存し、ご返信とサービス提供のためにのみ使用します。不正利用の防止のため、元に戻せない形にしたIPのハッシュ値も保存します。</li>
+    <li><b>願いの灯籠</b>：「灯す」を押すと、その灯籠と、元に戻せない形にしたIPのハッシュ値（同じ方を1回と数えるため）のみを記録します。消灯したときも同様に更新されます。「アイデア・ご提案」に書かれたテキストは非公開で保存され、運営者だけが閲覧します。連絡先などの個人情報は書かないでください。どの灯籠を灯したかは、お使いのブラウザ内（localStorage）に記憶され、ログインは不要で、外部に送信されません。</li>
+    <li><b>効果音とアニメーション</b>：サイトの効果音やアニメーションはブラウザ内で生成され、情報を収集することはありません。</li>
+  </ul>
+
+  <h2>行わないこと</h2>
+  <ul>
+    <li>訪問者の情報を販売・貸与することはありません。</li>
+    <li>法令に基づく場合を除き、第三者に提供することはありません。</li>
+    <li>広告トラッキングやクロスサイトトラッキングは行いません。</li>
+  </ul>
+
+  <h2>外部サービス</h2>
+  <p>本サイトは Vercel（ホスティング・アクセス解析）、Supabase（お問い合わせと願いの灯籠のデータベース）、Stripe（決済）を利用しています。Strava や各支援団体など外部サイトへのリンクもあり、リンク先では各サービスのプライバシーポリシーが適用されます。また、フォント表示に Google Fonts を使用しており、読み込み時にブラウザが Google のサーバーに接続します。</p>
+
+  <h2>運営者本人の身体記録</h2>
+  <p>「身体記録」の数値は運営者本人の健康データで、非公開のデータベースに保存されています。本人が確認した内容のみが記事として公開されます。訪問者の情報とは関係ありません。</p>
+
+  <h2>保存期間とあなたの権利</h2>
+  <p>お問い合わせフォームの情報は、サービス終了またはご本人から削除のご依頼があるまで保存します。ご自身に関する情報の確認・訂正・削除をご希望の場合は、{contact ? <><a href={`mailto:${contact}`}>{contact}</a> までご連絡ください。</> : <>今後サイトで案内する連絡先までご連絡ください。</>}合理的な期間内に対応します。なお、願いの灯籠は元に戻せないハッシュ値のみを保存しており、個人を特定できないため、個別の削除はできません。</p>
+
+  <h2>ポリシーの更新</h2>
+  <p>内容を変更した場合は、このページを更新し、上部の「最終更新」の日付を変更します。</p>
+  </section>
+
+  <section lang="en" data-sec="en" hidden>
+  <h2>Who runs this site</h2>
+  <p>{copy.site_name} (8aker0.com) is run personally by Lin Zixiang (Baker Lin), based in Osaka, Japan. This policy explains what data is recorded when you visit, and what it is used for.</p>
+
+  <h2>What is recorded</h2>
+  <ul>
+    <li><b>Traffic statistics</b>: We use Vercel Web Analytics, which only shows aggregate numbers: how many people viewed which pages, where they came from, and on what kind of device. It uses no cookies, does not follow you to other sites, and cannot identify you.</li>
+    <li><b>Hosting logs</b>: For security and operations, our host Vercel automatically logs technical connection details such as IP address, browser type and visit time.</li>
+    <li><b>Payments</b>: "Stripe support" (one-time amounts such as 一勺水, 桶裝水 and 及時雨) is processed by Stripe. Your card details go straight to Stripe; this site never sees or stores them. If you choose to transfer to the Taiwan bank account, the page only shows our receiving details and collects none of your banking information.</li>
+    <li><b>Inquiry form</b>: When you fill in a request under "What I can help with", we collect the name you give, your contact details, dates, party size or property overview, your request, (optionally) how you found us, and the submission time. This is kept in a private database (Supabase) and used only to reply and deliver the service. To prevent abuse we also keep an irreversible hash of your IP address.</li>
+    <li><b>Wish lanterns</b>: When you "light" a lantern we record only which lantern was lit and an irreversible hash of your IP address (so one person counts once); un-lighting updates it the same way. Any plain text you write under "Ideas &amp; suggestions" is stored privately and seen only by the site owner; please do not include personal contact details. Which lanterns you have lit is remembered in your own browser (localStorage) — no login is needed and it is not sent to anyone.</li>
+    <li><b>Sound and animation</b>: Sound effects and animations are generated inside your browser and collect no data.</li>
+  </ul>
+
+  <h2>What we do not do</h2>
+  <ul>
+    <li>We do not sell or rent visitor data.</li>
+    <li>We do not share data with third parties unless required by law.</li>
+    <li>We do not use advertising or cross-site tracking.</li>
+  </ul>
+
+  <h2>External services</h2>
+  <p>This site uses Vercel (hosting and analytics), Supabase (database for inquiries and wish lanterns) and Stripe (payments). It also links to outside sites such as Strava and charitable organisations; once you click through, their own privacy policies apply. The site displays fonts through Google Fonts, so your browser connects to Google's servers when loading them.</p>
+
+  <h2>The owner's own body records</h2>
+  <p>The figures in the "Body log" section are the owner's own health data, kept in a private database. Only content the owner has reviewed is published as articles. This has nothing to do with visitor data.</p>
+
+  <h2>Retention and your rights</h2>
+  <p>Inquiry data is kept until the service ends or you ask for it to be deleted. To view, correct or delete data about you, {contact ? <>please write to <a href={`mailto:${contact}`}>{contact}</a>.</> : <>please use the contact details this site publishes in future.</>} I will reply within a reasonable time. Wish-lantern records hold only irreversible hashes and cannot be traced back to a person, so they cannot be deleted individually.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy changes, this page will be updated along with the "Last updated" date above.</p>
+  </section>
 </div></article>
+<script is:inline>
+(function(){var bs=document.querySelectorAll('.pvl button'),ss=document.querySelectorAll('.pvb section[data-sec]');
+function go(l,push){bs.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.l===l?'true':'false')});ss.forEach(function(s){s.hidden=s.dataset.sec!==l});if(push){try{history.replaceState(null,'','#'+l)}catch(e){}}}
+bs.forEach(function(b){b.addEventListener('click',function(){go(b.dataset.l,true)})});
+var h=(location.hash||'').slice(1);if(h==='ja'||h==='en')go(h,false);
+else if(!h&&/^ja/i.test(navigator.language||''))go('ja',false);else if(!h&&/^en/i.test(navigator.language||''))go('en',false);})();
+</script>
 </BaseLayout>
