@@ -18,7 +18,7 @@ const C0: Record<string, string> = {
   tw_bank_on: 'on', tw_bank_msg: '轉好了之後，我會用您留下的聯絡方式與您聯繫。', tw_bank_sub: '留下稱呼，就能看到轉帳帳號',
   tw_show: 'on', tw_text: '在台灣？也可以轉帳**單筆支持**。',
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
-  give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: '',
+  give_show: 'on', give_rate: '8', give_org: 'Civic Force', give_url: '', give_tw_org: '', give_tw_url: '', give_next: '',
   give_text: '',
   give_use: 'AI 線上工具訂閱 38\n網站經營 20\n日本景點考察 20\n請我喝咖啡＋健康餐 14', give_month: '', give_received: '', give_donated: '', give_total: '', tw_note: '轉帳資訊只由 @{ig} 回覆，其他帳號請忽略。',
 };
@@ -582,6 +582,20 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 @media(prefers-reduced-motion:reduce){.give-cta:hover .gc-ic svg,.give-cta:hover .gc-ic i{animation:none;}}
 /* 善的循環：3D 年輪木樁 + 一行說明 */
 .support .give{display:grid;gap:12px;margin-top:22px;padding:16px;background:linear-gradient(135deg,rgba(138,43,61,.07),rgba(138,43,61,.02));border-top:1px solid rgba(28,15,20,.12);color:#1C0F14;}
+.support .gv{display:grid;gap:9px;}
+.support .gv-k{margin:0;font-size:11px;letter-spacing:.24em;color:#A07A3A;}
+.support .gv-l{margin:0;font-size:14px;line-height:1.7;color:#3A2A2D;}
+.support .gv-l b{font-family:var(--latin);font-weight:600;font-size:18px;color:#8A2B3D;}
+.support .gv-org{list-style:none;margin:2px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;}
+.support .gv-org a{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid rgba(138,43,61,.28);background:rgba(255,255,255,.35);color:#1C0F14;text-decoration:none;transition:border-color .3s,background .3s,transform .3s;}
+.support .gv-org a:hover{border-color:#8A2B3D;background:rgba(255,255,255,.65);transform:translateY(-1px);}
+.support .gv-org a:focus-visible{outline:2px solid #8A2B3D;outline-offset:2px;}
+.support .gv-flag{width:28px;height:19px;flex:none;box-shadow:0 0 0 1px rgba(28,15,20,.18);}
+.support .gv-org span{display:grid;gap:1px;font-size:13px;line-height:1.35;min-width:0;}
+.support .gv-org span b{font-weight:400;font-size:10.5px;letter-spacing:.18em;color:#7A6A6C;}
+.support .gv-org i{margin-left:auto;font-style:normal;color:#8A2B3D;font-size:13px;}
+.support .gv-n{margin:0;font-size:12.5px;line-height:1.7;color:#5B4B4E;}
+.support .gv-n b{font-weight:600;color:#8A2B3D;}
 .support .gline{margin:0;font-size:13.5px;line-height:1.75;color:#3A2A2D;}
 .support .gline b{font-family:var(--latin);font-weight:600;font-size:17px;color:#8A2B3D;}
 .support .gnum{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:8px;font-size:12px;}
@@ -1250,12 +1264,22 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
           </div>
           {C.give_show !== 'off' && <>
           <div class="give">
-            <div>{C.give_text && <p class="gline"><Fragment set:html={giveHtml} /></p>}{(C.give_donated || C.give_total) && <dl class="gnum">
+            <div class="gv">
+              <p class="gv-k">善的循環</p>
+              <p class="gv-l">每份支持，撥出 <b class="num">{C.give_rate}%</b> 捐給台日兩地的災害救援。</p>
+              {C.give_text && <p class="gline"><Fragment set:html={giveHtml} /></p>}
+              <ul class="gv-org">
+                {C.give_tw_org && <li><a href={safeHref(C.give_tw_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#D1162B"/><rect width="12" height="8" fill="#0B2C86"/><circle cx="6" cy="4" r="2.3" fill="#fff"/><circle cx="6" cy="4" r="1.5" fill="#0B2C86"/><circle cx="6" cy="4" r="1.1" fill="#fff"/></svg><span><b>台灣</b>{C.give_tw_org}</span><i aria-hidden="true">↗</i></a></li>}
+                {C.give_org && <li><a href={safeHref(C.give_url) || undefined} target="_blank" rel="noopener"><svg class="gv-flag" viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/><circle cx="12" cy="8" r="4.6" fill="#BC002D"/></svg><span><b>日本</b>{C.give_org}</span><i aria-hidden="true">↗</i></a></li>}
+              </ul>
+              {C.give_next && <p class="gv-n">下次捐贈 <b>{C.give_next}</b>・每 3 個月一次，證明會公開在日常紀錄</p>}
+              {(C.give_donated || C.give_total) && <dl class="gnum">
               {C.give_month && <div><dt>月份</dt><dd>{C.give_month}</dd></div>}
               {C.give_received && <div><dt>本月支持</dt><dd>NT${C.give_received}</dd></div>}
               {C.give_donated && <div><dt>已捐出</dt><dd>NT${C.give_donated}</dd></div>}
               {C.give_total && <div><dt>累計捐出</dt><dd>NT${C.give_total}</dd></div>}
-            </dl>}{safeHref(C.give_url) && <a class="glink" href={safeHref(C.give_url)} target="_blank" rel="noopener">認識 {C.give_org} ↗</a>}</div>
+              </dl>}
+            </div>
             <div class="flow">
               <p class="flow-k">支持的去向</p><ul class="flow-key">{flowAll.map((x) => <li class={x.give ? 'kg' : ''}><i style={`background:${x.c}`}></i><b class="num">{x.pct}%</b><span>{x.name}</span></li>)}</ul></div>
           </div>

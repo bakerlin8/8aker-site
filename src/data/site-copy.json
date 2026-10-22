@@ -57,7 +57,7 @@
   "give_show": "on",
   "give_rate": "8",
   "give_org": "Civic Force",
-  "give_url": "",
+  "give_url": "https://www.civic-force.org/",
   "give_text": "",
   "give_use": "AI 線上工具訂閱 38\n品牌網站經營 20\n日本私人景點考察 20\n請我喝咖啡＋健康餐 14",
   "give_month": "",
@@ -66,5 +66,8 @@
   "give_total": "",
   "tw_bank_on": "on",
   "tw_bank_sub": "銀行轉帳",
-  "tw_bank_msg": ""
+  "tw_bank_msg": "",
+  "give_tw_org": "中華民國紅十字會",
+  "give_tw_url": "https://www.redcross.org.tw/",
+  "give_next": "12 月 31 日前"
 }
