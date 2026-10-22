@@ -88,7 +88,7 @@ const WISH_KINDS: Record<string, string> = { goal: 'Goal', habit: 'Habit', fun: 
 const WISH_ST: Record<string, Record<string, [string, number]>> = {
   goal: { idea: ['想做', 0], doing: ['進行中', 0.7], done: ['已實現', 1] },
   idea: { idea: ['點子', 0], test: ['驗證中', 0.55], build: ['動工', 0.8], done: ['已實現', 1] },
-  fun: { idea: ['想試', 0], done: ['試過了', 1] },
+  fun: { idea: ['想試', 0], doing: ['進行中', 0.7], done: ['試過了', 1] },
 };
 const wishView = (d: any) => {
   const kind = WISH_KINDS[d.kind] ? d.kind : 'goal';

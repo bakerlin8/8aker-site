@@ -913,7 +913,7 @@ async function saveJson(path, data, sha, msg, btn) {
 }
 
 /* ══════════════════════════ 祈願所 ══════════════════════════ */
-const WISH_STATES = { goal: [['idea', '想做'], ['doing', '進行中'], ['done', '已實現']], idea: [['idea', '點子'], ['test', '驗證中'], ['build', '動工'], ['done', '已實現']], fun: [['idea', '想試'], ['done', '試過了']], habit: [] };
+const WISH_STATES = { goal: [['idea', '想做'], ['doing', '進行中'], ['done', '已實現']], idea: [['idea', '點子'], ['test', '驗證中'], ['build', '動工'], ['done', '已實現']], fun: [['idea', '想試'], ['doing', '進行中'], ['done', '試過了']], habit: [] };
 async function loadDreams() {
   showView('dreams');
   const form = document.getElementById('dreamsForm');
