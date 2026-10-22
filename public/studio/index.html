@@ -359,7 +359,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-inbox">
       <div class="page-eyebrow">Inbox</div>
       <div class="page-title">需求收件匣</div>
-      <div class="page-sub">首頁「填寫需求」送進來的內容。只有你看得到。</div>
+      <div class="page-sub">首頁「填寫需求」送進來的內容，加上祈願所燈籠上訪客留的想法與建議。只有你看得到。</div>
       <div id="wishBox"></div>
       <div id="bankBox"></div>
       <div id="inboxList"></div>
@@ -369,7 +369,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
     <section class="view" id="view-dreams">
       <div class="page-eyebrow">Kiganjo</div>
       <div class="page-title">祈願所</div>
-      <div class="page-sub">40 歲生日前要完成的事，網站上以一排提灯（燈籠）由左到右呈現：許願＝還沒點燈，進行中＝依「進度 %」越來越亮，已實現＝最亮並蓋上「叶」。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#kiganjo" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
+      <div class="page-sub">40 歲生日前想做的事，網站上以一排燈籠由左到右呈現。<b>三種燈籠</b>：Goal 目標・Fun 好玩・Idea 點子。<b>三種狀態</b>：規劃中（燈籠是灰的）→ 進行中（點亮）→ 已完成（最亮並蓋章）。每盞燈籠上的 ✦ 是點亮的人數、💡 是想法與建議的則數，由訪客操作，這裡看得到、不能改。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#kiganjo" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
       <div id="dreamsForm"></div>
     </section>
 
@@ -653,13 +653,13 @@ const HOME_GROUPS = [
     [['subscribe_url', 'Stripe 連結（留空就不顯示按鈕）'], ['subscribe_btn', '按鈕文字', 'short']],
     [['subscribe_note', '按鈕下方小字（例：單次支持・金額由你決定）']],
   ]},
-  { title: '結尾・善的循環', note: '每月撥出固定比例做災害救援；{rate}、{org} 會自動換成下面的比例和單位', rows: [
+  { title: '結尾・善的循環', note: '網站上滑過「善的循環」那一行，會浮出台灣與日本兩個單位的連結和下次捐贈日。比例、單位、日期都在這裡改。', rows: [
     [['give_show', '這一段要不要顯示', 'onoff']],
     [['give_rate', '撥出比例 %', 'short'], ['give_org', '日本捐款單位']],
     [['give_url', '日本單位網址（留空就不可點）']],
     [['give_tw_org', '台灣捐款單位'], ['give_tw_url', '台灣單位網址']],
     [['give_next', '下次捐贈日（例：12 月 31 日前；留空就不顯示）']],
-    [['give_text', '說明（**粗體**）', 'area']],
+    [['give_text', '額外說明（可留空；有填才會顯示在支持區塊，{rate}、{org} 會自動換成比例和日本單位）', 'area']],
     [['give_use', '去向條：其餘用途（一行一項：名稱 空格 %，例：在日協助 30）', 'area']],
     [['give_month', '月份（例：2026.10）', 'short'], ['give_received', '本月收到的支持（數字，不用加 NT$）']],
     [['give_donated', '本月已捐出（數字）'], ['give_total', '累計捐出（數字）']],
@@ -924,6 +924,7 @@ async function loadDreams() {
   const file = await ghGetFile('src/data/dreams.json');
   const data = JSON.parse(file.content);
   data.items.forEach(x => { if (x.kind === 'habit') { x.kind = 'fun'; if (!x.state || x.state === 'idea') x.state = 'doing'; } }); // 舊的 Habit 併入 Fun
+  let wishCounts = {}; try { const w = await inboxApi('POST', { action: 'wish_ideas' }); (w.counts || []).forEach(c => { wishCounts[c.wish_id] = c; }); } catch (e) {}
   const norm = (o) => JSON.stringify(Object.keys(o).filter(k => k !== 'updated' && o[k] !== '' && o[k] != null).sort().map(k => [k, o[k]]));
   const origById = Object.fromEntries(data.items.map(x => [x.id, norm(x)]));
   const dirs = Object.entries(KANJI_BY_DIR).map(([d, k]) => [d, `${k}・${PILLARS[d].jp}`]);
@@ -938,18 +939,18 @@ async function loadDreams() {
     form.innerHTML = `<div class="field"><label class="field-label">祈願所開頭的一句話</label><input type="text" data-intro value="${escapeAttr(data.intro || '')}"></div>` +
       data.items.map((d, i) => `
       <div class="hb-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="field-label" style="margin:0">第 ${i + 1} 盞燈籠（網站上由左到右）</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap"><span class="field-label" style="margin:0">第 ${i + 1} 盞燈籠（網站上由左到右）${wishCounts[d.id] ? `<span class="hb-note" style="margin-left:10px;letter-spacing:0">✦ ${wishCounts[d.id].likes} 人點亮・💡 ${wishCounts[d.id].ideas} 則想法（想法在「需求收件匣」）</span>` : ''}</span>
           <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" data-del="${i}">移除</button></span></div>
         <div class="field"><label class="field-label">想完成的事（做完時能判斷「實現了」）</label><input type="text" data-d="${i}" data-key="title" value="${escapeAttr(d.title)}"></div>
         <div class="field"><label class="field-label">為什麼想做</label><textarea rows="2" data-d="${i}" data-key="why">${escapeHtml(d.why || '')}</textarea></div>
         <div class="field"><label class="field-label">種類</label><select data-d="${i}" data-key="kind" style="${SEL_STYLE}">${opt([['goal', 'Goal・目標（做到就算數）'], ['fun', 'Fun・好玩（有趣、會持續做的事）'], ['idea', 'Idea・點子（從日常小卡關來的想法）']], d.kind || 'goal')}</select></div>
-        <div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt(WISH_STATES[d.kind || 'goal'], d.state)}</select></div>
+        <div class="field"><label class="field-label">狀態（網站上只顯示：規劃中／進行中／已完成；越後面燈籠越亮）</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt(WISH_STATES[d.kind || 'goal'], d.state)}</select></div>
         ${(d.kind || 'goal') === 'fun' ? `<div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px"><div class="field"><label class="field-label">已累積（選填，數字）</label><input type="number" min="0" step="1" data-d="${i}" data-key="count" value="${d.count ?? ''}" placeholder="例：12"></div><div class="field"><label class="field-label">單位（例：天、次、週）</label><input type="text" data-d="${i}" data-key="unit" value="${escapeAttr(d.unit || '')}" maxlength="4" placeholder="次"></div></div>` : ''}
         <div class="field"><label class="field-label">旁註（紅色小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
         <div class="field"><label class="field-label">下一步（可空白，一句話：接下來要做什麼，展開燈籠時會顯示）</label><input type="text" data-d="${i}" data-key="next" value="${escapeAttr(d.next || '')}" maxlength="60"></div>
         <div class="field"><label class="field-label">需要幫忙（可空白；有填的燈籠會出現「需要幫忙」標記和「我可以幫忙」按鈕）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
         <div class="field"><label class="field-label">點燈籠要連到哪裡（例：/chapters/3/、/works/checkin/；空白＝燈籠不能點）</label><input type="text" data-d="${i}" data-key="link" value="${escapeAttr(d.link || '')}"></div>
-        <div class="field-checkbox"><input type="checkbox" id="dp${i}" data-d="${i}" data-key="public" ${d.public ? 'checked' : ''}><label for="dp${i}">公開在網站上</label></div>
+        
       </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 掛一盞新燈籠</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
     form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定取下這盞燈籠嗎？儲存後才會生效。')) return; collect(); data.items.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.items[i - 1], data.items[i]] = [data.items[i], data.items[i - 1]]; render(); }));
@@ -1123,7 +1124,7 @@ async function inboxApi(method, body) {
   return r.json();
 }
 async function refreshInboxCount() {
-  try { const d = await inboxApi('GET'); const n = d.items.filter(x => x.status === 'new').length; document.getElementById('count-inbox').textContent = n || ''; return d; } catch (e) { return null; }
+  try { const d = await inboxApi('GET'); let n = d.items.filter(x => x.status === 'new').length; try { const w = await inboxApi('POST', { action: 'wish_ideas' }); n += (w.items || []).filter(x => x.status === 'new').length; } catch (e) {} document.getElementById('count-inbox').textContent = n || ''; return d; } catch (e) { return null; }
 }
 async function loadInbox() {
   showView('inbox');
