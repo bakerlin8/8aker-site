@@ -275,7 +275,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho.dim .st{color:var(--ash);}
 .cho-hint{display:none!important;}
 /* 祈願所：燈籠互動（有興趣／想法與建議） */
-.cho-act{position:absolute;left:0;right:0;top:84px;display:flex;justify-content:space-between;padding:0 8px;pointer-events:none;z-index:3;}
+.cho-act{position:absolute;left:0;right:0;top:169px;display:flex;justify-content:center;gap:48px;padding:0;pointer-events:none;z-index:3;}
 .ca{pointer-events:auto;width:30px;height:30px;padding:0;border-radius:50%;border:1px solid rgba(212,162,76,.6);background:rgba(28,15,20,.9);color:var(--gold);display:grid;place-items:center;cursor:pointer;opacity:0;transform:scale(.6);transition:opacity .3s,transform .4s var(--ease),background .3s,color .3s;}
 .ca svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
 .cho:hover .ca,.cho:focus-within .ca,.cho.open .ca{opacity:1;transform:none;}
@@ -352,7 +352,7 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 #kiganjo.in .cho{animation:choIn .7s var(--ease) both;animation-delay:calc(var(--n) * 90ms);}
 @keyframes choIn{from{opacity:0;transform:translateY(-12px);}}
 @media(prefers-reduced-motion:reduce){.cho .lan,#kiganjo.in .cho{animation:none;}}
-@media(max-width:640px){.cho-row>.cho{flex-basis:140px;}.cho{padding:26px 8px 0;}.cho .bd{width:70px;height:100px;}}
+@media(max-width:640px){.cho-row>.cho{flex-basis:140px;}.cho-act{top:153px;gap:44px;}.cho{padding:26px 8px 0;}.cho .bd{width:70px;height:100px;}}
 
 /* ── 弐 連載 ── */
 .mv-toggle{display:inline-flex;margin-top:28px;border:1px solid var(--line);}
