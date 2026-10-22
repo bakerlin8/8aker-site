@@ -379,7 +379,9 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .rg.done{stroke:rgba(212,162,76,.7);stroke-width:1.6;}
 .rg.next{stroke:#F3D9A0;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(212,162,76,.6));}
 .rg.fin{stroke:rgba(212,162,76,.35);stroke-dasharray:1 4;}
-.rg.on{stroke-width:3;}
+.rg.on{stroke-width:3.2;animation:rgGlow 2.4s ease-in-out infinite;}
+@keyframes rgGlow{0%,100%{filter:drop-shadow(0 0 2px rgba(243,217,160,.35));}50%{filter:drop-shadow(0 0 9px rgba(243,217,160,.95));}}
+@media(prefers-reduced-motion:reduce){.rg.on{animation:none;filter:drop-shadow(0 0 6px rgba(243,217,160,.7));}}
 .rg:hover{stroke:var(--bone);}
 .rg-hit{fill:none;stroke:none;}
 .cb-c{position:absolute;left:50%;top:0;width:100%;aspect-ratio:1;transform:translateX(-50%);display:grid;place-content:center;justify-items:center;pointer-events:none;}
@@ -402,17 +404,19 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .cc-cols .vd{font-size:11.5px;color:var(--ash);letter-spacing:.08em;}
 .cc-cols .future{opacity:.5;}
 .cc-cols button:hover{background:rgba(239,229,214,.04);opacity:1;}
-.cc-cols button.on{background:linear-gradient(rgba(212,162,76,.14),rgba(212,162,76,.05));}
+.cc-cols button.done{background:linear-gradient(rgba(212,162,76,.16),rgba(212,162,76,.07));box-shadow:inset 0 3px 0 rgba(212,162,76,.75);}
+.cc-cols button.next{background:linear-gradient(rgba(243,217,160,.18),rgba(212,162,76,.06));box-shadow:inset 0 3px 0 #F3D9A0;}
+.cc-cols button.on{background:linear-gradient(rgba(212,162,76,.30),rgba(212,162,76,.12));box-shadow:inset 0 3px 0 var(--gold);}
 .cc-cols button.on .vn{color:var(--gold);}
 .cc-cols .hk{writing-mode:horizontal-tb;bottom:86px;}
 .hk{position:absolute;bottom:56px;left:50%;transform:translateX(-50%) rotate(-8deg);writing-mode:horizontal-tb;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--jp);font-size:13px;border:1.5px solid currentColor;}
 .hk.done{color:#C8584A;background:rgba(200,88,74,.08);}
 .hk.next{color:var(--gold);}
 .hk.fin{color:var(--gold);border-radius:3px;}
-.cc-now{display:grid;grid-template-columns:240px minmax(0,1.3fr) minmax(0,1fr);gap:44px;margin-top:30px;align-items:start;}
+.cc-now{display:grid;grid-template-columns:240px minmax(0,1fr);gap:44px;margin-top:30px;align-items:start;}
 .cc-now .cb-ring{width:100%;}
 .cc-side .ca-nums{margin-top:6px;}
-@media(max-width:1100px){.cc-now{grid-template-columns:200px minmax(0,1fr);}.cc-side{grid-column:1/-1;}}
+@media(max-width:1100px){.cc-now{grid-template-columns:200px minmax(0,1fr);}}
 @media(max-width:700px){.cc-now{grid-template-columns:1fr;gap:28px;}.cc-now .cb-ring{max-width:230px;margin:0 auto;}}
 @media(max-width:520px){.chd h3{font-size:21px;}.ca-nums b{font-size:24px;}.cc-cols li{flex-basis:58px;}.cc-cols button{height:320px;}}
 .mv-toggle button{font-size:13px;padding:5px 16px;color:var(--bone-2);transition:background .3s,color .3s;}
@@ -1634,8 +1638,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var cols=list.map(function(q,i){var stamp=q.state==='done'?'<span class="hk done">刊</span>':q.state==='next'?'<span class="hk next">今</span>':q.final?'<span class="hk fin">巻</span>':'';
       return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="vn">'+(q.final?'第一卷':'第'+KN[q.no]+'話')+'</span><span class="vt">'+esc(q.final?'四十歲・發售':q.title)+'</span><span class="vd">'+(+q.date.slice(5,7))+'月'+(+q.date.slice(8))+'日</span>'+stamp+'</button></li>';}).join('');
     return '<div class="cc"><ol class="cc-cols" aria-label="連載帳">'+cols+'</ol>'
-      +'<article class="cc-now">'+ringSvg()+'<div><p class="ca-kick">'+x.st+(r.arc?'・'+r.arc:'')+'・'+r.date.replace(/-/g,'.')+'</p><h3><em>'+label(r)+'</em>'+esc(r.title)+'</h3>'
-      +(r.state==='next'?'<div class="ca-prog"><i style="width:'+(x.pct*100).toFixed(1)+'%"></i></div><p class="ca-pn">第 <b>'+x.dayN+'</b> 天／'+x.dayT+' 天・還有 <b>'+r.days+'</b> 天刊出</p>':'')+x.body+x.link+'</div>'
+      +'<article class="cc-now">'+ringSvg()
       +'<div class="cc-side"><div class="ca-nums"><div><b class="num">'+(x.live?x.total:'—')+'</b><small>這一話</small></div><div><b class="num">'+D.entries.length+'</b><small>全卷累積</small></div><div><b class="num">'+streak+'</b><small>連續紀錄</small></div></div>'+dirLine(D.totals)+'</div></article></div>'+repLine;}
   function render(){CD.innerHTML=vC();
     var cc=CD.querySelector('.cc-cols');if(cc){var on=cc.querySelector('.on');if(on)cc.scrollLeft=on.parentElement.offsetLeft-cc.clientWidth/2;}}
