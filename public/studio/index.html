@@ -360,6 +360,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="page-eyebrow">Inbox</div>
       <div class="page-title">需求收件匣</div>
       <div class="page-sub">首頁「填寫需求」送進來的內容。只有你看得到。</div>
+      <div id="wishBox"></div>
       <div id="bankBox"></div>
       <div id="inboxList"></div>
     </section>
@@ -1124,6 +1125,7 @@ async function refreshInboxCount() {
 }
 async function loadInbox() {
   showView('inbox');
+  loadWishBox();
   loadBankBox();
   const box = document.getElementById('inboxList');
   box.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
@@ -1149,6 +1151,33 @@ async function loadInbox() {
     const status = box.querySelector(`[data-i="${i}"][data-k="status"]`).value, note = box.querySelector(`[data-i="${i}"][data-k="note"]`).value;
     b.disabled = true;
     try { await inboxApi('POST', { action: 'update', id: x.id, status, note }); x.status = status; x.note = note; toast('已更新'); loadInbox(); }
+    catch (e) { toast('更新失敗：' + e.message, 'err'); b.disabled = false; }
+  }));
+}
+
+/* 祈願所：訪客在燈籠上留的「想法與建議」（純文字，無聯絡方式）＋各燈籠點亮人數 */
+async function loadWishBox() {
+  const box = document.getElementById('wishBox'); if (!box) return;
+  box.innerHTML = '<div class="hb-card"><h3>祈願所的想法與建議</h3><p class="hb-note">讀取中…</p></div>';
+  let d; try { d = await inboxApi('POST', { action: 'wish_ideas' }); } catch (e) { box.innerHTML = `<div class="hb-card"><h3>祈願所的想法與建議</h3><p class="hb-note">讀取失敗：${escapeHtml(e.message)}</p></div>`; return; }
+  let titles = {}; try { const f = await ghGetFile('src/data/dreams.json'); JSON.parse(f.content).items.forEach(x => { titles[x.id] = x.title; }); } catch (e) {}
+  const WS = [['new', '未讀'], ['read', '已讀'], ['used', '已採用'], ['spam', '垃圾訊息']];
+  const items = d.items || [], counts = d.counts || [];
+  const cnt = counts.map(c => `<span class="hb-note" style="margin-right:14px;display:inline-block">${escapeHtml(titles[c.wish_id] || c.wish_id)}：✦${c.likes}・💡${c.ideas}</span>`).join('');
+  box.innerHTML = `<div class="hb-card" style="border-left:3px solid #B76E79">
+    <h3 style="margin:0">祈願所的想法與建議 <span class="hb-note">（${items.filter(x => x.status === 'new').length} 則未讀）</span></h3>
+    <p class="hb-note" style="margin-top:6px">${cnt || '還沒有人點亮或留言。'}</p>
+    ${items.map((x, i) => `<div style="border-top:1px solid rgba(255,255,255,.08);margin-top:12px;padding-top:12px">
+      <p class="hb-note" style="margin:0">${escapeHtml(titles[x.wish_id] || x.wish_id)}｜${escapeHtml(new Date(x.created_at).toLocaleString('zh-TW', { timeZone: 'Asia/Tokyo' }))}</p>
+      <div class="hb-preview" style="margin-top:6px">${escapeHtml(x.body || '')}</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:8px;align-items:end">
+        <div class="field" style="margin:0"><select data-wi="${i}" style="${SEL_STYLE}">${opt(WS, x.status)}</select></div>
+        <div><button class="btn btn-ghost" data-wsave="${i}">更新狀態</button></div></div></div>`).join('')}
+  </div>`;
+  box.querySelectorAll('[data-wsave]').forEach(b => b.addEventListener('click', async () => {
+    const i = +b.dataset.wsave, x = items[i], status = box.querySelector(`[data-wi="${i}"]`).value;
+    b.disabled = true;
+    try { await inboxApi('POST', { action: 'wish_idea_update', id: x.id, status }); toast('已更新'); loadWishBox(); }
     catch (e) { toast('更新失敗：' + e.message, 'err'); b.disabled = false; }
   }));
 }

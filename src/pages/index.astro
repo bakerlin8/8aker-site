@@ -1717,10 +1717,10 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 </script>
 
 <script is:inline>
-/* 祈願所互動（預覽版）：♡ 為它點亮、💡 想法與建議。?count=a／b／c 預覽三種人數顯示（數字是示範用假數字）。尚未接後台，不送出任何資料 */
+/* 祈願所互動：♡ 為它點亮（可取消，最多反覆 3 輪後鎖定）、💡 想法與建議（純文字）。人數與想法存在 Supabase wish_events，經 wish-actions 函式讀寫 */
 (function(){
   var SEC=document.getElementById('kiganjo');if(!SEC)return;
-  var CV=(new URLSearchParams(location.search).get('count')||'').toLowerCase();if('abc'.indexOf(CV)<0)CV='';if(!CV){var ib=document.querySelectorAll('.cho .ca.idea');for(var q=0;q<ib.length;q++)ib[q].remove();}
+  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/wish-actions',loaded=false;
   var K='wish-liked:';
   function st(id){try{var v=JSON.parse(localStorage.getItem(K+id)||'null');if(v&&typeof v==='object')return v;if(localStorage.getItem(K+id)==='1')return {lit:true,c:0,lock:false};}catch(e){}return {lit:false,c:0,lock:false};}
   function save(id,v){try{localStorage.setItem(K+id,JSON.stringify(v));}catch(e){}}
@@ -1728,17 +1728,20 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var lockN=0;
   function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var BULB='<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/></svg>';
-  var DL=[12,0,7,24,1,3,0,9,5,2],DI=[3,0,1,5,0,0,0,2,1,0];
   var cards=SEC.querySelectorAll('article.cho');
-  if(CV){var nb=document.createElement('p');nb.className='cnt-note';nb.textContent='預覽：畫面上的人數是示範用假數字，正式上線會是真的。';var row=SEC.querySelector('.cho-wrap');if(row)row.parentNode.insertBefore(nb,row);}
   function render(card){
-    var o=card.querySelectorAll('.cnt-in,.ffs');for(var i=0;i<o.length;i++)o[i].remove();if(!CV)return;
+    var o=card.querySelectorAll('.cnt-in,.ffs');for(var i=0;i<o.length;i++)o[i].remove();if(!loaded)return;
     var l=card._l,n=card._n,bd=card.querySelector('.bd');if(!bd)return;
     if(l>0){var t=document.createElement('span');t.className='cnt-in cnt-up';t.title=l+' 人為它點亮';t.innerHTML='<i>✦</i>'+l;bd.appendChild(t);
       var f=document.createElement('div');f.className='ffs';f.setAttribute('aria-hidden','true');var m=Math.min(l,20),h='';for(var j=0;j<m;j++){var ang=j*2.39996,rad=46+((j*37)%28),x=Math.cos(ang)*rad,y=Math.sin(ang)*58;h+='<b style="left:'+x.toFixed(0)+'px;top:'+y.toFixed(0)+'px;animation-delay:'+((j*370)%2600)+'ms;animation-duration:'+(2200+(j*190)%1800)+'ms"></b>';}f.innerHTML=h;card.appendChild(f);}
     if(n>0){var u=document.createElement('span');u.className='cnt-in cnt-dn';u.title=n+' 則想法與建議';u.innerHTML=BULB+n;bd.appendChild(u);}
   }
-  for(var ci=0;ci<cards.length;ci++){cards[ci]._l=DL[ci%10];cards[ci]._n=DI[ci%10];var s0=st(cards[ci].getAttribute('data-id'));if(s0.lit){setLiked(cards[ci]);cards[ci]._l+=1;}render(cards[ci]);}
+  for(var ci=0;ci<cards.length;ci++){cards[ci]._l=0;cards[ci]._n=0;if(st(cards[ci].getAttribute('data-id')).lit)setLiked(cards[ci]);}
+  function post(o){try{return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(o)}).then(function(r){return r.json().catch(function(){return {};});}).catch(function(){return {error:'net'};});}catch(e){return Promise.resolve({error:'net'});}}
+  try{fetch(API).then(function(r){return r.json();}).then(function(d){if(!d||!d.counts)return;loaded=true;var mine={};(d.mine||[]).forEach(function(x){mine[x]=1;});
+    for(var i=0;i<cards.length;i++){var c=cards[i],id=c.getAttribute('data-id'),k=d.counts[id]||{l:0,n:0};c._l=k.l;c._n=k.n;var z=st(id);
+      if(mine[id]){if(!z.lit){z.lit=true;save(id,z);}setLiked(c);}else if(z.lit){z.lit=false;save(id,z);unLiked(c);}
+      render(c);}}).catch(function(){});}catch(e){}
   var AC=null;
   function tone(f,t0,d,v){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+t0;o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+0.05);}catch(e){}}
   function sfx(k){if(k==='on'){tone(659,0,.5,.12);tone(988,.09,.7,.1);}else if(k==='off'){tone(494,0,.35,.09);tone(330,.1,.5,.07);}else if(k==='lock'){tone(523,0,.5,.1);tone(659,.1,.5,.1);tone(784,.2,.8,.1);}else if(k==='idea'){tone(880,0,.35,.1);tone(1175,.1,.35,.1);tone(1568,.2,.7,.09);}}
@@ -1756,15 +1759,16 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var below=r.bottom+10+ph<window.innerHeight||r.top-ph-10<0;p.style.left=(left+window.scrollX)+'px';p.style.setProperty('--ax',(x-left)+'px');
     if(below){p.style.top=(r.bottom+10+window.scrollY)+'px';}else{p.classList.add('up');p.style.top=(r.top-ph-10+window.scrollY)+'px';}
     p.querySelector('.wp-x').onclick=closeAll;cur=p;
-    p.addEventListener('click',function(e){var go=e.target.closest('[data-go]');if(!go)return;var ta=p.querySelector('[name=wm]');if(!ta.value.trim()){ta.focus();return;}card._n+=1;spark(card,true);sfx('idea');p.querySelector('.wp-body').innerHTML='<p class="wp-ok">謝謝你的想法！</p><p class="wp-demo">（預覽版：還沒接上後台，內容不會真的送出）</p>';render(card);});
+    p.addEventListener('click',function(e){var go=e.target.closest('[data-go]');if(!go)return;var ta=p.querySelector('[name=wm]');if(!ta.value.trim()){ta.focus();return;}if(go.disabled)return;go.disabled=true;go.textContent='送出中…';var ob=p.querySelector('.wp-s');
+      post({action:'idea',id:card.getAttribute('data-id'),text:ta.value}).then(function(r){if(r&&r.ok){card._n+=1;spark(card,true);sfx('idea');p.querySelector('.wp-body').innerHTML='<p class="wp-ok">謝謝你的想法！</p>';render(card);}else{go.disabled=false;go.textContent='送出';if(ob){ob.textContent=(r&&r.error&&r.error!=='net'&&r.error.length<40)?r.error:'暫時送不出去，請稍後再試。';ob.style.color='#e8a090';}}});});
     var f=p.querySelector('textarea');if(f)setTimeout(function(){try{f.focus({preventScroll:true});}catch(e){}},50);
   }
   SEC.addEventListener('click',function(e){
     var b=e.target.closest('.ca');if(!b)return;e.stopPropagation();e.preventDefault();var card=b.closest('.cho'),id=card.getAttribute('data-id');
     if(b.getAttribute('data-act')==='like'){closeAll();var z=st(id);
       if(z.lock){toast(card,L.lock[lockN++%3]);return;}
-      if(!z.lit){z.lit=true;card._l+=1;if(z.c>=3){z.lock=true;toast(card,L.fin);}else toast(card,L.on[z.c]);sfx(z.lock?'lock':'on');save(id,z);setLiked(card);spark(card);}
-      else{z.lit=false;z.c+=1;card._l=Math.max(0,card._l-1);save(id,z);unLiked(card);snuff(card);sfx('off');toast(card,L.off[Math.min(z.c,3)-1]);}
+      if(!z.lit){z.lit=true;card._l+=1;if(z.c>=3){z.lock=true;toast(card,L.fin);}else toast(card,L.on[z.c]);sfx(z.lock?'lock':'on');save(id,z);setLiked(card);spark(card);post({action:'like',id:id});}
+      else{z.lit=false;z.c+=1;card._l=Math.max(0,card._l-1);save(id,z);post({action:'unlike',id:id});unLiked(card);snuff(card);sfx('off');toast(card,L.off[Math.min(z.c,3)-1]);}
       setTimeout(function(){render(card);},300);}
     else pop(card,b,ideaBody(card.getAttribute('data-t')));
   },true);
