@@ -83,6 +83,19 @@ const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbn
 const HAT_SVC: Record<string, string[]> = { '築': ['property', 'owner'], '旅': ['omakase'] };
 const svcById: Record<string, any> = Object.fromEntries((services.services as any[]).map((x) => [x.id, x]));
 // 祈願所：「我可以幫忙」連到需求填表，並帶入是哪個願望、需要什麼
+// 祈願所：四種燈籠（Goal／Habit／Fun／Idea），不用百分比，亮度由「階段」決定
+const WISH_KINDS: Record<string, string> = { goal: 'Goal', habit: 'Habit', fun: 'Fun', idea: 'Idea' };
+const WISH_ST: Record<string, Record<string, [string, number]>> = {
+  goal: { idea: ['想做', 0], doing: ['進行中', 0.7], done: ['已實現', 1] },
+  idea: { idea: ['點子', 0], test: ['驗證中', 0.55], build: ['動工', 0.8], done: ['已實現', 1] },
+  fun: { idea: ['想試', 0], done: ['試過了', 1] },
+};
+const wishView = (d: any) => {
+  const kind = WISH_KINDS[d.kind] ? d.kind : 'goal';
+  if (kind === 'habit') { const n = Number(d.count); const has = d.count !== '' && d.count != null && Number.isFinite(n) && n > 0; return { kind, label: WISH_KINDS[kind], st: has ? `累積 ${n} ${String(d.unit || '次').slice(0, 4)}` : '養成中', g: 0.75, lit: true, stamp: '' }; }
+  const t = WISH_ST[kind][d.state] || WISH_ST[kind].idea;
+  return { kind, label: WISH_KINDS[kind], st: t[0], g: t[1], lit: t[1] > 0, stamp: d.state === 'done' ? (kind === 'fun' ? '趣' : '叶') : '' };
+};
 const wishHelpHref = (d: any) => `/chat/?from=wish&about=${encodeURIComponent(String(d.title || ''))}&help=${encodeURIComponent(String(d.help || ''))}`;
 const wishDate = (u: any) => { const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(String(u || '')); return m ? `${+m[1]}/${+m[2]}` : ''; };
 const HAT_COL = [['196,86,107', '236,160,176'], ['212,162,76', '243,217,160'], ['214,196,172', '245,234,218']];
@@ -225,7 +238,7 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 1px 11px),radial-gradient(60% 60% at 50% 50%,#ffe0a0,#e8893a 70%,#b0472a);
   filter:saturate(calc(.35 + var(--g) * .65)) brightness(calc(.55 + var(--g) * .55));
   box-shadow:0 0 calc(var(--g) * 70px) calc(var(--g) * 16px) rgba(255,170,80,calc(var(--g) * .55));transition:box-shadow .6s,filter .6s;}
-.cho.idea .bd{background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 11px),radial-gradient(60% 60% at 50% 50%,#ddd0c2,#a8968a 78%);color:#3a2a2a;filter:none;box-shadow:none;}
+.cho.dim .bd{background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 11px),radial-gradient(60% 60% at 50% 50%,#ddd0c2,#a8968a 78%);color:#3a2a2a;filter:none;box-shadow:none;}
 .cho .cp2{width:38px;height:7px;background:#1a0f0a;border-radius:2px;}
 .cho .tas{width:2px;height:16px;background:#b0472a;}
 .cho .stamp{position:absolute;right:-12px;bottom:6px;width:30px;height:30px;border:1.6px solid #C0392B;color:#C0392B;border-radius:50%;display:grid;place-items:center;font-size:15px;background:rgba(255,240,220,.9);transform:rotate(-12deg);}
@@ -244,8 +257,9 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho .why{margin-top:6px;font-size:12.5px;line-height:1.75;color:var(--bone-2);}
 .cho .memo{margin-top:6px;font-size:12.5px;color:#E2A08F;}
 .cho .st{margin-top:10px;font-size:11.5px;letter-spacing:.1em;color:var(--gold);}
-.cho.idea .st{color:var(--ash);}
+.cho.dim .st{color:var(--ash);}
 .cho-hint{display:none!important;}
+.cho .kd{font-family:var(--latin);font-size:15px;font-weight:600;letter-spacing:.12em;line-height:1;}
 .cho-empty{margin-top:28px;color:var(--bone-2);font-size:14.5px;letter-spacing:.06em;}
 
 /* 祈願所：需要幫忙的標記、下一步、更新日、幫忙入口 */
@@ -1118,18 +1132,18 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
           
           {dreams.items.filter((d: any) => d.public).length === 0 && <p class="cho-empty">燈籠正在重新掛上，過幾天再來看看。</p>}
           <div class="cho-scroll"><div class="cho-row">
-          {dreams.items.filter((d: any) => d.public).map((d: any) => ({ d, k: d.state === 'done' ? 1000 : d.state === 'doing' ? 100 + (Number.isFinite(Number(d.progress)) && d.progress !== '' && d.progress != null ? Number(d.progress) : 30) : 0 })).sort((a: any, b: any) => b.k - a.k).map(({ d }: any, i: number) => { const st = ({ idea: '許願', doing: '進行中', done: '已實現' } as any)[d.state] || '許願'; const raw = Number(d.progress); const hasPg = d.progress !== '' && d.progress != null && Number.isFinite(raw); const pg = d.state === 'done' ? 100 : d.state === 'idea' ? 0 : Math.max(5, Math.min(100, hasPg ? Math.round(raw) : 30)); const g = d.state === 'idea' ? 0 : (0.4 + pg / 100 * 0.6).toFixed(2);
-            const href = safeHref(d.link); const cls = `cho ${d.state}${href ? ' go' : ''}`; const sty = `--n:${i};--g:${g}`;
-            const inner = (<><div class="lan" aria-hidden="true">{href ? <span class="pin" title="可以點開">↗</span> : <span class="pin-none"></span>}<span class="str"></span><span class="cp"></span><span class="bd"><span class="gan">願</span><span class="pct"><b>{pg}</b><small>%</small></span>{d.state === 'done' && <span class="stamp">叶</span>}</span><span class="cp2"></span><span class="tas"></span></div>
+          {dreams.items.filter((d: any) => d.public).map((d: any, i: number) => { const V = wishView(d);
+            const href = safeHref(d.link); const cls = `cho k-${V.kind} ${V.lit ? 'lit' : 'dim'}${href ? ' go' : ''}`; const sty = `--n:${i};--g:${V.g}`;
+            const inner = (<><div class="lan" aria-hidden="true">{href ? <span class="pin" title="可以點開">↗</span> : <span class="pin-none"></span>}<span class="str"></span><span class="cp"></span><span class="bd"><span class="kd">{V.label}</span>{V.stamp && <span class="stamp">{V.stamp}</span>}</span><span class="cp2"></span><span class="tas"></span></div>
               <h4>{d.title}</h4>
-              <p class="st">{st}{d.state === 'doing' && `・${pg}%`}</p>
-              {d.help && d.state !== 'done' && <p class="need-tag">需要幫忙</p>}
+              <p class="st">{V.st}</p>
+              {d.help && V.stamp === '' && <p class="need-tag">需要幫忙</p>}
               {(d.why || d.note || d.next || d.help || wishDate(d.updated)) && <div class="more"><div>
               {d.why && <p class="why">{d.why}</p>}
               {d.note && <p class="memo">── {d.note}</p>}
-              {d.next && d.state !== 'done' && <p class="next"><b>下一步</b>{d.next}</p>}
+              {d.next && V.stamp === '' && <p class="next"><b>下一步</b>{d.next}</p>}
               {d.help && <p class="needs">需要幫忙：{d.help}</p>}
-              {d.help && !href && d.state !== 'done' && <a class="hlp" href={wishHelpHref(d)}>我可以幫忙 →</a>}
+              {d.help && !href && V.stamp === '' && <a class="hlp" href={wishHelpHref(d)}>我可以幫忙 →</a>}
               {wishDate(d.updated) && <p class="upd">更新於 {wishDate(d.updated)}</p>}</div></div>}</>);
             return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty} tabindex="0">{inner}</article>; })}
           </div></div>
