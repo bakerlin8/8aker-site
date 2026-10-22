@@ -11,7 +11,7 @@ export function chapterList() {
     const from = i > 0 ? arr[i - 1].date : '0000-00-00';
     const arc = (chapters.arcs || []).find((a: any) => c.no >= a.from && c.no <= a.to)?.name ?? '';
     const state = T(c.date) <= now ? (c.on_break ? 'break' : 'done') : 'future';
-    return { ...c, from, arc, state, label: `第 ${c.no} 話` };
+    return { ...c, from, arc, state, label: `第 ${c.no + 1} 話` };
   });
   const next = list.find((c) => c.state === 'future');
   if (next) (next as any).state = 'next';

@@ -63,7 +63,7 @@ const schema = [
 </style>
 <header class="chh">
   <div class="chh-in">
-    <div class="no" aria-hidden="true">{c.no}</div>
+    <div class="no" aria-hidden="true">{c.no + 1}</div>
     <p class="crumb rv"><a href="/#chapters">{copy.chapters_title}</a>／<a href="/chapters/">第一卷目次</a></p>
     <h1 class="rv" style="--i:1"><small>{c.label}</small>{c.title}</h1>
     <div class="meta rv" style="--i:2"><span class="st">{stateLabel[c.state]}</span><span>{dot(c.date)} 刊出</span>{c.arc && <span>{c.arc}</span>}</div>

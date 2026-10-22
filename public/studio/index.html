@@ -850,15 +850,15 @@ async function loadChapters(pick) {
     const c = data.chapters[cur];
     form.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px;">${data.chapters.map((x, i) =>
-        `<button class="btn ${i === cur ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px" data-pick="${i}">第 ${x.no} 話</button>`).join('')}</div>
-      <div class="field"><label class="field-label">第 ${c.no} 話・標題</label><input type="text" id="c-title" value="${escapeAttr(c.title)}"></div>
+        `<button class="btn ${i === cur ? 'btn-primary' : 'btn-ghost'}" style="padding:6px 12px" data-pick="${i}">第 ${x.no + 1} 話</button>`).join('')}</div>
+      <div class="field"><label class="field-label">第 ${c.no + 1} 話・標題</label><input type="text" id="c-title" value="${escapeAttr(c.title)}"></div>
       <div class="field"><label class="field-label">刊出日</label><input type="date" id="c-date" value="${escapeAttr(c.date)}"></div>
       <div class="field field-checkbox"><input type="checkbox" id="c-break" ${c.on_break ? 'checked' : ''}><label for="c-break">這個月休載</label></div>
       <div class="field"><label class="field-label">預計刊出的內容（刊出前顯示）</label><textarea id="c-plan" rows="3">${escapeHtml(planToText(c.plan))}</textarea><div class="field-hint">一行一項。開頭加「強 」「放 」「操 」「具 」「變 」（後面空一格）會標上方向顏色。</div></div>
       <div class="field"><label class="field-label">這一話的摘要（刊出後顯示）</label><textarea id="c-summary" rows="3">${escapeHtml(c.summary || '')}</textarea></div>
       <div class="field"><label class="field-label">這一話留下的</label><textarea id="c-keep" rows="3">${escapeHtml((c.keep || []).join('\n'))}</textarea><div class="field-hint">一行一項：做出來的東西、數字、學到的事。</div></div>
       <div class="field"><label class="field-label">這一話放下的</label><textarea id="c-letgo" rows="3">${escapeHtml((c.letgo || []).join('\n'))}</textarea><div class="field-hint">一行一項：沒做成的、卡住的、要翻篇的心情。</div></div>
-      <div class="btn-row"><button class="btn btn-primary" id="saveChBtn">儲存第 ${c.no} 話</button></div>`;
+      <div class="btn-row"><button class="btn btn-primary" id="saveChBtn">儲存第 ${c.no + 1} 話</button></div>`;
     form.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => { collect(); cur = +b.dataset.pick; render(); }));
     document.getElementById('saveChBtn').addEventListener('click', save);
   }

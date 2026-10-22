@@ -1600,19 +1600,19 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var acc=0,lock=0;D.addEventListener('wheel',function(e){if(Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;e.preventDefault();var now=Date.now();if(now<lock)return;acc+=e.deltaX;if(Math.abs(acc)>40){go(cur+(acc>0?1:-1));acc=0;lock=now+450;}},{passive:false});
   lay();addEventListener('resize',lay);})();
 
-/* 連載: 第 0 話 … 第 11 話 → 第一卷 */
+/* 連載: 第 1 話 … 第 12 話（資料裡 no 為 0…11，網址不變）→ 第一卷 */
 (function(){var C=D.chapters,now=Date.now(),T=function(d){return new Date(d+'T00:00:00+09:00').getTime();};
   var list=C.chapters.map(function(c){return Object.assign({},c);});list.push(Object.assign({final:true,no:12},C.volume));
   var nextIdx=list.findIndex(function(r){return T(r.date)>=now;});if(nextIdx<0)nextIdx=list.length;
   list.forEach(function(r,i){r.days=Math.floor((T(r.date)-now)/DAY);r.state=i<nextIdx?(r.on_break?'break':'done'):i===nextIdx?'next':'future';
     var a=(C.arcs||[]).filter(function(a){return !r.final&&r.no>=a.from&&r.no<=a.to;})[0];r.arc=a?a.name:'';});
-  var md=function(r){return (+r.date.slice(5,7))+'.'+r.date.slice(8);},label=function(r){return r.final?'第一卷':'第 '+r.no+' 話';};
+  var md=function(r){return (+r.date.slice(5,7))+'.'+r.date.slice(8);},label=function(r){return r.final?'第一卷':'第 '+(r.no+1)+' 話';};
   var esc=function(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');};
   var nr=list[Math.min(nextIdx,list.length-1)];
   var nrEl=document.getElementById('nextRel');if(nrEl)nrEl.innerHTML=(nr.no===0?'新連載・':'連載中・')+label(nr)+'・'+(+nr.date.slice(5,7))+' 月 '+(+nr.date.slice(8))+' 日刊出 <b>'+(nr.days<=0?'今天':nr.days+' 天後')+'</b>';
   /* ── 連載：三種版型（A 目次／B 年輪帳／C 縦書き帳），資料共用 ── */
   var CD=document.getElementById('chDash');
-  var KN=['〇','一','二','三','四','五','六','七','八','九','十','十一'];
+  var KN=['〇','一','二','三','四','五','六','七','八','九','十','十一','十二'];
   var dan=function(c){return c>=100?'四段':c>=60?'三段':c>=30?'二段':c>=10?'初段':'見習';};
   var days={};D.entries.forEach(function(e){days[e.date]=1;});
   var streak=0,dd=new Date(now+9*3600e3);for(var g=0;g<400;g++){var key=dd.toISOString().slice(0,10);if(days[key])streak++;else if(g>0)break;dd.setUTCDate(dd.getUTCDate()-1);}
@@ -1629,7 +1629,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     return {r:r,total:es.length,live:live,cc:cc,pct:pct,dayN:dayN,dayT:dayT,body:body,st:{done:'刊出',break:'休載',next:'製作中',future:'預定'}[r.state],
       link:'<a class="ch-link" href="/chapters/'+(r.final?'':r.no+'/')+'">'+(r.final?'看第一卷目次':'看完整的'+label(r))+' →</a>'};}
   var dirLine=function(c){return '<p class="dline">'+D.dirs.map(function(d){return '<a href="/pillars/'+d.id+'/" style="--dc:'+col(d.id)+'"><b>'+d.k+'</b>'+(c[d.id]||0)+'</a>';}).join('')+'</p>';};
-  var knum=function(r){return r.final?'巻':KN[r.no]||r.no;};
+  var knum=function(r){return r.final?'巻':KN[r.no+1]||(r.no+1);};
   /* 年輪：每一話是一圈，刊出的圈描金，這一話依月份進度畫到一半並發光 */
   function ringSvg(){var n=list.length,R0=44,R1=150,sv='';
     for(var i=0;i<n;i++){var q=list[i],rr=R0+(R1-R0)*i/(n-1),c=2*Math.PI*rr,dash='';
@@ -1649,7 +1649,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     return h+'</article>';}
   function vC(){var x=info(SEL),r=x.r;
     var cols=list.map(function(q,i){var stamp=q.state==='done'?'<span class="hk done">刊</span>':q.state==='next'?'<span class="hk next">今</span>':q.final?'<span class="hk fin">巻</span>':'';
-      return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="vn">'+(q.final?'第一卷':'第'+KN[q.no]+'話')+'</span><span class="vt">'+esc(q.final?'四十歲・發售':q.title)+'</span><span class="vd">'+(+q.date.slice(5,7))+'月'+(+q.date.slice(8))+'日</span>'+stamp+'</button></li>';}).join('');
+      return '<li><button data-i="'+i+'" class="'+q.state+(i===SEL?' on':'')+(q.final?' fin':'')+'"><span class="vn">'+(q.final?'第一卷':'第'+KN[q.no+1]+'話')+'</span><span class="vt">'+esc(q.final?'四十歲・發售':q.title)+'</span><span class="vd">'+(+q.date.slice(5,7))+'月'+(+q.date.slice(8))+'日</span>'+stamp+'</button></li>';}).join('');
     return '<div class="cc"><ol class="cc-cols" aria-label="連載帳">'+cols+'</ol>'
       +nowHtml(x,r)+'</div>';}
   function render(){CD.innerHTML=vC();
