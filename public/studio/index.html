@@ -919,6 +919,8 @@ async function loadDreams() {
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
   const file = await ghGetFile('src/data/dreams.json');
   const data = JSON.parse(file.content);
+  const norm = (o) => JSON.stringify(Object.keys(o).filter(k => k !== 'updated' && o[k] !== '' && o[k] != null).sort().map(k => [k, o[k]]));
+  const origById = Object.fromEntries(data.items.map(x => [x.id, norm(x)]));
   const dirs = Object.entries(KANJI_BY_DIR).map(([d, k]) => [d, `${k}・${PILLARS[d].jp}`]);
   function collect() {
     data.intro = form.querySelector('[data-intro]').value;
@@ -940,7 +942,8 @@ async function loadDreams() {
           <div class="field"><label class="field-label">旁註（紅色小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
           <div class="field"><label class="field-label">進度 %（燈籠亮度）</label><input type="number" min="0" max="100" step="5" data-d="${i}" data-key="progress" value="${d.progress ?? ''}" placeholder="${d.state === 'doing' ? '30' : '—'}" ${d.state === 'doing' ? '' : 'disabled title="只有「進行中」會顯示進度"'}></div>
         </div>
-        <div class="field"><label class="field-label">需要幫忙（可空白，顯示在燈籠下方）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
+        <div class="field"><label class="field-label">下一步（可空白，一句話：接下來要做什麼，展開燈籠時會顯示）</label><input type="text" data-d="${i}" data-key="next" value="${escapeAttr(d.next || '')}" maxlength="60"></div>
+        <div class="field"><label class="field-label">需要幫忙（可空白；有填的燈籠會出現「需要幫忙」標記和「我可以幫忙」按鈕）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
         <div class="field"><label class="field-label">點燈籠要連到哪裡（例：/chapters/3/、/works/checkin/；空白＝燈籠不能點）</label><input type="text" data-d="${i}" data-key="link" value="${escapeAttr(d.link || '')}"></div>
         <div class="field-checkbox"><input type="checkbox" id="dp${i}" data-d="${i}" data-key="public" ${d.public ? 'checked' : ''}><label for="dp${i}">公開在網站上</label></div>
       </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addDream">＋ 掛一盞新燈籠</button><div class="spacer"></div><button class="btn btn-primary" id="saveDreams">儲存變更</button></div>`;
@@ -950,6 +953,8 @@ async function loadDreams() {
     document.getElementById('addDream').addEventListener('click', () => { collect(); data.items.push({ id: 'd' + Date.now(), dir: '', title: '', why: '', horizon: 'vol1', state: 'idea', note: '', help: '', link: '', public: true }); render(); });
     document.getElementById('saveDreams').addEventListener('click', async (e) => {
       collect(); if (data.items.some(x => !x.title.trim())) { toast('有一盞燈籠還沒填「想完成的事」', 'err'); return; }
+      const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10); // 日本時間
+      data.items.forEach(x => { if (origById[x.id] !== norm(x)) x.updated = today; }); // 有改動的燈籠自動記「更新於」
       file.sha = await saveJson('src/data/dreams.json', data, file.sha, 'Update 祈願所 via Studio', e.currentTarget);
     });
   }

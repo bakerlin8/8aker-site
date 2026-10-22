@@ -82,6 +82,9 @@ const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbn
 // 服務卡燈箱：每張卡對應哪幾張服務內容（樣品）、每張卡的色調（與 .hats .hat:nth-child 一致）
 const HAT_SVC: Record<string, string[]> = { '築': ['property', 'owner'], '旅': ['omakase'] };
 const svcById: Record<string, any> = Object.fromEntries((services.services as any[]).map((x) => [x.id, x]));
+// 祈願所：「我可以幫忙」連到需求填表，並帶入是哪個願望、需要什麼
+const wishHelpHref = (d: any) => `/chat/?from=wish&about=${encodeURIComponent(String(d.title || ''))}&help=${encodeURIComponent(String(d.help || ''))}`;
+const wishDate = (u: any) => { const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(String(u || '')); return m ? `${+m[1]}/${+m[2]}` : ''; };
 const HAT_COL = [['196,86,107', '236,160,176'], ['212,162,76', '243,217,160'], ['214,196,172', '245,234,218']];
 const json = JSON.stringify(pageData).replace(/</g, '\\u003c');
 ---
@@ -243,6 +246,14 @@ h1.motto .l2{color:#3A1F29;transition:color 2.2s var(--ease) .9s;}
 .cho .st{margin-top:10px;font-size:11.5px;letter-spacing:.1em;color:var(--gold);}
 .cho.idea .st{color:var(--ash);}
 .cho-hint{display:none!important;}
+/* 祈願所：需要幫忙的標記、下一步、更新日、幫忙入口 */
+.cho .need-tag{margin-top:6px;font-size:11px;letter-spacing:.12em;color:#E2A08F;border:1px solid rgba(226,160,143,.5);padding:1px 8px;border-radius:99px;}
+.cho .next{margin-top:8px;font-size:12.5px;line-height:1.7;color:var(--bone);}
+.cho .next b{display:block;font-weight:500;font-size:11px;letter-spacing:.16em;color:var(--gold);}
+.cho .upd{margin-top:8px;font-size:11px;letter-spacing:.1em;color:var(--ash);}
+.cho .hlp{display:inline-block;margin-top:8px;padding:5px 12px;border:1px solid rgba(212,162,76,.6);color:var(--gold);font-size:12.5px;letter-spacing:.06em;text-decoration:none;transition:background .3s,color .3s;}
+.cho .hlp:hover,.cho .hlp:focus-visible{background:var(--gold);color:#1C0F14;}
+
 @keyframes sway{0%,100%{transform:rotate(-1.6deg);}50%{transform:rotate(1.6deg);}}
 #kiganjo.in .cho{animation:choIn .7s var(--ease) both;animation-delay:calc(var(--n) * 90ms);}
 @keyframes choIn{from{opacity:0;transform:translateY(-12px);}}
@@ -1109,10 +1120,14 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             const inner = (<><div class="lan" aria-hidden="true">{href ? <span class="pin" title="可以點開">↗</span> : <span class="pin-none"></span>}<span class="str"></span><span class="cp"></span><span class="bd"><span class="gan">願</span><span class="pct"><b>{pg}</b><small>%</small></span>{d.state === 'done' && <span class="stamp">叶</span>}</span><span class="cp2"></span><span class="tas"></span></div>
               <h4>{d.title}</h4>
               <p class="st">{st}{d.state === 'doing' && `・${pg}%`}</p>
-              {(d.why || d.note || d.help) && <div class="more"><div>
+              {d.help && d.state !== 'done' && <p class="need-tag">需要幫忙</p>}
+              {(d.why || d.note || d.next || d.help || wishDate(d.updated)) && <div class="more"><div>
               {d.why && <p class="why">{d.why}</p>}
               {d.note && <p class="memo">── {d.note}</p>}
-              {d.help && <p class="needs">需要幫忙：{d.help}</p>}</div></div>}</>);
+              {d.next && d.state !== 'done' && <p class="next"><b>下一步</b>{d.next}</p>}
+              {d.help && <p class="needs">需要幫忙：{d.help}</p>}
+              {d.help && !href && d.state !== 'done' && <a class="hlp" href={wishHelpHref(d)}>我可以幫忙 →</a>}
+              {wishDate(d.updated) && <p class="upd">更新於 {wishDate(d.updated)}</p>}</div></div>}</>);
             return href ? <a class={cls} style={sty} href={href} aria-label={`${d.title}（點開看相關內容）`}>{inner}</a> : <article class={cls} style={sty} tabindex="0">{inner}</article>; })}
           </div></div>
           <p class="cho-hint">← 左右滑動看全部 →</p>
