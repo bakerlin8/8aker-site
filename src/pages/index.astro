@@ -311,6 +311,7 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 @media(max-width:640px){.cnt-up{top:19px;}.cnt-dn{bottom:19px;}}
 .cnt-in i{font-style:normal;font-size:12px;}
 .cnt-in svg{width:15px;height:15px;filter:drop-shadow(0 1px 0 rgba(255,226,170,.55));fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;}
+.spark.alt{background:#fff3c4;box-shadow:0 0 8px 2px rgba(255,236,150,.85);}
 .ash{position:absolute;left:50%;top:70px;width:5px;height:5px;border-radius:50%;background:#b9857c;pointer-events:none;z-index:4;animation:ashDn 1.3s ease-in forwards;}
 @keyframes ashDn{to{transform:translate(var(--dx),130px) scale(.3);opacity:0;}}
 .cho .bd.snuff{animation:snuff .7s ease-out;}
@@ -1740,7 +1741,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function snuff(card){var bd=card.querySelector('.bd');if(bd){bd.classList.remove('snuff');void bd.offsetWidth;bd.classList.add('snuff');}for(var i=0;i<8;i++){var a=document.createElement('i');a.className='ash';a.style.setProperty('--dx',(Math.random()*60-30)+'px');a.style.left=(40+Math.random()*20)+'%';a.style.animationDelay=(i*60)+'ms';card.appendChild(a);setTimeout(function(x){x.remove();},1900,a);}}
   function setLiked(card){card.classList.add('hearted');var b=card.querySelector('.ca.like');if(b){b.classList.add('on');var z=st(card.getAttribute('data-id'));b.title=z.lock?'已點亮':'取消點亮';}}
   function unLiked(card){card.classList.remove('hearted');var b=card.querySelector('.ca.like');if(b){b.classList.remove('on');b.title='為它點亮';}}
-  function spark(card){for(var i=0;i<9;i++){var s=document.createElement('i');s.className='spark';s.style.setProperty('--dx',(Math.random()*70-35)+'px');s.style.left=(42+Math.random()*16)+'%';s.style.animationDelay=(i*50)+'ms';card.appendChild(s);setTimeout(function(x){x.remove();}.bind(null,s),1500);}}
+  function spark(card,alt){for(var i=0;i<(alt?12:9);i++){var s=document.createElement('i');s.className='spark'+(alt?' alt':'');s.style.setProperty('--dx',(Math.random()*70-35)+'px');s.style.left=(42+Math.random()*16)+'%';s.style.animationDelay=(i*50)+'ms';card.appendChild(s);setTimeout(function(x){x.remove();}.bind(null,s),1500);}}
   function toast(card,txt){var o=card.querySelector('.wp-toast');if(o)o.remove();var t=document.createElement('div');t.className='wp-toast';t.textContent=txt;card.appendChild(t);setTimeout(function(){t.remove();},2800);}
   var cur=null;
   function closeAll(){var o=document.querySelectorAll('.wp');for(var i=0;i<o.length;i++)o[i].remove();cur=null;}
@@ -1751,7 +1752,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var below=r.bottom+10+ph<window.innerHeight||r.top-ph-10<0;p.style.left=(left+window.scrollX)+'px';p.style.setProperty('--ax',(x-left)+'px');
     if(below){p.style.top=(r.bottom+10+window.scrollY)+'px';}else{p.classList.add('up');p.style.top=(r.top-ph-10+window.scrollY)+'px';}
     p.querySelector('.wp-x').onclick=closeAll;cur=p;
-    p.addEventListener('click',function(e){var go=e.target.closest('[data-go]');if(!go)return;var ta=p.querySelector('[name=wm]');if(!ta.value.trim()){ta.focus();return;}card._n+=1;p.querySelector('.wp-body').innerHTML='<p class="wp-ok">謝謝你的想法！</p><p class="wp-demo">（預覽版：還沒接上後台，內容不會真的送出）</p>';render(card);});
+    p.addEventListener('click',function(e){var go=e.target.closest('[data-go]');if(!go)return;var ta=p.querySelector('[name=wm]');if(!ta.value.trim()){ta.focus();return;}card._n+=1;spark(card,true);p.querySelector('.wp-body').innerHTML='<p class="wp-ok">謝謝你的想法！</p><p class="wp-demo">（預覽版：還沒接上後台，內容不會真的送出）</p>';render(card);});
     var f=p.querySelector('textarea');if(f)setTimeout(function(){try{f.focus({preventScroll:true});}catch(e){}},50);
   }
   SEC.addEventListener('click',function(e){
