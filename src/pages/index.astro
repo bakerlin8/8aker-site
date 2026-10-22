@@ -1733,7 +1733,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     var o=card.querySelectorAll('.cnt-in,.ffs');for(var i=0;i<o.length;i++)o[i].remove();if(!loaded)return;
     var l=card._l,n=card._n,bd=card.querySelector('.bd');if(!bd)return;
     if(l>0){var t=document.createElement('span');t.className='cnt-in cnt-up';t.title=l+' 人為它點亮';t.innerHTML='<i>✦</i>'+l;bd.appendChild(t);
-      var f=document.createElement('div');f.className='ffs';f.setAttribute('aria-hidden','true');var m=Math.min(l,20),h='';for(var j=0;j<m;j++){var ang=j*2.39996,rad=46+((j*37)%28),x=Math.cos(ang)*rad,y=Math.sin(ang)*58;h+='<b style="left:'+x.toFixed(0)+'px;top:'+y.toFixed(0)+'px;animation-delay:'+((j*370)%2600)+'ms;animation-duration:'+(2200+(j*190)%1800)+'ms"></b>';}f.innerHTML=h;card.appendChild(f);}
+      var f=document.createElement('div');f.className='ffs';f.setAttribute('aria-hidden','true');var m=Math.min(24,4+l*2),h='';for(var j=0;j<m;j++){var ang=j*2.39996,rad=46+((j*37)%28),x=Math.cos(ang)*rad,y=Math.sin(ang)*58;h+='<b style="left:'+x.toFixed(0)+'px;top:'+y.toFixed(0)+'px;animation-delay:'+((j*370)%2600)+'ms;animation-duration:'+(2200+(j*190)%1800)+'ms"></b>';}f.innerHTML=h;card.appendChild(f);}
     if(n>0){var u=document.createElement('span');u.className='cnt-in cnt-dn';u.title=n+' 則想法與建議';u.innerHTML=BULB+n;bd.appendChild(u);}
   }
   for(var ci=0;ci<cards.length;ci++){cards[ci]._l=0;cards[ci]._n=0;if(st(cards[ci].getAttribute('data-id')).lit)setLiked(cards[ci]);}
