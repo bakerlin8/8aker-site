@@ -68,7 +68,7 @@
     },
     {
       "id": "w6",
-      "kind": "fun",
+      "kind": "idea",
       "title": "雪具好推薦：幫你挑到合腳的板與靴",
       "state": "idea",
       "note": "",
@@ -101,7 +101,33 @@
       "next": "",
       "help": "",
       "link": "",
-      "public": false,
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w9",
+      "kind": "goal",
+      "title": "英文配音：自媒體影片自己說英文",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
+      "updated": "2026-10-22",
+      "why": ""
+    },
+    {
+      "id": "w10",
+      "kind": "fun",
+      "title": "跳舞：跟著短影音自學編舞",
+      "state": "idea",
+      "note": "",
+      "next": "",
+      "help": "",
+      "link": "",
+      "public": true,
       "updated": "2026-10-22",
       "why": ""
     }
