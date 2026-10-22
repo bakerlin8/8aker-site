@@ -84,17 +84,18 @@ const HAT_SVC: Record<string, string[]> = { '築': ['property', 'owner'], '旅':
 const svcById: Record<string, any> = Object.fromEntries((services.services as any[]).map((x) => [x.id, x]));
 // 祈願所：「我可以幫忙」連到需求填表，並帶入是哪個願望、需要什麼
 // 祈願所：四種燈籠（Goal／Habit／Fun／Idea），不用百分比，亮度由「階段」決定
-const WISH_KINDS: Record<string, string> = { goal: 'Goal', habit: 'Habit', fun: 'Fun', idea: 'Idea' };
+const WISH_KINDS: Record<string, string> = { goal: 'Goal', fun: 'Fun', idea: 'Idea' };
 const WISH_ST: Record<string, Record<string, [string, number]>> = {
   goal: { idea: ['想做', 0], doing: ['進行中', 0.7], done: ['已實現', 1] },
   idea: { idea: ['點子', 0], test: ['驗證中', 0.55], build: ['動工', 0.8], done: ['已實現', 1] },
   fun: { idea: ['想試', 0], doing: ['進行中', 0.7], done: ['試過了', 1] },
 };
 const wishView = (d: any) => {
-  const kind = WISH_KINDS[d.kind] ? d.kind : 'goal';
-  if (kind === 'habit') { const n = Number(d.count); const has = d.count !== '' && d.count != null && Number.isFinite(n) && n > 0; return { kind, label: WISH_KINDS[kind], st: has ? `累積 ${n} ${String(d.unit || '次').slice(0, 4)}` : '養成中', g: 0.75, lit: true, stamp: '' }; }
-  const t = WISH_ST[kind][d.state] || WISH_ST[kind].idea;
-  return { kind, label: WISH_KINDS[kind], st: t[0], g: t[1], lit: t[1] > 0, stamp: d.state === 'done' ? (kind === 'fun' ? '趣' : '叶') : '' };
+  const legacyHabit = d.kind === 'habit'; // 舊的 Habit 併入 Fun
+  const kind = legacyHabit ? 'fun' : (WISH_KINDS[d.kind] ? d.kind : 'goal');
+  const t = WISH_ST[kind][legacyHabit && (!d.state || d.state === 'idea') ? 'doing' : d.state] || WISH_ST[kind].idea;
+  const n = Number(d.count); const has = kind === 'fun' && d.count !== '' && d.count != null && Number.isFinite(n) && n > 0;
+  return { kind, label: WISH_KINDS[kind], st: t[0] + (has ? `・累積 ${n} ${String(d.unit || '次').slice(0, 4)}` : ''), g: t[1], lit: t[1] > 0, stamp: d.state === 'done' ? (kind === 'fun' ? '趣' : '叶') : '' };
 };
 const wishHelpHref = (d: any) => `/chat/?from=wish&about=${encodeURIComponent(String(d.title || ''))}&help=${encodeURIComponent(String(d.help || ''))}`;
 const wishDate = (u: any) => { const m = /^\d{4}-(\d{2})-(\d{2})$/.exec(String(u || '')); return m ? `${+m[1]}/${+m[2]}` : ''; };

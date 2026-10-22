@@ -913,13 +913,14 @@ async function saveJson(path, data, sha, msg, btn) {
 }
 
 /* ══════════════════════════ 祈願所 ══════════════════════════ */
-const WISH_STATES = { goal: [['idea', '想做'], ['doing', '進行中'], ['done', '已實現']], idea: [['idea', '點子'], ['test', '驗證中'], ['build', '動工'], ['done', '已實現']], fun: [['idea', '想試'], ['doing', '進行中'], ['done', '試過了']], habit: [] };
+const WISH_STATES = { goal: [['idea', '想做'], ['doing', '進行中'], ['done', '已實現']], idea: [['idea', '點子'], ['test', '驗證中'], ['build', '動工'], ['done', '已實現']], fun: [['idea', '想試'], ['doing', '進行中'], ['done', '試過了']] };
 async function loadDreams() {
   showView('dreams');
   const form = document.getElementById('dreamsForm');
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
   const file = await ghGetFile('src/data/dreams.json');
   const data = JSON.parse(file.content);
+  data.items.forEach(x => { if (x.kind === 'habit') { x.kind = 'fun'; if (!x.state || x.state === 'idea') x.state = 'doing'; } }); // 舊的 Habit 併入 Fun
   const norm = (o) => JSON.stringify(Object.keys(o).filter(k => k !== 'updated' && o[k] !== '' && o[k] != null).sort().map(k => [k, o[k]]));
   const origById = Object.fromEntries(data.items.map(x => [x.id, norm(x)]));
   const dirs = Object.entries(KANJI_BY_DIR).map(([d, k]) => [d, `${k}・${PILLARS[d].jp}`]);
@@ -938,8 +939,9 @@ async function loadDreams() {
           <span style="display:flex;gap:6px"><button class="btn btn-ghost" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" data-del="${i}">移除</button></span></div>
         <div class="field"><label class="field-label">想完成的事（做完時能判斷「實現了」）</label><input type="text" data-d="${i}" data-key="title" value="${escapeAttr(d.title)}"></div>
         <div class="field"><label class="field-label">為什麼想做</label><textarea rows="2" data-d="${i}" data-key="why">${escapeHtml(d.why || '')}</textarea></div>
-        <div class="field"><label class="field-label">種類</label><select data-d="${i}" data-key="kind" style="${SEL_STYLE}">${opt([['goal', 'Goal・目標（做到就算數）'], ['habit', 'Habit・習慣（持續就好，沒有終點）'], ['fun', 'Fun・好玩（想試試看的事）'], ['idea', 'Idea・點子（從日常小卡關來的想法）']], d.kind || 'goal')}</select></div>
-        ${(d.kind || 'goal') === 'habit' ? `<div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px"><div class="field"><label class="field-label">已累積（數字）</label><input type="number" min="0" step="1" data-d="${i}" data-key="count" value="${d.count ?? ''}" placeholder="例：12"></div><div class="field"><label class="field-label">單位（例：天、次、週）</label><input type="text" data-d="${i}" data-key="unit" value="${escapeAttr(d.unit || '')}" maxlength="4" placeholder="次"></div></div>` : `<div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt(WISH_STATES[d.kind || 'goal'], d.state)}</select></div>`}
+        <div class="field"><label class="field-label">種類</label><select data-d="${i}" data-key="kind" style="${SEL_STYLE}">${opt([['goal', 'Goal・目標（做到就算數）'], ['fun', 'Fun・好玩（有趣、會持續做的事）'], ['idea', 'Idea・點子（從日常小卡關來的想法）']], d.kind || 'goal')}</select></div>
+        <div class="field"><label class="field-label">狀態</label><select data-d="${i}" data-key="state" style="${SEL_STYLE}">${opt(WISH_STATES[d.kind || 'goal'], d.state)}</select></div>
+        ${(d.kind || 'goal') === 'fun' ? `<div style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px"><div class="field"><label class="field-label">已累積（選填，數字）</label><input type="number" min="0" step="1" data-d="${i}" data-key="count" value="${d.count ?? ''}" placeholder="例：12"></div><div class="field"><label class="field-label">單位（例：天、次、週）</label><input type="text" data-d="${i}" data-key="unit" value="${escapeAttr(d.unit || '')}" maxlength="4" placeholder="次"></div></div>` : ''}
         <div class="field"><label class="field-label">旁註（紅色小字，例：卡在報價、下個月開工）</label><input type="text" data-d="${i}" data-key="note" value="${escapeAttr(d.note || '')}" maxlength="60"></div>
         <div class="field"><label class="field-label">下一步（可空白，一句話：接下來要做什麼，展開燈籠時會顯示）</label><input type="text" data-d="${i}" data-key="next" value="${escapeAttr(d.next || '')}" maxlength="60"></div>
         <div class="field"><label class="field-label">需要幫忙（可空白；有填的燈籠會出現「需要幫忙」標記和「我可以幫忙」按鈕）</label><input type="text" data-d="${i}" data-key="help" value="${escapeAttr(d.help || '')}"></div>
