@@ -912,37 +912,29 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .pay-morph .pm-face{width:100%;margin:0;text-align:left;cursor:pointer;height:100%;will-change:transform,opacity;}
 .pay-morph .pm-tiers{display:grid;align-items:stretch;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;pointer-events:none;}
 .pay-morph .pm-tiers .pay-t{opacity:0;will-change:transform,opacity;}
-.give-cta.pay-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;padding:7px 4px;text-align:center;}
-.pay-t .pt-ic{flex:none;width:44px;height:44px;max-width:none;object-fit:cover;border-radius:50%;display:block;margin-bottom:2px;box-shadow:0 2px 8px rgba(0,0,0,.35);}
-.pay-t .pt-n{font-family:var(--serif);font-weight:500;font-size:16px;line-height:1.3;letter-spacing:.06em;white-space:nowrap;color:var(--bone);}
-.pay-a{font-style:normal;font-size:14px;line-height:1.3;letter-spacing:.04em;color:#E7B36A;}
+.give-cta.pay-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;margin:0;padding:11px 6px;text-align:center;min-height:0;}
+.pay-t .pt-ic{flex:none;width:34px;height:34px;max-width:none;object-fit:cover;border-radius:50%;display:block;margin-bottom:3px;box-shadow:0 2px 8px rgba(0,0,0,.35);}
+.pay-t .pt-n{font-family:var(--serif);font-weight:500;font-size:14.5px;line-height:1.3;letter-spacing:.05em;white-space:nowrap;color:var(--bone);}
+.pay-a{font-style:normal;font-size:12.5px;line-height:1.3;letter-spacing:.04em;color:#E7B36A;}
 .pay-t.t3{border-color:rgba(212,162,76,.55);}
 /* 通用：開啟狀態（hover / 點擊 / 鍵盤） */
 .pay-morph .pm-face,.pay-morph .pm-tiers .pay-t{transition:opacity .38s var(--pm-e),transform .5s var(--pm-e),filter .38s var(--pm-e),clip-path .55s var(--pm-e);}
 .pay-morph.open .pm-tiers,.pay-morph:has(:focus-visible) .pm-tiers{pointer-events:auto;}
 .pay-morph.open .pm-face,.pay-morph:has(:focus-visible) .pm-face{pointer-events:none;}
-.pay-morph[data-v].open .pm-tiers .pay-t,.pay-morph[data-v]:has(:focus-visible) .pm-tiers .pay-t{opacity:1;transform:none;filter:none;clip-path:inset(0);}
+.pay-morph.open .pm-tiers .pay-t,.pay-morph:has(:focus-visible) .pm-tiers .pay-t{opacity:1;transform:none;filter:none;clip-path:inset(0);}
 .pay-morph.open .pm-tiers .t2,.pay-morph:has(:focus-visible) .pm-tiers .t2{transition-delay:.06s;}
 .pay-morph.open .pm-tiers .t3,.pay-morph:has(:focus-visible) .pm-tiers .t3{transition-delay:.12s;}
 @media(hover:hover){.pay-morph:hover .pm-tiers{pointer-events:auto;}.pay-morph:hover .pm-face{pointer-events:none;}
-.pay-morph[data-v]:hover .pm-tiers .pay-t{opacity:1;transform:none;filter:none;clip-path:inset(0);}
+.pay-morph:hover .pm-tiers .pay-t{opacity:1;transform:none;filter:none;clip-path:inset(0);}
 .pay-morph:hover .pm-tiers .t2{transition-delay:.06s;}.pay-morph:hover .pm-tiers .t3{transition-delay:.12s;}}
-/* 版本 1：翻牌（原卡片往上翻走，三張由下翻上來） */
-.pay-morph[data-v="1"]{perspective:900px;}
-.pay-morph[data-v="1"] .pm-face{transform-origin:50% 100%;}
-.pay-morph[data-v="1"].open .pm-face,.pay-morph[data-v="1"]:has(:focus-visible) .pm-face{opacity:0;transform:rotateX(-80deg);}
-.pay-morph[data-v="1"] .pm-tiers .pay-t{transform:rotateX(70deg) translateY(10px);transform-origin:50% 0;}
-@media(hover:hover){.pay-morph[data-v="1"]:hover .pm-face{opacity:0;transform:rotateX(-80deg);}}
-/* 版本 2：浮現（原卡片模糊淡出，三張依序從下方浮起） */
-.pay-morph[data-v="2"] .pm-tiers .pay-t{transform:translateY(16px) scale(.94);}
-.pay-morph[data-v="2"].open .pm-face,.pay-morph[data-v="2"]:has(:focus-visible) .pm-face{opacity:0;transform:translateY(-8px) scale(.97);filter:blur(4px);}
-@media(hover:hover){.pay-morph[data-v="2"]:hover .pm-face{opacity:0;transform:translateY(-8px) scale(.97);filter:blur(4px);}}
-/* 版本 3：拉簾（由左到右擦開，三張從左側滑入） */
-.pay-morph[data-v="3"] .pm-tiers .pay-t{opacity:1;clip-path:inset(0 100% 0 0);transform:translateX(-14px);}
-.pay-morph[data-v="3"].open .pm-face,.pay-morph[data-v="3"]:has(:focus-visible) .pm-face{clip-path:inset(0 0 0 100%);opacity:0;}
-@media(hover:hover){.pay-morph[data-v="3"]:hover .pm-face{clip-path:inset(0 0 0 100%);opacity:0;}}
-@media(prefers-reduced-motion:reduce){.pay-morph .pm-face,.pay-morph .pm-tiers .pay-t{transition:opacity .01s!important;transform:none!important;filter:none!important;}.pay-morph[data-v="3"] .pm-tiers .pay-t{clip-path:none;opacity:0;}.pay-morph[data-v="3"].open .pm-tiers .pay-t{opacity:1;}}
-.end-card .cta-pair{order:3;display:grid;grid-auto-rows:auto;gap:10px;margin:22px 0 24px;}
+/* 翻牌（原卡片往上翻走，三張由下翻上來） */
+.pay-morph{perspective:900px;}
+.pay-morph .pm-face{transform-origin:50% 100%;}
+.pay-morph.open .pm-face,.pay-morph:has(:focus-visible) .pm-face{opacity:0;transform:rotateX(-80deg);}
+.pay-morph .pm-tiers .pay-t{transform:rotateX(70deg) translateY(10px);transform-origin:50% 0;}
+@media(hover:hover){.pay-morph:hover .pm-face{opacity:0;transform:rotateX(-80deg);}}
+@media(prefers-reduced-motion:reduce){.pay-morph .pm-face,.pay-morph .pm-tiers .pay-t{transition:opacity .01s!important;transform:none!important;}}
+.end-card .cta-pair{order:3;display:grid;grid-auto-rows:1fr;gap:10px;margin:22px 0 24px;}
 .end-card .cta-pair .give-cta{margin:0;height:100%;}
 .end-card .cta-pair .tw-wrap{display:contents;}
 .end-card .support>.sup-k,.end-card .support>h3,.end-card .support>.sdesc,.end-card .support>.r{order:1;}
@@ -1287,7 +1279,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
           <h3>{copy.subscribe_title}</h3>{copy.subscribe_desc && <p class="sdesc">{copy.subscribe_desc}</p>}
           {copy.subscribe_price && <div class="r"><b>{copy.subscribe_price}</b>{C.subscribe_unit && <span>{C.subscribe_unit}</span>}</div>}
           <div class="cta-pair">
-          {payTiers.length > 0 ? <div class="pay-morph" id="payMorph" data-v="1">
+          {payTiers.length > 0 ? <div class="pay-morph" id="payMorph">
             <button type="button" class="give-cta pm-face" aria-expanded="false" aria-controls="pmTiers">
               <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
               <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
@@ -1295,7 +1287,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             </button>
             <div class="pm-tiers" id="pmTiers" role="group" aria-label="Stripe 單次支持，選一個金額">
               {payTiers.map((t, i) => <a class={`give-cta pay-t t${i + 1}`} href={t.url} target="_blank" rel="noopener" aria-label={`${t.name} ${t.amt || ''}`}>
-                <img class="pt-ic" src={`/img/pay-${i + 1}.webp`} alt="" width="44" height="44" loading="lazy" />
+                <img class="pt-ic" src={`/img/pay-${i + 1}.webp`} alt="" width="34" height="34" loading="lazy" />
                 <span class="pt-n">{t.name}</span>
                 {t.amt && <em class="pay-a num">{t.amt}</em>}
               </a>)}
@@ -1847,7 +1839,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
 (function(){var l=document.querySelector('.flow-key li[data-give]');if(!l)return;l.addEventListener('click',function(e){if(e.target.closest('.gv-pop a'))return;l.classList.toggle('open');});document.addEventListener('click',function(e){if(!l.contains(e.target))l.classList.remove('open');});document.addEventListener('keydown',function(e){if(e.key==='Escape')l.classList.remove('open');});})();
 </script>
 <script is:inline>
-(function(){var m=document.getElementById('payMorph');if(!m)return;try{var v=new URLSearchParams(location.search).get('pm');if(v&&/^[123]$/.test(v))m.setAttribute('data-v',v);}catch(_){}var f=m.querySelector('.pm-face');
+(function(){var m=document.getElementById('payMorph');if(!m)return;var f=m.querySelector('.pm-face');
 f.addEventListener('click',function(e){e.stopPropagation();var o=m.classList.toggle('open');f.setAttribute('aria-expanded',o?'true':'false');if(o){var a=m.querySelector('.pay-t');if(a&&!window.matchMedia('(hover:hover)').matches){}}});
 document.addEventListener('click',function(e){if(!m.contains(e.target)){m.classList.remove('open');f.setAttribute('aria-expanded','false');}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){m.classList.remove('open');f.setAttribute('aria-expanded','false');}});})();
