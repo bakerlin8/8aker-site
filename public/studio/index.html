@@ -311,6 +311,14 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .svc-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
 @media(max-width:600px){.svc-two{grid-template-columns:1fr;}.svc-seg b{font-size:13px;}}
 #svcDirty{font-size:12.5px;color:#C8584A;margin-right:auto;}
+.ai-box{border-top:1px solid var(--line,#e5ddd0);padding-top:18px;margin-top:6px;}
+.ai-btns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 8px;}
+.ai-job{border:1px solid var(--line,#e5ddd0);border-radius:10px;padding:12px 14px;margin-top:10px;background:rgba(255,255,255,.5);}
+.ai-jh{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;}
+.ai-jh span{font-size:12px;opacity:.65;flex:1;min-width:120px;}
+.ai-st{font-style:normal;font-size:12px;padding:1px 8px;border-radius:99px;background:#eee;}
+.ai-st.done{background:#e3efe3;}.ai-st.error{background:#f5dcdc;}
+.ai-res{white-space:pre-wrap;word-break:break-word;font:inherit;font-size:14px;line-height:1.7;margin:10px 0;max-height:360px;overflow:auto;}
 .we-save .btn{white-space:nowrap;}@media(max-width:600px){.we-save a.btn{display:none;}}
 .we-save{position:sticky;bottom:0;display:flex;justify-content:flex-end;align-items:center;gap:16px;padding:12px 0;background:linear-gradient(transparent,var(--cream) 30%);}
 #weDirty{font-size:12.5px;color:#C8584A;}
@@ -1599,6 +1607,48 @@ async function loadPillar(slug) {
 
 document.getElementById('newArticleBtn').addEventListener('click', () => newArticle());
 
+/* ══════════════════════════ AI 助手（排隊處理，不即時） ══════════════════════════ */
+const AI_KIND = { outline: ['🧱', '搭骨架'], polish: ['✨', '順稿'], review: ['🔍', '讀者視角檢查'], translate: ['🌐', '三語版本'] };
+async function aiApi(body) {
+  const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-ai`, { method: 'POST', headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+  return d;
+}
+function initAiBox() {
+  const box = document.getElementById('aiBox'); if (!box) return;
+  const fmt = (t) => { try { return new Date(t).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } };
+  let jobs = [];
+  const draw = () => {
+    box.innerHTML = `<label class="field-label">AI 助手</label>
+      <div class="ai-btns">${Object.keys(AI_KIND).map(k => `<button type="button" class="btn btn-ghost ai-b" data-k="${k}">${AI_KIND[k][0]} ${AI_KIND[k][1]}</button>`).join('')}</div>
+      <div class="field-hint">按下後會排進佇列，AI 會在固定時段一起處理（不是即時），結果會出現在下方。</div>
+      <div class="ai-list">${jobs.length ? jobs.map(j => `<div class="ai-job" data-id="${j.id}">
+        <div class="ai-jh"><b>${AI_KIND[j.kind][0]} ${AI_KIND[j.kind][1]}</b><span>${escapeHtml(j.title || '（未命名）')}・${fmt(j.created_at)}</span><em class="ai-st ${j.status}">${j.status === 'pending' ? '排隊中' : j.status === 'done' ? '完成' : '失敗'}</em></div>
+        ${j.status === 'done' ? `<pre class="ai-res">${escapeHtml(j.result || '')}</pre><div class="btn-row">${j.kind === 'polish' ? '<button type="button" class="btn btn-primary ai-use" data-m="replace">採用（取代正文）</button>' : ''}${j.kind === 'outline' ? '<button type="button" class="btn btn-primary ai-use" data-m="append">加到正文最前面</button>' : ''}<button type="button" class="btn btn-ghost ai-copy">複製</button><button type="button" class="btn btn-ghost ai-x">收起</button></div>` : `<div class="btn-row"><button type="button" class="btn btn-ghost ai-x">${j.status === 'pending' ? '取消' : '收起'}</button></div>`}
+      </div>`).join('') : ''}</div>`;
+    box.querySelectorAll('.ai-b').forEach(b => b.addEventListener('click', async () => {
+      const body = document.getElementById('f-body').value.trim(), title = document.getElementById('f-title').value.trim(), ex = document.getElementById('f-excerpt').value.trim();
+      const input = b.dataset.k === 'outline' ? [title && '標題：' + title, ex && '摘要：' + ex, body && '目前文字：\n' + body].filter(Boolean).join('\n\n') : body;
+      if (!input || input.length < 5) { toast(b.dataset.k === 'outline' ? '先在標題、摘要或正文寫一兩句想法' : '正文是空的，先寫一些內容'); return; }
+      b.disabled = true;
+      try { await aiApi({ action: 'submit', kind: b.dataset.k, pillar: currentPillar, title, input }); toast('已排進佇列，處理完會顯示在這裡'); await load(); } catch (e) { toast(e.message); b.disabled = false; }
+    }));
+    box.querySelectorAll('.ai-job').forEach(el => {
+      const j = jobs.find(x => x.id === el.dataset.id);
+      const x = el.querySelector('.ai-x'); if (x) x.addEventListener('click', async () => { try { await aiApi({ action: 'dismiss', id: j.id }); await load(); } catch (e) { toast(e.message); } });
+      const c = el.querySelector('.ai-copy'); if (c) c.addEventListener('click', () => { navigator.clipboard.writeText(j.result || '').then(() => toast('已複製')).catch(() => toast('複製失敗')); });
+      el.querySelectorAll('.ai-use').forEach(u => u.addEventListener('click', () => {
+        const ta = document.getElementById('f-body');
+        if (u.dataset.m === 'replace') { if (!confirm('用順好的版本取代目前正文？（還沒儲存前都可以重整頁面還原）')) return; ta.value = j.result; } else { ta.value = j.result + '\n\n' + ta.value; }
+        toast('已放進正文，記得按「儲存變更」');
+      }));
+    });
+  };
+  const load = async () => { try { jobs = (await aiApi({ action: 'list' })).items || []; } catch (e) { jobs = []; } draw(); };
+  draw(); load();
+}
+
 /* ══════════════════════════ ARTICLE EDITOR ══════════════════════════ */
 function newArticle() {
   currentArticle = { path: null, sha: null, isNew: true };
@@ -1637,6 +1687,7 @@ function renderArticleForm(fm) {
       <textarea id="f-body" class="mono" rows="16">${escapeHtml(fm.body)}</textarea>
       <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等</div>
     </div>
+    <div class="field ai-box" id="aiBox"></div>
     <div class="btn-row">
       <button class="btn btn-primary" id="saveArticleBtn">${currentArticle.isNew ? '建立文章' : '儲存變更'}</button>
       <button class="btn btn-ghost" id="backToListBtn">返回列表</button>
@@ -1646,6 +1697,7 @@ function renderArticleForm(fm) {
   `;
 
   worksOptions().then(list => { const sel = document.getElementById('f-work'); if (!sel) return; sel.innerHTML = '<option value="">（不屬於任何作品）</option>' + list.map(w => `<option value="${escapeAttr(w.slug)}" ${w.slug === fm.work ? 'selected' : ''}>${escapeHtml(w.title)}</option>`).join('') + (fm.work && !list.some(w => w.slug === fm.work) ? `<option value="${escapeAttr(fm.work)}" selected>${escapeHtml(fm.work)}（已不在作品列表）</option>` : ''); }).catch(() => {});
+  initAiBox();
   let tags = [...fm.tags];
   const tagsWrap = document.getElementById('f-tags');
   function renderTags() {
