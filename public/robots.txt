@@ -3,7 +3,6 @@
 User-agent: *
 Allow: /
 Disallow: /studio/
-Disallow: /admin/
 Disallow: /api/
 
 # AI search / answer engines (explicitly allowed)
@@ -19,7 +18,6 @@ User-agent: Google-Extended
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /studio/
-Disallow: /admin/
 Disallow: /api/
 
 Sitemap: https://8aker0.com/sitemap.xml

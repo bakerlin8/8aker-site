@@ -34,72 +34,6 @@
       "statusCode": 302
     },
     {
-      "source": "/dashboard",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/dashboard/",
-      "statusCode": 302
-    },
-    {
-      "source": "/quests",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/quests/",
-      "statusCode": 302
-    },
-    {
-      "source": "/five-orbs",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/five-orbs/",
-      "statusCode": 302
-    },
-    {
-      "source": "/ig-cards",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/ig-cards/",
-      "statusCode": 302
-    },
-    {
-      "source": "/sns-playbook",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/sns-playbook/",
-      "statusCode": 302
-    },
-    {
-      "source": "/crypto-score",
-      "has": [
-        {
-          "type": "host",
-          "value": "8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/crypto-score/",
-      "statusCode": 302
-    },
-    {
       "source": "/site",
       "has": [
         {
@@ -119,72 +53,6 @@
         }
       ],
       "destination": "https://8aker0.com/works/checkin/",
-      "statusCode": 302
-    },
-    {
-      "source": "/dashboard",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/dashboard/",
-      "statusCode": 302
-    },
-    {
-      "source": "/quests",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/quests/",
-      "statusCode": 302
-    },
-    {
-      "source": "/five-orbs",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/five-orbs/",
-      "statusCode": 302
-    },
-    {
-      "source": "/ig-cards",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/ig-cards/",
-      "statusCode": 302
-    },
-    {
-      "source": "/sns-playbook",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/sns-playbook/",
-      "statusCode": 302
-    },
-    {
-      "source": "/crypto-score",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.8aker.com"
-        }
-      ],
-      "destination": "https://8aker0.com/works/crypto-score/",
       "statusCode": 302
     },
     {
@@ -241,7 +109,7 @@
       ]
     },
     {
-      "source": "/(studio|admin)/(.*)",
+      "source": "/studio/(.*)",
       "headers": [
         {
           "key": "X-Robots-Tag",

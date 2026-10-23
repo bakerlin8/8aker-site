@@ -35,40 +35,19 @@ async function cfgSet(obj: Record<string, string>) {
     body: JSON.stringify(Object.entries(obj).map(([key, value]) => ({ key, value, updated_at: new Date().toISOString() }))) });
 }
 
-// ── Strava: pulled on demand when Studio opens (no AI involved; drafts are plain templates) ──
+// ── Strava：這裡只回報連線狀態，不再自己同步。
+// 同步一律交給 health-public（含全部歷史、爬升、1/5/10 公里最佳成績，每 6 小時一次）。
+// 以前兩邊都同步，這邊寫入時少了 elev_m 又整筆覆蓋，會把公開儀表板的爬升洗掉（2026-10-23 修正）。
 const STRAVA_KEYS = ['strava_client_id', 'strava_client_secret', 'strava_refresh_token', 'strava_access_token', 'strava_expires_at', 'strava_last_sync', 'strava_athlete'];
-async function stravaToken(c: Record<string, string>) {
-  if (Number(c.strava_expires_at || 0) > Date.now() / 1000 + 300) return c.strava_access_token;
-  const r = await fetch('https://www.strava.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ client_id: c.strava_client_id, client_secret: c.strava_client_secret, grant_type: 'refresh_token', refresh_token: c.strava_refresh_token }) });
-  if (!r.ok) throw new Error('strava_refresh_failed');
-  const d = await r.json();
-  await cfgSet({ strava_access_token: d.access_token, strava_refresh_token: d.refresh_token, strava_expires_at: String(d.expires_at) });
-  return d.access_token as string;
-}
-async function syncStrava() {
+async function stravaStatus() {
   const c = await cfgGet(STRAVA_KEYS);
   const status: any = { configured: !!(c.strava_client_id && c.strava_client_secret), connected: !!c.strava_refresh_token, last_sync: c.strava_last_sync || null, athlete: c.strava_athlete || null };
   if (status.configured) status.authorize_url = `https://www.strava.com/oauth/authorize?client_id=${encodeURIComponent(c.strava_client_id)}&redirect_uri=${encodeURIComponent(SITE + '/studio/')}&response_type=code&approval_prompt=auto&scope=activity:read_all&state=strava`;
-  if (!status.connected) return status;
-  if (c.strava_last_sync && Date.now() - new Date(c.strava_last_sync).getTime() < 10 * 60e3) return status;
-  try {
-    const token = await stravaToken(c);
-    const after = Math.floor((Date.now() - 35 * DAY) / 1000);
-    const r = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${after}&per_page=100`, { headers: { Authorization: `Bearer ${token}` } });
-    if (!r.ok) throw new Error(`strava_${r.status}`);
-    const acts: any[] = await r.json();
-    const rows = acts.map((a) => ({ metric: 'workout', recorded_at: new Date(a.start_date).toISOString(), value: Math.round((a.moving_time || 0) / 6) / 10, unit: 'min',
-      extra: { name: a.sport_type || a.type, distance_km: a.distance ? Math.round(a.distance / 100) / 10 : null, source: 'strava', id: a.id } }));
-    if (rows.length) await db('health_samples?on_conflict=metric,recorded_at', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify(rows) });
-    status.last_sync = new Date().toISOString();
-    await cfgSet({ strava_last_sync: status.last_sync });
-  } catch (e) { status.error = String(e).slice(0, 80); }
   return status;
 }
 
 async function overview(dayParam?: string) {
-  const strava = await syncStrava();
+  const strava = await stravaStatus();
   const since = new Date(Date.now() - 90 * DAY).toISOString();
   const rows: any[] = await db(`health_samples?recorded_at=gte.${since}&select=metric,recorded_at,value,unit,extra&order=recorded_at.asc`);
   const posts: any[] = await db('health_posts?select=day,article_path&order=day.desc&limit=30');
