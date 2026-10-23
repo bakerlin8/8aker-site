@@ -7,7 +7,8 @@ const pillarSchema = z.object({
   date: z.date(),
   excerpt: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  draft: z.boolean().optional().default(false), // set true to hide from the site until you're ready
+  draft: z.boolean().optional().default(false), // true = 網站上看不到（草稿或暫時關閉）
+  status: z.enum(['draft', 'published', 'paused']).optional(), // Studio 用來區分「草稿」與「暫時關閉」；公開與否仍由 draft 決定
   work: z.string().optional(), // 屬於「有點樣子」哪一件作品（works.json 的 slug），作品頁會自動列為製作紀錄
 });
 

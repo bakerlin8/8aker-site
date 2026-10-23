@@ -106,6 +106,22 @@ input,textarea,select{font-family:inherit;}
 .list-row-main{min-width:0;}
 .list-row-title{font-size:14.5px;color:var(--ink);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .list-row-meta{font-family:'Noto Sans TC',system-ui,sans-serif;font-size:10.5px;color:var(--ink-ghost);margin-top:4px;display:flex;gap:10px;align-items:center;}
+
+.st-seg{display:flex;gap:8px;flex-wrap:wrap;}
+.st-seg button{flex:1;min-width:104px;text-align:left;padding:10px 12px;border:1px solid var(--border);border-radius:3px;background:var(--warm-white);font-family:inherit;cursor:pointer;color:var(--ink-mute);}
+.st-seg button b{display:block;font-weight:500;font-size:14px;color:var(--ink);}.st-seg button small{font-size:11.5px;color:var(--ink-ghost);line-height:1.4;display:block;margin-top:2px;}
+.st-seg button.on{background:var(--emerald-deep);border-color:var(--emerald-deep);}.st-seg button.on b,.st-seg button.on small{color:var(--warm-white);}
+.badge-pub{background:#E3EFE6;color:#2d6a43;font-size:9.5px;padding:2px 7px;border-radius:10px;letter-spacing:0.04em;}
+.badge-pause{background:#E9E4EA;color:#5b4a63;font-size:9.5px;padding:2px 7px;border-radius:10px;letter-spacing:0.04em;}
+.flt{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;}.flt button{border:1px solid var(--border);background:var(--warm-white);border-radius:14px;padding:5px 12px;font:inherit;font-size:12.5px;color:var(--ink-mute);cursor:pointer;}.flt button.on{background:var(--emerald-deep);border-color:var(--emerald-deep);color:var(--warm-white);}
+.tg{border:1px solid var(--border);border-radius:3px;padding:14px;background:var(--warm-white);}
+.tg-row{display:flex;gap:8px;}.tg-row input{flex:1;}
+.tg-list{margin-top:10px;display:grid;gap:6px;}
+.tg-i{display:flex;gap:10px;align-items:center;justify-content:space-between;text-align:left;padding:9px 12px;border:1px solid var(--border);border-radius:3px;background:#fff;cursor:pointer;font:inherit;font-size:14px;color:var(--ink);}
+.tg-i:hover{border-color:var(--emerald-deep);}.tg-i small{color:var(--ink-ghost);font-size:11px;white-space:nowrap;}
+.seo{border:1px solid var(--border);border-radius:3px;padding:14px;background:var(--warm-white);}
+.seo-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:13px;color:var(--ink);}.seo-h b{font-size:18px;}
+.seo-l{display:grid;gap:5px;font-size:12.5px;color:var(--ink-soft);}.seo-l div{display:flex;gap:8px;}.seo-l .ok{color:#2d6a43;}.seo-l .no{color:#a8741a;}
 .badge-draft{background:var(--vermillion-pale);color:#8a5a10;font-size:9.5px;padding:2px 7px;border-radius:10px;letter-spacing:0.04em;}
 .list-row-arrow{color:var(--ink-ghost);flex-shrink:0;}
 .empty-state{padding:50px 0;text-align:center;color:var(--ink-ghost);font-size:13px;}
@@ -740,7 +756,7 @@ function toast(msg, type = 'ok') {
 /* ══════════════════════════ FRONTMATTER (articles) ══════════════════════════ */
 function parseFrontmatter(raw) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, work: '', body: raw };
+  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, status: 'published', work: '', body: raw };
   const fm = {};
   m[1].split('\n').forEach(line => {
     const idx = line.indexOf(':');
@@ -756,13 +772,14 @@ function parseFrontmatter(raw) {
       fm[key] = val.replace(/^"|"$/g, '');
     }
   });
-  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: fm.draft || false, work: fm.work || '', body: m[2].trim() };
+  const status = fm.status === 'paused' ? 'paused' : (fm.draft ? 'draft' : 'published');
+  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: status !== 'published', status, work: fm.work || '', body: m[2].trim() };
 }
 
 function serializeFrontmatter(fm) {
   const tagsStr = '[' + fm.tags.map(t => `"${t}"`).join(', ') + ']';
   const workLine = /^[a-z0-9-]+$/.test(fm.work || '') ? `work: "${fm.work}"\n` : '';
-  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.draft}\n${workLine}---\n\n${fm.body}\n`;
+  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.status ? fm.status !== 'published' : fm.draft}\n${fm.status === 'paused' ? 'status: "paused"\n' : ''}${workLine}---\n\n${fm.body}\n`;
 }
 
 function slugify(title) {
@@ -1720,20 +1737,28 @@ async function loadPillar(slug) {
       return { ...fm, path: f.path, sha: f.sha };
     }));
     entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-    list.innerHTML = '';
-    entries.forEach(entry => {
+    const flt = document.createElement('div'); flt.className = 'flt';
+    const cnt = (k) => k === 'all' ? entries.length : entries.filter(e => e.status === k).length;
+    const FL = [['all', '全部'], ['published', '已公開'], ['draft', '草稿'], ['paused', '暫時關閉']];
+    let cur = 'all';
+    const drawList = () => {
+    list.innerHTML = ''; list.appendChild(flt);
+    entries.filter(e => cur === 'all' || e.status === cur).forEach(entry => {
       const row = document.createElement('div');
       row.className = 'list-row';
       row.innerHTML = `
         <div class="list-row-main">
           <div class="list-row-title">${escapeHtml(entry.title || '（無標題）')}</div>
-          <div class="list-row-meta">${entry.date || ''} ${entry.draft ? '<span class="badge-draft">草稿</span>' : ''}</div>
+          <div class="list-row-meta">${entry.date || ''} ${entry.status === 'paused' ? '<span class="badge-pause">暫時關閉</span>' : entry.draft ? '<span class="badge-draft">草稿</span>' : '<span class="badge-pub">已公開</span>'}</div>
         </div>
         <div class="list-row-arrow">→</div>
       `;
       row.addEventListener('click', () => editArticle(slug, entry.path));
       list.appendChild(row);
     });
+    };
+    const drawFlt = () => { flt.innerHTML = FL.map(([k, t]) => `<button type="button" data-k="${k}" class="${k === cur ? 'on' : ''}">${t} ${cnt(k)}</button>`).join(''); flt.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { cur = b.dataset.k; drawFlt(); drawList(); })); };
+    drawFlt(); drawList();
   }
 }
 
@@ -1816,7 +1841,7 @@ function initAiBox() {
 /* ══════════════════════════ ARTICLE EDITOR ══════════════════════════ */
 function newArticle() {
   currentArticle = { path: null, sha: null, isNew: true };
-  renderArticleForm({ title: '', date: new Date().toISOString().slice(0, 10), excerpt: '', tags: [], draft: true, body: '' });
+  renderArticleForm({ title: '', date: new Date().toISOString().slice(0, 10), excerpt: '', tags: [], draft: true, status: 'draft', body: '' });
 }
 
 async function editArticle(slug, path) {
@@ -1837,6 +1862,11 @@ function renderArticleForm(fm) {
 
   form.innerHTML = `
     <div class="field"><label class="field-label">標題</label><input type="text" id="f-title" value="${escapeAttr(fm.title)}"></div>
+    <div class="field tg"><label class="field-label">標題靈感：給一個關鍵字，產生幾個標題讓你選</label>
+      <div class="tg-row"><input type="text" id="f-kw" placeholder="例如：Airbnb 民宿經營、跑步入門、Astro 網站"><button type="button" class="btn btn-ghost" id="f-kw-go">產生標題</button></div>
+      <div class="tg-list" id="f-tg"></div>
+      <div class="field-hint">這個關鍵字也會用來檢查下方的搜尋引擎（SEO）與 AI 問答（AEO）建議。標題最理想在 30 個中文字內，關鍵字放前面。</div>
+    </div>
     <div class="field"><label class="field-label">日期</label><input type="date" id="f-date" value="${escapeAttr(fm.date)}"></div>
     <div class="field"><label class="field-label">摘要</label><textarea id="f-excerpt" rows="2">${escapeHtml(fm.excerpt)}</textarea></div>
     <div class="field">
@@ -1845,12 +1875,18 @@ function renderArticleForm(fm) {
       <div class="tag-row" id="f-tags"></div>
     </div>
     <div class="field"><label class="field-label">屬於哪個作品（選填：選了會自動出現在該作品頁的「製作紀錄」）</label><select id="f-work" style="${SEL_STYLE}"><option value="">（不屬於任何作品）</option></select></div>
-    <div class="field field-checkbox"><input type="checkbox" id="f-draft" ${fm.draft ? 'checked' : ''}><label for="f-draft">先存草稿（不公開顯示）</label></div>
+    <div class="field"><label class="field-label">文章狀態</label>
+      <div class="st-seg" id="f-status">
+        <button type="button" data-s="draft"><b>草稿</b><small>還在寫，網站看不到</small></button>
+        <button type="button" data-s="published"><b>已公開</b><small>顯示在網站上，搜尋引擎找得到</small></button>
+        <button type="button" data-s="paused"><b>暫時關閉</b><small>先下架，內容保留，隨時可再公開</small></button>
+      </div></div>
     <div class="field">
       <label class="field-label">正文（Markdown）</label>
       <textarea id="f-body" class="mono" rows="16">${escapeHtml(fm.body)}</textarea>
       <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等</div>
     </div>
+    <div class="field seo" id="seoBox"></div>
     <div class="field ai-box" id="aiBox"></div>
     <div class="btn-row">
       <button class="btn btn-primary" id="saveArticleBtn">${currentArticle.isNew ? '建立文章' : '儲存變更'}</button>
@@ -1884,6 +1920,49 @@ function renderArticleForm(fm) {
     }
   });
 
+
+  /* 文章狀態 */
+  let status = fm.status || (fm.draft ? 'draft' : 'published');
+  const stWrap = document.getElementById('f-status');
+  const drawSt = () => stWrap.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.s === status));
+  stWrap.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { status = b.dataset.s; drawSt(); }));
+  drawSt();
+  window.__articleStatus = () => status;
+
+  /* 標題靈感＋SEO/AEO 檢查 */
+  const w = (t) => [...t].reduce((n, c) => n + (c.charCodeAt(0) > 255 ? 2 : 1), 0); // 中文算 2、英數算 1，上限 60 ≈ 30 個中文字
+  const $ = (id) => document.getElementById(id);
+  const kwv = () => $('f-kw').value.trim();
+  $('f-kw-go').addEventListener('click', () => {
+    const k = kwv(); if (!k) { toast('先輸入一個關鍵字'); return; }
+    const T = [
+      [`${k}是什麼？新手一次看懂`, '問句型・AEO'], [`${k}怎麼做？我的實際步驟與心得`, '教學型・AEO'],
+      [`${k}：我試過之後學到的 3 件事`, '經驗型'], [`${k}：從零開始的 5 個重點整理`, '清單型'],
+      [`${k}值得嗎？真實經驗與注意事項`, '評估型・AEO'], [`${k}常見問題整理（附我的答案）`, '問答型・AEO'],
+    ];
+    $('f-tg').innerHTML = T.map(([t, tag]) => `<button type="button" class="tg-i" data-t="${escapeAttr(t)}"><span>${escapeHtml(t)}</span><small>${tag}・${w(t) <= 60 ? '長度 OK' : '偏長'}</small></button>`).join('');
+    $('f-tg').querySelectorAll('.tg-i').forEach(b => b.addEventListener('click', () => { $('f-title').value = b.dataset.t; if (!tags.includes(k)) { tags.push(k); renderTags(); } checkSeo(); toast('已填入標題，並把關鍵字加進標籤'); }));
+  });
+  const checkSeo = () => {
+    const t = $('f-title').value.trim(), ex = $('f-excerpt').value.trim(), body = $('f-body').value, k = kwv();
+    const heads = (body.match(/^##\s+/gm) || []).length, faq = /^##\s*(常見問題|FAQ|Q&A)/mi.test(body);
+    const R = [
+      [w(t) >= 20 && w(t) <= 60, `標題長度（${Math.ceil(w(t) / 2)} 個字，建議 10–30）`],
+      [ex.length >= 40 && ex.length <= 110, `摘要長度（${ex.length} 字，建議 40–110；它會成為搜尋結果的說明文字）`],
+      [body.replace(/\s/g, '').length >= 300, `正文夠完整（${body.replace(/\s/g, '').length} 字，建議至少 300）`],
+      [heads >= 2, `有 2 個以上的小標題（## ）`],
+      [tags.length >= 2, `標籤 2 個以上`],
+    ];
+    if (k) R.push([t.toLowerCase().includes(k.toLowerCase()), '標題含關鍵字'], [t.toLowerCase().indexOf(k.toLowerCase()) >= 0 && t.toLowerCase().indexOf(k.toLowerCase()) <= 8, '關鍵字在標題前段'], [ex.toLowerCase().includes(k.toLowerCase()), '摘要含關鍵字'], [body.slice(0, 200).toLowerCase().includes(k.toLowerCase()), '正文開頭 200 字內提到關鍵字']);
+    R.push([faq, 'AEO：有「## 常見問題」區塊，網站會自動產生 AI 問答能讀的結構（FAQ）']);
+    const ok = R.filter(r => r[0]).length;
+    $('seoBox').innerHTML = `<div class="seo-h"><span>搜尋與 AI 問答檢查</span><b>${ok} / ${R.length}</b></div><div class="seo-l">${R.map(([o, m]) => `<div class="${o ? 'ok' : 'no'}"><span>${o ? '✓' : '△'}</span><span>${m}</span></div>`).join('')}</div>${faq ? '' : '<div class="btn-row"><button type="button" class="btn btn-ghost" id="seo-faq">加入「常見問題」範本到正文最後</button></div>'}${k ? '' : '<div class="field-hint">在上方輸入關鍵字，會多出 4 項關鍵字檢查。</div>'}`;
+    const fb = $('seo-faq'); if (fb) fb.addEventListener('click', () => { const b = $('f-body'); b.value = b.value.replace(/\s+$/, '') + '\n\n## 常見問題\n\n### 問題一：（寫讀者最常問的一句話）\n\n（用 1–3 句直接回答）\n\n### 問題二：\n\n（回答）\n'; checkSeo(); toast('已加入範本，改成你自己的問題與答案'); });
+  };
+  ['f-title', 'f-excerpt', 'f-body', 'f-kw'].forEach(id => $(id).addEventListener('input', checkSeo));
+  $('f-tag-input').addEventListener('keydown', () => setTimeout(checkSeo, 0));
+  checkSeo();
+
   document.getElementById('backToListBtn').addEventListener('click', () => loadPillar(currentPillar));
 
   document.getElementById('saveArticleBtn').addEventListener('click', async () => {
@@ -1895,7 +1974,7 @@ function renderArticleForm(fm) {
         date: document.getElementById('f-date').value,
         excerpt: document.getElementById('f-excerpt').value.trim(),
         tags,
-        draft: document.getElementById('f-draft').checked,
+        draft: status !== 'published', status,
         work: (document.getElementById('f-work') || {}).value || '',
         body: document.getElementById('f-body').value,
       };

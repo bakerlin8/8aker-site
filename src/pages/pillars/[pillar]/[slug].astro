@@ -21,7 +21,17 @@ const ofWork = entry.data.work ? (worksData.works as any[]).find((x) => x.slug =
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
 const url = `${SITE}/pillars/${meta.slug}/${entry.slug}/`;
+// AEO：正文有「## 常見問題」區塊，下面每個「### 問題」＋ 回答 → 自動輸出 FAQPage 結構化資料，讓搜尋與 AI 問答能直接引用
+const faqItems: { q: string; a: string }[] = [];
+{
+  const sec = /^##\s*(?:常見問題|FAQ|Q&A)[^\n]*\n([\s\S]*?)(?=^##\s[^#]|$(?![\s\S]))/mi.exec(entry.body ?? '');
+  if (sec) for (const part of sec[1].split(/^###\s+/m).slice(1)) {
+    const [q, ...rest] = part.split('\n'); const a = rest.join(' ').replace(/[*_`>#-]/g, '').replace(/\s+/g, ' ').trim();
+    if (q.trim() && a && !/^[（(]/.test(a)) faqItems.push({ q: q.trim().replace(/[*_`]/g, ''), a });
+  }
+}
 const schema = [
+  ...(faqItems.length ? [{ '@type': 'FAQPage', '@id': `${url}#faq`, mainEntity: faqItems.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }] : []),
   { '@type': 'BlogPosting', '@id': `${url}#article`, headline: entry.data.title, description: entry.data.excerpt ?? meta.desc,
     datePublished: entry.data.date.toISOString(), dateModified: entry.data.date.toISOString(), inLanguage: 'zh-Hant-TW',
     author: { '@id': `${SITE}/#person` }, publisher: { '@id': `${SITE}/#person` }, mainEntityOfPage: url,
