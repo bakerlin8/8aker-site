@@ -6,7 +6,7 @@ const ig = /^[A-Za-z0-9._]{1,30}$/.test(igHandle) ? igHandle : '';
 import services from '../../data/services.json';
 import inq from '../../data/inquiry.json';
 const hideItems: string[] = (inq as any).hide_items || [];
-const hats = ((services as any).hats || []).map((h: any) => ({ k: h.k, title: h.title, desc: h.desc, items: (h.items || []).filter((x: string) => !hideItems.includes(x)) }));
+const hats = ((services as any).hats || []).map((h: any) => ({ k: h.k, title: h.title, desc: h.desc, provider: h.provider, fee: h.fee, items: (h.items || []).filter((x: string) => !hideItems.includes(x)) }));
 const OTHER = { k: 'other', title: '祈願所：我可以幫忙', desc: '', items: [] };
 const noteForm = String((services as any).form_note || '');
 ---
@@ -57,6 +57,14 @@ const noteForm = String((services as any).form_note || '');
 .svc-pick label:has(input:checked)::after{opacity:1;transform:none;color:rgba(212,162,76,.16);}
 .svc-pick input:focus-visible+.sp{outline:2px solid #D4A24C;outline-offset:-4px;}
 .cf .scope{display:inline-block;margin:-6px 0 18px;font-size:13px;letter-spacing:.06em;color:#7a5a1a;background:#F6E9D3;border-left:3px solid #D4A24C;padding:7px 14px;}
+.cf .feebox{margin:0 0 22px;padding:16px 18px;background:#FBF6F3;border:1px solid rgba(42,24,30,.14);font-size:14px;line-height:1.85;color:#2A181E;}
+.cf .feebox .fp{margin:0 0 10px;font-size:13px;color:#6b5a5f;}
+.cf .feebox .fp b{font-weight:500;color:#1C0F14;margin-left:6px;}
+.cf .feebox h3{margin:0 0 6px;font-family:var(--serif);font-weight:500;font-size:14px;letter-spacing:.14em;color:#9E6F22;}
+.cf .feebox ul{list-style:none;margin:0;padding:0;display:grid;gap:4px;}
+.cf .feebox li{position:relative;padding-left:16px;}
+.cf .feebox li::before{content:'';position:absolute;left:0;top:.95em;width:8px;height:1px;background:#9E6F22;}
+.cf .feebox[hidden]{display:none;}
 .cf .scope[hidden],.cf label[hidden],.cf .q[hidden],.cf .qwarn[hidden],.cf #sub[hidden]{display:none;}
 /* 題目 */
 .qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 20px;}
@@ -143,6 +151,7 @@ const noteForm = String((services as any).form_note || '');
       </section>
       <section class="fs" id="s2" hidden><h2 class="fh"><i>02</i>你的需求</h2>
         <p class="scope" id="scope" hidden></p>
+        <div class="feebox" id="feebox" hidden></div>
         <div id="sub" hidden style="margin-bottom:22px"><span class="lbl">哪些項目？（可多選，選填）</span><div class="chips" id="chips"></div></div>
         <div id="qs" class="qgrid"></div>
       </section>
@@ -190,7 +199,7 @@ const noteForm = String((services as any).form_note || '');
       if(q.warnIf){var wp=el('p','qwarn',q.warnIf.text);wp.hidden=true;wp.dataset.wk=q.key;w.appendChild(wp);}
       if(q.showIf){w.dataset.sk=q.showIf.key;w.hidden=true;}
       w.dataset.qk=q.key;QS.appendChild(w);});
-    var sc=document.getElementById('scope');sc.textContent=SCOPES[k]||'';sc.hidden=!SCOPES[k];S2.hidden=false;CM.hidden=false;STEPS.dataset.step='2';E.textContent='';}
+    var sc=document.getElementById('scope');sc.textContent=SCOPES[k]||'';sc.hidden=!SCOPES[k];var fb=document.getElementById('feebox'),hh=HATS.filter(function(x){return x.k===k})[0];fb.innerHTML='';if(hh&&hh.fee&&hh.fee.length){if(hh.provider){var fp=el('p','fp','提供單位');fp.appendChild(el('b',null,hh.provider));fb.appendChild(fp);}fb.appendChild(el('h3',null,'費用怎麼算'));var ul=el('ul');hh.fee.forEach(function(t){ul.appendChild(el('li',null,t));});fb.appendChild(ul);fb.hidden=false;}else fb.hidden=true;S2.hidden=false;CM.hidden=false;STEPS.dataset.step='2';E.textContent='';}
   function sync(){qs().forEach(function(q){
     if(q.showIf){var w=QS.querySelector('[data-qk="'+q.key+'"]'),cv=val(qOf(q.showIf.key)||{key:q.showIf.key}),ok=q.showIf.includes!=null?(Array.isArray(cv)&&cv.indexOf(q.showIf.includes)>-1):cv===q.showIf.equals;w.hidden=!ok;}
     if(q.warnIf){var wp=QS.querySelector('[data-wk="'+q.key+'"]'),nv=parseInt(val(q),10);wp.hidden=!(nv>=q.warnIf.gte);}});}

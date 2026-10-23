@@ -1442,7 +1442,9 @@ async function loadServices() {
         <div class="svc-sub"><span>①</span>卡片上看到的<em>（第一層）</em></div>
         <div style="display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px"><div class="field"><label class="field-label">代表字</label>${inp('k', h.k, `data-h="${i}"`)}</div><div class="field"><label class="field-label">標題</label>${inp('title', h.title, `data-h="${i}"`)}</div></div>
         <div class="field"><label class="field-label">說明（一句話）</label>${inp('desc', h.desc, `data-h="${i}"`)}</div>
+        <div class="field"><label class="field-label">提供單位（顯示在卡片與填表頁）</label>${inp('provider', h.provider, `data-h="${i}"`)}</div>
         <div class="field"><label class="field-label">提供的服務（一行一項，保持精簡）</label><textarea rows="3" data-h="${i}" data-list="1" data-key="items">${escapeHtml((h.items || []).join('\n'))}</textarea></div>
+        <div class="field"><label class="field-label">費用怎麼算（填表頁會顯示，一行一句）</label><textarea rows="4" data-h="${i}" data-list="1" data-key="fee">${escapeHtml((h.fee || []).join('\n'))}</textarea></div>
         <div class="svc-sub"><span>②</span>點開卡片後看到的<em>（第二層）</em></div>
         <div class="field"><label class="field-label">一句話定位</label><input type="text" data-hd="${i}" data-key="tagline" value="${escapeAttr(D.tagline || '')}"></div>
         <div class="field"><label class="field-label">適合你，如果（一行一點，約 3 點）</label><textarea rows="3" data-hd="${i}" data-list="1" data-key="for">${escapeHtml((D.for || []).join('\n'))}</textarea></div>
