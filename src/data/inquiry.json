@@ -44,10 +44,58 @@
         ]
       },
       {
+        "key": "purpose",
+        "label": "主要用途？",
+        "type": "select",
+        "required": true,
+        "options": [
+          "自住",
+          "出租",
+          "民宿・旅館經營",
+          "自住兼出租",
+          "還沒決定"
+        ]
+      },
+      {
         "key": "budget",
-        "label": "預算或時間的考量",
-        "type": "text",
-        "placeholder": "例如：預算 3,000 萬日圓內，明年春天前"
+        "label": "預算範圍（物件或工程總額，日圓）",
+        "type": "select",
+        "required": true,
+        "options": [
+          "3,000 萬以下",
+          "3,000 萬～6,000 萬",
+          "6,000 萬～1 億",
+          "1 億以上",
+          "還沒概念，想先了解行情"
+        ]
+      },
+      {
+        "key": "funding",
+        "label": "資金方式",
+        "type": "select",
+        "options": [
+          "全部自備現金",
+          "需要日本銀行貸款",
+          "需要台灣銀行貸款",
+          "還在評估"
+        ]
+      },
+      {
+        "key": "timeline",
+        "label": "希望什麼時候開始行動？",
+        "type": "select",
+        "options": [
+          "三個月內",
+          "半年內",
+          "一年內",
+          "不急，先蒐集資訊"
+        ]
+      },
+      {
+        "key": "existing",
+        "label": "已有的條件或候選物件（面積、屋齡、車站距離、地址等）",
+        "type": "textarea",
+        "placeholder": "有就寫，沒有可以空白"
       }
     ],
     "旅": [
@@ -85,7 +133,8 @@
     ]
   },
   "hide_items": [
-    "AI 使用教學"
+    "AI 使用教學",
+    "在日管家"
   ],
   "_hide_items說明": "這裡列的細項只在需求填表隱藏，服務頁不受影響。",
   "scope_by_service": {
