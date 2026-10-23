@@ -1,24 +1,88 @@
 {
   "_說明": "需求填表的問題清單。key 要對應 services.json 裡每張服務卡的 k。服務卡的標題、說明、細項會自動從 services.json 來，這裡只放「選了之後要問什麼」。type: text / textarea / select；required 預設選填；col 可填 dates 或 people，會存到收件匣對應欄位。",
-  "service_codes": { "AI": "ai", "築": "estate", "旅": "trip" },
+  "service_codes": {
+    "AI": "ai",
+    "築": "estate",
+    "旅": "trip"
+  },
   "questions": {
     "AI": [
-      { "key": "work", "label": "你現在做的是什麼工作？", "type": "text", "placeholder": "例如：一人設計工作室、民宿經營、電商小店" },
-      { "key": "pain", "label": "每天或每週最花時間的重複工作是什麼？", "type": "textarea", "required": true, "placeholder": "越具體越好，例如：每天要把訂單手動貼進表格" },
-      { "key": "tools", "label": "目前用哪些工具？", "type": "text", "placeholder": "例如：LINE、Google 試算表、Notion" }
+      {
+        "key": "pain",
+        "label": "每天或每週最花時間的重複工作是什麼？",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "越具體越好，例如：每天要把訂單手動貼進表格"
+      },
+      {
+        "key": "tools",
+        "label": "目前用哪些工具？",
+        "type": "text",
+        "placeholder": "例如：LINE、Google 試算表、Notion"
+      }
     ],
     "築": [
-      { "key": "goal", "label": "你想做的是？", "type": "select", "required": true, "options": ["找土地／物件評估", "新建或改建", "已有物件，想改成住宿經營", "在日本有房，想找人代管", "還不確定，想先聊聊"] },
-      { "key": "area", "label": "想看的區域，或手上物件的概況", "type": "text", "placeholder": "例如：大阪市內、想買 2LDK，或：西成區一戶建" },
-      { "key": "budget", "label": "預算或時間的考量", "type": "text", "placeholder": "例如：預算 3,000 萬日圓內，明年春天前" }
+      {
+        "key": "goal",
+        "label": "你想做的是？",
+        "type": "select",
+        "required": true,
+        "options": [
+          "找土地／物件評估",
+          "新建或改建",
+          "已有物件，想改成住宿經營",
+          "在日本有房，想找人代管"
+        ]
+      },
+      {
+        "key": "area",
+        "label": "想看的區域，或手上物件的概況",
+        "type": "text",
+        "placeholder": "例如：大阪市內、想買 2LDK，或：西成區一戶建"
+      },
+      {
+        "key": "budget",
+        "label": "預算或時間的考量",
+        "type": "text",
+        "placeholder": "例如：預算 3,000 萬日圓內，明年春天前"
+      }
     ],
     "旅": [
-      { "key": "dates", "label": "預計的日期", "type": "text", "col": "dates", "required": true, "placeholder": "例如：2027 年 3 月下旬" },
-      { "key": "people", "label": "人數", "type": "text", "col": "people", "placeholder": "例如：2 大 1 小" },
-      { "key": "want", "label": "想訂的餐廳、體驗，或需要翻譯陪同的場合", "type": "textarea", "required": true, "placeholder": "例如：想吃人氣燒肉、需要陪同看醫生" }
+      {
+        "key": "dates",
+        "label": "預計的日期",
+        "type": "text",
+        "col": "dates",
+        "required": true,
+        "placeholder": "例如：2027 年 3 月下旬"
+      },
+      {
+        "key": "people",
+        "label": "人數",
+        "type": "text",
+        "col": "people",
+        "placeholder": "例如：2 大 1 小"
+      },
+      {
+        "key": "want",
+        "label": "想訂的餐廳、體驗，或需要翻譯陪同的場合",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "例如：想吃人氣燒肉、需要陪同看醫生"
+      }
     ],
     "other": [
-      { "key": "about", "label": "想聊什麼？", "type": "textarea", "required": true, "placeholder": "你的目標、在意的事" }
+      {
+        "key": "about",
+        "label": "想聊什麼？",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "你的目標、在意的事"
+      }
     ]
-  }
+  },
+  "hide_items": [
+    "AI 使用教學"
+  ],
+  "_hide_items說明": "這裡列的細項只在需求填表隱藏，服務頁不受影響。"
 }
