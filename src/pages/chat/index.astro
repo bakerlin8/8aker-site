@@ -3,15 +3,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import copy from '../../data/site-copy.json';
 const igHandle = String((copy as any).instagram_handle || '').replace(/^@/, '').trim();
 const ig = /^[A-Za-z0-9._]{1,30}$/.test(igHandle) ? igHandle : '';
-const TOPICS = [
-  ['property', '在日本置產陪跑（Second House／投資）'],
-  ['owner', '海外屋主代管'],
-  ['guide', '大阪地陪・隨行翻譯・在地推薦'],
-  ['ai', 'AI・工作流優化'],
-  ['other', '其他，或只是想聊聊'],
-];
+import services from '../../data/services.json';
+import inq from '../../data/inquiry.json';
+const hats = ((services as any).hats || []).map((h: any) => ({ k: h.k, title: h.title, desc: h.desc, items: h.items || [] }));
+const OTHER = { k: 'other', title: '還不確定，想先聊聊', desc: '', items: [] };
+const noteForm = String((services as any).form_note || '');
 ---
-<BaseLayout title="需求填表 — 8AKER零" description="想聊置產、代管、大阪地陪翻譯或 AI 工具？先填幾個問題，整理好之後一鍵複製或存成圖片，直接傳到 Instagram 私訊。">
+<BaseLayout title="需求填表 — 8AKER零" description="想聊日本不動產、行程規劃或 AI 工具？選一個服務、回答幾個問題，送出就好。">
 <style is:global>
 .chat{min-height:100vh;padding:140px 40px 96px;background:radial-gradient(110% 80% at 80% 0%,#3D0F1A 0%,#1C0F14 60%);color:#EFE5D6;}
 .chat-in{max-width:720px;margin:0 auto;}
@@ -48,94 +46,96 @@ const TOPICS = [
 .pv-side .ok{font-size:13.5px;color:#D4A24C;min-height:1.4em;margin-top:10px;}
 .pv-side pre{white-space:pre-wrap;font-family:inherit;font-size:13px;color:#B9A89E;background:rgba(239,229,214,.05);border:1px solid rgba(239,229,214,.1);padding:12px;margin-top:16px;line-height:1.8;}
 .privacy-note{font-size:12.5px;color:#86707A;margin-top:18px;line-height:1.8;}
-@media(max-width:720px){.chat{padding:100px 20px 72px;}.cf{padding:20px 16px;margin-left:-4px;margin-right:-4px;}.frow2{grid-template-columns:1fr;}.pv-grid{grid-template-columns:1fr;}.cacts .cbtn{width:100%;}}
+@media(max-width:720px){.chat{padding:100px 20px 72px;}.cf{padding:20px 16px;margin-left:-4px;margin-right:-4px;}.frow2{grid-template-columns:1fr;}.pv-grid{grid-template-columns:1fr;}.svc-pick{grid-template-columns:1fr;}.cacts .cbtn{width:100%;}}
+.svc-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.svc-pick label{margin:0;display:block;cursor:pointer;}
+.svc-pick input{position:absolute;opacity:0;pointer-events:none;width:auto;}
+.svc-pick .sp{display:block;padding:14px 14px 13px;border:1px solid rgba(42,24,30,.18);background:#FBF6F3;transition:border-color .2s,background .2s;height:100%;}
+.svc-pick .sp b{display:block;font-weight:500;font-size:16px;color:#1C0F14;}
+.svc-pick .sp small{display:block;margin-top:4px;font-size:12.5px;line-height:1.6;color:#7a6a6d;}
+.svc-pick label:has(input:checked) .sp{border-color:#9E6F22;background:#F6E9D3;}
+.svc-pick input:focus-visible+.sp{box-shadow:0 0 0 3px rgba(158,111,34,.25);}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.chips label{margin:0;display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid rgba(42,24,30,.18);background:#FBF6F3;font-size:14px;cursor:pointer;}
+.chips input{width:auto;margin:0;accent-color:#9E6F22;}
+.chips label:has(input:checked){border-color:#9E6F22;background:#F6E9D3;}
+.cf .req{color:#A1324A;margin-left:2px;}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+.done{margin-top:28px;background:#EFE5D6;color:#1C0F14;padding:28px;}
+.done h2{font-family:var(--serif);font-weight:500;font-size:22px;}
+.done p{margin-top:10px;line-height:1.9;color:#5B4B4E;font-size:15px;}
+.done .ok{color:#7a5a1a;font-size:13.5px;min-height:1.4em;margin-top:10px;}
 </style>
 <main class="chat">
   <div class="chat-in">
     <nav class="crumb" aria-label="麵包屑"><a href="/">首頁</a> / 需求填表</nav>
     <h1>需求填表</h1>
-    <p class="lede">先回答幾個問題，我會更快知道怎麼幫你。填好後可以一鍵複製文字、或存成一張圖片，直接傳到我的 Instagram 私訊，不用再自己整理。</p>
-    <p class="steps"><span><b>1</b> 填寫</span><span>→</span><span><b>2</b> 確認</span><span>→</span><span><b>3</b> 傳到 IG 私訊</span></p>
+    <p class="lede">選一個服務，回答幾個問題就好。{noteForm}</p>
 
     <form class="cf" id="cf" novalidate>
       <fieldset><legend>想聊什麼？</legend>
-        <div class="topics">{TOPICS.map(([v, t], i) => <label><input type="radio" name="topic" value={v} checked={i === 0} />{t}</label>)}</div>
+        <div class="svc-pick">{[...hats, OTHER].map((h: any) => <label><input type="radio" name="svc" value={h.k} /><span class="sp"><b>{h.title}</b>{h.desc && <small>{h.desc}</small>}</span></label>)}</div>
       </fieldset>
-      <div class="frow2">
-        <label><span>怎麼稱呼你</span><input name="name" maxlength="40" autocomplete="name" required></label>
-        <label><span>大概的時間（選填）</span><input name="dates" maxlength="60" placeholder="例如：2027 年 3 月下旬"></label>
+      <div id="sub" hidden><label><span>哪些項目？（可多選，選填）</span></label><div class="chips" id="chips"></div></div>
+      <div id="qs"></div>
+      <div id="common" hidden>
+        <div class="frow2">
+          <label><span>怎麼稱呼你<i class="req">*</i></span><input name="name" maxlength="40" autocomplete="name"></label>
+          <label><span>聯絡方式<i class="req">*</i></span><input name="contact" maxlength="120" placeholder="Instagram、LINE ID 或 Email 擇一"></label>
+        </div>
+        <label><span>還有什麼想補充？（選填）</span><textarea name="extra" rows="3" maxlength="800"></textarea></label>
+        <label><span>你從哪裡知道我？（選填）</span><select name="source"><option value="">—</option><option>朋友介紹</option><option>Instagram</option><option>LINE 群組</option><option>Facebook</option><option>8AKER零 的文章</option><option>祈願所</option><option>搜尋</option><option>其他</option></select></label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="err" id="cfErr" role="alert"></p>
+        <div class="cacts"><button class="cbtn ink" type="submit" id="send">送出</button></div>
       </div>
-      <label id="peopleL"><span id="peopleT">物件概況（選填）</span><input name="people" maxlength="80" id="people" placeholder="例如：想在大阪市內買 2LDK，自住兼出租"></label>
-      <label><span>想聊的內容</span><textarea name="message" rows="5" maxlength="1000" required placeholder="越具體越好：你的目標、在意的事、預算或時間的考量"></textarea></label>
-      <label><span>你從哪裡知道我？（選填）</span><select name="source"><option value="">—</option><option>朋友介紹</option><option>Instagram</option><option>LINE 群組</option><option>Facebook</option><option>搜尋</option><option>其他</option></select></label>
-      <p class="err" id="cfErr" role="alert"></p>
-      <div class="cacts"><button class="cbtn ink" type="submit">整理好了，下一步 →</button></div>
-      <p class="hint">你填的內容只會留在你的手機或電腦上，不會上傳到任何地方。</p>
     </form>
 
-    <section class="preview" id="pv" hidden aria-live="polite">
-      <div class="pv-grid">
-        <canvas id="card" width="1080" height="1350" aria-label="需求確認圖片預覽"></canvas>
-        <div class="pv-side">
-          <h2>確認一下，然後傳給我</h2>
-          <ol>
-            <li>按「複製文字並開啟 IG」，到私訊裡直接貼上就好</li>
-            <li>或「存成圖片」，在私訊裡傳這張圖</li>
-          </ol>
-          <div class="cacts">
-            <button class="cbtn gold" type="button" id="goIg">複製文字並開啟 IG 私訊 →</button>
-            <button class="cbtn ghost" type="button" id="shareImg" hidden>分享圖片（可選 Instagram）</button>
-            <button class="cbtn ghost" type="button" id="saveImg">存成圖片</button>
-            <button class="cbtn ghost" type="button" id="copyTxt">只複製文字</button>
-            <button class="cbtn ghost" type="button" id="back">← 回去修改</button>
-          </div>
-          <p class="ok" id="ok" role="status"></p>
-          <pre id="txt"></pre>
-        </div>
-      </div>
-      <p class="privacy-note">Instagram 不允許網站直接幫你把文字放進私訊，所以這裡先幫你複製好，打開私訊後貼上即可。{ig && <>我的帳號：<a href={`https://www.instagram.com/${ig}/`} target="_blank" rel="noopener">@{ig}</a></>}</p>
+    <section class="done" id="done" hidden aria-live="polite">
+      <h2>已收到，謝謝你</h2>
+      <p>我會在 2 個工作天內回覆。想更快的話，也可以直接傳一則 Instagram 私訊，內容我已經幫你整理好了。</p>
+      <div class="cacts">{ig && <button class="cbtn gold" type="button" id="goIg">複製內容並開啟 IG 私訊 →</button>}<button class="cbtn line" type="button" id="again">再填一份</button></div>
+      <p class="ok" id="ok" role="status"></p>
     </section>
   </div>
 </main>
-<script is:inline define:vars={{ IG: ig, TOPICS }}>
+<script is:inline define:vars={{ IG: ig, HATS: hats, OTHER, Q: (inq as any).questions, CODES: (inq as any).service_codes }}>
 (function(){
-  var F=document.getElementById('cf'),PV=document.getElementById('pv'),E=document.getElementById('cfErr'),OK=document.getElementById('ok'),TX=document.getElementById('txt'),CV=document.getElementById('card');
-  var TN={};TOPICS.forEach(function(t){TN[t[0]]=t[1];});
-  var PEOPLE={property:['物件概況（選填）','例如：想在大阪市內買 2LDK，自住兼出租'],owner:['物件概況（選填）','例如：大阪市西成區一戶建，一年回去兩次'],guide:['人數（選填）','例如：2 大 1 小，想吃在地的燒肉'],ai:['你的工作類型（選填）','例如：一人經營的咖啡店'],other:['補充（選填）','']};
-  function syncPeople(){var v=(F.querySelector('input[name=topic]:checked')||{}).value||'other',p=PEOPLE[v];document.getElementById('peopleT').textContent=p[0];document.getElementById('people').placeholder=p[1];}
-  F.addEventListener('change',function(e){if(e.target.name==='topic')syncPeople();});syncPeople();
-  // 從祈願所「我可以幫忙」進來：預先帶入是哪個願望、需要什麼
-  try{var Q=new URLSearchParams(location.search);if(Q.get('from')==='wish'){var ab=(Q.get('about')||'').slice(0,80),hp=(Q.get('help')||'').slice(0,120);
-    var oth=F.querySelector('input[name=topic][value=other]');if(oth){oth.checked=true;syncPeople();}
-    if(ab&&F.elements.message&&!F.elements.message.value){F.elements.message.value='我看到祈願所的「'+ab+'」'+(hp?'，你需要：'+hp:'')+'。我可以幫忙的是：';}
-    if(F.elements.source){for(var i=0;i<F.elements.source.options.length;i++){if(F.elements.source.options[i].text==='其他'){F.elements.source.selectedIndex=i;break;}}}}}catch(e){}
-  var data={},text='',blob=null;
-  function val(n){var el=F.elements[n];return el?String(el.value||'').trim():'';}
-  function build(){data={topic:TN[(F.querySelector('input[name=topic]:checked')||{}).value]||'',name:val('name'),dates:val('dates'),people:val('people'),message:val('message'),source:val('source'),label:document.getElementById('peopleT').textContent.replace('（選填）','')};
-    var L=['你好，我是 '+data.name+'，從 8aker0.com 來的。','','【想聊】'+data.topic];if(data.dates)L.push('【時間】'+data.dates);if(data.people)L.push('【'+data.label+'】'+data.people);L.push('【內容】'+data.message);if(data.source)L.push('【從哪裡知道】'+data.source);text=L.join('\n');}
-  function wrap(ctx,s,maxW){var out=[];String(s).split('\n').forEach(function(par){var line='';for(var i=0;i<par.length;i++){var ch=par[i],tl=line+ch;if(ctx.measureText(tl).width>maxW&&line){out.push(line);line=ch;}else line=tl;}out.push(line);});return out;}
-  function draw(){var c=CV.getContext('2d'),W=1080,H=1350;var g=c.createRadialGradient(W*.8,0,50,W*.8,0,H*1.1);g.addColorStop(0,'#4B1623');g.addColorStop(.6,'#1C0F14');c.fillStyle=g;c.fillRect(0,0,W,H);
-    c.strokeStyle='rgba(212,162,76,.5)';c.lineWidth=2;c.strokeRect(48,48,W-96,H-96);
-    for(var k=0;k<9;k++){c.beginPath();c.arc(W-150,170,26+k*13,0,6.283);c.strokeStyle='rgba(212,162,76,'+(.08+k*.05)+')';c.lineWidth=1.5;c.stroke();}
-    var serif='"Noto Serif TC","Noto Serif JP",serif',sans='"Noto Sans TC",system-ui,sans-serif';
-    c.fillStyle='#D4A24C';c.font='28px '+sans;c.fillText('需求填表・內容確認',110,150);
-    c.fillStyle='#EBD3A8';c.font='500 64px '+serif;c.fillText(data.name?('我是 '+data.name):'你好',110,250);
-    var y=340,rows=[['想聊',data.topic],['時間',data.dates],[data.label,data.people],['內容',data.message],['從哪裡知道',data.source]];
-    rows.forEach(function(r){if(!r[1])return;c.fillStyle='#D4A24C';c.font='26px '+sans;c.fillText(r[0],110,y);y+=46;c.fillStyle='#EFE5D6';c.font='36px '+sans;
-      var lines=wrap(c,r[1],W-220);var max=r[0]==='內容'?Math.max(3,Math.floor((H-260-y)/54)):3;lines.slice(0,max).forEach(function(l,i){c.fillText(i===max-1&&lines.length>max?l.slice(0,-1)+'…':l,110,y);y+=54;});y+=26;});
-    c.fillStyle='#86707A';c.font='26px '+sans;c.fillText('8aker0.com'+(IG?('　→　IG @'+IG):''),110,H-110);
-    return new Promise(function(res){CV.toBlob(function(b){blob=b;res(b);},'image/png');});}
+  var F=document.getElementById('cf'),SUB=document.getElementById('sub'),CH=document.getElementById('chips'),QS=document.getElementById('qs'),CM=document.getElementById('common'),E=document.getElementById('cfErr'),DONE=document.getElementById('done'),OK=document.getElementById('ok'),BTN=document.getElementById('send');
+  var ALL=HATS.concat([OTHER]),cur=null,lastText='';
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+  function pick(k){cur=ALL.filter(function(h){return h.k===k;})[0]||null;if(!cur)return;
+    CH.innerHTML='';SUB.hidden=!cur.items.length;cur.items.forEach(function(t){var l=el('label'),i=el('input');i.type='checkbox';i.name='item';i.value=t;l.appendChild(i);l.appendChild(document.createTextNode(t));CH.appendChild(l);});
+    QS.innerHTML='';(Q[k]||Q.other||[]).forEach(function(q){var l=el('label'),s=el('span',null,q.label);if(q.required){var r=el('i','req','*');s.appendChild(r);}l.appendChild(s);var f;
+      if(q.type==='textarea'){f=el('textarea');f.rows=3;}else if(q.type==='select'){f=el('select');var o0=el('option',null,'請選擇');o0.value='';f.appendChild(o0);(q.options||[]).forEach(function(o){var op=el('option',null,o);op.value=o;f.appendChild(op);});}else{f=el('input');f.type='text';}
+      f.name='q_'+q.key;f.maxLength=600;if(q.placeholder)f.placeholder=q.placeholder;l.appendChild(f);QS.appendChild(l);});
+    CM.hidden=false;E.textContent='';}
+  F.addEventListener('change',function(e){if(e.target.name==='svc')pick(e.target.value);});
+  // 從祈願所「我可以幫忙」進來：選「還不確定」，預先帶入是哪個願望、需要什麼
+  try{var P=new URLSearchParams(location.search);if(P.get('from')==='wish'){var ab=(P.get('about')||'').slice(0,80),hp=(P.get('help')||'').slice(0,120);
+    var r=F.querySelector('input[name=svc][value=other]');if(r){r.checked=true;pick('other');}
+    var a=F.querySelector('[name=q_about]');if(a)a.value='我看到祈願所的「'+ab+'」'+(hp?'，你需要：'+hp:'')+'。我可以幫忙的是：';
+    var sr=F.elements.source;if(sr){for(var i=0;i<sr.options.length;i++){if(sr.options[i].text==='祈願所'){sr.selectedIndex=i;break;}}}}}catch(e){}
+  function v(n){var x=F.elements[n];return x?String(x.value||'').trim():'';}
+  F.addEventListener('submit',function(e){e.preventDefault();E.textContent='';
+    if(!cur){E.textContent='先選一個想聊的服務。';return;}
+    var qs=Q[cur.k]||Q.other||[],lines=['【想聊】'+cur.title],dates='',people='',miss=false;
+    var items=[].map.call(F.querySelectorAll('input[name=item]:checked'),function(x){return x.value;});if(items.length)lines.push('【項目】'+items.join('、'));
+    qs.forEach(function(q){var val=v('q_'+q.key);if(q.required&&!val)miss=true;if(val){lines.push('【'+q.label.replace(/[？?]$/,'')+'】'+val);if(q.col==='dates')dates=val;if(q.col==='people')people=val;}});
+    if(v('extra'))lines.push('【補充】'+v('extra'));
+    if(miss||!v('name')||!v('contact')){E.textContent='請填寫有 * 的欄位。';window.sfx&&sfx('error');return;}
+    var body={service:CODES[cur.k]||'other',name:v('name'),contact:v('contact'),dates:dates,people:people,message:lines.join('\n'),source:v('source'),website:v('website'),lang:navigator.language||''};
+    lastText='你好，我是 '+body.name+'，從 8aker0.com 來的。\n\n'+lines.join('\n');
+    BTN.disabled=true;BTN.textContent='送出中…';
+    fetch('https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/inquiry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
+      .then(function(x){if(!x.ok)throw new Error(x.d&&x.d.error||'送出失敗');F.hidden=true;DONE.hidden=false;OK.textContent='';window.sfx&&sfx('success');DONE.scrollIntoView({behavior:'smooth',block:'start'});})
+      .catch(function(err){E.textContent=(err&&err.message)||'送出失敗，請稍後再試，或直接私訊我。';window.sfx&&sfx('error');})
+      .then(function(){BTN.disabled=false;BTN.textContent='送出';});});
   function copy(s){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(s);return new Promise(function(res,rej){var t=document.createElement('textarea');t.value=s;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{document.execCommand('copy');res();}catch(e){rej(e);}t.remove();});}
-  F.addEventListener('submit',function(e){e.preventDefault();if(!val('name')||val('message').length<4){E.textContent='請填寫稱呼和想聊的內容。';window.sfx&&sfx('error');return;}E.textContent='';build();TX.textContent=text;OK.textContent='';
-    (document.fonts?document.fonts.ready:Promise.resolve()).then(draw).then(function(b){var f=b&&new File([b],'8aker0-需求填表.png',{type:'image/png'});document.getElementById('shareImg').hidden=!(f&&navigator.canShare&&navigator.canShare({files:[f]}));});
-    F.hidden=true;PV.hidden=false;window.sfx&&sfx('success');PV.scrollIntoView({behavior:'smooth',block:'start'});});
-  document.getElementById('back').addEventListener('click',function(){PV.hidden=true;F.hidden=false;F.scrollIntoView({behavior:'smooth',block:'start'});});
-  document.getElementById('goIg').addEventListener('click',function(){var p=copy(text);var w=IG?window.open('https://ig.me/m/'+IG,'_blank','noopener'):null;
-    p.then(function(){OK.textContent='已複製！在 Instagram 私訊裡長按輸入框「貼上」就好。';}).catch(function(){OK.textContent='沒辦法自動複製，請長按下方文字手動複製。';});
-    if(IG&&!w)location.href='https://ig.me/m/'+IG;});
-  document.getElementById('copyTxt').addEventListener('click',function(){copy(text).then(function(){OK.textContent='已複製文字。';}).catch(function(){OK.textContent='沒辦法自動複製，請長按下方文字手動複製。';});});
-  document.getElementById('saveImg').addEventListener('click',function(){if(!blob)return;var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='8aker0-需求填表.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);OK.textContent='圖片已儲存（手機上若開啟新頁，長按圖片「加入照片」）。';});
-  document.getElementById('shareImg').addEventListener('click',function(){if(!blob)return;var f=new File([blob],'8aker0-需求填表.png',{type:'image/png'});navigator.share({files:[f],text:text}).catch(function(){});});
+  var g=document.getElementById('goIg');if(g)g.addEventListener('click',function(){var p=copy(lastText);var w=window.open('https://ig.me/m/'+IG,'_blank','noopener');
+    p.then(function(){OK.textContent='已複製！在 Instagram 私訊裡長按輸入框「貼上」就好。';}).catch(function(){OK.textContent='沒辦法自動複製，請回到表單手動複製內容。';});if(!w)location.href='https://ig.me/m/'+IG;});
+  document.getElementById('again').addEventListener('click',function(){F.reset();QS.innerHTML='';CM.hidden=true;SUB.hidden=true;cur=null;DONE.hidden=true;F.hidden=false;F.scrollIntoView({behavior:'smooth',block:'start'});});
 })();
 </script>
 </BaseLayout>

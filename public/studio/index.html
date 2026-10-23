@@ -1426,7 +1426,7 @@ async function loadOverview() {
 }
 
 /* ══════════════════════════ 需求收件匣 ══════════════════════════ */
-const SVC_NAME = { property: '在日本置產陪跑', owner: '海外屋主代管', omakase: '大阪導覽', interpret: '單次隨行翻譯', ai: 'AI 工具', tw_transfer: '台灣轉帳・索取帳號（未回報）', tw_transfer_paid: '台灣轉帳・已回報轉帳', other: '其他' };
+const SVC_NAME = { ai: 'AI・工作流優化', estate: '日本不動產', trip: '日本行程規劃', property: '在日本置產陪跑', owner: '海外屋主代管', omakase: '大阪導覽', interpret: '單次隨行翻譯', tw_transfer: '台灣轉帳・索取帳號（未回報）', tw_transfer_paid: '台灣轉帳・已回報轉帳', other: '其他' };
 const ST_NAME = [['new', '未處理'], ['replied', '已回覆'], ['done', '已完成'], ['spam', '垃圾訊息']];
 async function inboxApi(method, body) {
   const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-inbox`, { method, headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
