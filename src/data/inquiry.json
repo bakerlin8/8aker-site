@@ -111,26 +111,99 @@
     ],
     "旅": [
       {
+        "key": "people",
+        "label": "人數",
+        "type": "number",
+        "required": true,
+        "col": "people",
+        "placeholder": "例如：4",
+        "hint": "精緻團以 8 人以下為主。",
+        "warnIf": {
+          "gte": 9,
+          "text": "9 人以上建議請由旅行社與我們聯繫。"
+        }
+      },
+      {
         "key": "dates",
         "label": "預計的日期",
         "type": "text",
+        "required": true,
         "col": "dates",
-        "required": true,
-        "placeholder": "例如：2027 年 3 月下旬"
+        "short": "日期",
+        "placeholder": "例如：2027 年 3 月下旬，或還在考慮的月份"
       },
       {
-        "key": "people",
-        "label": "人數",
+        "key": "booked",
+        "label": "已經自己訂好的有哪些？",
+        "short": "已自行預訂",
+        "type": "checks",
+        "options": [
+          "機票",
+          "包車",
+          "住宿",
+          "想住 TRS Osaka Stay（我們經營的民宿）",
+          "都還沒訂"
+        ],
+        "hint": "機票、包車、住宿建議先自行預訂。包車我們可以免費介紹合法的綠牌業者，但不收任何差價或佣金。"
+      },
+      {
+        "key": "hotel",
+        "label": "住宿的區域或飯店名稱",
+        "short": "住宿",
         "type": "text",
-        "col": "people",
-        "placeholder": "例如：2 大 1 小"
+        "showIf": {
+          "key": "booked",
+          "includes": "住宿"
+        }
       },
       {
-        "key": "want",
-        "label": "想訂的餐廳、體驗，或需要翻譯陪同的場合",
-        "type": "textarea",
+        "key": "occasion",
+        "label": "需要隨行翻譯陪同的場合",
+        "short": "陪同場合",
+        "type": "checks",
         "required": true,
-        "placeholder": "例如：想吃人氣燒肉、需要陪同看醫生"
+        "options": [
+          "餐廳",
+          "購物",
+          "看房",
+          "商務洽談",
+          "景點"
+        ],
+        "hint": "陪同期間可以順便幫忙餐廳訂位，不另外收費。"
+      },
+      {
+        "key": "duration",
+        "label": "大約陪同多久？",
+        "short": "陪同時間",
+        "type": "select",
+        "required": true,
+        "options": [
+          "半天（約 4 小時）",
+          "一整天（約 8 小時）",
+          "多天",
+          "還不確定"
+        ]
+      },
+      {
+        "key": "care",
+        "label": "同行者需要特別留意的事（選填）",
+        "short": "同行者備註",
+        "type": "text",
+        "placeholder": "例如：長輩同行、不想走太多路、不吃牛"
+      },
+      {
+        "key": "wishes",
+        "label": "想去的餐廳或體驗（最多 5 個，選填）",
+        "short": "想去的餐廳或體驗",
+        "type": "list",
+        "count": 5,
+        "placeholder": "店名，或想做的事"
+      },
+      {
+        "key": "notes",
+        "label": "備註（有什麼想先讓我知道的）",
+        "short": "備註",
+        "type": "textarea"
       }
     ],
     "other": [
@@ -145,7 +218,9 @@
   },
   "hide_items": [
     "AI 使用教學",
-    "在日管家"
+    "在日管家",
+    "餐廳・票券代訂",
+    "日本地陪・隨行翻譯"
   ],
   "_hide_items說明": "這裡列的細項只在需求填表隱藏，服務頁不受影響。",
   "scope_by_service": {
@@ -153,5 +228,6 @@
     "旅": "服務範圍：大阪及周邊，以大阪市為主。"
   },
   "_scope說明": "選到哪個服務才顯示對應的範圍文字；AI 沒有地區限制所以不放。",
-  "_showIf說明": "問題加上 showIf:{key,equals} 時，只有前面那題選到指定答案才會出現。"
+  "_showIf說明": "問題加上 showIf:{key,equals} 時，只有前面那題選到指定答案才會出現。",
+  "_題型說明": "type: text / textarea / select / number / checks（可複選，選項在 options）/ list（count 個小欄位）。可加 hint（小字提示）、short（送出內容裡用的短名稱）、showIf（{key,equals} 或 {key,includes}）、warnIf（{gte,text}，數字達標時顯示提醒）。"
 }

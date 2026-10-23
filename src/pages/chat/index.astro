@@ -17,7 +17,13 @@ const noteForm = String((services as any).form_note || '');
 .chat .crumb{font-size:13px;color:#86707A;}.chat .crumb a{border-bottom:1px solid rgba(239,229,214,.15);}
 .chat h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,44px);margin-top:12px;color:#EBD3A8;}
 .chat .lede{color:#B9A89E;margin-top:12px;line-height:1.9;max-width:34em;}
-.cf .scope[hidden],.cf label[hidden]{display:none;}
+.cf .scope[hidden],.cf label[hidden],.cf .q[hidden],.cf .qwarn[hidden]{display:none;}
+.cf .q{margin-top:16px;}
+.cf .q>.ql{display:block;font-size:13px;color:#5B4B4E;margin-bottom:6px;}
+.cf .q .chips{margin-top:0;}
+.cf .q input.li{margin-bottom:6px;}
+.cf .q .qh{font-size:12.5px;color:#7a6a6d;line-height:1.7;margin-top:8px;}
+.cf .q .qwarn{font-size:13.5px;color:#A1324A;margin-top:8px;line-height:1.7;}
 .cf .scope{margin-top:14px;display:inline-block;font-size:13px;letter-spacing:.06em;color:#7a5a1a;background:#F6E9D3;border:1px solid rgba(158,111,34,.4);padding:5px 12px;}
 .steps{display:flex;gap:18px;margin-top:22px;font-size:12.5px;color:#86707A;letter-spacing:.06em;}
 .steps b{font-weight:400;color:#D4A24C;}
@@ -103,6 +109,7 @@ const noteForm = String((services as any).form_note || '');
         <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <p class="err" id="cfErr" role="alert"></p>
         <div class="cacts"><button class="cbtn ink" type="submit" id="send">送出</button></div>
+        <p class="hint">送出即表示同意依<a href="/privacy/" target="_blank" rel="noopener">隱私權政策</a>處理你填寫的資料，只用來回覆你。</p>
       </div>
     </form>
 
@@ -117,17 +124,32 @@ const noteForm = String((services as any).form_note || '');
 <script is:inline define:vars={{ IG: ig, HATS: hats, OTHER, Q: (inq as any).questions, CODES: (inq as any).service_codes, SCOPES: (inq as any).scope_by_service || {} }}>
 (function(){
   var F=document.getElementById('cf'),SUB=document.getElementById('sub'),CH=document.getElementById('chips'),QS=document.getElementById('qs'),CM=document.getElementById('common'),E=document.getElementById('cfErr'),DONE=document.getElementById('done'),OK=document.getElementById('ok'),BTN=document.getElementById('send');
-  var ALL=HATS.concat([OTHER]),cur=null,lastText='';
+  var ALL=HATS.concat([OTHER]),cur=null,lastText='',uid=0;
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
+  function qs(){return cur?(Q[cur.k]||Q.other||[]):[];}
+  function qOf(key){return qs().filter(function(q){return q.key===key;})[0];}
+  function val(q){var n='q_'+q.key;
+    if(q.type==='checks')return [].map.call(F.querySelectorAll('input[name='+n+']:checked'),function(x){return x.value;});
+    if(q.type==='list')return [].map.call(F.querySelectorAll('input[name^='+n+'_]'),function(x){return x.value.trim();}).filter(Boolean);
+    var x=F.elements[n];return x?String(x.value||'').trim():'';}
   function pick(k){cur=ALL.filter(function(h){return h.k===k;})[0]||null;if(!cur)return;
     CH.innerHTML='';SUB.hidden=!cur.items.length;cur.items.forEach(function(t){var l=el('label'),i=el('input');i.type='checkbox';i.name='item';i.value=t;l.appendChild(i);l.appendChild(document.createTextNode(t));CH.appendChild(l);});
-    QS.innerHTML='';(Q[k]||Q.other||[]).forEach(function(q){var l=el('label'),s=el('span',null,q.label);if(q.required){var r=el('i','req','*');s.appendChild(r);}l.appendChild(s);var f;
-      if(q.type==='textarea'){f=el('textarea');f.rows=3;}else if(q.type==='select'){f=el('select');var o0=el('option',null,'請選擇');o0.value='';f.appendChild(o0);(q.options||[]).forEach(function(o){var op=el('option',null,o);op.value=o;f.appendChild(op);});}else{f=el('input');f.type='text';}
-      f.name='q_'+q.key;f.maxLength=600;if(q.placeholder)f.placeholder=q.placeholder;l.appendChild(f);if(q.showIf){l.dataset.sk=q.showIf.key;l.dataset.sv=q.showIf.equals;l.hidden=true;}QS.appendChild(l);});
+    QS.innerHTML='';qs().forEach(function(q){var w=el('div','q'),id='qf'+(++uid),lab=el('label','ql');lab.textContent=q.label;lab.htmlFor=id;if(q.required)lab.appendChild(el('i','req','*'));w.appendChild(lab);var f;
+      if(q.type==='checks'){var cw=el('div','chips');(q.options||[]).forEach(function(o){var l=el('label'),i=el('input');i.type='checkbox';i.name='q_'+q.key;i.value=o;l.appendChild(i);l.appendChild(document.createTextNode(o));cw.appendChild(l);});w.removeChild(lab);var sp=el('span','ql',q.label);if(q.required)sp.appendChild(el('i','req','*'));w.appendChild(sp);w.appendChild(cw);}
+      else if(q.type==='list'){w.removeChild(lab);var sp2=el('span','ql',q.label);w.appendChild(sp2);for(var n=1;n<=(q.count||5);n++){var li=el('input');li.type='text';li.name='q_'+q.key+'_'+n;li.maxLength=80;li.placeholder=(q.placeholder||'')+(n>1?'':'');li.className='li';w.appendChild(li);}}
+      else{if(q.type==='textarea'){f=el('textarea');f.rows=3;}else if(q.type==='select'){f=el('select');var o0=el('option',null,'請選擇');o0.value='';f.appendChild(o0);(q.options||[]).forEach(function(o){var op=el('option',null,o);op.value=o;f.appendChild(op);});}else if(q.type==='number'){f=el('input');f.type='number';f.min='1';f.max='99';f.inputMode='numeric';}else{f=el('input');f.type='text';}
+        f.id=id;f.name='q_'+q.key;if(q.type!=='number')f.maxLength=600;if(q.placeholder)f.placeholder=q.placeholder;w.appendChild(f);}
+      if(q.hint)w.appendChild(el('p','qh',q.hint));
+      if(q.warnIf){var wp=el('p','qwarn',q.warnIf.text);wp.hidden=true;wp.dataset.wk=q.key;w.appendChild(wp);}
+      if(q.showIf){w.dataset.sk=q.showIf.key;w.hidden=true;}
+      w.dataset.qk=q.key;QS.appendChild(w);});
     var sc=document.getElementById('scope');sc.textContent=SCOPES[k]||'';sc.hidden=!SCOPES[k];CM.hidden=false;E.textContent='';}
-  function showIfSync(){QS.querySelectorAll('label[data-sk]').forEach(function(l){var c=F.elements['q_'+l.dataset.sk];l.hidden=!(c&&c.value===l.dataset.sv);});}
-  F.addEventListener('change',function(e){if(e.target.name==='svc')pick(e.target.value);else if(e.target.name&&e.target.name.indexOf('q_')===0)showIfSync();});
-  // 從祈願所「我可以幫忙」進來：選「還不確定」，預先帶入是哪個願望、需要什麼
+  function sync(){qs().forEach(function(q){
+    if(q.showIf){var w=QS.querySelector('[data-qk="'+q.key+'"]'),cv=val(qOf(q.showIf.key)||{key:q.showIf.key}),ok=q.showIf.includes!=null?(Array.isArray(cv)&&cv.indexOf(q.showIf.includes)>-1):cv===q.showIf.equals;w.hidden=!ok;}
+    if(q.warnIf){var wp=QS.querySelector('[data-wk="'+q.key+'"]'),nv=parseInt(val(q),10);wp.hidden=!(nv>=q.warnIf.gte);}});}
+  F.addEventListener('change',function(e){if(e.target.name==='svc')pick(e.target.value);else sync();});
+  F.addEventListener('input',function(e){if(e.target.type==='number')sync();});
+  // 從祈願所「我可以幫忙」進來：直接帶入是哪個願望、需要什麼
   try{var P=new URLSearchParams(location.search);if(P.get('from')==='wish'){var ab=(P.get('about')||'').slice(0,80),hp=(P.get('help')||'').slice(0,120);
     var fs=document.getElementById('svcSet');if(fs)fs.hidden=true;pick('other');
     var a=F.querySelector('[name=q_about]');if(a)a.value='我看到祈願所的「'+ab+'」'+(hp?'，你需要：'+hp:'')+'。我可以幫忙的是：';
@@ -135,9 +157,10 @@ const noteForm = String((services as any).form_note || '');
   function v(n){var x=F.elements[n];return x?String(x.value||'').trim():'';}
   F.addEventListener('submit',function(e){e.preventDefault();E.textContent='';
     if(!cur){E.textContent='先選一個想聊的服務。';return;}
-    var qs=Q[cur.k]||Q.other||[],lines=['【想聊】'+cur.title],dates='',people='',miss=false;
+    var lines=['【想聊】'+cur.title],dates='',people='',miss=false;
     var items=[].map.call(F.querySelectorAll('input[name=item]:checked'),function(x){return x.value;});if(items.length)lines.push('【項目】'+items.join('、'));
-    qs.forEach(function(q){var fe=F.elements['q_'+q.key];if(fe&&fe.closest('label').hidden)return;var val=v('q_'+q.key);if(q.required&&!val)miss=true;if(val){lines.push('【'+q.label.replace(/[？?]$/,'')+'】'+val);if(q.col==='dates')dates=val;if(q.col==='people')people=val;}});
+    qs().forEach(function(q){var w=QS.querySelector('[data-qk="'+q.key+'"]');if(w&&w.hidden)return;var x=val(q),has=Array.isArray(x)?x.length:!!x;if(q.required&&!has)miss=true;
+      if(has){var t=Array.isArray(x)?x.join('、'):x;lines.push('【'+(q.short||q.label.replace(/[？?]$/,''))+'】'+t);if(q.col==='dates')dates=t;if(q.col==='people')people=t;}});
     if(miss||!v('name')||!v('contact')){E.textContent='請填寫有 * 的欄位。';window.sfx&&sfx('error');return;}
     var body={service:CODES[cur.k]||'other',name:v('name'),contact:v('ctype')+'：'+v('contact'),dates:dates,people:people,message:lines.join('\n'),source:v('source'),website:v('website'),lang:navigator.language||''};
     lastText='你好，我是 '+body.name+'，從 8aker0.com 來的。\n\n'+lines.join('\n');
