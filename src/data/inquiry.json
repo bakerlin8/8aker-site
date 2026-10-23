@@ -36,9 +36,15 @@
       },
       {
         "key": "area",
-        "label": "想看的區域，或手上物件的概況",
-        "type": "text",
-        "placeholder": "例如：大阪市內、想買 2LDK，或：西成區一戶建"
+        "label": "區域",
+        "type": "select",
+        "required": true,
+        "options": [
+          "大阪市內",
+          "大阪府內（大阪市以外）",
+          "關西其他地區（京都・神戶・奈良等）",
+          "其他地區（先聊聊能不能協助）"
+        ]
       },
       {
         "key": "budget",
