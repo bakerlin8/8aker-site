@@ -3,7 +3,7 @@ title: "請 Claude 當系統規劃師，跑一次網站大健檢"
 date: 2026-10-23
 excerpt: "從儀表板改版，到整站盤點、清掉舊東西、升級版本。"
 tags: ["AI", "網站", "vibe coding"]
-draft: true
+draft: false
 work: "site"
 ---
 
