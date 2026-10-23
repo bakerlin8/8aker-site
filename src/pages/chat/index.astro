@@ -8,6 +8,7 @@ import inq from '../../data/inquiry.json';
 const hideItems: string[] = (inq as any).hide_items || [];
 const hats = ((services as any).hats || []).map((h: any) => ({ k: h.k, title: h.title, desc: h.desc, items: (h.items || []).filter((x: string) => !hideItems.includes(x)) }));
 const OTHER = { k: 'other', title: '祈願所：我可以幫忙', desc: '', items: [] };
+const scope = String((inq as any).scope || '');
 const noteForm = String((services as any).form_note || '');
 ---
 <BaseLayout title="需求填表 — 8AKER零" description="想聊日本不動產、行程規劃或 AI 工具？選一個服務、回答幾個問題，送出就好。">
@@ -17,6 +18,7 @@ const noteForm = String((services as any).form_note || '');
 .chat .crumb{font-size:13px;color:#86707A;}.chat .crumb a{border-bottom:1px solid rgba(239,229,214,.15);}
 .chat h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,44px);margin-top:12px;color:#EBD3A8;}
 .chat .lede{color:#B9A89E;margin-top:12px;line-height:1.9;max-width:34em;}
+.chat .scope{margin-top:14px;display:inline-block;font-size:13px;letter-spacing:.06em;color:#D4A24C;border:1px solid rgba(212,162,76,.4);padding:5px 12px;}
 .steps{display:flex;gap:18px;margin-top:22px;font-size:12.5px;color:#86707A;letter-spacing:.06em;}
 .steps b{font-weight:400;color:#D4A24C;}
 .cf{margin-top:28px;background:#EFE5D6;color:#1C0F14;padding:28px;}
@@ -84,6 +86,7 @@ const noteForm = String((services as any).form_note || '');
     <nav class="crumb" aria-label="麵包屑"><a href="/">首頁</a> / 需求填表</nav>
     <h1>需求填表</h1>
     <p class="lede">選一個服務，回答幾個問題就好。{noteForm}</p>
+    {scope && <p class="scope">{scope}</p>}
 
     <form class="cf" id="cf" novalidate>
       <fieldset id="svcSet"><legend>想聊什麼？</legend>
