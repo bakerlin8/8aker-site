@@ -76,6 +76,8 @@ const noteForm = String((services as any).form_note || '');
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;}
 .chips label{margin:0;display:flex;gap:9px;align-items:center;padding:10px 15px;min-height:44px;border:1px solid rgba(42,24,30,.2);background:#FBF6F3;font-size:14.5px;color:#1C0F14;cursor:pointer;transition:border-color .2s,background .2s;}
 .chips label:hover{border-color:rgba(158,111,34,.6);}
+.chips .olk{margin-left:2px;padding-left:10px;border-left:1px solid rgba(42,24,30,.2);font-size:12.5px;color:#9E6F22;text-decoration:none;white-space:nowrap;}
+.chips .olk:hover{text-decoration:underline;text-underline-offset:3px;}
 .chips input{width:auto;min-height:0;margin:0;padding:0;accent-color:#9E6F22;flex:none;-webkit-appearance:auto;appearance:auto;}
 .chips label:has(input:checked){border-color:#9E6F22;background:#F6E9D3;}
 /* 聯絡 */
@@ -180,7 +182,7 @@ const noteForm = String((services as any).form_note || '');
   function pick(k){cur=ALL.filter(function(h){return h.k===k;})[0]||null;if(!cur)return;
     CH.innerHTML='';SUB.hidden=!cur.items.length;cur.items.forEach(function(t){var l=el('label'),i=el('input');i.type='checkbox';i.name='item';i.value=t;l.appendChild(i);l.appendChild(document.createTextNode(t));CH.appendChild(l);});
     QS.innerHTML='';qs().forEach(function(q){var w=el('div','q'+((q.type==='textarea'||q.type==='checks'||q.type==='list'||q.hint||q.warnIf)?' wide':'')),id='qf'+(++uid),lab=el('label','ql');lab.textContent=q.label;lab.htmlFor=id;if(q.required)lab.appendChild(el('i','req','*'));w.appendChild(lab);var f;
-      if(q.type==='checks'){var cw=el('div','chips');(q.options||[]).forEach(function(o){var l=el('label'),i=el('input');i.type='checkbox';i.name='q_'+q.key;i.value=o;l.appendChild(i);l.appendChild(document.createTextNode(o));cw.appendChild(l);});w.removeChild(lab);var sp=el('span','ql',q.label);if(q.required)sp.appendChild(el('i','req','*'));w.appendChild(sp);w.appendChild(cw);}
+      if(q.type==='checks'){var cw=el('div','chips');(q.options||[]).forEach(function(o){var l=el('label'),i=el('input');i.type='checkbox';i.name='q_'+q.key;i.value=o;l.appendChild(i);l.appendChild(document.createTextNode(o));var lk=q.links&&q.links[o];if(lk&&/^https:\/\//.test(lk)){var an=el('a','olk','看房源 ↗');an.href=lk;an.target='_blank';an.rel='noopener';l.appendChild(an);}cw.appendChild(l);});w.removeChild(lab);var sp=el('span','ql',q.label);if(q.required)sp.appendChild(el('i','req','*'));w.appendChild(sp);w.appendChild(cw);}
       else if(q.type==='list'){w.removeChild(lab);var sp2=el('span','ql',q.label);w.appendChild(sp2);for(var n=1;n<=(q.count||5);n++){var li=el('input');li.type='text';li.name='q_'+q.key+'_'+n;li.maxLength=80;li.placeholder=(q.placeholder||'')+(n>1?'':'');li.className='li';w.appendChild(li);}}
       else{if(q.type==='textarea'){f=el('textarea');f.rows=3;}else if(q.type==='select'){f=el('select');var o0=el('option',null,'請選擇');o0.value='';f.appendChild(o0);(q.options||[]).forEach(function(o){var op=el('option',null,o);op.value=o;f.appendChild(op);});}else if(q.type==='number'){f=el('input');f.type='number';f.min='1';f.max='99';f.inputMode='numeric';}else{f=el('input');f.type='text';}
         f.id=id;f.name='q_'+q.key;if(q.type!=='number')f.maxLength=600;if(q.placeholder)f.placeholder=q.placeholder;w.appendChild(f);}

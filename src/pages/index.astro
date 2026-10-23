@@ -1052,6 +1052,42 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 .svc-cta:hover .arw i,.svc-cta:focus-visible .arw i,.svc-cta:active .arw i{opacity:1;}
 @media(prefers-reduced-motion:reduce){.arw::before,.arw::after,.arw i{transition:none;}}
 @media(max-width:640px){.svc-in{padding:30px 20px 24px;}.svc-dlg::after{font-size:150px;}}
+/* ── 服務內容視窗（閱讀友善版）── */
+.svc-dlg{width:min(660px,calc(100vw - 28px));}
+.svc-in{padding:0;display:flex;flex-direction:column;}
+.svc-hd{padding:42px 40px 26px;background:linear-gradient(180deg,rgba(var(--hc),.14),transparent);}
+.svc-eyebrow{margin:0;font-family:var(--latin);font-size:12px;letter-spacing:.34em;color:rgb(var(--hc));}
+.svc-in h3{margin-top:14px;font-size:clamp(26px,4vw,34px);line-height:1.35;letter-spacing:.02em;}
+.svc-hd .svc-desc{margin-top:14px;font-size:16px;line-height:1.95;color:#D8CABD;max-width:30em;}
+.svc-sec{margin:0;padding:28px 40px;border-top:1px solid rgba(var(--hc),.2);}
+.svc-sec h4{display:flex;align-items:center;gap:14px;margin:0 0 18px;font-size:12.5px;letter-spacing:.28em;color:rgb(var(--hl));}
+.svc-sec h4::after{content:'';flex:1;height:1px;background:rgba(var(--hc),.25);}
+.svc-list{gap:12px;margin-top:0;}
+.svc-list li{padding-left:24px;font-size:15.5px;line-height:1.85;color:#EFE5D6;}
+.svc-list li::before{top:.95em;width:12px;background:rgb(var(--hc));}
+.svc-blocks{gap:14px;}
+.svc-blk{grid-template-columns:44px minmax(0,1fr);gap:6px;padding:22px 22px 22px 18px;background:rgba(10,4,6,.28);border:1px solid rgba(var(--hc),.2);}
+.svc-no{font-size:26px;line-height:1;letter-spacing:.02em;padding-top:2px;color:rgba(var(--hc),.9);}
+.svc-bn{font-size:19px;line-height:1.5;margin-bottom:2px;}
+.svc-blk .svc-list{margin-top:12px;gap:9px;}
+.svc-blk .svc-list li{font-size:15px;color:#E4D8CB;}
+.svc-get{margin-top:16px;padding-top:14px;border-top:1px dashed rgba(var(--hc),.3);font-size:14.5px;line-height:1.85;}
+.svc-more{margin-top:14px;font-size:14px;}
+.svc-exs{background:rgba(10,4,6,.22);}
+.svc-exs h4{color:#B9A89E;}
+.svc-exs .svc-list li{font-size:14.5px;color:#BDAEA5;}
+.svc-exs .svc-list li::before{background:#8D7A80;}
+.svc-foot{padding:26px 40px;border-top:1px solid rgba(var(--hc),.2);display:grid;gap:12px;}
+.svc-foot .svc-price,.svc-foot .svc-note{margin:0;}
+.svc-foot .svc-price{font-family:var(--serif);font-size:18px;letter-spacing:.04em;color:rgb(var(--hl));}
+.svc-foot .svc-price b{display:block;margin:0 0 6px;font-family:var(--sans,inherit);font-size:12px;letter-spacing:.28em;color:rgb(var(--hc));}
+.svc-foot .svc-note{font-size:14.5px;line-height:1.9;color:#B9A89E;}
+.svc-ctas{position:sticky;bottom:0;margin:0;padding:18px 40px 22px;background:linear-gradient(180deg,rgba(38,20,27,.88),#26141B 40%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid rgba(var(--hc),.35);grid-template-columns:1fr 1fr;gap:12px;z-index:2;}
+.svc-cta-col p{margin-bottom:6px;font-size:11.5px;}
+.svc-cta{padding:14px;font-size:15px;}
+@media(max-width:640px){.svc-hd{padding:40px 22px 22px;}.svc-sec,.svc-foot{padding:24px 22px;}.svc-blk{padding:18px 16px 18px 12px;grid-template-columns:36px minmax(0,1fr);}.svc-no{font-size:22px;}.svc-list li{font-size:15px;}.svc-ctas{padding:14px 22px 18px;gap:10px;}.svc-cta{padding:13px 8px;font-size:14px;}}
+@media(max-width:380px){.svc-ctas{grid-template-columns:1fr;}}
+
 @media(prefers-reduced-motion:reduce){.svc-dlg[open]::backdrop,.svc-dlg.closing::backdrop{animation:none;}}
 @keyframes hatSpin{to{--ang:360deg;}}
 @media(hover:none){.hats .hat{border-left:2px solid rgb(var(--hc));}}
@@ -1180,20 +1216,19 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
             <div class="svc-in">
               <button type="button" class="svc-x" data-close aria-label="關閉">×</button>
               {(() => { const D = h.detail || {}; return (<>
-              <h3 id={`svc-h-${i}`}>{h.title}</h3>
-              {D.tagline && <p class="svc-desc">{D.tagline}</p>}
+              <header class="svc-hd"><p class="svc-eyebrow">SERVICE {String(i + 1).padStart(2, '0')}</p><h3 id={`svc-h-${i}`}>{h.title}</h3>
+              {D.tagline && <p class="svc-desc">{D.tagline}</p>}</header>
               {D.for && D.for.length > 0 && <section class="svc-sec"><h4>適合你，如果</h4><ul class="svc-list">{D.for.map((t: string) => <li>{t}</li>)}</ul></section>}
               {D.blocks && D.blocks.length > 0 && <section class="svc-sec"><h4>服務內容</h4>
                 <ol class="svc-blocks">{D.blocks.map((x: any, n: number) => (
                   <li class="svc-blk"><span class="svc-no">{String(n + 1).padStart(2, '0')}</span><div>
                     <p class="svc-bn">{x.name}</p>
-                    <ul class="svc-list">{(x.do || []).map((t: string) => <li>{t}</li>)}</ul>
+                    <ul class="svc-list svc-do">{(x.do || []).map((t: string) => <li>{t}</li>)}</ul>
                     {x.get && <p class="svc-get"><b>你會拿到</b>{x.get}</p>}
                     {x.link && safeHref(x.link.href) && <a class="svc-more" href={safeHref(x.link.href)}>{x.link.text} →</a>}
                   </div></li>))}</ol></section>}
-              {D.excludes && D.excludes.length > 0 && <section class="svc-sec"><h4>不包含</h4><ul class="svc-list svc-ex">{D.excludes.map((t: string) => <li>{t}</li>)}</ul></section>}
-              {D.note && <p class="svc-ex svc-note">{D.note}</p>}
-              {D.price && <p class="svc-price"><b>費用</b>{D.price}</p>}
+              {D.excludes && D.excludes.length > 0 && <section class="svc-sec svc-exs"><h4>不包含</h4><ul class="svc-list svc-ex">{D.excludes.map((t: string) => <li>{t}</li>)}</ul></section>}
+              {(D.note || D.price) && <div class="svc-foot">{D.price && <p class="svc-price"><b>費用</b>{D.price}</p>}{D.note && <p class="svc-ex svc-note">{D.note}</p>}</div>}
               </>); })()}
               <div class="svc-ctas">
                 {igUrl && <div class="svc-cta-col"><p>已有聯絡</p><a class="svc-cta" href={igUrl} target="_blank" rel="noopener">私訊講<span class="arw" aria-hidden="true"><i></i></span></a></div>}
