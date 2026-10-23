@@ -50,7 +50,7 @@ const rings = [0.25, 0.5, 0.75, 1].map((l) => pillars.map((_, i) => pt(i, l).map
 const HOME_N = 6, PER_DIR = 4;
 const topSet = new Set(all.slice(0, HOME_N));
 const dirSet = new Set(pillars.flatMap((p) => all.filter((a) => a.dir === p.slug).slice(0, PER_DIR)));
-const journal = all.filter((a) => topSet.has(a) || dirSet.has(a)).map((a) => ({ ...a, top: topSet.has(a) }));
+const journal = all.filter((a) => topSet.has(a)).map((a) => ({ ...a, top: true }));
 const escH = (x: string) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as any)[c]);
 // 直排時，兩位以內的數字或英文字母橫躺排成一格（縦中横）
 const tcy = (x: string) => escH(x).replace(/(?<![0-9A-Za-z])([0-9A-Za-z]{1,2})(?![0-9A-Za-z])/g, '<span class="tcy">$1</span>');
@@ -539,7 +539,18 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .chip{font-size:13px;padding:4px 14px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
 .chip:hover{border-color:var(--bone-2);color:var(--bone);}
 .chip[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);}
-.jlist{margin-top:10px;}
+.jdirs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:30px;}
+.jdir{position:relative;display:grid;grid-template-rows:auto auto auto;gap:2px;padding:16px 16px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--dc) 5%,transparent);transition:border-color .3s,background .3s,transform .45s var(--ease);overflow:hidden;}
+.jdir .jk{font-family:var(--jp);font-weight:400;font-size:34px;line-height:1.1;color:var(--dc);}
+.jdir .jn{font-family:var(--serif);font-size:16px;margin-top:6px;}
+.jdir .jt{font-size:12.5px;color:var(--bone-2);}
+.jdir em{position:absolute;top:12px;right:14px;font-style:normal;font-size:12px;color:var(--ash);}
+.jdir:hover{border-color:var(--dc);background:color-mix(in srgb,var(--dc) 11%,transparent);transform:translateY(-3px);}
+.jdir:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.jlatest{font-family:var(--serif);font-weight:400;font-size:13px;letter-spacing:.2em;color:var(--ash);margin-top:40px;}
+@media(max-width:900px){.jdirs{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:560px){.jdirs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}.jdir{padding:14px 14px 12px;min-height:88px;}.jdir:last-child{grid-column:1/-1;}}
+.jlist{margin-top:6px;}
 .jrow{display:grid;grid-template-columns:96px 36px minmax(0,1fr) 24px;gap:18px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline;transition:opacity .4s,padding .4s var(--ease);}
 .jrow[hidden]{display:none;}
 .jrow .dft{display:inline-block;font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px dashed var(--gold);color:var(--gold);vertical-align:2px;}
@@ -1278,20 +1289,19 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
     <div class="side" aria-hidden="true"><span class="sn">参</span><span class="sl"></span><span class="se">Journal</span></div>
     <div>
       <div class="sec-head"><p class="sub rv">{copy.journal_sub}</p><h2 id="j-h" class="rv" style="--i:1">{copy.journal_title}</h2></div>
-      <div class="filters rv" style="--i:2" id="filters" role="group" aria-label="依方向篩選">
-        <button class="chip" data-f="all" aria-pressed="true">全部</button>
-        {pillars.map((p) => <button class="chip" data-f={p.slug} aria-pressed="false">{p.type}</button>)}
-      </div>
+      <nav class="jdirs rv" style="--i:2" aria-label="依方向瀏覽日常紀錄">
+        {pillars.map((p) => <a class="jdir" style={`--dc:var(--c-${p.slug})`} href={`/pillars/${p.slug}/`}><b class="jk" aria-hidden="true">{p.kanji}</b><span class="jn">{p.type}</span><span class="jt">{p.title}</span><em>{counts[p.slug]}</em></a>)}
+      </nav>
+      <h3 class="jlatest rv" style="--i:3">最新的紀錄</h3>
       <div class="jlist" id="jlist">
         {journal.map((a, i) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
-          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} data-top={a.top ? '1' : undefined} hidden={!a.top} href={`/pillars/${a.dir}/${a.e.slug}/`}>
+          <a class="jrow rv" style={`--i:${Math.min(i, 6) + 3};--dc:var(--c-${a.dir})`} data-dir={a.dir} data-top={a.top ? '1' : undefined} href={`/pillars/${a.dir}/${a.e.slug}/`}>
             <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
             <div><h3>{a.e.data.draft && <span class="dft">草稿</span>}{a.e.data.title}</h3>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div><span class="arrow" aria-hidden="true">→</span>
           </a>
         ); })}
-        <p class="jempty" id="jempty" hidden>這個方向還沒有文章。</p>
       </div>
-      <a class="jmore rv" id="jmore" href="/journal/" data-all={`看全部 ${all.length} 篇`} data-counts={JSON.stringify(Object.fromEntries(pillars.map((p) => [p.slug, { n: counts[p.slug], t: p.type }])))}><span>看全部 {all.length} 篇</span><i aria-hidden="true">→</i></a>
+      <a class="jmore rv" href="/journal/"><span>看全部 {all.length} 篇</span><i aria-hidden="true">→</i></a>
     </div>
   </div>
 </section>
@@ -1854,14 +1864,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){io.unobserve(e.target);e.target.querySelectorAll('.flap').forEach(function(el,i){setTimeout(function(){run(el);},i*260);});}});},{threshold:.4});
   var pr=document.querySelector('.proof');if(pr)io.observe(pr);})();
 
-/* journal filter */
-(function(){var F=document.getElementById('filters'),rows=[].slice.call(document.querySelectorAll('.jrow')),E=document.getElementById('jempty');
-  F.addEventListener('click',function(e){var b=e.target.closest('.chip');if(!b)return;var f=b.dataset.f,n=0;
-    F.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===b);});
-    rows.forEach(function(r){var on=f==='all'?!!r.dataset.top:(r.dataset.dir===f&&n<4);r.hidden=!on;if(on)n++;});E.hidden=n>0;
-    var M=document.getElementById('jmore');if(M){var C=JSON.parse(M.dataset.counts||'{}'),c=C[f];
-      if(f==='all'||!c){M.href='/journal/';M.firstChild.textContent=M.dataset.all;M.hidden=false;}
-      else{M.href='/pillars/'+f+'/';M.firstChild.textContent='看「'+c.t+'」全部 '+c.n+' 篇';M.hidden=c.n===0;}}});})();
+
 })();
 </script>
 
