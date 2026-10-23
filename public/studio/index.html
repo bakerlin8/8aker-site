@@ -1460,6 +1460,7 @@ async function loadServices() {
           </div></details>`; }).join('')}
         <button type="button" class="btn btn-ghost" data-addb="${i}">＋ 新增一項服務內容</button>
         <div class="field" style="margin-top:18px"><label class="field-label">不包含（一行一點，沒有就留空）</label><textarea rows="2" data-hd="${i}" data-list="1" data-key="excludes">${escapeHtml((D.excludes || []).join('\n'))}</textarea></div>
+        <div class="field"><label class="field-label">「隨喜」感謝語（選填，有填才會出現這一段）</label><input type="text" data-hd="${i}" data-key="thanks_quote" placeholder="一句開場，例如：家鄉來的水，最甘甜。" value="${escapeAttr(D.thanks_quote || '')}"><textarea rows="3" style="margin-top:8px" data-hd="${i}" data-key="thanks_text" placeholder="說聲謝謝，並說明隨喜即可">${escapeHtml(D.thanks_text || '')}</textarea></div>
         <div class="svc-two"><div class="field" style="margin:0"><label class="field-label">補充一句（選填）</label><input type="text" data-hd="${i}" data-key="note" value="${escapeAttr(D.note || '')}"></div><div class="field" style="margin:0"><label class="field-label">費用</label><input type="text" data-hd="${i}" data-key="price" value="${escapeAttr(D.price || '')}"></div></div>`; })()}
       </div>
       <div class="hb-card"><h3>實績數字 <small style="font-size:11.5px;color:var(--ink-ghost);font-weight:400">（目前首頁隱藏中，資料先保留）</small></h3>

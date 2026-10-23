@@ -59,7 +59,11 @@
         ],
         "excludes": [],
         "note": "不限地區，線上就能進行。每個流程都不一樣，先聊聊你現在怎麼做，再決定做什麼。",
-        "price": "依需求報價"
+        "price": "小工具隨喜；長期系統另談分期",
+        "thanks_title": "隨喜",
+        "thanks_quote": "家鄉來的水，最甘甜。",
+        "thanks_text": "謝謝你願意試用我做的東西。小工具不收固定費用，用得開心，隨喜支持就好，多少都是心意，不給也沒關係。",
+        "thanks_link_text": "隨喜支持的方式"
       },
       "provider": "TRS Living Studio",
       "fee": [
