@@ -311,6 +311,17 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .svc-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;}
 @media(max-width:600px){.svc-two{grid-template-columns:1fr;}.svc-seg b{font-size:13px;}}
 #svcDirty{font-size:12.5px;color:#C8584A;margin-right:auto;}
+.ai-notice{margin:-8px 0 26px;padding:16px 18px;border:1px solid rgba(158,111,34,.45);background:#FBF1DE;display:grid;gap:10px;}
+.ai-notice.quiet{border-color:var(--border);background:var(--warm-white);padding:11px 16px;}
+.ai-notice .an-t{font-size:14.5px;font-weight:600;color:#5a3d0c;}
+.ai-notice.quiet .an-t{font-weight:400;font-size:13px;color:var(--ink-soft,#6b5a5f);}
+.ai-notice .an-l{display:grid;gap:8px;}
+.ai-notice .an-i{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px;}
+.ai-notice .an-i span{flex:1;min-width:140px;}
+.ai-notice .an-i button{appearance:none;border:1px solid #9E6F22;background:#fff;color:#7a5a1a;padding:8px 14px;font:inherit;font-size:13px;cursor:pointer;min-height:38px;}
+.ai-notice .an-i button:hover{background:#9E6F22;color:#fff;}
+#tabbar button.has-dot::after{content:'';position:absolute;top:4px;left:calc(50% + 8px);width:9px;height:9px;border-radius:50%;background:#C8962F;border:2px solid var(--paper,#fff);}
+.nav-item.has-dot::after{content:'';display:inline-block;width:8px;height:8px;margin-left:8px;border-radius:50%;background:#C8962F;vertical-align:middle;}
 .ai-box{border-top:1px solid var(--line,#e5ddd0);padding-top:18px;margin-top:6px;}
 .ai-btns{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 8px;}
 .ai-job{border:1px solid var(--line,#e5ddd0);border-radius:10px;padding:12px 14px;margin-top:10px;background:rgba(255,255,255,.5);}
@@ -472,6 +483,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
   </aside>
 
   <main class="main">
+    <div class="ai-notice" id="aiNotice" hidden></div>
 
     <!-- OVERVIEW -->
     <section class="view" id="view-overview">
@@ -1735,6 +1747,37 @@ async function aiApi(body) {
   if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
   return d;
 }
+
+/* ══════════════════════════ AI 助手：完成通知 ══════════════════════════ */
+const AI_SEEN_KEY = 'studio_ai_seen';
+const aiSeen = () => { try { return new Set(JSON.parse(localStorage.getItem(AI_SEEN_KEY) || '[]')); } catch (e) { return new Set(); } };
+const aiMarkSeen = (ids) => { try { const s = aiSeen(); ids.forEach(i => s.add(i)); localStorage.setItem(AI_SEEN_KEY, JSON.stringify([...s].slice(-200))); } catch (e) { /* 沒關係 */ } };
+function aiNextRun() { const now = new Date(Date.now() + 9 * 3600e3); const m = now.getUTCHours() * 60 + now.getUTCMinutes(); const t = [8 * 60 + 13, 13 * 60 + 13, 22 * 60 + 13].find(x => x > m); const x = t == null ? 8 * 60 + 13 : t; return (t == null ? '明天 ' : '今天 ') + String(Math.floor(x / 60)).padStart(2, '0') + ':' + String(x % 60).padStart(2, '0'); }
+async function refreshAiNotice() {
+  const el = document.getElementById('aiNotice'); if (!el) return;
+  let d; try { d = await aiApi({ action: 'count' }); } catch (e) { return; }
+  const seen = aiSeen(), fresh = (d.done || []).filter(j => !seen.has(j.id));
+  document.querySelectorAll('#tabbar button[data-t="writing"]').forEach(b => b.classList.toggle('has-dot', fresh.length > 0));
+  document.title = (fresh.length ? `(${fresh.length}) ` : '') + document.title.replace(/^\(\d+\)\s*/, '');
+  if (fresh.length) {
+    el.className = 'ai-notice';
+    el.innerHTML = `<div class="an-t">✨ AI 助手完成了 ${fresh.length} 筆，等你確認</div><div class="an-l">${fresh.slice(0, 6).map(j => `<div class="an-i"><span><b>${(AI_KIND[j.kind] || ['', ''])[0]} ${(AI_KIND[j.kind] || ['', ''])[1]}</b>　${escapeHtml(j.title || '（未命名）')}</span><button type="button" data-id="${j.id}" data-ref="${escapeAttr(j.ref || '')}" data-p="${escapeAttr(j.pillar || '')}">去看結果 →</button></div>`).join('')}</div>`;
+    el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      aiMarkSeen([b.dataset.id]);
+      const p = b.dataset.p, r = b.dataset.ref;
+      if (r && PILLARS[p]) editArticle(p, r); else if (PILLARS[p]) loadPillar(p); else loadPillar('strengthen');
+      refreshAiNotice();
+    }));
+    el.hidden = false;
+  } else if (d.pending > 0) {
+    el.className = 'ai-notice quiet';
+    el.innerHTML = `<div class="an-t">⏳ AI 助手還有 ${d.pending} 筆排隊中，預計 ${aiNextRun()} 處理，完成後這裡會通知你。</div>`;
+    el.hidden = false;
+  } else el.hidden = true;
+}
+setInterval(() => { if (!document.hidden && document.getElementById('aiNotice') && document.getElementById('loginScreen').style.display !== 'flex') refreshAiNotice(); }, 45000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshAiNotice(); });
+
 function initAiBox() {
   const box = document.getElementById('aiBox'); if (!box) return;
   const fmt = (t) => { try { return new Date(t).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } };
@@ -1742,7 +1785,7 @@ function initAiBox() {
   const draw = () => {
     box.innerHTML = `<label class="field-label">AI 助手</label>
       <div class="ai-btns">${Object.keys(AI_KIND).map(k => `<button type="button" class="btn btn-ghost ai-b" data-k="${k}">${AI_KIND[k][0]} ${AI_KIND[k][1]}</button>`).join('')}</div>
-      <div class="field-hint">按下後會排進佇列，AI 會在固定時段一起處理（不是即時），結果會出現在下方。</div>
+      <div class="field-hint">按下後會排進佇列，AI 會在固定時段一起處理（不是即時），結果會出現在下方，完成時後台上方會通知你。目前排隊中的，預計 ${aiNextRun()} 處理。</div>
       <div class="ai-list">${jobs.length ? jobs.map(j => `<div class="ai-job" data-id="${j.id}">
         <div class="ai-jh"><b>${AI_KIND[j.kind][0]} ${AI_KIND[j.kind][1]}</b><span>${escapeHtml(j.title || '（未命名）')}・${fmt(j.created_at)}</span><em class="ai-st ${j.status}">${j.status === 'pending' ? '排隊中' : j.status === 'done' ? '完成' : '失敗'}</em></div>
         ${j.status === 'done' ? `<pre class="ai-res">${escapeHtml(j.result || '')}</pre><div class="btn-row">${j.kind === 'polish' ? '<button type="button" class="btn btn-primary ai-use" data-m="replace">採用（取代正文）</button>' : ''}${j.kind === 'outline' ? '<button type="button" class="btn btn-primary ai-use" data-m="append">加到正文最前面</button>' : ''}<button type="button" class="btn btn-ghost ai-copy">複製</button><button type="button" class="btn btn-ghost ai-x">收起</button></div>` : `<div class="btn-row"><button type="button" class="btn btn-ghost ai-x">${j.status === 'pending' ? '取消' : '收起'}</button></div>`}
@@ -1752,7 +1795,7 @@ function initAiBox() {
       const input = b.dataset.k === 'outline' ? [title && '標題：' + title, ex && '摘要：' + ex, body && '目前文字：\n' + body].filter(Boolean).join('\n\n') : body;
       if (!input || input.length < 5) { toast(b.dataset.k === 'outline' ? '先在標題、摘要或正文寫一兩句想法' : '正文是空的，先寫一些內容'); return; }
       b.disabled = true;
-      try { await aiApi({ action: 'submit', kind: b.dataset.k, pillar: currentPillar, title, input }); toast('已排進佇列，處理完會顯示在這裡'); await load(); } catch (e) { toast(e.message); b.disabled = false; }
+      try { await aiApi({ action: 'submit', kind: b.dataset.k, pillar: currentPillar, title, input, ref: currentArticle && currentArticle.path || undefined }); toast('已排進佇列，處理完後上方會通知你'); await load(); refreshAiNotice(); } catch (e) { toast(e.message); b.disabled = false; }
     }));
     box.querySelectorAll('.ai-job').forEach(el => {
       const j = jobs.find(x => x.id === el.dataset.id);
@@ -1765,7 +1808,8 @@ function initAiBox() {
       }));
     });
   };
-  const load = async () => { try { jobs = (await aiApi({ action: 'list' })).items || []; } catch (e) { jobs = []; } draw(); };
+  const load = async () => { try { jobs = ((await aiApi({ action: 'list' })).items || []).filter(j => !(j.ref && currentArticle && currentArticle.path && j.ref !== currentArticle.path)); } catch (e) { jobs = []; } draw(); aiMarkSeen(jobs.filter(j => j.status === 'done').map(j => j.id)); refreshAiNotice(); };
+  const poll = setInterval(() => { if (!document.getElementById('aiBox') || document.getElementById('aiBox') !== box) { clearInterval(poll); return; } if (!document.hidden && jobs.some(j => j.status === 'pending')) load(); }, 30000);
   draw(); load();
 }
 
@@ -2058,7 +2102,7 @@ async function boot() {
       } else toast('沒有完成 Strava 授權', 'err');
       loadBody(); return;
     }
-    loadOverview();
+    loadOverview(); refreshAiNotice();
   } catch (e) {
     document.getElementById('loginScreen').style.display = 'flex';
   }
