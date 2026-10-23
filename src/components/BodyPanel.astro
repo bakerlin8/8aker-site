@@ -1,162 +1,289 @@
 ---
 // 身體儀表：Strava 運動＋OMRON 體重體脂的即時彙總。放在「強化」分類頁。
+// 三種版型共用同一份資料：預設 A；網址加 ?v=a / ?v=b / ?v=c 可預覽（出現切換鈕）。
 import body from '../data/body.json';
 const json = JSON.stringify(body).replace(/</g, '\\u003c');
 ---
-<section class="bodypanel" id="bodyPanel" aria-labelledby="bp-h">
-  <div class="bp-head"><h2 id="bp-h">身體儀表</h2><p>每天自動記錄，確認後才寫成「強化」的文章</p></div>
-<p class="blive rv" style="--i:2"><i aria-hidden="true"></i><span id="bdLive">讀取最新資料中…</span></p>
+<section class="bp" id="bodyPanel" data-v="a" aria-labelledby="bp-h">
+  <div class="bp-top">
+    <div class="bp-head"><h2 id="bp-h">身體儀表</h2><p class="blive"><i aria-hidden="true"></i><span id="bdLive">讀取最新資料中…</span></p></div>
+    <div class="bp-vsw" id="bpSw" hidden role="group" aria-label="預覽版型">
+      <button data-v="a">A 帳本</button><button data-v="b">B 夜色</button><button data-v="c">C 年輪</button>
+    </div>
+  </div>
+  <div class="bp-grid" id="bpGrid"><p class="bp-empty">讀取中…</p></div>
+  <a class="strava" href="https://www.strava.com/athletes/103942910" target="_blank" rel="noopener">在 Strava 一起運動<span aria-hidden="true">↗</span></a>
+</section>
 
-      <div class="bstats" role="list">
-        <div class="bstat rv" style="--i:2" role="listitem"><b class="num" id="bsMin">—</b><small>本週訓練（分鐘）</small></div>
-        <div class="bstat rv" style="--i:3" role="listitem"><b class="num" id="bsN">—</b><small>本週運動（次）</small></div>
-        <div class="bstat rv" style="--i:4" role="listitem"><b class="num" id="bsFat">—</b><small>體脂 12 週變化</small></div>
-        <div class="bstat rv" style="--i:5" role="listitem"><b class="num" id="bsScale">—</b><small>最近一次量體脂</small></div>
-      </div>
-
-      <div class="bmain">
-        <div class="bchart rv" style="--i:3">
-          <div class="bchart-top"><span id="sparkLabel">近 12 週・每週訓練分鐘</span><div class="tabs" id="bTabs" role="group" aria-label="切換指標"></div></div>
-          <svg id="spark" viewBox="0 0 600 200" role="img" aria-label="近 12 週身體指標趨勢"></svg>
-        </div>
-        <div class="brecent rv" style="--i:4">
-          <h3>最近的運動</h3>
-          <ol id="bsRecent"><li class="empty">讀取中…</li></ol>
-          <a class="strava" href="https://www.strava.com/athletes/103942910" target="_blank" rel="noopener">在 Strava 一起運動<span aria-hidden="true">↗</span></a>
-        </div>
-      </div>
-
-      <div class="bsrc">
-        <h3 class="rv" style="--i:2">這些數字是怎麼來的</h3>
-        <ol class="flow">
-          <li class="rv" style="--i:3"><span class="tag">來源一</span><b>運動</b><em>Strava</em><p>跑步、跳舞、訓練都用 Strava 記錄，網站直接讀取，約每 6 小時更新。</p></li>
-          <li class="rv" style="--i:4"><span class="tag">來源二</span><b>體重・體脂</b><em>OMRON 體組成計</em><p>量完自動存進 iPhone「健康」，每晚 23:30 由捷徑送到網站。</p></li>
-          <li class="rv" style="--i:5"><span class="tag">保存</span><b>私人資料庫</b><em>原始數字不公開</em><p>每一筆紀錄只存在這裡，這一頁看到的是彙總後的趨勢。</p></li>
-          <li class="now rv" style="--i:6"><span class="tag">公開</span><b>確認後才寫成文章</b><em>由巴決定</em><p>要寫進「強化」的文章，公開哪些數字，都由我看過再決定。</p></li>
-        </ol>
-      </div>
-    </section>
 <style is:global>
-.bodypanel{margin-bottom:56px;}
+/* ───────── 共通 ───────── */
+.bp{margin-bottom:56px;--bpc:var(--gold);}
+.bp-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;}
 .bp-head h2{font-family:var(--serif);font-weight:500;font-size:clamp(22px,2.6vw,28px);}
-.bp-head p{font-size:13.5px;color:var(--ash);margin-top:2px;}
-/* ── 伍 body ── */
-.blive{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--ash);}
-.blive i{width:7px;height:7px;border-radius:50%;background:#5E9C6A;box-shadow:0 0 0 0 rgba(94,156,106,.5);animation:livePulse 2.4s ease-out infinite;}
+.blive{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-size:12.5px;color:var(--ash);}
+.blive i{width:7px;height:7px;border-radius:50%;background:#5E9C6A;box-shadow:0 0 0 0 rgba(94,156,106,.5);animation:livePulse 2.4s ease-out infinite;flex:none;}
 .blive.stale i{background:var(--ash);animation:none;}
 @keyframes livePulse{70%{box-shadow:0 0 0 7px rgba(94,156,106,0);}100%{box-shadow:0 0 0 0 rgba(94,156,106,0);}}
-.bstats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:26px;background:var(--line);border:1px solid var(--line);}
-.bstat{background:var(--night);padding:18px 20px 16px;transition:background .3s;}
-.bstat:hover{background:var(--night-2);}
-.bstat b{display:block;font-family:var(--serif);font-weight:500;font-size:34px;line-height:1.1;color:var(--bone);}
-.bstat small{font-size:12.5px;color:var(--ash);}
-.bstat b.up{color:var(--c-strengthen);} .bstat b.down{color:var(--c-conjure);}
-.bmain{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;margin-top:28px;align-items:start;}
-.bchart{border:1px solid var(--line);padding:20px 22px 14px;background:var(--night);}
-.bchart svg{width:100%;height:auto;display:block;overflow:visible;}
-.bchart-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--bone-2);margin-bottom:10px;gap:10px;flex-wrap:wrap;}
-.bchart .bar{transition:opacity .3s;}
-.bchart .bar:hover{opacity:.75;}
-.bchart .ln{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 1.6s var(--ease) forwards;}
-.bchart .grow{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);animation:growUp .9s var(--ease) forwards;animation-delay:calc(var(--k) * 40ms);}
-@keyframes growUp{to{transform:scaleY(1);}}
-@keyframes draw{to{stroke-dashoffset:0;}}
-.tabs{display:flex;gap:4px;}
-.tabs button{font-size:12.5px;padding:2px 10px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
-.tabs button:hover{border-color:var(--bone-2);}
-.tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
-.brecent h3,.bsrc h3{font-family:var(--serif);font-weight:500;font-size:16px;}
-.brecent ol{list-style:none;margin-top:10px;}
-.brecent li{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);font-size:14px;transition:padding .35s var(--ease);}
-.brecent li:hover{padding-left:6px;}
-.brecent li time{font-size:12.5px;color:var(--ash);font-variant-numeric:tabular-nums;}
-.brecent li small{font-size:12.5px;color:var(--bone-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
-.brecent li.empty{display:block;color:var(--ash);font-size:13px;}
-.strava{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:9px 16px;border:1px solid #FC4C02;color:#C73D00;font-size:13.5px;transition:background .3s,color .3s,gap .4s var(--ease);}
-.strava:hover{background:#FC4C02;color:#fff;gap:12px;}
-.bsrc{margin-top:40px;padding-top:28px;border-top:1px solid var(--line);}
-.flow{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:18px;counter-reset:f;}
-.flow li{position:relative;padding-top:14px;border-top:2px solid var(--line);}
-.flow li:not(:last-child)::after{content:'→';position:absolute;right:-22px;top:-13px;color:var(--ash);font-size:14px;}
-.flow li.now{border-top-color:var(--gold);}
-.flow .tag{font-size:11.5px;letter-spacing:.08em;color:var(--ash);}
-.flow b{display:block;font-family:var(--serif);font-weight:500;font-size:16px;margin-top:4px;}
-.flow em{display:block;font-style:normal;font-size:13px;color:var(--gold);margin-top:2px;}
-.flow p{font-size:13px;color:var(--bone-2);margin-top:8px;line-height:1.75;}
-@media(max-width:960px){.bmain{grid-template-columns:1fr;}.bstats{grid-template-columns:repeat(2,1fr);}.flow{grid-template-columns:1fr 1fr;row-gap:24px;}.flow li:nth-child(2)::after{display:none;}}
-@media(max-width:560px){.flow{grid-template-columns:1fr;}.flow li::after{display:none;}.bstat b{font-size:28px;}}
+.bp-vsw{display:flex;gap:4px;}
+.bp-vsw button{font-size:12.5px;padding:6px 12px;border:1px solid var(--line);color:var(--bone-2);}
+.bp-vsw button[aria-pressed="true"]{background:var(--gold);color:#1C0F14;border-color:var(--gold);}
+.bp-grid{display:grid;gap:20px;margin-top:22px;}
+.bp-empty{color:var(--ash);font-size:13.5px;}
+.w{min-width:0;}
+.w h3{font-family:var(--serif);font-weight:500;font-size:15px;letter-spacing:.04em;color:var(--bone-2);margin-bottom:12px;display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.w h3 small{font-family:var(--sans);font-size:12px;color:var(--ash);letter-spacing:0;font-weight:400;}
+.num{font-family:var(--serif);font-weight:500;font-variant-numeric:tabular-nums;}
+.est{display:inline-block;font-size:11px;letter-spacing:.08em;padding:1px 7px;border:1px dashed var(--gold);color:var(--gold);margin-left:6px;vertical-align:2px;}
+.dim{color:var(--ash);}
+.up{color:var(--c-strengthen);} .dn{color:var(--ash);}
 
-@media(max-width:640px){
-  .bstats{margin-top:20px;}
-  .bstat{padding:14px 14px 12px;}
-  .bstat b{font-size:26px;}
-  .bchart{padding:14px 14px 10px;}
-  .bchart-top{flex-direction:column;align-items:flex-start;}
-  .tabs button{padding:7px 14px;font-size:13px;}
-  .brecent li{grid-template-columns:44px minmax(0,1fr) auto;}
+/* 連續週 */
+.w-streak .big{display:flex;align-items:baseline;gap:8px;}
+.w-streak .big b{font-size:clamp(54px,7vw,76px);line-height:1;}
+.w-streak .big span{font-family:var(--serif);font-size:18px;}
+.w-streak p{font-size:13px;color:var(--ash);margin-top:8px;}
+.wkdots{display:flex;gap:6px;margin-top:14px;}
+.wkdots i{width:12px;height:12px;border-radius:50%;border:1px solid var(--bpc);opacity:.55;}
+.wkdots i.on{background:var(--bpc);opacity:1;}
+/* 本週 */
+.wk3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.wk3 div b{display:block;font-size:clamp(24px,3vw,32px);line-height:1.15;}
+.wk3 .u{font-style:normal;font-family:var(--sans);font-size:14px;color:var(--bone-2);margin-left:3px;}
+.wk3 div small{display:block;font-size:12px;color:var(--ash);margin-top:2px;}
+.wk3 div em{display:block;font-style:normal;font-size:12px;margin-top:3px;font-variant-numeric:tabular-nums;}
+.wkrow{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:12px;color:var(--ash);}
+.wkrow .lab{width:36px;flex:none;}
+.dots{display:flex;gap:7px;}
+.dots i{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:10px;color:var(--ash);}
+.dots i.on{background:var(--bpc);border-color:var(--bpc);color:#1C0F14;}
+.dots i.now{outline:1px solid var(--bpc);outline-offset:2px;}
+/* 月曆 */
+.cal-nav{display:flex;align-items:center;gap:6px;}
+.cal-nav button{width:30px;height:30px;border:1px solid var(--line);color:var(--bone-2);font-size:14px;}
+.cal-nav button:hover:not(:disabled){border-color:var(--bpc);color:var(--bpc);}
+.cal-nav button:disabled{opacity:.3;}
+.cal-nav b{font-family:var(--serif);font-weight:500;font-size:15px;min-width:92px;text-align:center;color:var(--bone);}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:12px;}
+.cal .h{font-size:11.5px;color:var(--ash);text-align:center;padding-bottom:2px;}
+.cal .d{position:relative;aspect-ratio:1/.78;border:1px solid var(--line);padding:5px 6px;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:var(--ash);text-align:left;background:transparent;transition:border-color .25s,transform .35s var(--ease);}
+.cal .d.x{border-color:transparent;pointer-events:none;}
+.cal .d.on{background:color-mix(in srgb,var(--bpc) calc(var(--l) * 1%),transparent);border-color:color-mix(in srgb,var(--bpc) 55%,transparent);color:var(--bone-2);cursor:pointer;}
+.cal .d.on:hover,.cal .d.sel{border-color:var(--bpc);transform:translateY(-2px);}
+.cal .d.today{box-shadow:inset 0 0 0 1px var(--bpc);}
+.cal .d s{text-decoration:none;font-family:var(--serif);font-weight:500;font-size:15px;line-height:1;color:var(--bone);font-variant-numeric:tabular-nums;}
+.cal .d s small{font-size:10.5px;font-weight:400;color:var(--bone-2);margin-left:1px;}
+.cal .d u{text-decoration:none;font-size:10.5px;color:var(--bone-2);}
+.cal-det{min-height:22px;margin-top:10px;font-size:13px;color:var(--bone-2);}
+.cal-det b{color:var(--bone);font-weight:500;}
+/* 趨勢 */
+.tr-tabs{display:flex;flex-wrap:wrap;gap:4px;}
+.tr-tabs button{font-size:12.5px;padding:3px 11px;border:1px solid var(--line);color:var(--bone-2);transition:all .25s;}
+.tr-tabs button:hover{border-color:var(--bone-2);}
+.tr-tabs button[aria-pressed="true"]{background:var(--bone);color:var(--night);border-color:var(--bone);}
+.tr-sports{margin-top:8px;}
+.tr-sports button{border-style:dashed;}
+.tr svg{width:100%;height:auto;display:block;margin-top:10px;overflow:visible;}
+.tr .grow{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);animation:growUp .9s var(--ease) forwards;animation-delay:calc(var(--k) * 40ms);}
+@keyframes growUp{to{transform:scaleY(1);}}
+.tr .ln{stroke-dasharray:1400;stroke-dashoffset:1400;animation:draw 1.6s var(--ease) forwards;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+/* 最佳表現 */
+.rec3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.rec{border:1px solid var(--line);padding:14px 14px 12px;}
+.rec small{display:block;font-size:12px;color:var(--ash);letter-spacing:.06em;}
+.rec b{display:block;font-size:clamp(22px,2.6vw,28px);line-height:1.2;margin-top:4px;}
+.rec span{display:block;font-size:11.5px;color:var(--ash);margin-top:4px;}
+.pred{margin-top:10px;border:1px dashed color-mix(in srgb,var(--gold) 60%,transparent);padding:12px 14px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.pred b{font-size:24px;}
+.pred span{font-size:12px;color:var(--ash);}
+/* 身體 */
+.bd2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.bd2 div b{display:block;font-size:clamp(26px,3vw,34px);line-height:1.15;}
+.bd2 div b small{font-size:14px;font-family:var(--sans);color:var(--bone-2);margin-left:3px;}
+.bd2 div span{display:block;font-size:12px;color:var(--ash);margin-top:2px;}
+/* 最近 */
+.rl{list-style:none;}
+.rl li{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:10px 0;border-top:1px solid var(--line);font-size:14px;transition:padding .35s var(--ease);}
+.rl li:hover{padding-left:6px;}
+.rl time{font-size:12.5px;color:var(--ash);font-variant-numeric:tabular-nums;}
+.rl small{font-size:12.5px;color:var(--bone-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
+/* 年輪熱圖 */
+.heat{overflow-x:auto;scrollbar-width:none;}
+.heat::-webkit-scrollbar{display:none;}
+.heat svg{display:block;min-width:620px;width:100%;height:auto;}
+.strava{display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:9px 16px;border:1px solid #FC4C02;color:#C73D00;font-size:13.5px;transition:background .3s,color .3s,gap .4s var(--ease);}
+.strava:hover{background:#FC4C02;color:#fff;gap:12px;}
+
+/* ───────── A 帳本：細線・留白・大數字 ───────── */
+.bp[data-v="a"] .bp-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:0 28px;border-top:1px solid var(--line);}
+.bp[data-v="a"] .w{padding:24px 0;border-bottom:1px solid var(--line);}
+.bp[data-v="a"] .w-streak{grid-column:span 4;}
+.bp[data-v="a"] .w-week{grid-column:span 8;}
+.bp[data-v="a"] .w-cal{grid-column:span 7;}
+.bp[data-v="a"] .w-trend{grid-column:span 5;}
+.bp[data-v="a"] .w-rec{grid-column:span 7;}
+.bp[data-v="a"] .w-body{grid-column:span 5;}
+.bp[data-v="a"] .w-recent{grid-column:span 12;border-bottom:0;}
+.bp[data-v="a"] .w-heat{display:none;}
+
+/* ───────── B 夜色：深酒紅卡片・金色光暈 ───────── */
+.bp[data-v="b"]{--night:#1C0F14;--night-2:#26141B;--bone:#EFE5D6;--bone-2:#B9A89E;--ash:#8d7882;--line:rgba(239,229,214,.14);--gold:#D4A24C;--bpc:#D4A24C;--c-strengthen:#E08A9B;
+  background:radial-gradient(120% 90% at 85% 0%,#3A1F29 0%,#1C0F14 60%);color:#EFE5D6;padding:28px clamp(16px,3vw,32px) 30px;border:1px solid rgba(212,162,76,.25);}
+.bp[data-v="b"] .bp-head h2{color:#EFE5D6;}
+.bp[data-v="b"] .bp-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;}
+.bp[data-v="b"] .w{background:rgba(239,229,214,.04);border:1px solid rgba(239,229,214,.1);padding:20px 20px 18px;}
+.bp[data-v="b"] .w-streak{grid-column:span 4;background:linear-gradient(160deg,rgba(212,162,76,.16),rgba(212,162,76,.03));border-color:rgba(212,162,76,.4);}
+.bp[data-v="b"] .w-streak .big b{color:var(--gold);text-shadow:0 0 28px rgba(212,162,76,.35);}
+.bp[data-v="b"] .w-week{grid-column:span 8;}
+.bp[data-v="b"] .w-cal{grid-column:span 7;}
+.bp[data-v="b"] .w-trend{grid-column:span 5;}
+.bp[data-v="b"] .w-rec{grid-column:span 5;}
+.bp[data-v="b"] .w-body{grid-column:span 3;}
+.bp[data-v="b"] .w-recent{grid-column:span 4;}
+.bp[data-v="b"] .w-heat{display:none;}
+.bp[data-v="b"] .rec{border-color:rgba(212,162,76,.3);background:rgba(0,0,0,.18);}
+.bp[data-v="b"] .tr-tabs button[aria-pressed="true"]{background:var(--gold);color:#1C0F14;border-color:var(--gold);}
+.bp[data-v="b"] .bd2{grid-template-columns:1fr;}
+.bp[data-v="b"] .strava{color:#FF8A57;}
+
+/* ───────── C 年輪：整年熱圖為主角 ───────── */
+.bp[data-v="c"] .bp-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:22px 28px;}
+.bp[data-v="c"] .w-heat{grid-column:1/-1;border:1px solid var(--line);padding:20px 22px 14px;}
+.bp[data-v="c"] .w-streak{grid-column:span 3;}
+.bp[data-v="c"] .w-week{grid-column:span 9;}
+.bp[data-v="c"] .w-streak,.bp[data-v="c"] .w-week{border-left:2px solid var(--gold);padding-left:18px;}
+.bp[data-v="c"] .w-trend{grid-column:span 7;}
+.bp[data-v="c"] .w-rec{grid-column:span 5;}
+.bp[data-v="c"] .w-cal{grid-column:span 7;}
+.bp[data-v="c"] .w-body{grid-column:span 5;}
+.bp[data-v="c"] .w-recent{grid-column:1/-1;}
+.bp[data-v="c"] .w-cal .cal .d{aspect-ratio:auto;min-height:44px;}
+.bp[data-v="c"] .w-cal .cal .d u{display:none;}
+
+/* ───────── 手機 ───────── */
+@media(max-width:900px){
+  .bp .bp-grid>.w{grid-column:1/-1 !important;}
+  .bp[data-v="c"] .w-streak,.bp[data-v="c"] .w-week{border-left-width:2px;}
+}
+@media(max-width:560px){
+  .bp-grid{gap:14px;}
+  .bp[data-v="a"] .w{padding:20px 0;}
+  .bp[data-v="b"]{padding:20px 14px 22px;}
+  .bp[data-v="b"] .w{padding:16px 14px;}
+  .cal{gap:3px;}
+  .cal .d{aspect-ratio:1/1;padding:4px;}
+  .cal .d u{display:none;}
+  .cal .d s{font-size:13px;}
+  .cal .d s small{display:none;}
+  .rec3{gap:6px;}.rec{padding:12px 10px 10px;}
+  .wk3{gap:8px;}
+  .tr-tabs button,.bp-vsw button,.cal-nav button{min-height:36px;}
+  .cal-nav button{width:36px;}
   .strava{min-height:44px;}
 }
+@media(prefers-reduced-motion:reduce){.tr .grow,.tr .ln{animation:none;transform:none;stroke-dashoffset:0;}}
 </style>
+
 <script type="application/json" id="body-data" set:html={json}></script>
 <script is:inline>
 (function(){
 var BD=JSON.parse(document.getElementById('body-data').textContent);
-/* body: live summary from the private database's public endpoint; static file as fallback */
-(function(){
-  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/health-public';
-  var S=document.getElementById('spark'),L=document.getElementById('sparkLabel'),TB=document.getElementById('bTabs'),live=document.getElementById('bdLive');
-  var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');};
-  var ago=function(iso){if(!iso)return null;var m=Math.round((Date.now()-new Date(iso).getTime())/6e4);return m<60?Math.max(1,m)+' 分鐘前':m<1440?Math.round(m/60)+' 小時前':Math.round(m/1440)+' 天前';};
-  var series={},labels=[],drawn=false,current='mins';
-  var META={mins:['近 12 週・每週訓練分鐘','分'],fat:['近 12 週・體脂（%）','%'],weight:['近 12 週・體重（kg）','kg']};
-  function draw(k){
-    var v=series[k]||[],W=Math.max(300,Math.min(640,Math.round(S.getBoundingClientRect().width)||600)),H=W<480?220:200,pl=8,pr=8,pt=18,pb=26,cw=(W-pl-pr)/Math.max(1,v.length);
-    var nums=v.filter(function(x){return x!=null;}); if(!nums.length){S.innerHTML='<text x="300" y="100" text-anchor="middle" style="fill:var(--ash)" font-size="13">資料累積中</text>';L.textContent=META[k][0];return;}
-    var mx=Math.max.apply(0,nums),mn=k==='mins'?0:Math.min.apply(0,nums),rg=(mx-mn)||1;
-    var y=function(x){return pt+(H-pt-pb)*(1-(x-mn)/rg);},g='';
-    for(var i=0;i<4;i++){var gy=pt+(H-pt-pb)*i/3;g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+gy+'" y2="'+gy+'" style="stroke:var(--line)"/>';}
-    var xl=labels.map(function(t,i){return (i%3===2||i===labels.length-1)?'<text x="'+(pl+cw*i+cw/2)+'" y="'+(H-6)+'" text-anchor="middle" style="fill:var(--ash)" font-size="11">'+esc(t)+'</text>':'';}).join('');
-    var body='';
-    if(k==='mins'){
-      body=v.map(function(x,i){var bh=Math.max(x?2:0,(H-pt-pb)-(y(x||0)-pt)),bx=pl+cw*i+cw*.18,last=i===v.length-1;
-        return '<g class="grow" style="--k:'+i+'"><rect class="bar" x="'+bx+'" y="'+(H-pb-bh)+'" width="'+(cw*.64)+'" height="'+bh+'" style="fill:'+(last?'var(--gold)':'var(--gold-soft)')+';stroke:var(--gold);stroke-width:'+(last?0:1)+'"><title>'+esc(labels[i])+' 那一週：'+(x||0)+' 分鐘</title></rect></g>';}).join('');
-      var lx=pl+cw*(v.length-1)+cw/2; body+='<text x="'+lx+'" y="'+(y(v[v.length-1]||0)-8)+'" text-anchor="middle" style="fill:var(--bone)" font-size="13">'+(v[v.length-1]||0)+'</text>';
-    }else{
-      var pts=v.map(function(x,i){return x==null?null:(pl+cw*i+cw/2)+','+y(x);}).filter(Boolean).join(' ');
-      body='<polyline class="ln" points="'+pts+'" fill="none" style="stroke:var(--gold)" stroke-width="2"/>';
-      var last=v[v.length-1];if(last!=null){var cx=pl+cw*(v.length-1)+cw/2;body+='<circle cx="'+cx+'" cy="'+y(last)+'" r="4.5" style="fill:var(--gold)"/><text x="'+cx+'" y="'+(y(last)-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+last+'</text>';}
-    }
-    S.setAttribute('viewBox','0 0 '+W+' '+H);S.innerHTML=g+body+xl;L.textContent=META[k][0];current=k;
-  }
-  function tabs(keys){
-    if(keys.length<2){TB.innerHTML='';return;}
-    var names={mins:'訓練',fat:'體脂',weight:'體重'};
-    TB.innerHTML=keys.map(function(k){return '<button aria-pressed="'+(k===current)+'" data-m="'+k+'">'+names[k]+'</button>';}).join('');
-  }
-  var rz;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){if(labels.length&&drawn)draw(current);},200);});
-  TB.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;[].forEach.call(TB.children,function(x){x.setAttribute('aria-pressed',x===b);});draw(b.dataset.m);});
-  function render(d,isLive){
-    series={mins:d.weeks.mins};if(d.weeks.fat)series.fat=d.weeks.fat;if(d.weeks.weight)series.weight=d.weeks.weight;
-    labels=d.weeks.labels||[];
-    var st=d.stats||{};
-    document.getElementById('bsMin').textContent=st.week_minutes!=null?st.week_minutes:'—';
-    document.getElementById('bsN').textContent=st.week_sessions!=null?st.week_sessions:'—';
-    var f=document.getElementById('bsFat');
-    if(st.fat_change==null){f.textContent='累積中';f.style.fontSize='22px';}
-    else{f.textContent=(st.fat_change>0?'+':st.fat_change<0?'−':'±')+Math.abs(st.fat_change).toFixed(1);f.className='num '+(st.fat_change>0?'up':st.fat_change<0?'down':'');}
-    document.getElementById('bsScale').textContent=d.scale_last_day?d.scale_last_day.slice(5).replace('-','.'):'—';
-    var R=document.getElementById('bsRecent');
-    R.innerHTML=(d.recent&&d.recent.length)?d.recent.map(function(r){return '<li><time>'+esc(r.date.slice(5).replace('-','.'))+'</time><span>'+esc(r.name)+'</span><small>'+r.min+' 分'+(r.km?'・'+r.km+' km':'')+'</small></li>';}).join(''):'<li class="empty">最近還沒有運動紀錄。</li>';
-    tabs(Object.keys(series));
-    if(isLive){var a=ago(d.updated_at),s=ago(d.strava_synced_at);live.textContent='自動同步中'+(a?'・最新資料 '+a:'')+(s?'・Strava '+s+'同步':'');}
-    else{live.parentElement.classList.add('stale');live.textContent='暫時讀不到即時資料，顯示的是上次發布時的數字';}
-    if(drawn)draw('mins');
-  }
-  var sec=document.getElementById('bodyPanel'),want=false;
-  new IntersectionObserver(function(es,o){if(es[0].isIntersecting){want=true;drawn=true;o.disconnect();if(labels.length)draw('mins');}},{threshold:.15}).observe(sec);
-  var fallback=function(){var b=BD;render({weeks:{mins:b.weeks.mins,labels:[],fat:(b.sample||b.show_values)?b.weeks.fat:null,weight:(b.sample||b.show_values)?b.weeks.weight:null},stats:{week_minutes:b.stats.week_minutes,week_sessions:null,fat_change:null},recent:[]},false);if(want)draw('mins');};
-  fetch(API,{mode:'cors'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){if(d.error)throw 0;render(d,true);if(want)draw('mins');}).catch(fallback);
-})();
+var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/health-public';
+var root=document.getElementById('bodyPanel'),G=document.getElementById('bpGrid'),live=document.getElementById('bdLive'),SW=document.getElementById('bpSw');
+var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');};
+var ago=function(iso){if(!iso)return null;var m=Math.round((Date.now()-new Date(iso).getTime())/6e4);return m<60?Math.max(1,m)+' 分鐘前':m<1440?Math.round(m/60)+' 小時前':Math.round(m/1440)+' 天前';};
+var hm=function(m){m=Math.round(m||0);return m>=60?Math.floor(m/60)+'h'+(m%60?String(m%60).padStart(2,'0')+'m':''):m+'m';};
+var clock=function(s){s=Math.round(s);var h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0');};
+var md=function(s){return s?s.slice(5).replace('-','/'):'';};
+var jst=new Date(Date.now()+9*36e5),TODAY=jst.toISOString().slice(0,10);
+var D=null,calMonth=null,metric='mins',sport='all',drawn=false;
 
+/* ── 版型 ── */
+var qv=(new URLSearchParams(location.search).get('v')||'').toLowerCase();
+function setV(v){root.dataset.v=v;[].forEach.call(SW.children,function(b){b.setAttribute('aria-pressed',b.dataset.v===v);});if(D)drawTrend();}
+if(/^[abc]$/.test(qv)){SW.hidden=false;setV(qv);}
+SW.addEventListener('click',function(e){var b=e.target.closest('button');if(b)setV(b.dataset.v);});
+
+/* ── 小零件 ── */
+function delta(a,b,unit,f){if(a==null||b==null)return '';var x=a-b;if(Math.abs(x)<0.05)return '<em class="dim">與上週相同</em>';return '<em class="'+(x>0?'up':'dn')+'">'+(x>0?'▲ ':'▼ ')+(f?f(Math.abs(x)):Math.abs(Math.round(x*10)/10))+unit+' 較上週</em>';}
+function wStreak(){var n=D.streak_weeks||0,dots='';var W=D.this_week||{dots:[]};
+  return '<div class="w w-streak"><h3>連續運動</h3><div class="big"><b class="num">'+n+'</b><span>週</span></div><p>每週至少動一次，已連續 '+n+' 週'+(D.longest_streak_weeks>n?'・最長 '+D.longest_streak_weeks+' 週':'')+(D.total_activities?'<br>累積 '+D.total_activities+' 次紀錄'+(D.first_day?'（'+D.first_day.slice(0,4)+' 起）':''):'')+'</p></div>';}
+function dotRow(arr,isNow){var N='一二三四五六日',h='';var tdx=isNow?(new Date(TODAY+'T00:00:00Z').getUTCDay()+6)%7:-1;for(var i=0;i<7;i++){h+='<i class="'+(arr&&arr[i]!=null?'on ':'')+(i===tdx?'now':'')+'" title="'+(arr&&arr[i]!=null?arr[i]+' 分鐘':'休息')+'">'+N[i]+'</i>';}return '<div class="dots">'+h+'</div>';}
+function wWeek(){var a=D.this_week,b=D.last_week;if(!a)return '<div class="w w-week"><h3>本週</h3><p class="dim">累積中</p></div>';
+  return '<div class="w w-week"><h3>本週<small>週一起算</small></h3><div class="wk3">'+
+  '<div><b class="num">'+hm(a.mins)+'</b><small>運動時間</small>'+delta(a.mins,b&&b.mins,'',function(x){return hm(x);})+'</div>'+
+  '<div><b class="num">'+(a.km!=null?a.km:0)+'<i class="u">km</i></b><small>距離</small>'+delta(a.km,b&&b.km,' km')+'</div>'+
+  '<div><b class="num">'+(a.elev||0)+'<i class="u">m</i></b><small>爬升</small>'+delta(a.elev,b&&b.elev,' m')+'</div></div>'+
+  '<div class="wkrow"><span class="lab">本週</span>'+dotRow(a.dots,true)+'</div>'+
+  '<div class="wkrow"><span class="lab">上週</span>'+dotRow(b&&b.dots,false)+'</div></div>';}
+/* 月曆 */
+var CAL={};
+function buildCal(){CAL={};(D.calendar||[]).forEach(function(r){CAL[r[0]]={m:r[1],k:r[2],e:r[3],t:r[4]};});}
+function monthOf(s){return s.slice(0,7);}
+function calHtml(){var ym=calMonth,y=+ym.slice(0,4),m=+ym.slice(5,7),first=new Date(Date.UTC(y,m-1,1)),lead=(first.getUTCDay()+6)%7,days=new Date(Date.UTC(y,m,0)).getUTCDate(),h='';
+  '一二三四五六日'.split('').forEach(function(x){h+='<div class="h">'+x+'</div>';});
+  for(var i=0;i<lead;i++)h+='<div class="d x"></div>';
+  var mx=1;Object.keys(CAL).forEach(function(k){if(monthOf(k)===ym&&CAL[k].m>mx)mx=CAL[k].m;});
+  for(var d=1;d<=days;d++){var key=ym+'-'+String(d).padStart(2,'0'),c=CAL[key];
+    if(c){var lv=Math.round(18+Math.min(1,c.m/Math.max(mx,60))*52);h+='<button class="d on'+(key===TODAY?' today':'')+'" data-d="'+key+'" style="--l:'+lv+'"><s>'+d+'</s><span><s>'+c.m+'<small>分</small></s>'+(c.k?'<u>'+c.k+' km</u>':'')+'</span></button>';}
+    else h+='<div class="d'+(key===TODAY?' today':'')+'"><s style="color:var(--ash);font-weight:400">'+d+'</s></div>';}
+  return h;}
+function wCal(){return '<div class="w w-cal"><h3><span>運動月曆</span><span class="cal-nav"><button id="cPrev" aria-label="上個月">‹</button><b id="cTitle"></b><button id="cNext" aria-label="下個月">›</button></span></h3><div class="cal" id="calGrid"></div><p class="cal-det" id="calDet">點有顏色的日期看當天內容</p></div>';}
+function paintCal(){var el=document.getElementById('calGrid');if(!el)return;var y=+calMonth.slice(0,4),m=+calMonth.slice(5,7);document.getElementById('cTitle').textContent=y+' 年 '+m+' 月';el.innerHTML=calHtml();
+  var keys=Object.keys(CAL).sort(),lo=keys[0]?monthOf(keys[0]):calMonth,hi=monthOf(TODAY);document.getElementById('cPrev').disabled=calMonth<=lo;document.getElementById('cNext').disabled=calMonth>=hi;
+  var tot=0,km=0,n=0;keys.forEach(function(k){if(monthOf(k)===calMonth){tot+=CAL[k].m;km+=CAL[k].k||0;n++;}});
+  document.getElementById('calDet').innerHTML=n?'這個月動了 <b>'+n+'</b> 天・共 <b>'+hm(tot)+'</b>'+(km?'・<b>'+Math.round(km*10)/10+' km</b>':'')+'　<span class="dim">點日期看細節</span>':'這個月沒有紀錄';}
+function shiftMonth(dx){var y=+calMonth.slice(0,4),m=+calMonth.slice(5,7)-1+dx;var d=new Date(Date.UTC(y,m,1));calMonth=d.toISOString().slice(0,7);paintCal();}
+document.addEventListener('click',function(e){if(!root.contains(e.target))return;
+  if(e.target.closest('#cPrev')){shiftMonth(-1);return;}if(e.target.closest('#cNext')){shiftMonth(1);return;}
+  var b=e.target.closest('.cal .d.on');if(b){[].forEach.call(document.querySelectorAll('.cal .d.sel'),function(x){x.classList.remove('sel');});b.classList.add('sel');var c=CAL[b.dataset.d];document.getElementById('calDet').innerHTML='<b>'+md(b.dataset.d)+'</b>　'+esc(c.t)+'・'+hm(c.m)+(c.k?'・'+c.k+' km':'')+(c.e?'・爬升 '+c.e+' m':'');return;}
+  var t=e.target.closest('.tr-tabs button');if(t){if(t.dataset.m){metric=t.dataset.m;if(metric!=='mins')sport='all';}if(t.dataset.s){sport=t.dataset.s;}drawTrend();}
+});
+/* 趨勢 */
+function wTrend(){return '<div class="w w-trend tr"><h3><span id="trTitle">近 12 週</span></h3><div class="tr-tabs" id="trM"></div><div class="tr-tabs tr-sports" id="trS"></div><svg id="trSvg" viewBox="0 0 600 200" role="img" aria-label="近 12 週趨勢"></svg></div>';}
+function series(){var W=D.weeks||{};var s={mins:W.mins||[]};if(W.km&&W.km.some(function(x){return x}))s.km=W.km;if(W.fat&&W.fat.some(function(x){return x!=null}))s.fat=W.fat;if(W.weight&&W.weight.some(function(x){return x!=null}))s.weight=W.weight;return s;}
+var NM={mins:'時間',km:'距離',fat:'體脂',weight:'體重'},UN={mins:'分鐘',km:'km',fat:'%',weight:'kg'};
+function drawTrend(){var S=document.getElementById('trSvg');if(!S||!D)return;var ser=series(),keys=Object.keys(ser);if(!ser[metric])metric='mins';
+  document.getElementById('trM').innerHTML=keys.map(function(k){return '<button data-m="'+k+'" aria-pressed="'+(k===metric)+'">'+NM[k]+'</button>';}).join('');
+  var types=(D.weeks&&D.weeks.types)||[];document.getElementById('trS').innerHTML=(metric==='mins'&&types.length>1)?'<button data-s="all" aria-pressed="'+(sport==='all')+'">全部</button>'+types.map(function(t){return '<button data-s="'+esc(t.key)+'" aria-pressed="'+(sport===t.key)+'">'+esc(t.name)+'</button>';}).join(''):'';
+  var v=ser[metric].slice();if(metric==='mins'&&sport!=='all'){var t=types.filter(function(x){return x.key===sport})[0];if(t)v=t.mins;}
+  var labels=(D.weeks&&D.weeks.labels)||[];document.getElementById('trTitle').textContent='近 12 週・'+(sport!=='all'&&metric==='mins'?types.filter(function(x){return x.key===sport})[0].name+' ':'')+NM[metric]+'（'+UN[metric]+'）';
+  var W=Math.max(300,Math.min(640,Math.round(S.getBoundingClientRect().width)||600)),H=W<480?200:190,pl=8,pr=8,pt=20,pb=24,cw=(W-pl-pr)/Math.max(1,v.length);
+  var nums=v.filter(function(x){return x!=null;});if(!nums.length){S.innerHTML='<text x="'+W/2+'" y="90" text-anchor="middle" style="fill:var(--ash)" font-size="13">資料累積中</text>';return;}
+  var bar=metric==='mins'||metric==='km',mx=Math.max.apply(0,nums),mn=bar?0:Math.min.apply(0,nums),rg=(mx-mn)||1,y=function(x){return pt+(H-pt-pb)*(1-(x-mn)/rg);},g='';
+  for(var i=0;i<4;i++){var gy=pt+(H-pt-pb)*i/3;g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+gy+'" y2="'+gy+'" style="stroke:var(--line)"/>';}
+  var xl=labels.map(function(t,i){return (i%3===2||i===labels.length-1)?'<text x="'+(pl+cw*i+cw/2)+'" y="'+(H-6)+'" text-anchor="middle" style="fill:var(--ash)" font-size="11">'+esc(t)+'</text>':'';}).join('');
+  var out='';
+  if(bar){out=v.map(function(x,i){var bh=Math.max(x?2:0,(H-pt-pb)-(y(x||0)-pt)),bx=pl+cw*i+cw*.2,last=i===v.length-1;return '<g class="grow" style="--k:'+i+'"><rect x="'+bx+'" y="'+(H-pb-bh)+'" width="'+(cw*.6)+'" height="'+bh+'" style="fill:'+(last?'var(--gold)':'color-mix(in srgb,var(--gold) 28%,transparent)')+';stroke:var(--gold);stroke-width:'+(last?0:1)+'"><title>'+esc(labels[i]||'')+'：'+(x||0)+' '+UN[metric]+'</title></rect></g>';}).join('');
+    out+='<text x="'+(pl+cw*(v.length-1)+cw/2)+'" y="'+(y(v[v.length-1]||0)-8)+'" text-anchor="middle" style="fill:var(--bone)" font-size="13">'+(v[v.length-1]||0)+'</text>';}
+  else{var pts=v.map(function(x,i){return x==null?null:(pl+cw*i+cw/2)+','+y(x);}).filter(Boolean).join(' ');out='<polyline class="ln" points="'+pts+'" fill="none" style="stroke:var(--gold)" stroke-width="2"/>';var last=v[v.length-1];if(last!=null){var cx=pl+cw*(v.length-1)+cw/2;out+='<circle cx="'+cx+'" cy="'+y(last)+'" r="4.5" style="fill:var(--gold)"/><text x="'+cx+'" y="'+(y(last)-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+last+'</text>';}}
+  S.setAttribute('viewBox','0 0 '+W+' '+H);S.innerHTML=g+out+xl;}
+/* 最佳表現 */
+function wRec(){var R=D.records||{},Y=(R.year)||{};function card(k,n){var r=R[k],y=Y[k];return '<div class="rec"><small>'+n+'</small><b class="num">'+(r?clock(r.sec):'—')+'</b><span>'+(r?r.day.replace(/-/g,'.'):'補齊紀錄中')+'</span>'+(y&&r&&y.sec!==r.sec?'<span>今年 '+clock(y.sec)+'</span>':'')+'</div>';}
+  var p=D.predict10k;return '<div class="w w-rec"><h3>最佳表現<small>Strava 最佳成績</small></h3><div class="rec3">'+card('k1','1 公里')+card('k5','5 公里')+card('k10','10 公里')+'</div>'+(p?'<div class="pred"><div><small class="dim" style="font-size:12px">10K 預估<span class="est">估算</span></small><br><b class="num">'+clock(p.sec)+'</b></div><span>依近 90 天最快 5 公里（'+clock((R.k5&&R.k5.sec)||0)+'）換算，非實測</span></div>':'')+'</div>';}
+/* 身體 */
+function wBody(){var b=D.body_now;if(!b||(!b.weight&&!b.fat))return '<div class="w w-body"><h3>體重・體脂</h3><p class="dim" style="font-size:13px">累積中</p></div>';
+  return '<div class="w w-body"><h3>體重・體脂'+(D.scale_last_day?'<small>'+md(D.scale_last_day)+'</small>':'')+'</h3><div class="bd2"><div><b class="num">'+(b.weight?b.weight.v:'—')+'<small>kg</small></b><span>體重</span></div><div><b class="num">'+(b.fat?b.fat.v:'—')+'<small>%</small></b><span>體脂'+(D.stats&&D.stats.fat_change!=null?'・近 12 週 '+(D.stats.fat_change>0?'+':D.stats.fat_change<0?'−':'±')+Math.abs(D.stats.fat_change).toFixed(1):'')+'</span></div></div></div>';}
+function wRecent(){var r=D.recent||[];return '<div class="w w-recent"><h3>最近的運動</h3><ol class="rl">'+(r.length?r.map(function(x){return '<li><time>'+esc(md(x.date))+'</time><span>'+esc(x.name)+'</span><small>'+x.min+' 分'+(x.km?'・'+x.km+' km':'')+'</small></li>';}).join(''):'<li class="dim" style="display:block">最近還沒有運動紀錄。</li>')+'</ol></div>';}
+/* 年輪熱圖：近 26 週 */
+function wHeat(){var cell=14,gap=3,weeks=26,W=weeks*(cell+gap)+34,H=7*(cell+gap)+26,end=new Date(TODAY+'T00:00:00Z'),dow=(end.getUTCDay()+6)%7,start=new Date(end.getTime()-((weeks-1)*7+dow)*864e5),mx=60;
+  Object.keys(CAL).forEach(function(k){if(CAL[k].m>mx)mx=CAL[k].m;});
+  var s='',ml='',lastM=-1,lastW=-9;for(var w=0;w<weeks;w++){for(var d=0;d<7;d++){var t=new Date(start.getTime()+(w*7+d)*864e5);if(t>end)continue;var key=t.toISOString().slice(0,10),c=CAL[key],x=30+w*(cell+gap),y=d*(cell+gap)+16;
+      var op=c?(0.28+Math.min(1,c.m/mx)*0.72):0;s+='<rect x="'+x+'" y="'+y+'" width="'+cell+'" height="'+cell+'" rx="3" style="fill:'+(c?'var(--gold)':'var(--line)')+';opacity:'+(c?op.toFixed(2):'1')+'"><title>'+key+(c?'：'+hm(c.m)+(c.k?'・'+c.k+' km':''):'：休息')+'</title></rect>';
+      if(d===0&&t.getUTCMonth()!==lastM){lastM=t.getUTCMonth();if(w-lastW<3&&lastW>=0){lastW=w;continue;}lastW=w;ml+='<text x="'+x+'" y="10" font-size="10.5" style="fill:var(--ash)">'+(t.getUTCMonth()+1)+'月</text>';}}}
+  var dl='';['一','三','五','日'].forEach(function(n,i){var di=[0,2,4,6][i];dl+='<text x="0" y="'+(di*(cell+gap)+16+11)+'" font-size="10" style="fill:var(--ash)">'+n+'</text>';});
+  var days=0;Object.keys(CAL).forEach(function(k){if(k>=start.toISOString().slice(0,10))days++;});
+  return '<div class="w w-heat"><h3>近半年的軌跡<small>共動了 '+days+' 天・顏色越深越久</small></h3><div class="heat"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="近 26 週運動熱圖">'+ml+dl+s+'</svg></div></div>';}
+
+function render(d,isLive){D=d;buildCal();
+  var keys=Object.keys(CAL).sort();calMonth=monthOf(keys.length?(keys[keys.length-1]>TODAY?TODAY:keys[keys.length-1]):TODAY);if(monthOf(TODAY)>calMonth&&keys.length&&keys[keys.length-1]>=TODAY.slice(0,8))calMonth=monthOf(TODAY);
+  if(keys.length&&keys[keys.length-1]<TODAY)calMonth=monthOf(TODAY);
+  G.innerHTML=wHeat()+wStreak()+wWeek()+wTrend()+wCal()+wRec()+wBody()+wRecent();
+  paintCal();drawTrend();var hh=G.querySelector('.heat');if(hh)hh.scrollLeft=hh.scrollWidth;
+  if(isLive){var a=ago(d.updated_at),s=ago(d.strava_synced_at);live.textContent='自動同步中'+(s?'・Strava '+s+'同步':'')+(a?'・體組成 '+a:'');}
+  else{live.parentElement.classList.add('stale');live.textContent='暫時讀不到即時資料，顯示的是上次發布時的數字';}}
+var rz;addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(function(){if(D)drawTrend();},200);});
+var fallback=function(){render({weeks:{mins:BD.weeks.mins,labels:[]},calendar:[],records:{},recent:[],stats:{}},false);};
+fetch(API,{mode:'cors'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){if(d.error)throw 0;render(d,true);}).catch(fallback);
 })();
 </script>
