@@ -39,7 +39,7 @@ const schema = [
 .ph-compact .d{display:none;}
 .ph-compact .big{font-size:clamp(72px,10vw,120px);opacity:.9;}
 .ph-compact .count{margin-top:10px;}
-.ph-compact .jump{color:var(--gold);border-bottom:1px solid rgba(212,162,76,.4);}
+.ph .jump{font-size:13.5px;color:var(--gold);border-bottom:1px solid rgba(212,162,76,.4);}
 .ph-compact+.list-sec{padding-top:36px;}
 @media(max-width:700px){.ph-compact{padding:92px 20px 18px;}.ph-compact .ph-in{grid-template-columns:minmax(0,1fr) auto;}.ph-compact .ph-in .big{order:0;font-size:72px;}}
 .list-sec{padding:72px 40px 96px;}
@@ -64,22 +64,20 @@ const schema = [
 .others a:hover{border-color:var(--dc);transform:translateY(-2px);}
 @media(max-width:700px){.ph{padding:96px 20px 44px;}.ph-in{grid-template-columns:1fr;}.ph .big{order:-1;font-size:120px;}.list-sec{padding:48px 20px 72px;}.arow{grid-template-columns:1fr;gap:4px;}.arow .arrow{display:none;}}
 </style>
-<section class={`ph${meta.slug === 'strengthen' ? ' ph-compact' : ''}`} style={`--dc:var(--c-${meta.slug})`}>
+<section class="ph" style={`--dc:var(--c-${meta.slug})`}>
   <div class="ph-in">
     <div>
       <p class="crumb rv"><a href="/">首頁</a>　／　<a href="/journal/">日常紀錄</a>　／　{meta.type}</p>
       <h1 class="rv" style="--i:1">{meta.title}</h1>
       <p class="jp rv" style="--i:2" lang="ja">{meta.titleJp}</p>
       <p class="d rv" style="--i:3">{meta.desc}</p>
-      <p class="count rv" style="--i:4">{meta.slug === 'strengthen' ? <a class="jump" href="#articles">看「強化」的文章（{entries.length}{meta.unit}）↓</a> : <>共<b>{entries.length}</b>{meta.unit}</>}</p>
+      <p class="count rv" style="--i:4"><>共<b>{entries.length}</b>{meta.unit}</>{meta.slug === 'strengthen' && <a class="jump" href="#bodyPanel" style="margin-left:18px">身體儀表 ↓</a>}</p>
     </div>
     <div class="big" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
   </div>
 </section>
 <section class="list-sec band-light" style="background:var(--night);color:var(--bone)">
   <div class="list-in">
-    {meta.slug === 'strengthen' && <BodyPanel />}
-    {meta.slug === 'strengthen' && <h2 class="list-h" id="articles" style="margin-top:8px">「強化」的文章</h2>}
     {entries.length === 0 && <p class="empty">這個方向還沒有文章，第一篇可以從今天開始。</p>}
     {entries.map((e: any, i: number) => (
       <a class="arow rv" style={`--i:${Math.min(i, 8)}`} href={`/pillars/${meta.slug}/${e.slug}`}>
@@ -88,6 +86,7 @@ const schema = [
         <span class="arrow" aria-hidden="true">→</span>
       </a>
     ))}
+    {meta.slug === 'strengthen' && <BodyPanel />}
     <div class="others"><a href="/journal/" style="--dc:var(--gold)">日常紀錄・全部</a><span>其他方向</span>{others.map((p) => <a href={`/pillars/${p.slug}`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}</a>)}</div>
   </div>
 </section>
