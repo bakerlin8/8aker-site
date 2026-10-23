@@ -17,7 +17,7 @@ const noteForm = String((services as any).form_note || '');
 .chat .crumb{font-size:13px;color:#86707A;}.chat .crumb a{border-bottom:1px solid rgba(239,229,214,.15);}
 .chat h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,44px);margin-top:12px;color:#EBD3A8;}
 .chat .lede{color:#B9A89E;margin-top:12px;line-height:1.9;max-width:34em;}
-.cf .scope[hidden]{display:none;}
+.cf .scope[hidden],.cf label[hidden]{display:none;}
 .cf .scope{margin-top:14px;display:inline-block;font-size:13px;letter-spacing:.06em;color:#7a5a1a;background:#F6E9D3;border:1px solid rgba(158,111,34,.4);padding:5px 12px;}
 .steps{display:flex;gap:18px;margin-top:22px;font-size:12.5px;color:#86707A;letter-spacing:.06em;}
 .steps b{font-weight:400;color:#D4A24C;}
@@ -123,9 +123,10 @@ const noteForm = String((services as any).form_note || '');
     CH.innerHTML='';SUB.hidden=!cur.items.length;cur.items.forEach(function(t){var l=el('label'),i=el('input');i.type='checkbox';i.name='item';i.value=t;l.appendChild(i);l.appendChild(document.createTextNode(t));CH.appendChild(l);});
     QS.innerHTML='';(Q[k]||Q.other||[]).forEach(function(q){var l=el('label'),s=el('span',null,q.label);if(q.required){var r=el('i','req','*');s.appendChild(r);}l.appendChild(s);var f;
       if(q.type==='textarea'){f=el('textarea');f.rows=3;}else if(q.type==='select'){f=el('select');var o0=el('option',null,'請選擇');o0.value='';f.appendChild(o0);(q.options||[]).forEach(function(o){var op=el('option',null,o);op.value=o;f.appendChild(op);});}else{f=el('input');f.type='text';}
-      f.name='q_'+q.key;f.maxLength=600;if(q.placeholder)f.placeholder=q.placeholder;l.appendChild(f);QS.appendChild(l);});
+      f.name='q_'+q.key;f.maxLength=600;if(q.placeholder)f.placeholder=q.placeholder;l.appendChild(f);if(q.showIf){l.dataset.sk=q.showIf.key;l.dataset.sv=q.showIf.equals;l.hidden=true;}QS.appendChild(l);});
     var sc=document.getElementById('scope');sc.textContent=SCOPES[k]||'';sc.hidden=!SCOPES[k];CM.hidden=false;E.textContent='';}
-  F.addEventListener('change',function(e){if(e.target.name==='svc')pick(e.target.value);});
+  function showIfSync(){QS.querySelectorAll('label[data-sk]').forEach(function(l){var c=F.elements['q_'+l.dataset.sk];l.hidden=!(c&&c.value===l.dataset.sv);});}
+  F.addEventListener('change',function(e){if(e.target.name==='svc')pick(e.target.value);else if(e.target.name&&e.target.name.indexOf('q_')===0)showIfSync();});
   // 從祈願所「我可以幫忙」進來：選「還不確定」，預先帶入是哪個願望、需要什麼
   try{var P=new URLSearchParams(location.search);if(P.get('from')==='wish'){var ab=(P.get('about')||'').slice(0,80),hp=(P.get('help')||'').slice(0,120);
     var fs=document.getElementById('svcSet');if(fs)fs.hidden=true;pick('other');
@@ -136,7 +137,7 @@ const noteForm = String((services as any).form_note || '');
     if(!cur){E.textContent='先選一個想聊的服務。';return;}
     var qs=Q[cur.k]||Q.other||[],lines=['【想聊】'+cur.title],dates='',people='',miss=false;
     var items=[].map.call(F.querySelectorAll('input[name=item]:checked'),function(x){return x.value;});if(items.length)lines.push('【項目】'+items.join('、'));
-    qs.forEach(function(q){var val=v('q_'+q.key);if(q.required&&!val)miss=true;if(val){lines.push('【'+q.label.replace(/[？?]$/,'')+'】'+val);if(q.col==='dates')dates=val;if(q.col==='people')people=val;}});
+    qs.forEach(function(q){var fe=F.elements['q_'+q.key];if(fe&&fe.closest('label').hidden)return;var val=v('q_'+q.key);if(q.required&&!val)miss=true;if(val){lines.push('【'+q.label.replace(/[？?]$/,'')+'】'+val);if(q.col==='dates')dates=val;if(q.col==='people')people=val;}});
     if(miss||!v('name')||!v('contact')){E.textContent='請填寫有 * 的欄位。';window.sfx&&sfx('error');return;}
     var body={service:CODES[cur.k]||'other',name:v('name'),contact:v('ctype')+'：'+v('contact'),dates:dates,people:people,message:lines.join('\n'),source:v('source'),website:v('website'),lang:navigator.language||''};
     lastText='你好，我是 '+body.name+'，從 8aker0.com 來的。\n\n'+lines.join('\n');
