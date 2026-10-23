@@ -48,20 +48,31 @@ const noteForm = String((services as any).form_note || '');
 .pv-side pre{white-space:pre-wrap;font-family:inherit;font-size:13px;color:#B9A89E;background:rgba(239,229,214,.05);border:1px solid rgba(239,229,214,.1);padding:12px;margin-top:16px;line-height:1.8;}
 .privacy-note{font-size:12.5px;color:#86707A;margin-top:18px;line-height:1.8;}
 @media(max-width:720px){.chat{padding:100px 20px 72px;}.cf{padding:20px 16px;margin-left:-4px;margin-right:-4px;}.frow2{grid-template-columns:1fr;}.pv-grid{grid-template-columns:1fr;}.svc-pick{grid-template-columns:1fr;}.cacts .cbtn{width:100%;}}
-.svc-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.svc-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .svc-pick label{margin:0;display:block;cursor:pointer;}
 .svc-pick input{position:absolute;opacity:0;pointer-events:none;width:auto;}
-.svc-pick .sp{display:block;padding:14px 14px 13px;border:1px solid rgba(42,24,30,.18);background:#FBF6F3;transition:border-color .2s,background .2s;height:100%;}
+.svc-pick .sp{display:block;padding:14px 14px 13px;border:1px solid rgba(42,24,30,.18);background:transparent;transition:border-color .2s;height:100%;}
 .svc-pick .sp b{display:block;font-weight:500;font-size:16px;color:#1C0F14;}
 .svc-pick .sp small{display:block;margin-top:4px;font-size:12.5px;line-height:1.6;color:#7a6a6d;}
-.svc-pick label:has(input:checked) .sp{border-color:#9E6F22;background:#F6E9D3;}
+.svc-pick label{background:#FBF6F3;transition:background .2s;}
+.svc-pick label:has(input:checked){background:#F6E9D3;}
+.svc-pick label:has(input:checked) .sp{border-color:#9E6F22;}
+.svc-pick label{position:relative;overflow:hidden;}
+.svc-pick .sp{position:relative;z-index:1;}
+.svc-pick label::after{content:attr(data-k);position:absolute;right:-4px;bottom:-22px;font-family:var(--jp);font-size:96px;line-height:1;color:rgba(var(--hc),.17);z-index:0;transform:translateY(18px) scale(.92);opacity:0;transition:transform .5s var(--ease),opacity .4s;pointer-events:none;}
+.svc-pick label[data-long]::after{font-size:62px;bottom:-8px;}
+.svc-pick label:nth-child(3n+1){--hc:176,70,92;}
+.svc-pick label:nth-child(3n+2){--hc:158,111,34;}
+.svc-pick label:nth-child(3n+3){--hc:110,92,78;}
+.svc-pick label:hover::after,.svc-pick label:has(input:checked)::after{transform:none;opacity:1;}
+@media(hover:none){.svc-pick label::after{transform:none;opacity:.7;}.svc-pick label:has(input:checked)::after{opacity:1;}}
 .svc-pick input:focus-visible+.sp{box-shadow:0 0 0 3px rgba(158,111,34,.25);}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
 .chips label{margin:0;display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid rgba(42,24,30,.18);background:#FBF6F3;font-size:14px;cursor:pointer;}
 .chips input{width:auto;margin:0;accent-color:#9E6F22;}
 .chips label:has(input:checked){border-color:#9E6F22;background:#F6E9D3;}
 .cf .req{color:#A1324A;margin-left:2px;}
-.crow{display:flex;gap:8px;margin-top:0;}.crow select{width:auto;flex:0 0 112px;}.crow input{flex:1;min-width:0;}
+.cf .crow{display:flex;gap:8px;margin:0;}.crow select{width:auto;flex:0 0 112px;}.crow input{flex:1;min-width:0;}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
 .done{margin-top:28px;background:#EFE5D6;color:#1C0F14;padding:28px;}
 .done h2{font-family:var(--serif);font-weight:500;font-size:22px;}
@@ -76,7 +87,7 @@ const noteForm = String((services as any).form_note || '');
 
     <form class="cf" id="cf" novalidate>
       <fieldset id="svcSet"><legend>想聊什麼？</legend>
-        <div class="svc-pick">{hats.map((h: any) => <label><input type="radio" name="svc" value={h.k} /><span class="sp"><b>{h.title}</b>{h.desc && <small>{h.desc}</small>}</span></label>)}</div>
+        <div class="svc-pick">{hats.map((h: any) => <label data-k={h.k} data-long={h.k.length > 1 ? '1' : undefined}><input type="radio" name="svc" value={h.k} /><span class="sp"><b>{h.title}</b>{h.desc && <small>{h.desc}</small>}</span></label>)}</div>
       </fieldset>
       <div id="sub" hidden><label><span>哪些項目？（可多選，選填）</span></label><div class="chips" id="chips"></div></div>
       <div id="qs"></div>
