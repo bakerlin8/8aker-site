@@ -443,6 +443,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="nav-group-label">網站內容・照首頁由上到下</div>
       <div class="nav-item" data-view="home" data-page="cover">封面</div>
       <div class="nav-item" data-view="home" data-page="about" data-also="services">初次見面</div>
+      <div class="nav-item" data-view="inqq">需求填表・問題</div>
       <div class="nav-item" data-view="works">有點樣子・作品</div>
       <div class="nav-item" data-view="dreams">祈願所</div>
       <div class="nav-item" data-view="home" data-page="ending">結尾・支持贊助</div>
@@ -456,6 +457,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 
     <div class="nav-group">
       <div class="nav-group-label">工具</div>
+      <div class="nav-item" data-view="notif">通知設定</div>
       <div class="nav-item" data-view="links">短網址</div>
       <div class="nav-item" data-view="home" data-page="settings">網站設定</div>
       <a class="nav-item ext" href="/" target="_blank" rel="noopener">看正式網站 <span>↗</span></a>
@@ -521,6 +523,22 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="page-title">祈願所</div>
       <div class="page-sub">40 歲生日前想做的事。點一盞燈籠就能編輯；燈籠上的 ✦ 是點亮人數、💡 是想法數，由訪客操作。存檔後約 1 分鐘上線。<a href="https://8aker0.com/#kiganjo" target="_blank" rel="noopener">看網站上的樣子 ↗</a></div>
       <div id="dreamsForm"></div>
+    </section>
+
+    <!-- 需求填表問題 -->
+    <section class="view" id="view-inqq">
+      <div class="page-eyebrow">Inquiry form</div>
+      <div class="page-title">需求填表・問題</div>
+      <div class="page-sub">客人選了服務之後，會依序看到這裡的問題。服務卡的名稱、說明和細項不在這裡改，請到「初次見面 → 服務卡」，填表頁會自動同步。存檔後約 1～2 分鐘生效。</div>
+      <div id="inqqForm"></div>
+    </section>
+
+    <!-- 通知設定 -->
+    <section class="view" id="view-notif">
+      <div class="page-eyebrow">Notifications</div>
+      <div class="page-title">通知設定</div>
+      <div class="page-sub">LINE 通知什麼時候、用什麼方式提醒你。時間都是日本時間，每小時整點檢查一次，所以只能選整點。</div>
+      <div id="notifForm"></div>
     </section>
 
     <!-- LINKS -->
@@ -743,7 +761,7 @@ function slugify(title) {
 }
 
 /* ══════════════════════════ NAV / ROUTER ══════════════════════════ */
-const views = ['overview', 'home', 'inbox', 'chapters', 'dreams', 'links', 'works', 'services', 'body', 'pillar', 'article'];
+const views = ['overview', 'inqq', 'notif', 'home', 'inbox', 'chapters', 'dreams', 'links', 'works', 'services', 'body', 'pillar', 'article'];
 let currentPillar = null;
 let currentArticle = null; // { path, sha, isNew }
 
@@ -1296,6 +1314,104 @@ async function loadLinks() {
   render();
 }
 
+
+/* ══════════════════════════ 需求填表・問題 ══════════════════════════ */
+async function loadInqq() {
+  showView('inqq'); syncTitle('inqq');
+  const form = document.getElementById('inqqForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  const [sf, qf] = await Promise.all([ghGetFile('src/data/services.json'), ghGetFile('src/data/inquiry.json')]);
+  const hats = JSON.parse(sf.content).hats || [], data = JSON.parse(qf.content);
+  data.questions = data.questions || {};
+  const groups = hats.map(h => ({ k: h.k, name: h.title })).concat([{ k: 'other', name: '祈願所來的人' }]);
+  groups.forEach(g => { data.questions[g.k] = data.questions[g.k] || []; });
+  let cur = 0, dirty = false; const openQ = new Set();
+  const TYPES = [['text', '一行文字'], ['textarea', '多行文字'], ['select', '下拉選單（單選）'], ['checks', '勾選（可複選）'], ['number', '數字'], ['list', '多個小欄位']];
+  function collect() {
+    form.querySelectorAll('[data-q]').forEach(el => {
+      const [g, i] = el.dataset.q.split('.'); const q = data.questions[g][+i], k = el.dataset.key; let v = el.type === 'checkbox' ? el.checked : el.value;
+      if (k === 'options') v = lines(v);
+      if (k === 'required') { if (v) q.required = true; else delete q.required; }
+      else if (k === 'options') { if (v.length) q.options = v; else delete q.options; }
+      else if (k === 'placeholder' || k === 'hint') { if (v) q[k] = v; else delete q[k]; }
+      else q[k] = v;
+    });
+  }
+  const mark = () => { dirty = true; const m = document.getElementById('inqDirty'); if (m) m.textContent = '● 有尚未儲存的變更'; };
+  function render() {
+    const g = groups[cur], list = data.questions[g.k];
+    form.innerHTML = `
+      <div class="hb-card"><div class="seg svc-seg">${groups.map((x, i) => `<button type="button" data-g="${i}" class="${i === cur ? 'on' : ''}"><b>${escapeHtml(x.k === 'other' ? '其他' : x.k + '　' + x.name)}</b><small>${data.questions[x.k].length} 個問題</small></button>`).join('')}</div></div>
+      <div class="hb-card"><h3>「${escapeHtml(g.name)}」會問的問題<small style="font-size:11.5px;color:var(--ink-ghost);font-weight:400">　由上到下依序出現；點標題展開修改</small></h3>
+        ${list.map((q, j) => { const key = g.k + '.' + j, n = list.length, hasOpt = q.type === 'select' || q.type === 'checks'; return `<details class="svc-bk" data-qk="${key}" ${openQ.has(key) ? 'open' : ''}>
+          <summary><span class="svc-bn">${String(j + 1).padStart(2, '0')}</span><span class="svc-bt">${escapeHtml(q.label || '（未命名）')}${q.required ? ' <em style="color:#A1324A;font-style:normal">*</em>' : ''}${q.showIf ? ' <small style="color:var(--ink-ghost)">有條件才出現</small>' : ''}</span>
+            <span class="svc-ops"><button type="button" data-mvq="${key}:-1" ${j === 0 ? 'disabled' : ''}>↑</button><button type="button" data-mvq="${key}:1" ${j === n - 1 ? 'disabled' : ''}>↓</button><button type="button" data-delq="${key}">×</button></span></summary>
+          <div class="svc-bb">
+            <div class="field"><label class="field-label">問題文字</label><input type="text" data-q="${key}" data-key="label" value="${escapeAttr(q.label || '')}"></div>
+            <div class="svc-two"><div class="field" style="margin:0"><label class="field-label">回答方式</label><select style="${SEL_STYLE}" data-q="${key}" data-key="type">${opt(TYPES, q.type)}</select></div><div class="field field-checkbox" style="margin:0;align-self:end"><input type="checkbox" id="rq-${key}" data-q="${key}" data-key="required" ${q.required ? 'checked' : ''}><label for="rq-${key}">必填</label></div></div>
+            ${hasOpt ? `<div class="field"><label class="field-label">選項（一行一個）</label><textarea rows="4" data-q="${key}" data-key="options">${escapeHtml((q.options || []).join('\n'))}</textarea></div>` : ''}
+            <div class="field"><label class="field-label">輸入框裡的提示字（選填）</label><input type="text" data-q="${key}" data-key="placeholder" value="${escapeAttr(q.placeholder || '')}"></div>
+            <div class="field"><label class="field-label">問題下方的小字說明（選填）</label><input type="text" data-q="${key}" data-key="hint" value="${escapeAttr(q.hint || '')}"></div>
+          </div></details>`; }).join('')}
+        <button type="button" class="btn btn-ghost" id="addQ">＋ 新增一個問題</button>
+        <div class="field-hint" style="margin-top:10px">「聯絡方式、稱呼」是每個服務都會問的，不在這裡設定。條件式出現、人數提醒這類進階設定由我維護，這裡不會動到它們。</div>
+      </div>
+      <div class="we-save"><span id="inqDirty">${dirty ? '● 有尚未儲存的變更' : ''}</span><a class="btn btn-ghost" href="/chat/" target="_blank" rel="noopener">看填表頁 ↗</a><button class="btn btn-primary" id="saveInq">儲存變更</button></div>`;
+    form.querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => { collect(); cur = +b.dataset.g; render(); }));
+    form.querySelectorAll('[data-q]').forEach(el => el.addEventListener('input', mark));
+    form.querySelectorAll('[data-q][data-key="type"]').forEach(el => el.addEventListener('change', () => { collect(); form.querySelectorAll('details.svc-bk[open]').forEach(d => openQ.add(d.dataset.qk)); mark(); render(); }));
+    form.querySelectorAll('details.svc-bk').forEach(d => d.addEventListener('toggle', () => { d.open ? openQ.add(d.dataset.qk) : openQ.delete(d.dataset.qk); }));
+    form.querySelectorAll('[data-mvq]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); collect(); const [key, dir] = b.dataset.mvq.split(':'), [gk, i] = key.split('.'), a = data.questions[gk], j = +i + +dir; [a[+i], a[j]] = [a[j], a[+i]]; openQ.clear(); openQ.add(gk + '.' + j); mark(); render(); }));
+    form.querySelectorAll('[data-delq]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); if (!confirm('確定要拿掉這個問題嗎？（拿掉後記得按儲存才會生效）')) return; collect(); const [gk, i] = b.dataset.delq.split('.'); data.questions[gk].splice(+i, 1); openQ.clear(); mark(); render(); }));
+    document.getElementById('addQ').addEventListener('click', () => { collect(); const a = data.questions[g.k]; a.push({ key: 'q' + Date.now().toString(36), label: '新的問題', type: 'text' }); openQ.add(g.k + '.' + (a.length - 1)); mark(); render(); });
+    document.getElementById('saveInq').addEventListener('click', async e => {
+      collect();
+      const bad = []; groups.forEach(x => data.questions[x.k].forEach(q => { if (!String(q.label || '').trim()) bad.push(x.name); if ((q.type === 'select' || q.type === 'checks') && !(q.options || []).length) bad.push(x.name + '：「' + q.label + '」沒有選項'); }));
+      if (bad.length) { toast('請先補齊：' + bad[0], 'err'); return; }
+      const sha = await saveJson('src/data/inquiry.json', data, qf.sha, '需求填表問題：Studio 更新', e.currentTarget);
+      if (sha !== qf.sha) { qf.sha = sha; dirty = false; document.getElementById('inqDirty').textContent = ''; }
+    });
+  }
+  render();
+}
+document.querySelectorAll('.nav-item[data-view="inqq"]').forEach(el => el.addEventListener('click', () => loadInqq()));
+
+/* ══════════════════════════ 通知設定 ══════════════════════════ */
+async function loadNotif() {
+  showView('notif'); syncTitle('notif');
+  const form = document.getElementById('notifForm');
+  form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
+  let S; try { S = (await aiApi({ action: 'settings_get' })).settings; } catch (e) { form.innerHTML = '<div class="empty-state">讀取失敗，請重新整理再試：' + escapeHtml(e.message) + '</div>'; return; }
+  const hours = Array.from({ length: 24 }, (_, h) => [String(h), String(h).padStart(2, '0') + ':00']);
+  const DOWS = ['日', '一', '二', '三', '四', '五', '六'];
+  form.innerHTML = `
+    <div class="hb-card"><h3>每日提醒</h3>
+      <div class="field-hint" style="margin:-4px 0 12px">只有「這一天還沒有新增日常紀錄」才會提醒你；已經新增就不會打擾。</div>
+      <div class="field field-checkbox"><input type="checkbox" id="nd-on" ${S.daily.on ? 'checked' : ''}><label for="nd-on">開啟每日提醒</label></div>
+      <div class="field"><label class="field-label">幾點提醒（日本時間）</label><select id="nd-hour" style="${SEL_STYLE}">${opt(hours, String(S.daily.hour))}</select></div>
+      <div class="field"><label class="field-label">哪幾天要提醒</label><div class="chips-row" id="nd-days" style="display:flex;flex-wrap:wrap;gap:8px">${[1, 2, 3, 4, 5, 6, 0].map(d => `<label class="field-checkbox" style="margin:0;padding:8px 12px;border:1px solid var(--border);display:flex;gap:6px;align-items:center;background:var(--warm-white)"><input type="checkbox" value="${d}" ${S.daily.days.includes(d) ? 'checked' : ''}>週${DOWS[d]}</label>`).join('')}</div></div>
+    </div>
+    <div class="hb-card"><h3>每週統整</h3>
+      <div class="field-hint" style="margin:-4px 0 12px">這一週新增了什麼，加上助理的話。助理的話約在晚上 8:30 備好，所以時間建議設在 21:00 以後。</div>
+      <div class="field field-checkbox"><input type="checkbox" id="nw-on" ${S.weekly.on ? 'checked' : ''}><label for="nw-on">開啟每週統整</label></div>
+      <div class="svc-two"><div class="field" style="margin:0"><label class="field-label">星期幾</label><select id="nw-day" style="${SEL_STYLE}">${opt(DOWS.map((n, i) => [String(i), '週' + n]), String(S.weekly.day))}</select></div><div class="field" style="margin:0"><label class="field-label">幾點</label><select id="nw-hour" style="${SEL_STYLE}">${opt(hours, String(S.weekly.hour))}</select></div></div>
+    </div>
+    <div class="hb-card"><h3>新需求通知</h3>
+      <div class="field-hint" style="margin:-4px 0 0">客人送出需求填表時，會立刻通知你。這個一律開啟，不能關閉，以免漏掉客人。</div>
+    </div>
+    <div class="we-save"><span id="notifDirty"></span><button class="btn btn-primary" id="saveNotif">儲存變更</button></div>`;
+  form.querySelectorAll('input,select').forEach(el => el.addEventListener('input', () => { document.getElementById('notifDirty').textContent = '● 有尚未儲存的變更'; }));
+  document.getElementById('saveNotif').addEventListener('click', async e => {
+    const btn = e.currentTarget, days = [...document.querySelectorAll('#nd-days input:checked')].map(x => +x.value);
+    const next = { daily: { on: document.getElementById('nd-on').checked, hour: +document.getElementById('nd-hour').value, days }, weekly: { on: document.getElementById('nw-on').checked, day: +document.getElementById('nw-day').value, hour: +document.getElementById('nw-hour').value }, inquiry: { on: true } };
+    if (next.daily.on && !days.length) { toast('每日提醒至少要選一天，或把它關掉', 'err'); return; }
+    btn.disabled = true; const t = btn.textContent; btn.textContent = '儲存中…';
+    try { await aiApi({ action: 'settings_set', settings: next }); toast('已儲存，下個整點開始生效'); document.getElementById('notifDirty').textContent = ''; }
+    catch (err) { toast('儲存失敗：' + err.message, 'err'); } finally { btn.disabled = false; btn.textContent = t; }
+  });
+}
+document.querySelectorAll('.nav-item[data-view="notif"]').forEach(el => el.addEventListener('click', () => loadNotif()));
+
 /* ══════════════════════════ 服務與住宿 ══════════════════════════ */
 async function loadServices() {
   showView('services'); markNav('about'); syncTitle('services');
@@ -1388,6 +1504,7 @@ async function loadServices() {
 const OV_SECTIONS = [
   ['cover', '封面', '首頁第一屏的大標與身分', () => loadHome('cover')],
   ['about', '初次見面', '自我介紹、照片、服務卡', () => loadHome('about')],
+  ['inqq', '需求填表・問題', '客人填表時要回答的問題', () => loadInqq()],
   ['works', '有點樣子・作品', '作品卡片、截圖與影片', () => loadWorks()],
   ['dreams', '祈願所', '燈籠、狀態與訪客想法', () => loadDreams()],
   ['ending', '結尾・支持贊助', 'Stripe、台灣轉帳、善的循環', () => loadHome('ending')],
@@ -1413,10 +1530,10 @@ async function loadOverview() {
       ${Object.keys(PILLAR_SHORT).map(k => `<button type="button" class="ov-chip" data-ovp="${k}"><b>${PILLAR_SHORT[k]}</b><small>${PILLARS[k].title}</small><span>${PCNT[k] != null ? PCNT[k] : ''}</span></button>`).join('')}
     </div></section>
     <section class="ov-sec"><h3 class="ov-h">工具</h3><div class="ov-links">
-      <button type="button" class="ov-link" data-ov="links">短網址</button><button type="button" class="ov-link" data-ov="settings">網站設定</button>
+      <button type="button" class="ov-link" data-ov="notif">通知設定</button><button type="button" class="ov-link" data-ov="links">短網址</button><button type="button" class="ov-link" data-ov="settings">網站設定</button>
       <a class="ov-link" href="/" target="_blank" rel="noopener">看正式網站 ↗</a><a class="ov-link" href="https://vercel.com/baker-lin-s-projects/8aker-site/analytics" target="_blank" rel="noopener">流量 ↗</a><a class="ov-link" href="https://search.google.com/search-console" target="_blank" rel="noopener">搜尋成效 ↗</a>
     </div></section>`;
-    const go = { inbox: () => loadInbox(), body: () => loadBody(), links: () => loadLinks(), settings: () => loadHome('settings') };
+    const go = { inbox: () => loadInbox(), body: () => loadBody(), notif: () => loadNotif(), links: () => loadLinks(), settings: () => loadHome('settings') };
     OV_SECTIONS.forEach(x => { go[x[0]] = x[3]; });
     box.querySelectorAll('[data-ov]').forEach(b => b.addEventListener('click', () => go[b.dataset.ov]()));
     box.querySelectorAll('[data-ovp]').forEach(b => b.addEventListener('click', () => loadPillar(b.dataset.ovp)));
