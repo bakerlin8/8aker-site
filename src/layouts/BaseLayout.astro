@@ -7,7 +7,7 @@ const canonical = new URL(Astro.url.pathname, SITE + '/').href;
 // Site-wide identity: the same person and site on every page, so search and AI engines can connect them.
 const person = {
   '@type': 'Person', '@id': `${SITE}/#person`,
-  name: '林子翔', alternateName: ['Baker Lin', '巴', copy.site_name],
+  name: 'Baker Lin', alternateName: ['巴', copy.site_name],
   url: `${SITE}/`, homeLocation: { '@type': 'Place', name: '大阪, 日本' },
   knowsLanguage: ['zh-Hant', 'ja', 'en'],
   knowsAbout: ['日本不動產', '民宿營運', '室內佈置', 'AI 工具', '跑步與運動'],

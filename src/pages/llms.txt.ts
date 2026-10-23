@@ -9,7 +9,7 @@ export async function GET({ site }: { site: URL }) {
   const lines: string[] = [
     `# ${copy.site_name}`,
     '',
-    `> ${copy.site_name}（8 代表巴，零代表林）是林子翔（Baker Lin，暱稱「巴」）的個人網站。他是住在日本大阪的台灣人，從事不動產、民宿營運與室內佈置，同時持續學習並實作 AI 工具。座右銘：「${copy.motto_line1}${copy.motto_line2}」`,
+    `> ${copy.site_name}（8 代表巴，零代表林）是 Baker Lin（暱稱「巴」）的個人網站。他是住在日本大阪的台灣人，從事不動產、民宿營運與室內佈置，同時持續學習並實作 AI 工具。座右銘：「${copy.motto_line1}${copy.motto_line2}」`,
     '',
     '網站以繁體中文為主。內容分成五個持續累積的方向，並以每月 2 日刊出一話的「連載」形式記錄一年的成長（39 歲這一年，第一卷於 2027 年 10 月 2 日發售）。',
     '',
@@ -26,6 +26,6 @@ export async function GET({ site }: { site: URL }) {
   }
   lines.push('', '## 連載（每月 2 日刊出一話）', `- [第一卷目次](${base}/chapters/)`);
   for (const c of chapterList().list) lines.push(`- [${c.label}　${c.title}](${base}/chapters/${c.no}/)（${c.date}，${c.state === 'done' ? '已刊出' : c.state === 'break' ? '休載' : '預定'}）`);
-  lines.push('', '## 關於作者', '- 姓名：林子翔（Baker Lin）', '- 所在地：日本大阪', '- 語言：繁體中文、日文、英文', `- Strava：https://www.strava.com/athletes/103942910`, '');
+  lines.push('', '## 關於作者', '- 姓名：Baker Lin', '- 所在地：日本大阪', '- 語言：繁體中文、日文、英文', `- Strava：https://www.strava.com/athletes/103942910`, '');
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 }

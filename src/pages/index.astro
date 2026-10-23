@@ -1208,7 +1208,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
         {copy.about_story.map((para: string, i: number) => <p class="rv" style={`--i:${Math.min(i + 2, 8)}`}>{para.split('\n').map((ln: string, j: number) => <>{j > 0 && <br />}{ln}</>)}</p>)}
         {copy.about_story_end && <p class="tale-end rv" style="--i:8">{String(copy.about_story_end).split(/(?<=[，。；、！？：])/).map((c: string) => <span class="nb">{c}</span>)}</p>}
       </div>}
-      {aboutPhoto && <div class="me has-photo"><img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="林子翔（巴）" loading="lazy" decoding="async" /></div>}
+      {aboutPhoto && <div class="me has-photo"><img class="me-photo rv" style="--i:2" src={aboutPhoto} alt="Baker Lin（巴）" loading="lazy" decoding="async" /></div>}
       <div class="svc-head rv" style="--i:3"><small>SERVICES</small><h3>有聯絡直接聊，初見面先填表</h3></div>
       <ol class="hats" id="hats">
         {services.hats.map((h: any, i: number) => (
