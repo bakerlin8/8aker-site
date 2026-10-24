@@ -1,4 +1,4 @@
-# Supabase Edge Functions（9 個）
+# Supabase Edge Functions（10 個）
 
 這裡是 **唯一的原始碼來源**。改動一律改這裡，再用 Supabase MCP 或 CLI 部署，不要只在 Supabase 後台改。
 全部 `verify_jwt = false`（函式自己驗身份），部署時要把 `index.ts` 和同資料夾的其他檔案一起送。
@@ -12,6 +12,7 @@
 | `tw-bank` | 支持贊助（公開） | 留資料後回傳台灣轉帳帳號 | Origin＋蜜罐＋IP 限流 |
 | `wish-actions` | 祈願所（公開） | ♡ 與想法 | Origin＋IP 限流 |
 | `studio-inbox` | Studio | 收件匣、轉帳帳號設定 | Studio token |
+| `studio-suggest` | Studio | 即時 AI 建議（Gemini：標題、摘要、標籤、社群文案），金鑰在函式秘密變數 `GEMINI_API_KEY`，每天上限 60 次 | Studio token |
 | `studio-ai` | Studio | AI 佇列（ai_jobs）、通知設定 | Studio token |
 | `notify` | pg_cron `notify_tick()` | LINE 每日提醒／週統整 | `x-notify-key`（app_config.notify_key） |
 

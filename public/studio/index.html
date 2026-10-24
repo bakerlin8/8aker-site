@@ -122,6 +122,12 @@ input,textarea,select{font-family:inherit;}
 .seo{border:1px solid var(--border);border-radius:3px;padding:14px;background:var(--warm-white);}
 .seo-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:13px;color:var(--ink);}.seo-h b{font-size:18px;}
 .seo-l{display:grid;gap:5px;font-size:12.5px;color:var(--ink-soft);}.seo-l div{display:flex;gap:8px;}.seo-l .ok{color:#2d6a43;}.seo-l .no{color:#a8741a;}
+
+.gm-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.gm-r{margin-top:12px;display:grid;gap:8px;}
+.gm-i{border:1px solid var(--border);border-radius:3px;background:#fff;padding:10px 12px;font-size:14px;color:var(--ink);white-space:pre-wrap;line-height:1.7;}
+.gm-i small{display:block;color:var(--ink-ghost);font-size:11px;margin-bottom:4px;}
+.gm-i .btn-row{margin-top:8px;}
 .badge-draft{background:var(--vermillion-pale);color:#8a5a10;font-size:9.5px;padding:2px 7px;border-radius:10px;letter-spacing:0.04em;}
 .list-row-arrow{color:var(--ink-ghost);flex-shrink:0;}
 .empty-state{padding:50px 0;text-align:center;color:var(--ink-ghost);font-size:13px;}
@@ -1887,6 +1893,7 @@ function renderArticleForm(fm) {
       <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等</div>
     </div>
     <div class="field seo" id="seoBox"></div>
+    <div class="field tg" id="gmBox"></div>
     <div class="field ai-box" id="aiBox"></div>
     <div class="btn-row">
       <button class="btn btn-primary" id="saveArticleBtn">${currentArticle.isNew ? '建立文章' : '儲存變更'}</button>
@@ -1962,6 +1969,38 @@ function renderArticleForm(fm) {
   ['f-title', 'f-excerpt', 'f-body', 'f-kw'].forEach(id => $(id).addEventListener('input', checkSeo));
   $('f-tag-input').addEventListener('keydown', () => setTimeout(checkSeo, 0));
   checkSeo();
+
+  /* AI 即時建議（Gemini，走後端函式；金鑰不在網頁） */
+  const gm = $('gmBox');
+  const GM = { titles: ['💡', '想標題'], excerpt: ['📝', '寫摘要'], tags: ['🏷', '建議標籤'], social: ['📣', '社群文案'] };
+  gm.innerHTML = `<label class="field-label">AI 即時建議（約幾秒就有結果）</label>
+    <div class="gm-b">${Object.keys(GM).map(k => `<button type="button" class="btn btn-ghost" data-k="${k}">${GM[k][0]} ${GM[k][1]}</button>`).join('')}</div>
+    <div class="field-hint" id="gm-hint">依照上面的關鍵字、標題、摘要和正文來建議。會把這些文字送到 Google Gemini（免費方案內容可能被 Google 用來改善產品），所以不要放客戶個資、價格或其他私密內容。</div>
+    <div class="gm-r" id="gm-r"></div>`;
+  const gmCall = async (kind) => {
+    const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-suggest`, { method: 'POST', headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suggest', kind, keyword: kwv(), pillar: currentPillar, title: $('f-title').value, excerpt: $('f-excerpt').value, body: $('f-body').value }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+  };
+  const gmShow = (kind, d) => {
+    $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
+    const box = $('gm-r');
+    box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${kind === 'titles' ? '<button type="button" class="btn btn-primary gm-use">用這個標題</button>' : kind === 'excerpt' ? '<button type="button" class="btn btn-primary gm-use">用這個摘要</button>' : kind === 'tags' ? '<button type="button" class="btn btn-primary gm-use">加入標籤</button>' : ''}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
+    box.querySelectorAll('.gm-i').forEach(el => {
+      const x = d.items[+el.dataset.i];
+      const u = el.querySelector('.gm-use'); if (u) u.addEventListener('click', () => {
+        if (kind === 'titles') $('f-title').value = x.text; else if (kind === 'excerpt') $('f-excerpt').value = x.text; else if (!tags.includes(x.text)) { tags.push(x.text); renderTags(); }
+        checkSeo(); toast('已填入，記得按「儲存變更」');
+      });
+      el.querySelector('.gm-copy').addEventListener('click', () => navigator.clipboard.writeText(x.text).then(() => toast('已複製')).catch(() => toast('複製失敗')));
+    });
+  };
+  gm.querySelectorAll('.gm-b button').forEach(b => b.addEventListener('click', async () => {
+    const kind = b.dataset.k; b.disabled = true; const old = b.textContent; b.textContent = '思考中…';
+    try { gmShow(kind, await gmCall(kind)); } catch (e) { toast(e.message, 'err'); }
+    b.disabled = false; b.textContent = old;
+  }));
 
   document.getElementById('backToListBtn').addEventListener('click', () => loadPillar(currentPillar));
 
