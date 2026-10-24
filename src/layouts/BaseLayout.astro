@@ -107,8 +107,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 @view-transition{navigation:auto;}
 ::view-transition-old(root){animation:vt-out .35s var(--ease) both;}
 ::view-transition-new(root){animation:vt-in .55s var(--ease) both;}
-@keyframes vt-out{to{opacity:0;filter:blur(3px);}}
-@keyframes vt-in{from{opacity:0;filter:blur(4px);transform:translateY(6px);}}
+@keyframes vt-out{to{opacity:0;}}
+@keyframes vt-in{from{opacity:0;}}
+/* 手機／觸控裝置：整頁轉場容易卡頓、換頁後會再跳一次，關掉；進場動畫由下面的 .rv 負責 */
+@media (max-width:820px),(pointer:coarse){@view-transition{navigation:none;}}
 .vt-mark{view-transition-name:site-mark;}
 
 /* ── scroll progress hairline ── */
@@ -185,6 +187,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 /* ── reveal: ink surfacing (opacity + blur, tiny lift), staggered by --i ── */
 .rv{opacity:0;filter:blur(6px);transform:translateY(8px);transition:opacity 1s var(--ease),filter 1s var(--ease),transform 1s var(--ease);transition-delay:calc(var(--i,0) * 70ms);}
 .in .rv,.rv.in{opacity:1;filter:none;transform:none;}
+@media (max-width:820px),(pointer:coarse){.rv{filter:none;transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 50ms);}}
 
 footer.site-foot{padding:32px max(40px,calc((100% - 1160px)/2)) 44px;background:#1C0F14;border-top:1px solid rgba(239,229,214,.08);display:flex;gap:24px;flex-wrap:wrap;font-size:12.5px;color:#86707A;}
 footer.site-foot .sf-l{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;}
@@ -304,7 +307,9 @@ footer.site-foot a:hover{color:#EFE5D6;}
   var targets=document.querySelectorAll('.sec,.rv:not(.sec .rv)');
   if(RM){targets.forEach(function(t){t.classList.add('in');});}
   else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
-    targets.forEach(function(t){io.observe(t);});}
+    // 等網路字型載好（最多 1.2 秒）再開始浮現，避免文字出現後才換字型、版面「跳一下」
+    var go=function(){targets.forEach(function(t){io.observe(t);});};
+    if(document.fonts&&document.fonts.ready){var done=false,fire=function(){if(!done){done=true;go();}};document.fonts.ready.then(fire,fire);setTimeout(fire,1200);}else{go();}}
   // 日常紀錄的類別圓章：各自滑進畫面時才彈出（手機版）
   var ks=document.querySelectorAll('.jrow .k,.jr .k');
   if(RM||!('IntersectionObserver' in window)){ks.forEach(function(k){k.classList.add('pop');});}
