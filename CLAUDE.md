@@ -18,7 +18,8 @@
 - 本機預覽：`npm install` → `npm run dev`。
 
 ## 目錄
-- `src/content/{strengthen,emit,operate,conjure,transmute}/*.md`：日常紀錄文章，對應五個方向（強化／放出／操作／具現／變化）。欄位：`title`、`date`、`excerpt`、`tags`、`draft`、`status`、`work`。
+- `src/content/{strengthen,emit,operate,conjure,transmute}/*.md`：日常紀錄文章，對應五個方向（強化／放出／操作／具現／變化）。欄位：`title`、`date`、`excerpt`、`tags`、`draft`、`status`、`also`、`work`。
+  - `also` = 副分類（選填、最多一個）：文章網址與主分類仍以資料夾為準，但也會列在另一個方向的清單，標示「來自・〇〇」；首頁與各方向篇數只算主分類。
   - 公開與否只看 `draft`（`true` = 網站看不到）。`status` 是給後台區分「草稿」與「暫時關閉」用：`paused` = 暫時關閉。
   - 正文有「## 常見問題」＋「### 問題」時，文章頁會自動輸出 FAQ 結構化資料。
 - `src/pages/`：頁面。`src/components/`：元件（`BodyPanel.astro` 是強化頁的身體儀表板）。`src/data/`：站上文案與資料（works、pillars、site-copy 等）。

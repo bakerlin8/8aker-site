@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { pillars, pillarBySlug } from '../../data/pillars';
 import BodyPanel from '../../components/BodyPanel.astro';
-import { pillarEntries } from '../../data/journal';
+import { pillarEntries, alsoEntries } from '../../data/journal';
 
 export async function getStaticPaths() {
   return pillars.map((p) => ({ params: { pillar: p.slug } }));
@@ -10,6 +10,9 @@ export async function getStaticPaths() {
 const { pillar } = Astro.params;
 const meta = pillarBySlug(pillar!)!;
 const entries = await pillarEntries(meta.slug, 'desc');
+const crossRaw = await alsoEntries(meta.slug);
+const listed = [...entries.map((e: any) => ({ e, dir: meta.slug, cross: false })), ...crossRaw.map((c: any) => ({ e: c.e, dir: c.dir, cross: true }))].sort((a, b) => b.e.data.date.valueOf() - a.e.data.date.valueOf());
+const pType = (d: string) => pillarBySlug(d)?.type ?? '';
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const others = pillars.filter((p) => p.slug !== meta.slug);
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
@@ -55,6 +58,7 @@ const schema = [
 .arow:hover{padding-left:10px;}
 .arow:hover h2{color:var(--gold);}
 .arow:hover .arrow{opacity:1;transform:none;}
+.xf{display:inline-block;font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px solid var(--dc);color:var(--dc);vertical-align:3px;}
 .dft{display:inline-block;font-size:11px;letter-spacing:.08em;padding:0 7px;margin-right:8px;border:1px dashed var(--gold);color:var(--gold);vertical-align:3px;}
 .empty{padding:40px 0;color:var(--ash);}
 .list-h{font-family:var(--serif);font-weight:500;font-size:20px;margin-bottom:14px;}
@@ -71,18 +75,18 @@ const schema = [
       <h1 class="rv" style="--i:1">{meta.title}</h1>
       <p class="jp rv" style="--i:2" lang="ja">{meta.titleJp}</p>
       <p class="d rv" style="--i:3">{meta.desc}</p>
-      <p class="count rv" style="--i:4"><>共<b>{entries.length}</b>{meta.unit}</>{meta.slug === 'strengthen' && <a class="jump" href="#bodyPanel" style="margin-left:18px">身體儀表 ↓</a>}</p>
+      <p class="count rv" style="--i:4"><>共<b>{entries.length}</b>{meta.unit}{crossRaw.length > 0 && <span style="margin-left:10px;color:#86707A">另有 {crossRaw.length} 篇來自其他方向</span>}</>{meta.slug === 'strengthen' && <a class="jump" href="#bodyPanel" style="margin-left:18px">身體儀表 ↓</a>}</p>
     </div>
     <div class="big" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
   </div>
 </section>
 <section class="list-sec band-light" style="background:var(--night);color:var(--bone)">
   <div class="list-in">
-    {entries.length === 0 && <p class="empty">這個方向還沒有文章，第一篇可以從今天開始。</p>}
-    {entries.map((e: any, i: number) => (
-      <a class="arow rv" style={`--i:${Math.min(i, 8)}`} href={`/pillars/${meta.slug}/${e.slug}`}>
+    {listed.length === 0 && <p class="empty">這個方向還沒有文章，第一篇可以從今天開始。</p>}
+    {listed.map(({ e, dir, cross }: any, i: number) => (
+      <a class="arow rv" style={`--i:${Math.min(i, 8)}`} href={`/pillars/${dir}/${e.slug}`}>
         <time>{dot(e.data.date)}</time>
-        <div><h2>{e.data.draft && <span class="dft">草稿</span>}{e.data.title}</h2>{e.data.excerpt && <p>{e.data.excerpt}</p>}{e.data.tags?.length > 0 && <div class="tags">{e.data.tags.map((t: string) => <span>{t}</span>)}</div>}</div>
+        <div><h2>{e.data.draft && <span class="dft">草稿</span>}{cross && <span class="xf" style={`--dc:var(--c-${dir})`}>來自・{pType(dir)}</span>}{e.data.title}</h2>{e.data.excerpt && <p>{e.data.excerpt}</p>}{e.data.tags?.length > 0 && <div class="tags">{e.data.tags.map((t: string) => <span>{t}</span>)}</div>}</div>
         <span class="arrow" aria-hidden="true">→</span>
       </a>
     ))}

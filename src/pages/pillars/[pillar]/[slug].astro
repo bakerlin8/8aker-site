@@ -17,6 +17,7 @@ const { pillar } = Astro.params;
 const { entry, prev, next } = Astro.props as any;
 const meta = pillarBySlug(pillar!)!;
 const { Content } = await render(entry);
+const alsoMeta = entry.data.also && entry.data.also !== meta.slug ? pillarBySlug(entry.data.also) : null;
 const ofWork = entry.data.work ? (worksData.works as any[]).find((x) => x.slug === entry.data.work && /^[a-z0-9-]+$/.test(x.slug)) : null;
 const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
@@ -53,6 +54,8 @@ const schema = [
 .ah .crumb a:hover{color:#EFE5D6;border-color:#D4A24C;}
 .ah h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,4.2vw,44px);line-height:1.45;margin-top:14px;}
 .ah .meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:18px;font-size:13px;color:#B9A89E;}
+.ah .alsob{padding:1px 9px;border:1px solid var(--dc);color:var(--dc);font-size:12px;transition:background .3s;}
+.ah .alsob:hover{background:rgba(239,229,214,.06);}
 .ah .meta span{padding:1px 9px;border:1px solid rgba(239,229,214,.15);font-size:12px;}
 .read{padding:64px 40px 96px;background:var(--night);color:var(--bone);}
 .read-in{max-width:720px;margin:0 auto;}
@@ -97,7 +100,7 @@ const schema = [
     <div class="k" aria-hidden="true" style={`view-transition-name:k-${meta.slug}`}>{meta.kanji}</div>
     <p class="crumb rv"><a href="/">首頁</a>／<a href="/journal/">日常紀錄</a>／<a href={`/pillars/${meta.slug}/`}>{meta.type}・{meta.title}</a></p>
     <h1 class="rv" style="--i:1">{entry.data.title}</h1>
-    <div class="meta rv" style="--i:2">{entry.data.draft && <span class="dft">草稿・只在預覽顯示</span>}<time>{dot(entry.data.date)}</time>{entry.data.tags?.map((t: string) => <span>{t}</span>)}</div>
+    <div class="meta rv" style="--i:2">{entry.data.draft && <span class="dft">草稿・只在預覽顯示</span>}<time>{dot(entry.data.date)}</time>{alsoMeta && <a class="alsob" href={`/pillars/${alsoMeta.slug}/`} style={`--dc:var(--c-${alsoMeta.slug})`}>也屬於・{alsoMeta.type}</a>}{entry.data.tags?.map((t: string) => <span>{t}</span>)}</div>
   </div>
 </header>
 <article class="read band-light">

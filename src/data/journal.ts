@@ -14,6 +14,12 @@ export async function pillarEntries(slug: string, order: 'asc' | 'desc' = 'desc'
   return es.sort((a: any, b: any) => (order === 'desc' ? -1 : 1) * (a.data.date.valueOf() - b.data.date.valueOf()));
 }
 
+// 其他方向的文章，只要把「也屬於」設成這個方向，就會列在這個方向的清單裡（網址仍是它的主方向）
+export async function alsoEntries(slug: string) {
+  const all = (await Promise.all(pillars.filter((p) => p.slug !== slug).map(async (p) => (await getCollection(p.slug as any, isVisible)).filter((e: any) => e.data.also === slug).map((e: any) => ({ dir: p.slug, e }))))).flat();
+  return all;
+}
+
 export async function allEntries() {
   const all = (await Promise.all(pillars.map(async (p) => (await getCollection(p.slug as any, isVisible)).map((e: any) => ({ dir: p.slug, e }))))).flat();
   return all.sort((a, b) => b.e.data.date.valueOf() - a.e.data.date.valueOf());

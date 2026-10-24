@@ -763,7 +763,7 @@ function toast(msg, type = 'ok') {
 /* ══════════════════════════ FRONTMATTER (articles) ══════════════════════════ */
 function parseFrontmatter(raw) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, status: 'published', work: '', body: raw };
+  if (!m) return { title: '', date: '', excerpt: '', tags: [], draft: false, status: 'published', also: '', work: '', body: raw };
   const fm = {};
   m[1].split('\n').forEach(line => {
     const idx = line.indexOf(':');
@@ -780,13 +780,14 @@ function parseFrontmatter(raw) {
     }
   });
   const status = fm.status === 'paused' ? 'paused' : (fm.draft ? 'draft' : 'published');
-  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: status !== 'published', status, work: fm.work || '', body: m[2].trim() };
+  return { title: fm.title || '', date: fm.date || '', excerpt: fm.excerpt || '', tags: fm.tags || [], draft: status !== 'published', status, also: fm.also || '', work: fm.work || '', body: m[2].trim() };
 }
 
 function serializeFrontmatter(fm) {
   const tagsStr = '[' + fm.tags.map(t => `"${t}"`).join(', ') + ']';
+  const alsoLine = /^(strengthen|emit|operate|conjure|transmute)$/.test(fm.also || '') ? `also: "${fm.also}"\n` : '';
   const workLine = /^[a-z0-9-]+$/.test(fm.work || '') ? `work: "${fm.work}"\n` : '';
-  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.status ? fm.status !== 'published' : fm.draft}\n${fm.status === 'paused' ? 'status: "paused"\n' : ''}${workLine}---\n\n${fm.body}\n`;
+  return `---\ntitle: "${fm.title.replace(/"/g, '\\"')}"\ndate: ${fm.date}\nexcerpt: "${(fm.excerpt || '').replace(/"/g, '\\"')}"\ntags: ${tagsStr}\ndraft: ${fm.status ? fm.status !== 'published' : fm.draft}\n${fm.status === 'paused' ? 'status: "paused"\n' : ''}${alsoLine}${workLine}---\n\n${fm.body}\n`;
 }
 
 function slugify(title) {
@@ -1887,6 +1888,7 @@ function renderArticleForm(fm) {
       <input type="text" id="f-tag-input" placeholder="輸入標籤後按 Enter">
       <div class="tag-row" id="f-tags"></div>
     </div>
+    <div class="field"><label class="field-label">也屬於哪個方向（選填，最多一個）</label><select id="f-also" style="${SEL_STYLE}"><option value="">（只屬於「${PILLARS[currentPillar].jp}」）</option>${Object.keys(PILLARS).filter(k => k !== currentPillar).map(k => `<option value="${k}" ${fm.also === k ? 'selected' : ''}>${PILLARS[k].jp}・${PILLARS[k].title}</option>`).join('')}</select><div class="field-hint">網址和分類顏色仍以「${PILLARS[currentPillar].jp}」為主；選了之後，這篇也會列在另一個方向的清單裡，並標示「來自・${PILLARS[currentPillar].jp}」。</div></div>
     <div class="field"><label class="field-label">屬於哪個作品（選填：選了會自動出現在該作品頁的「製作紀錄」）</label><select id="f-work" style="${SEL_STYLE}"><option value="">（不屬於任何作品）</option></select></div>
     <div class="field"><label class="field-label">文章狀態</label>
       <div class="st-seg" id="f-status">
@@ -2046,6 +2048,7 @@ function renderArticleForm(fm) {
         excerpt: document.getElementById('f-excerpt').value.trim(),
         tags,
         draft: status !== 'published', status,
+        also: (document.getElementById('f-also') || {}).value || '',
         work: (document.getElementById('f-work') || {}).value || '',
         body: document.getElementById('f-body').value,
       };
