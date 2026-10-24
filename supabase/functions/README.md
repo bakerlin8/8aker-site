@@ -12,7 +12,7 @@
 | `tw-bank` | 支持贊助（公開） | 留資料後回傳台灣轉帳帳號 | Origin＋蜜罐＋IP 限流 |
 | `wish-actions` | 祈願所（公開） | ♡ 與想法 | Origin＋IP 限流 |
 | `studio-inbox` | Studio | 收件匣、轉帳帳號設定 | Studio token |
-| `studio-suggest` | Studio | 即時 AI 建議（Gemini：標題、摘要、標籤、社群文案），金鑰在函式秘密變數 `GEMINI_API_KEY`，每天上限 60 次 | Studio token |
+| `studio-suggest` | Studio | 即時 AI 寫作助手（Gemini：標題、角度、大綱、開頭、續寫、改寫、查錯字、查事實、摘要、標籤、FAQ、社群文案），金鑰在函式秘密變數 `GEMINI_API_KEY`，每天上限 60 次 | Studio token |
 | `studio-ai` | Studio | AI 佇列（ai_jobs）、通知設定 | Studio token |
 | `notify` | pg_cron `notify_tick()` | LINE 每日提醒／週統整 | `x-notify-key`（app_config.notify_key） |
 
