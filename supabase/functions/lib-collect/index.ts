@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
 
   const url = u.toString();
   const exists = await db(`lib_items?url=eq.${encodeURIComponent(url)}&select=id,title`);
-  if (exists?.length) return json({ ok: true, duplicate: true, id: exists[0].id, title: exists[0].title });
+  if (exists?.length) return json({ ok: true, duplicate: true, id: exists[0].id, title: exists[0].title, message: '這個連結之前存過了' + (exists[0].title ? '：' + exists[0].title : '') });
 
   const platform = platformOf(u.hostname);
   const info = await lookup(u, platform);
@@ -114,5 +114,5 @@ Deno.serve(async (req) => {
     meta: info.title || info.thumb ? 'ok' : 'pending',
   };
   const saved = await db('lib_items', { method: 'POST', headers: { Prefer: 'return=representation' }, body: JSON.stringify(row) });
-  return json({ ok: true, duplicate: false, id: saved?.[0]?.id, platform, title: row.title, has_thumb: !!row.thumb_url, meta: row.meta });
+  return json({ ok: true, duplicate: false, id: saved?.[0]?.id, platform, title: row.title, has_thumb: !!row.thumb_url, meta: row.meta, message: '已存進素材庫' + (row.title ? '：' + row.title : '（' + platform + '，標題稍後補）') });
 });
