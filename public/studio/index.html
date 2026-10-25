@@ -540,6 +540,16 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .wl-img .lib-pill{top:auto;bottom:8px;right:8px;}
 .bd-top{display:flex;justify-content:flex-end;margin:-4px -4px -2px;}
 .ls-side .pr{font-size:13px;}
+
+.lib-chip.focus{border-color:var(--vermillion);color:#8a5a10;}
+.lib-top{display:flex;flex-direction:column;gap:6px;background:var(--vermillion-pale);border-radius:4px;padding:12px 14px;margin:0 0 18px;}
+.lib-top>b{font-family:'Noto Serif TC',serif;font-weight:500;font-size:14px;color:#6b4710;margin-bottom:2px;}
+.lib-top button{appearance:none;border:0;background:rgba(251,246,243,.7);border-radius:3px;padding:8px 10px;display:flex;align-items:center;gap:8px;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);min-width:0;}
+.lib-top button:hover{background:var(--warm-white);}
+.lib-top em{font-style:normal;font-family:'Noto Serif TC',serif;color:#C9922E;width:14px;flex:none;}
+.lib-top span{flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lib-top i{font-style:normal;color:#C9922E;font-size:12px;flex:none;}
+.lib-top .pf{margin:0;}
 </style>
 </head>
 <body>
@@ -671,6 +681,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="lib-add"><input type="text" id="libNew" placeholder="手動貼上連結或提示詞，按 Enter" autocomplete="off"><button class="btn btn-primary" id="libNewBtn" type="button">加入收件匣</button></div>
       <div class="lib-note" id="libNote"></div>
       <div class="lib-bar" id="libBar"></div>
+      <div id="libTop"></div>
       <div class="lib-grid" id="libGrid"></div>
     </section>
 
@@ -1713,6 +1724,11 @@ const LIB_USES = ['網站文章', 'IG／Threads 貼文', '民宿與不動產', '
 const LIB_OT = [['', '未分類'], ['post', '社群貼文'], ['video', '影片'], ['article', '文章'], ['course', '課程'], ['own', '自己的想法']];
 let libS = 'prio'; try { libS = localStorage.getItem('libSort') || 'prio'; } catch (e) {}
 const LIB_PR = ['未設定', '低', '中', '高'];
+let libF = []; try { libF = JSON.parse(localStorage.getItem('libFocus') || '[]'); } catch (e) {}
+const libFocus = () => libF.filter(u => LIB_USES.includes(u));
+/* 排序分數：手動權重（高 30／中 20／低 10）＋ 符合「現階段重點用途」每項 +12 */
+const libScore = it => (it.priority || 0) * 10 + (it.uses || []).filter(u => libFocus().includes(u)).length * 12;
+let libEditFocus = false;
 let libV = 'wall'; try { libV = localStorage.getItem('libView') || 'wall'; } catch (e) {}
 const LIB = { sort: libS === 'new' ? 'new' : 'prio', view: ['wall', 'list', 'board'].includes(libV) ? libV : 'wall', items: [], stage: 'inbox', kind: 'all', src: 'all', use: 'all', q: '', pub: false, open: null, ready: false };
 const LIB_PF = { instagram: '#E4405F', threads: '#101010', youtube: '#FF0000', tiktok: '#161616', x: '#111111', twitter: '#111111', facebook: '#0866FF', github: '#181717', linkedin: '#0A66C2', reddit: '#FF4500', pinterest: '#BD081C' };
@@ -1774,13 +1790,16 @@ function libRender() {
   const chip = (attr, key, label, on, n) => `<button type="button" class="lib-chip${on ? ' on' : ''}" data-${attr}="${escapeAttr(key)}">${escapeHtml(label)}${n != null ? ` <small>${n}</small>` : ''}</button>`;
   bar.innerHTML = `<div class="lib-row"><span>類型</span>${[['all', '全部']].concat(LIB_KIND.map(k => [k[0], k[1]])).map(k => chip('k', k[0], k[1], LIB.kind === k[0])).join('')}<button type="button" class="lib-chip gold${LIB.pub ? ' on' : ''}" data-pub="1">只看公開</button></div>` +
     `<div class="lib-row"><span>來源</span>${chip('src', 'all', '全部', LIB.src === 'all')}${srcs.map(x => chip('src', x, x, LIB.src === x, LIB.items.filter(i => libSrc(i) === x).length)).join('')}</div>` +
-    `<div class="lib-row"><span>用途</span>${chip('use', 'all', '全部', LIB.use === 'all')}${LIB_USES.map(x => chip('use', x, x, LIB.use === x, LIB.items.filter(i => (i.uses || []).includes(x)).length)).join('')}</div>` +
+    `<div class="lib-row"><span>用途</span>${libEditFocus ? '' : chip('use', 'all', '全部', LIB.use === 'all')}${LIB_USES.map(x => `<button type="button" class="lib-chip${libEditFocus ? (libFocus().includes(x) ? ' on gold' : '') : (LIB.use === x ? ' on' : (libFocus().includes(x) ? ' focus' : ''))}" data-${libEditFocus ? 'focus' : 'use'}="${escapeAttr(x)}">${libFocus().includes(x) ? '⚑ ' : ''}${escapeHtml(x)} <small>${LIB.items.filter(i => (i.uses || []).includes(x)).length}</small></button>`).join('')}<button type="button" class="lib-chip gold${libEditFocus ? ' on' : ''}" data-fedit="1">${libEditFocus ? '完成設定' : '⚑ 設定現階段重點'}</button></div>` +
+    (libEditFocus ? '<div class="lib-row"><span></span><small style="color:var(--ink-ghost)">點下面的用途，標成「現階段重點」。符合重點的素材會自動加分、排前面。再點一次取消。</small></div>' : '') +
     `<div class="lib-row"><span>顯示</span>${[['wall', '圖牆'], ['list', '清單'], ['board', '看板']].map(v => chip('view', v[0], v[1], LIB.view === v[0])).join('')}</div>` +
     `<div class="lib-row"><span>排序</span>${[['prio', '優先權重高的在前'], ['new', '最新收藏在前']].map(v => chip('sort', v[0], v[1], LIB.sort === v[0])).join('')}</div>` +
     `<div class="lib-row"><input type="search" id="libQ" placeholder="搜尋標題、標籤、筆記" value="${escapeAttr(LIB.q)}"></div>`;
   bar.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => { LIB.kind = b.dataset.k; libRender(); }));
   bar.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { LIB.view = b.dataset.view; try { localStorage.setItem('libView', LIB.view); } catch (e) {} libRender(); }));
   bar.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { LIB.sort = b.dataset.sort; try { localStorage.setItem('libSort', LIB.sort); } catch (e) {} libRender(); }));
+  bar.querySelectorAll('[data-focus]').forEach(b => b.addEventListener('click', () => { const u = b.dataset.focus; libF = libFocus().includes(u) ? libF.filter(x => x !== u) : libF.concat([u]); try { localStorage.setItem('libFocus', JSON.stringify(libF)); } catch (e) {} libRender(); }));
+  bar.querySelector('[data-fedit]').addEventListener('click', () => { libEditFocus = !libEditFocus; libRender(); });
   bar.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click', () => { LIB.src = b.dataset.src; libRender(); }));
   bar.querySelectorAll('[data-use]').forEach(b => b.addEventListener('click', () => { LIB.use = b.dataset.use; libRender(); }));
   bar.querySelector('[data-pub]').addEventListener('click', () => { LIB.pub = !LIB.pub; libRender(); });
@@ -1809,10 +1828,17 @@ function libParts(it) {
     nextBtn: `<button type="button" class="btn btn-primary" data-next="${it.id}" data-to="${next[0]}">${next[1]}</button>`,
     delBtn: `<button type="button" class="btn btn-danger" data-del="${it.id}">刪除</button>` };
 }
+function libTop() {
+  const t = document.getElementById('libTop'); if (!t) return;
+  const top = LIB.items.filter(i => i.status !== 'done' && libScore(i) > 0).sort((a, b) => libScore(b) - libScore(a) || new Date(b.created_at) - new Date(a.created_at)).slice(0, 3);
+  t.innerHTML = top.length ? `<div class="lib-top"><b>今天先看這 ${top.length} 個</b>${top.map((i, n) => `<button type="button" data-open="${i.id}"><em>${n + 1}</em>${libPf(i.platform)}<span>${escapeHtml(libTitle(i))}</span><i>${(i.priority || 0) ? '★'.repeat(i.priority) : '⚑'}</i></button>`).join('')}</div>` : '';
+  t.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', () => libOpen(el.dataset.open)));
+}
 function libGrid() {
+  libTop();
   const g = document.getElementById('libGrid');
   const board = LIB.view === 'board';
-  const list = LIB.items.filter(it => libMatch(it, board)).sort((a, b) => (LIB.sort === 'prio' ? (b.priority || 0) - (a.priority || 0) : 0) || new Date(b.created_at) - new Date(a.created_at));
+  const list = LIB.items.filter(it => libMatch(it, board)).sort((a, b) => (LIB.sort === 'prio' ? libScore(b) - libScore(a) : 0) || new Date(b.created_at) - new Date(a.created_at));
   g.className = 'lib-' + LIB.view;
   if (!list.length) {
     g.className = 'lib-wall';
