@@ -41,6 +41,17 @@ const schema = [
 .jcats a i{font-style:normal;font-size:12px;color:#86707A;}
 .jcats a:hover{border-color:var(--dc,#D4A24C);color:#EFE5D6;}
 .jcats a[aria-current="page"]{border-color:#D4A24C;color:#D4A24C;}
+.jdirs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:30px;}
+.jdir{position:relative;display:grid;grid-template-rows:auto auto auto;gap:2px;padding:16px 16px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--dc) 5%,transparent);transition:border-color .3s,background .3s,transform .45s var(--ease);overflow:hidden;}
+.jdir .jk{font-family:var(--jp);font-weight:400;font-size:34px;line-height:1.1;color:var(--dc);}
+.jdir .jn{font-family:var(--serif);font-size:16px;margin-top:6px;}
+.jdir .jt{font-size:12.5px;color:var(--bone-2);}
+.jdir em{position:absolute;top:12px;right:14px;font-style:normal;font-size:12px;color:var(--ash);}
+.jdir .jd{position:absolute;right:14px;bottom:12px;font-size:11px;letter-spacing:.1em;color:var(--dc);opacity:.85;}
+.jdir:hover{border-color:var(--dc);background:color-mix(in srgb,var(--dc) 11%,transparent);transform:translateY(-3px);}
+.jdir:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+@media(max-width:900px){.jdirs{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:560px){.jdirs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}.jdir{padding:14px 14px 12px;min-height:88px;}.jdir:last-child{grid-column:1/-1;}}
 .jl-sec{padding:64px 40px 96px;background:var(--night);color:var(--bone);}
 .jl-in{max-width:1160px;margin:0 auto;}
 .jr{display:grid;grid-template-columns:96px 36px minmax(0,1fr) 24px;gap:18px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline;transition:padding .45s var(--ease);}
@@ -77,9 +88,8 @@ const schema = [
     <p class="crumb rv"><a href="/">首頁</a>　／　日常紀錄</p>
     <h1 class="rv" style="--i:1">日常紀錄</h1>
     <p class="count rv" style="--i:2">共<b>{total}</b>篇{page.lastPage > 1 && <>・第 {page.currentPage}／{page.lastPage} 頁</>}</p>
-    <nav class="jcats rv" style="--i:3" aria-label="依方向瀏覽">
-      <a href="/journal/" aria-current={page.currentPage === 1 ? 'page' : undefined}>全部<i>{total}</i></a>
-      {pillars.map((p) => <a href={`/pillars/${p.slug}/`} style={`--dc:var(--c-${p.slug})`}><b>{p.kanji}</b>{p.type}<i>{counts[p.slug]} 篇・{dan(counts[p.slug])}</i></a>)}
+    <nav class="jdirs rv" style="--i:3" aria-label="依方向瀏覽">
+      {pillars.map((p) => <a class="jdir" style={`--dc:var(--c-${p.slug})`} href={`/pillars/${p.slug}/`}><b class="jk" aria-hidden="true">{p.kanji}</b><span class="jn">{p.type}</span><span class="jt">{p.title}</span><em>{counts[p.slug]}</em><small class="jd">{dan(counts[p.slug])}</small></a>)}
     </nav>
   </div>
 </section>
