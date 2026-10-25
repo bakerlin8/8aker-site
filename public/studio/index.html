@@ -519,6 +519,20 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .bd-c:hover{border-color:var(--vermillion);}.bd-c b{font-family:'Noto Serif TC',serif;font-weight:500;font-size:13px;line-height:1.5;overflow-wrap:anywhere;}
 .bd-img{margin:-10px -10px 2px;max-height:130px;overflow:hidden;}.bd-img img{display:block;width:100%;object-fit:cover;}
 .bd-e{font-size:12px;color:var(--ink-ghost);text-align:center;padding:14px 0;}
+
+.pf{display:inline-block;width:13px;height:13px;vertical-align:-2px;margin-right:5px;background:var(--c,#444);-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat;}
+.pf-t{-webkit-mask:none;mask:none;background:var(--parchment);color:var(--ink-mute);border-radius:50%;font-size:9px;line-height:13px;text-align:center;font-style:normal;}
+.pf.big{width:15px;height:15px;margin:0;vertical-align:middle;}.pf-t.big{width:20px;height:20px;line-height:20px;font-size:11px;}
+.wl-pf{position:absolute;top:9px;left:9px;width:30px;height:30px;border-radius:50%;background:rgba(251,246,243,.94);display:grid;place-items:center;box-shadow:0 2px 8px rgba(28,15,20,.22);transition:transform .45s var(--ease);}
+.wl-pf .pf.big{width:16px;height:16px;}.wl-pf .pf-t.big{background:none;}
+.wl{transition:transform .45s var(--ease),border-color .25s,box-shadow .35s;}
+.wl:hover{transform:translateY(-4px) rotate(-.4deg);box-shadow:0 12px 26px rgba(28,15,20,.14);}
+.wl:hover .wl-pf{transform:scale(1.18) rotate(-8deg);}
+.wl-img{overflow:hidden;}.wl-img img{transition:transform .8s var(--ease);}.wl:hover .wl-img img{transform:scale(1.05);}
+.wl small .pf,.ls small .pf,.bd-c small .pf{vertical-align:-2px;}
+.ls-th{position:relative;overflow:visible;}.ls-th img{border-radius:3px;}
+.ls-pf{position:absolute;right:-6px;bottom:-6px;width:22px;height:22px;border-radius:50%;background:var(--warm-white);border:1px solid var(--border);display:grid;place-items:center;}.ls-pf .pf{margin:0;width:12px;height:12px;vertical-align:0;}
+@media(prefers-reduced-motion:reduce){.wl,.wl:hover{transform:none;}.wl-img img,.wl:hover .wl-img img{transform:none;}}
 </style>
 </head>
 <body>
@@ -1692,6 +1706,14 @@ const LIB_USES = ['電子報', '網站文章', 'IG／Threads 貼文', '民宿與
 const LIB_OT = [['', '未分類'], ['post', '社群貼文'], ['video', '影片'], ['article', '文章'], ['course', '課程'], ['own', '自己的想法']];
 let libV = 'wall'; try { libV = localStorage.getItem('libView') || 'wall'; } catch (e) {}
 const LIB = { view: ['wall', 'list', 'board'].includes(libV) ? libV : 'wall', items: [], stage: 'inbox', kind: 'all', src: 'all', use: 'all', q: '', pub: false, open: null, ready: false };
+const LIB_PF = { instagram: '#E4405F', threads: '#101010', youtube: '#FF0000', tiktok: '#161616', x: '#111111', twitter: '#111111', facebook: '#0866FF', github: '#181717', linkedin: '#0A66C2', reddit: '#FF4500', pinterest: '#BD081C' };
+function libPf(platform, big) {
+  const p = String(platform || '').toLowerCase(); const k = Object.keys(LIB_PF).find(n => n === 'x' ? /^(x|x\.com)$/.test(p) : p.includes(n));
+  const name = escapeAttr(platform || '手動輸入');
+  if (!k) return `<span class="pf pf-t${big ? ' big' : ''}" title="${name}">${platform ? escapeHtml(platform.slice(0, 1).toUpperCase()) : '✎'}</span>`;
+  const file = k === 'twitter' ? 'x' : k;
+  return `<span class="pf${big ? ' big' : ''}" title="${name}" style="--ic:url(/studio/icons/${file}.svg);--c:${LIB_PF[k]}"></span>`;
+}
 const libSrc = it => it.platform || (it.kind === 'prompt' ? '手動輸入' : '其他');
 /* 後台直接觀看：能嵌的平台就嵌，不能嵌的顯示縮圖與原文連結 */
 function libEmbed(it) {
@@ -1786,17 +1808,17 @@ function libGrid() {
   }
   if (LIB.view === 'wall') {
     g.innerHTML = list.map(it => { const x = libParts(it); return `<figure class="wl" data-open="${it.id}">
-      <div class="wl-img">${it.kind === 'prompt' && it.prompt ? `<div class="lib-pt" style="position:static;height:150px">${escapeHtml(it.prompt)}</div>` : `<div class="lib-glyph" style="position:static;height:120px">${x.k[2]}</div>`}${x.img}<span class="lib-badge">${escapeHtml(libSrc(it))}</span>${it.vis === 'public' ? '<span class="lib-pill">公開</span>' : ''}</div>
-      <figcaption><b>${escapeHtml(libTitle(it))}</b><small>${x.k[1]}・${x.st[1]}${it.column_name ? '・' + escapeHtml(it.column_name) : ''}</small>
-      <div class="wl-act">${x.nextBtn}${x.delBtn}</div></figcaption></figure>`; }).join('');
+      <div class="wl-img">${it.kind === 'prompt' && it.prompt ? `<div class="lib-pt" style="position:static;height:150px">${escapeHtml(it.prompt)}</div>` : `<div class="lib-glyph" style="position:static;height:120px">${x.k[2]}</div>`}${x.img}<span class="wl-pf">${libPf(it.platform, true)}</span>${it.vis === 'public' ? '<span class="lib-pill">公開</span>' : ''}</div>
+      <figcaption><b>${escapeHtml(libTitle(it))}</b><small>${libPf(it.platform)}${escapeHtml(libSrc(it))}・${x.k[1]}・${x.st[1]}</small>
+      ${it.uses && it.uses.length ? `<div class="lib-tags">${x.uses}</div>` : ''}<div class="wl-act">${x.nextBtn}${x.delBtn}</div></figcaption></figure>`; }).join('');
   } else if (LIB.view === 'list') {
     g.innerHTML = list.map(it => { const x = libParts(it); return `<div class="ls" data-open="${it.id}">
-      <div class="ls-th">${x.img || `<span>${x.k[2]}</span>`}</div>
+      <div class="ls-th">${x.img || `<span>${x.k[2]}</span>`}<i class="ls-pf">${libPf(it.platform)}</i></div>
       <div class="ls-main"><b>${escapeHtml(libTitle(it))}</b><small>${escapeHtml(x.meta)}</small>
       ${it.uses && it.uses.length || it.tags && it.tags.length ? `<div class="lib-tags">${x.uses}${x.tags}</div>` : ''}${x.pct >= 0 ? `<div class="lib-prog"><i style="width:${x.pct}%"></i></div>` : ''}</div>
       <div class="ls-side"><span class="ls-st">${x.st[1]}</span>${x.nextBtn}${x.delBtn}</div></div>`; }).join('');
   } else {
-    g.innerHTML = LIB_ST.map(c => { const rows = list.filter(it => it.status === c[0]); return `<section class="bd"><header><b>${c[1]}</b><small>${rows.length}</small></header>${rows.map(it => { const x = libParts(it); return `<article class="bd-c" data-open="${it.id}">${x.img ? `<div class="bd-img">${x.img}</div>` : ''}<b>${escapeHtml(libTitle(it))}</b><small>${escapeHtml(x.meta)}</small>${x.uses ? `<div class="lib-tags">${x.uses}</div>` : ''}${x.pct >= 0 ? `<div class="lib-prog"><i style="width:${x.pct}%"></i></div>` : ''}<div class="wl-act" style="opacity:1">${x.nextBtn}${x.delBtn}</div></article>`; }).join('') || '<div class="bd-e">空的</div>'}</section>`; }).join('');
+    g.innerHTML = LIB_ST.map(c => { const rows = list.filter(it => it.status === c[0]); return `<section class="bd"><header><b>${c[1]}</b><small>${rows.length}</small></header>${rows.map(it => { const x = libParts(it); return `<article class="bd-c" data-open="${it.id}">${x.img ? `<div class="bd-img">${x.img}</div>` : ''}<b>${escapeHtml(libTitle(it))}</b><small>${libPf(it.platform)}${escapeHtml(x.meta)}</small>${x.uses ? `<div class="lib-tags">${x.uses}</div>` : ''}${x.pct >= 0 ? `<div class="lib-prog"><i style="width:${x.pct}%"></i></div>` : ''}<div class="wl-act" style="opacity:1">${x.nextBtn}${x.delBtn}</div></article>`; }).join('') || '<div class="bd-e">空的</div>'}</section>`; }).join('');
   }
   libBind(g);
 }
