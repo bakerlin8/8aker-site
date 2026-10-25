@@ -478,6 +478,20 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .lib-seg button{flex:1;padding:8px;border:0;background:var(--warm-white);color:var(--ink-mute);font-family:inherit;font-size:13px;cursor:pointer;}
 .lib-seg button.on{background:var(--emerald-deep);color:var(--warm-white);}
 @media(max-width:560px){.lib-two{grid-template-columns:1fr;}.lib-bar input[type=search]{margin-left:0;flex:1 1 100%;}.lib-sheet{padding:16px 16px 40px;}}
+
+.lib-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%;}
+.lib-row>span{font-size:11px;letter-spacing:.1em;color:var(--ink-ghost);width:34px;flex:none;}
+.lib-chip small{font-size:10.5px;opacity:.7;margin-left:2px;}
+.lib-row input[type=search]{margin:0;flex:1 1 220px;max-width:360px;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:7px 12px;font-size:13px;color:var(--ink);}
+.lib-bar{flex-direction:column;align-items:stretch;gap:9px;}
+.lib-tags .use{background:var(--vermillion-pale);color:#8a5a10;}
+.lib-foot .btn-danger{margin-left:auto;}
+.lib-sheet header{position:sticky;top:-20px;z-index:3;background:var(--cream);margin:-20px -22px 14px;padding:12px 22px;border-bottom:1px solid var(--border-soft);}
+.lib-hbtn{display:flex;gap:8px;}
+.lib-embed{width:100%;margin-bottom:12px;border-radius:3px;overflow:hidden;background:var(--parchment);}
+.lib-embed iframe{width:100%;height:100%;border:0;display:block;}
+.lib-usepick{display:flex;flex-wrap:wrap;gap:6px;}
+@media(max-width:560px){.lib-sheet header{margin:-16px -16px 14px;padding:10px 16px;top:-16px;}.lib-row>span{width:100%;}}
 </style>
 </head>
 <body>
@@ -1647,7 +1661,18 @@ async function loadOverview() {
 const LIB_ST = [['candidate', '候選', '收進收件匣'], ['inbox', '收件匣', '開始消化'], ['learning', '消化中', '開始實作'], ['practice', '實作中', '標為內化'], ['done', '已內化', '再回顧']];
 const LIB_KIND = [['learn', '學習', '學'], ['style', '設計風格', '風'], ['motion', '動畫', '動'], ['prompt', '提示詞', '詞'], ['other', '其他', '雜']];
 const LIB_COL = ['AI 實作', '成長紀錄', '日本生活', '療癒小事', '政策資訊', '設計美學'];
-const LIB = { items: [], stage: 'inbox', kind: 'all', q: '', pub: false, open: null, ready: false };
+const LIB_USES = ['電子報', '網站文章', 'IG／Threads 貼文', '民宿與不動產', '設計與空間靈感', 'AI 工作流', '語言學習內容', '投資研究', '服務案例'];
+const LIB_OT = [['', '未分類'], ['post', '社群貼文'], ['video', '影片'], ['article', '文章'], ['course', '課程'], ['own', '自己的想法']];
+const LIB = { items: [], stage: 'inbox', kind: 'all', src: 'all', use: 'all', q: '', pub: false, open: null, ready: false };
+const libSrc = it => it.platform || (it.kind === 'prompt' ? '手動輸入' : '其他');
+/* 後台直接觀看：能嵌的平台就嵌，不能嵌的顯示縮圖與原文連結 */
+function libEmbed(it) {
+  const u = it.url || ''; let m;
+  if ((m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/))([\w-]{11})/))) return { src: `https://www.youtube.com/embed/${m[1]}`, h: 315, ratio: '16/9' };
+  if ((m = u.match(/instagram\.com\/(?:[\w.]+\/)?(reel|p|tv)\/([\w-]+)/))) return { src: `https://www.instagram.com/${m[1]}/${m[2]}/embed`, h: 600 };
+  if ((m = u.match(/tiktok\.com\/.*\/video\/(\d+)/))) return { src: `https://www.tiktok.com/embed/v2/${m[1]}`, h: 600 };
+  return null;
+}
 async function libApi(method, body) {
   const r = await fetch(`${HEALTH_BASE}/functions/v1/lib-studio`, { method, headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
   const d = await r.json().catch(() => ({}));
@@ -1673,6 +1698,8 @@ function libMatch(it) {
   if (LIB.stage !== 'all' && it.status !== LIB.stage) return false;
   if (LIB.kind !== 'all' && it.kind !== LIB.kind) return false;
   if (LIB.pub && it.vis !== 'public') return false;
+  if (LIB.src !== 'all' && libSrc(it) !== LIB.src) return false;
+  if (LIB.use !== 'all' && !(it.uses || []).includes(LIB.use)) return false;
   if (LIB.q) {
     const hay = [it.title, it.why, it.takeaway, it.prompt, it.source_text, it.origin, it.column_name, it.pain, it.solution, it.result, it.platform, (it.tags || []).join(' ')].join(' ').toLowerCase();
     if (!hay.includes(LIB.q.toLowerCase())) return false;
@@ -1684,9 +1711,15 @@ function libRender() {
   const cnt = k => LIB.items.filter(x => x.status === k).length;
   setSubtabs('library', LIB_ST.map(s => ({ label: s[1], n: cnt(s[0]), on: LIB.stage === s[0], fn: () => { LIB.stage = s[0]; libRender(); } })).concat([{ label: '全部', n: LIB.items.length, on: LIB.stage === 'all', fn: () => { LIB.stage = 'all'; libRender(); } }]));
   const bar = document.getElementById('libBar');
-  bar.innerHTML = [['all', '全部類型']].concat(LIB_KIND.map(k => [k[0], k[1]])).map(k => `<button type="button" class="lib-chip${LIB.kind === k[0] ? ' on' : ''}" data-k="${k[0]}">${k[1]}</button>`).join('') +
-    `<button type="button" class="lib-chip gold${LIB.pub ? ' on' : ''}" data-pub="1">只看公開</button><input type="search" id="libQ" placeholder="搜尋標題、標籤、筆記" value="${escapeAttr(LIB.q)}">`;
+  const srcs = [...new Set(LIB.items.map(libSrc))];
+  const chip = (attr, key, label, on, n) => `<button type="button" class="lib-chip${on ? ' on' : ''}" data-${attr}="${escapeAttr(key)}">${escapeHtml(label)}${n != null ? ` <small>${n}</small>` : ''}</button>`;
+  bar.innerHTML = `<div class="lib-row"><span>類型</span>${[['all', '全部']].concat(LIB_KIND.map(k => [k[0], k[1]])).map(k => chip('k', k[0], k[1], LIB.kind === k[0])).join('')}<button type="button" class="lib-chip gold${LIB.pub ? ' on' : ''}" data-pub="1">只看公開</button></div>` +
+    `<div class="lib-row"><span>來源</span>${chip('src', 'all', '全部', LIB.src === 'all')}${srcs.map(x => chip('src', x, x, LIB.src === x, LIB.items.filter(i => libSrc(i) === x).length)).join('')}</div>` +
+    `<div class="lib-row"><span>用途</span>${chip('use', 'all', '全部', LIB.use === 'all')}${LIB_USES.map(x => chip('use', x, x, LIB.use === x, LIB.items.filter(i => (i.uses || []).includes(x)).length)).join('')}</div>` +
+    `<div class="lib-row"><input type="search" id="libQ" placeholder="搜尋標題、標籤、筆記" value="${escapeAttr(LIB.q)}"></div>`;
   bar.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => { LIB.kind = b.dataset.k; libRender(); }));
+  bar.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click', () => { LIB.src = b.dataset.src; libRender(); }));
+  bar.querySelectorAll('[data-use]').forEach(b => b.addEventListener('click', () => { LIB.use = b.dataset.use; libRender(); }));
   bar.querySelector('[data-pub]').addEventListener('click', () => { LIB.pub = !LIB.pub; libRender(); });
   const q = bar.querySelector('#libQ'); q.addEventListener('input', () => { LIB.q = q.value.trim(); libGrid(); }); 
   const notes = { candidate: '自動整理出的候選會先放這裡，你決定收，才進收件匣。', inbox: '收件匣只負責接住。挑出現在最想學的，按「開始消化」。', learning: `專注名額 ${cnt('learning')} / 3：同時消化三個以內，比較容易真的吃下去。`, practice: '做過才算學會。拆成小步驟，打勾就有進度。', done: '已內化的是你自己的工具箱。有成果的可以寫成案例。', all: '' };
@@ -1697,7 +1730,7 @@ function libGrid() {
   const g = document.getElementById('libGrid');
   const list = LIB.items.filter(libMatch);
   if (!list.length) {
-    g.innerHTML = LIB.items.length && (LIB.kind !== 'all' || LIB.q || LIB.pub) ? '<div class="lib-empty"><b>沒有符合的素材</b>換個類型或關鍵字試試。</div>'
+    g.innerHTML = LIB.items.length && (LIB.kind !== 'all' || LIB.src !== 'all' || LIB.use !== 'all' || LIB.q || LIB.pub) ? '<div class="lib-empty"><b>沒有符合的素材</b>換個類型或關鍵字試試。</div>'
       : '<div class="lib-empty"><b>這裡還沒有東西</b>在手機按分享選「存進素材庫」，或在上面貼一個連結。</div>';
     return;
   }
@@ -1710,12 +1743,13 @@ function libGrid() {
       <div class="lib-body"><div class="lib-meta">${k[1]}${it.column_name ? '・' + escapeHtml(it.column_name) : ''}・${libDate(it.created_at)}・${st[1]}</div>
       <div class="lib-title" data-open="${it.id}">${escapeHtml(libTitle(it))}</div>
       ${it.why && it.title ? `<div class="lib-why">${escapeHtml(it.why)}</div>` : ''}
-      ${(it.tags || []).length ? `<div class="lib-tags">${it.tags.slice(0, 3).map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      ${(it.uses || []).length || (it.tags || []).length ? `<div class="lib-tags">${(it.uses || []).slice(0, 3).map(t => `<span class="use">${escapeHtml(t)}</span>`).join('')}${(it.tags || []).slice(0, 3).map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>` : ''}
       ${steps.length ? `<div class="lib-prog" title="${done}/${steps.length}"><i style="width:${Math.round(done / steps.length * 100)}%"></i></div>` : ''}
-      <div class="lib-foot"><button type="button" class="btn btn-primary" data-next="${it.id}" data-to="${next[0]}">${next[1]}</button>${it.kind === 'prompt' && it.prompt ? `<button type="button" class="btn btn-ghost" data-copy="${it.id}">複製</button>` : ''}</div></div></article>`;
+      <div class="lib-foot"><button type="button" class="btn btn-primary" data-next="${it.id}" data-to="${next[0]}">${next[1]}</button><button type="button" class="btn btn-ghost" data-open="${it.id}">觀看・編輯</button><button type="button" class="btn btn-danger" data-del="${it.id}">刪除</button>${it.kind === 'prompt' && it.prompt ? `<button type="button" class="btn btn-ghost" data-copy="${it.id}">複製</button>` : ''}</div></div></article>`;
   }).join('');
   g.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', () => libOpen(el.dataset.open)));
   g.querySelectorAll('[data-next]').forEach(el => el.addEventListener('click', () => libSet(el.dataset.next, { status: el.dataset.to }, true)));
+  g.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', () => libDelete(el.dataset.del, el)));
   g.querySelectorAll('[data-copy]').forEach(el => el.addEventListener('click', () => { const it = LIB.items.find(x => x.id === el.dataset.copy); navigator.clipboard?.writeText(it.prompt).then(() => toast('已複製'), () => toast('請手動選取複製', 'err')); }));
 }
 /* 寫回資料庫；先改畫面，失敗再提醒 */
@@ -1736,6 +1770,17 @@ async function libAdd(raw) {
     LIB.items.unshift(d.item); LIB.stage = 'inbox'; libRender(); toast(isUrl ? '已加入收件匣（標題與縮圖之後補）' : '已加入收件匣');
     return true;
   } catch (e) { toast(e.message, 'err'); }
+}
+/* 刪除：第一下變成確認，第二下才真的刪（3.5 秒內沒按會還原） */
+async function libDelete(id, btn) {
+  if (!btn.dataset.arm) { const t = btn.textContent; btn.dataset.arm = '1'; btn.textContent = '再按一次確認刪除'; setTimeout(() => { if (btn.isConnected) { delete btn.dataset.arm; btn.textContent = t; } }, 3500); return; }
+  clearTimeout(libTimer); libPend = {};
+  try {
+    await libApi('POST', { action: 'delete', id });
+    LIB.items = LIB.items.filter(x => x.id !== id);
+    const v = document.getElementById('libVeil'); if (v) v.remove(); LIB.open = null;
+    libRender(); toast('已刪除');
+  } catch (e) { toast('刪除失敗：' + e.message, 'err'); }
 }
 /* 詳細頁 */
 let libTimer = null, libPend = {};
@@ -1759,13 +1804,16 @@ function libSheet() {
   const txt = (label, k, ph, area, cls) => `<div class="field"><label class="field-label">${label}</label>${area ? `<textarea rows="${area}" data-f="${k}" class="${cls || ''}" placeholder="${A(ph || '')}">${escapeHtml(it[k] || '')}</textarea>` : `<input type="text" data-f="${k}" value="${A(it[k] || '')}" placeholder="${A(ph || '')}">`}</div>`;
   const steps = it.steps || [];
   v.innerHTML = `<div class="lib-sheet" role="dialog" aria-modal="true" aria-label="素材詳細">
-    <header><span class="lib-saved" id="libSaved">已儲存</span><button class="btn btn-primary" type="button" id="libDone">完成</button></header>
-    ${it.thumb_url ? `<img src="${A(it.thumb_url)}" alt="" referrerpolicy="no-referrer" style="width:100%;max-height:240px;object-fit:cover;border-radius:3px;margin-bottom:14px" onerror="this.remove()">` : ''}
+    <header><span class="lib-saved" id="libSaved">已儲存</span><span class="lib-hbtn"><button class="btn btn-danger" type="button" data-del="1">刪除</button><button class="btn btn-primary" type="button" id="libDone">儲存並關閉</button></span></header>
+    ${(() => { const e = libEmbed(it); return e ? `<div class="lib-embed" style="${e.ratio ? 'aspect-ratio:' + e.ratio : 'height:' + e.h + 'px'}"><iframe src="${A(e.src)}" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="預覽"></iframe></div>` : it.thumb_url ? `<img src="${A(it.thumb_url)}" alt="" referrerpolicy="no-referrer" style="width:100%;max-height:240px;object-fit:cover;border-radius:3px;margin-bottom:14px" onerror="this.remove()">` : ''; })()}
+    ${it.url ? `<div style="margin:0 0 16px"><a class="btn btn-ghost" href="${A(it.url)}" target="_blank" rel="noopener noreferrer">到原文觀看 ↗</a></div>` : ''}
     ${txt('標題', 'title', '幫它取個名字')}
     ${it.url ? `<div class="field-hint" style="margin:-8px 0 14px"><a href="${A(it.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--rose);overflow-wrap:anywhere">${escapeHtml(it.url)} ↗</a></div>` : ''}
     <div class="lib-two"><div class="field"><label class="field-label">階段</label><select data-f="status">${sel(LIB_ST.map(s => [s[0], s[1]]), it.status)}</select></div>
       <div class="field"><label class="field-label">類型</label><select data-f="kind">${sel(LIB_KIND.map(k => [k[0], k[1]]), it.kind)}</select></div></div>
     <div class="field"><label class="field-label">欄目</label><select data-f="column_name"><option value="">未分欄目</option>${sel(LIB_COL.map(c => [c, c]), it.column_name)}</select></div>
+    <div class="field"><label class="field-label">來源類型（來自 ${escapeHtml(libSrc(it))}）</label><select data-f="origin_type">${sel(LIB_OT, it.origin_type || '')}</select></div>
+    <div class="field"><label class="field-label">之後可以用在哪（可複選）</label><div class="lib-usepick">${LIB_USES.map(u => `<button type="button" class="lib-chip${(it.uses || []).includes(u) ? ' on' : ''}" data-u="${A(u)}">${escapeHtml(u)}</button>`).join('')}</div></div>
     <div class="field"><label class="field-label">標籤（用逗號分開）</label><input type="text" data-f="tags" value="${A((it.tags || []).join(', '))}" placeholder="Claude, 工作流"></div>
     ${txt('為什麼存？', 'why', '我覺得它能用在哪裡', 3)}
     <h4>提示詞</h4>${txt('提示詞全文', 'prompt', '貼在這裡', 5, 'mono')}
@@ -1779,9 +1827,9 @@ function libSheet() {
     ${txt('痛點', 'pain', '例：每次整理房客訊息要花 40 分鐘', 2)}${txt('解法', 'solution', '例：用 AI 做成固定回覆流程', 2)}${txt('結果', 'result', '例：每次縮短到 10 分鐘', 2)}${txt('下一步連結（導向你的服務）', 'cta', 'https://8aker0.com/…')}
     <h4>公開設定</h4><div class="lib-seg"><button type="button" data-vis="private" class="${it.vis === 'public' ? '' : 'on'}">私人</button><button type="button" data-vis="public" class="${it.vis === 'public' ? 'on' : ''}">公開</button></div>
     <div class="field-hint" style="margin:8px 0 14px">預設私人。「公開」只代表準備好給人看，目前網站沒有對外的素材庫頁面，不會有人看到。</div>
-    ${txt('來源（只有你看得到）', 'origin', '創作者、帳號或課程名稱')}
+    ${txt('創作者或帳號（只有你看得到）', 'origin', '例：Nate Herk、@someone、課程名稱')}
     <div class="field field-checkbox"><input type="checkbox" id="libShowO" data-f="show_origin"${it.show_origin ? ' checked' : ''}><label for="libShowO">公開時顯示來源（預設不顯示）</label></div>
-    <div style="margin-top:28px"><button type="button" class="btn btn-danger" id="libDel">刪除這筆</button></div></div>`;
+    <div style="margin-top:28px"><button type="button" class="btn btn-danger" data-del="1">刪除這筆</button></div></div>`;
   const q = s => v.querySelector(s);
   q('#libDone').addEventListener('click', libClose);
   const queue = (k, val) => { libPend[k] = val; const it2 = LIB.items.find(x => x.id === LIB.open); if (it2) it2[k] = val; q('#libSaved').textContent = '編輯中…'; clearTimeout(libTimer); libTimer = setTimeout(libFlush, 700); };
@@ -1798,13 +1846,8 @@ function libSheet() {
   v.querySelectorAll('[data-sx]').forEach(b => b.addEventListener('click', () => stepSave(steps.filter((_, j) => j !== +b.dataset.sx))));
   q('#libStepNew').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.value.trim()) { libFlush(); stepSave(steps.concat([{ t: e.target.value.trim(), done: false }])); } });
   q('#libLogNew').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.value.trim()) { libFlush(); libSet(LIB.open, { log: [{ d: Date.now(), t: e.target.value.trim() }].concat(it.log || []) }, false); libSheet(); } });
-  const del = q('#libDel');
-  del.addEventListener('click', async () => {
-    if (!del.dataset.arm) { del.dataset.arm = '1'; del.textContent = '再按一次，確認刪除'; setTimeout(() => { if (del.isConnected) { delete del.dataset.arm; del.textContent = '刪除這筆'; } }, 3500); return; }
-    const id = LIB.open; clearTimeout(libTimer); libPend = {};
-    try { await libApi('POST', { action: 'delete', id }); LIB.items = LIB.items.filter(x => x.id !== id); LIB.open = null; v.remove(); libRender(); toast('已刪除'); }
-    catch (e) { toast('刪除失敗：' + e.message, 'err'); }
-  });
+  v.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); queue('uses', [...v.querySelectorAll('[data-u].on')].map(x => x.dataset.u)); }));
+  v.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => libDelete(LIB.open, b)));
 }
 document.getElementById('libNewBtn').addEventListener('click', async () => { const i = document.getElementById('libNew'); if (await libAdd(i.value)) i.value = ''; });
 document.getElementById('libNew').addEventListener('keydown', async e => { if (e.key === 'Enter') { if (await libAdd(e.target.value)) e.target.value = ''; } });

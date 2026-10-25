@@ -15,6 +15,7 @@ async function owner(req: Request) {
 
 const STATUS = ['candidate', 'inbox', 'learning', 'practice', 'done'];
 const KIND = ['learn', 'style', 'motion', 'prompt', 'other'];
+const ORIGIN_TYPE = ['', 'post', 'video', 'article', 'course', 'own'];
 const TEXT: Record<string, number> = { title: 300, why: 500, column_name: 40, origin: 200, pain: 1000, solution: 1000, result: 1000, cta: 500, prompt: 8000, source_text: 8000, takeaway: 2000 };
 
 // Keeps only known fields with sane types and lengths; anything else is dropped.
@@ -24,6 +25,8 @@ function clean(b: any) {
   if (STATUS.includes(b.status)) { p.status = b.status; p.done_at = b.status === 'done' ? new Date().toISOString() : null; }
   if (KIND.includes(b.kind)) p.kind = b.kind;
   if (b.vis === 'private' || b.vis === 'public') p.vis = b.vis;
+  if (ORIGIN_TYPE.includes(b.origin_type)) p.origin_type = b.origin_type;
+  if (Array.isArray(b.uses)) p.uses = b.uses.map((t: unknown) => String(t).trim().slice(0, 30)).filter(Boolean).slice(0, 10);
   if (typeof b.show_origin === 'boolean') p.show_origin = b.show_origin;
   if (Array.isArray(b.tags)) p.tags = b.tags.map((t: unknown) => String(t).trim().slice(0, 30)).filter(Boolean).slice(0, 8);
   if (Array.isArray(b.steps)) p.steps = b.steps.slice(0, 30).map((s: any) => ({ t: String(s?.t ?? '').slice(0, 200), done: !!s?.done })).filter((s: any) => s.t);
