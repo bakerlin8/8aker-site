@@ -533,6 +533,13 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .ls-th{position:relative;overflow:visible;}.ls-th img{border-radius:3px;}
 .ls-pf{position:absolute;right:-6px;bottom:-6px;width:22px;height:22px;border-radius:50%;background:var(--warm-white);border:1px solid var(--border);display:grid;place-items:center;}.ls-pf .pf{margin:0;width:12px;height:12px;vertical-align:0;}
 @media(prefers-reduced-motion:reduce){.wl,.wl:hover{transform:none;}.wl-img img,.wl:hover .wl-img img{transform:none;}}
+
+.pr{appearance:none;border:0;background:none;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:1px;color:var(--ink-ghost);padding:2px 4px;border-radius:3px;}
+.pr:hover{background:var(--vermillion-pale);}.pr.p1{color:#B9A06A;}.pr.p2{color:#C9922E;}.pr.p3{color:#D4A24C;text-shadow:0 0 8px rgba(212,162,76,.55);}
+.wl-pr{position:absolute;top:9px;right:9px;background:rgba(251,246,243,.94);border-radius:14px;box-shadow:0 2px 8px rgba(28,15,20,.2);}
+.wl-img .lib-pill{top:auto;bottom:8px;right:8px;}
+.bd-top{display:flex;justify-content:flex-end;margin:-4px -4px -2px;}
+.ls-side .pr{font-size:13px;}
 </style>
 </head>
 <body>
@@ -1704,8 +1711,10 @@ const LIB_KIND = [['learn', '學習', '學'], ['style', '設計風格', '風'], 
 const LIB_COL = ['AI 實作', '成長紀錄', '日本生活', '療癒小事', '政策資訊', '設計美學'];
 const LIB_USES = ['電子報', '網站文章', 'IG／Threads 貼文', '民宿與不動產', '設計與空間靈感', 'AI 工作流', '語言學習內容', '投資研究', '服務案例'];
 const LIB_OT = [['', '未分類'], ['post', '社群貼文'], ['video', '影片'], ['article', '文章'], ['course', '課程'], ['own', '自己的想法']];
+let libS = 'prio'; try { libS = localStorage.getItem('libSort') || 'prio'; } catch (e) {}
+const LIB_PR = ['未設定', '低', '中', '高'];
 let libV = 'wall'; try { libV = localStorage.getItem('libView') || 'wall'; } catch (e) {}
-const LIB = { view: ['wall', 'list', 'board'].includes(libV) ? libV : 'wall', items: [], stage: 'inbox', kind: 'all', src: 'all', use: 'all', q: '', pub: false, open: null, ready: false };
+const LIB = { sort: libS === 'new' ? 'new' : 'prio', view: ['wall', 'list', 'board'].includes(libV) ? libV : 'wall', items: [], stage: 'inbox', kind: 'all', src: 'all', use: 'all', q: '', pub: false, open: null, ready: false };
 const LIB_PF = { instagram: '#E4405F', threads: '#101010', youtube: '#FF0000', tiktok: '#161616', x: '#111111', twitter: '#111111', facebook: '#0866FF', github: '#181717', linkedin: '#0A66C2', reddit: '#FF4500', pinterest: '#BD081C' };
 function libPf(platform, big) {
   const p = String(platform || '').toLowerCase(); const k = Object.keys(LIB_PF).find(n => n === 'x' ? /^(x|x\.com)$/.test(p) : p.includes(n));
@@ -1767,9 +1776,11 @@ function libRender() {
     `<div class="lib-row"><span>來源</span>${chip('src', 'all', '全部', LIB.src === 'all')}${srcs.map(x => chip('src', x, x, LIB.src === x, LIB.items.filter(i => libSrc(i) === x).length)).join('')}</div>` +
     `<div class="lib-row"><span>用途</span>${chip('use', 'all', '全部', LIB.use === 'all')}${LIB_USES.map(x => chip('use', x, x, LIB.use === x, LIB.items.filter(i => (i.uses || []).includes(x)).length)).join('')}</div>` +
     `<div class="lib-row"><span>顯示</span>${[['wall', '圖牆'], ['list', '清單'], ['board', '看板']].map(v => chip('view', v[0], v[1], LIB.view === v[0])).join('')}</div>` +
+    `<div class="lib-row"><span>排序</span>${[['prio', '優先權重高的在前'], ['new', '最新收藏在前']].map(v => chip('sort', v[0], v[1], LIB.sort === v[0])).join('')}</div>` +
     `<div class="lib-row"><input type="search" id="libQ" placeholder="搜尋標題、標籤、筆記" value="${escapeAttr(LIB.q)}"></div>`;
   bar.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => { LIB.kind = b.dataset.k; libRender(); }));
   bar.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { LIB.view = b.dataset.view; try { localStorage.setItem('libView', LIB.view); } catch (e) {} libRender(); }));
+  bar.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { LIB.sort = b.dataset.sort; try { localStorage.setItem('libSort', LIB.sort); } catch (e) {} libRender(); }));
   bar.querySelectorAll('[data-src]').forEach(b => b.addEventListener('click', () => { LIB.src = b.dataset.src; libRender(); }));
   bar.querySelectorAll('[data-use]').forEach(b => b.addEventListener('click', () => { LIB.use = b.dataset.use; libRender(); }));
   bar.querySelector('[data-pub]').addEventListener('click', () => { LIB.pub = !LIB.pub; libRender(); });
@@ -1782,6 +1793,7 @@ function libBind(g) {
   g.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); libOpen(el.dataset.open); }));
   g.querySelectorAll('[data-next]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); libSet(el.dataset.next, { status: el.dataset.to }, true); }));
   g.querySelectorAll('[data-del]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); libDelete(el.dataset.del, el); }));
+  g.querySelectorAll('[data-prio]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); const it = LIB.items.find(x => x.id === el.dataset.prio); libSet(it.id, { priority: ((it.priority || 0) + 1) % 4 }, true); }));
   g.querySelectorAll('[data-copy]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); const it = LIB.items.find(x => x.id === el.dataset.copy); navigator.clipboard?.writeText(it.prompt).then(() => toast('已複製'), () => toast('請手動選取複製', 'err')); }));
 }
 function libParts(it) {
@@ -1790,7 +1802,9 @@ function libParts(it) {
   const img = it.thumb_url ? `<img src="${escapeAttr(it.thumb_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '';
   const uses = (it.uses || []).slice(0, 3).map(t => `<span class="use">${escapeHtml(t)}</span>`).join('');
   const tags = (it.tags || []).slice(0, 3).map(t => `<span>${escapeHtml(t)}</span>`).join('');
-  return { k, st, steps, done, next, img, uses, tags, pct: steps.length ? Math.round(done / steps.length * 100) : -1,
+  const pn = it.priority || 0;
+  const star = `<button type="button" class="pr p${pn}" data-prio="${it.id}" title="優先權重：${LIB_PR[pn]}（點一下切換）">${pn ? '★'.repeat(pn) : '☆'}</button>`;
+  return { star, k, st, steps, done, next, img, uses, tags, pct: steps.length ? Math.round(done / steps.length * 100) : -1,
     meta: `${libSrc(it)}・${k[1]}・${libDate(it.created_at)}`,
     nextBtn: `<button type="button" class="btn btn-primary" data-next="${it.id}" data-to="${next[0]}">${next[1]}</button>`,
     delBtn: `<button type="button" class="btn btn-danger" data-del="${it.id}">刪除</button>` };
@@ -1798,7 +1812,7 @@ function libParts(it) {
 function libGrid() {
   const g = document.getElementById('libGrid');
   const board = LIB.view === 'board';
-  const list = LIB.items.filter(it => libMatch(it, board));
+  const list = LIB.items.filter(it => libMatch(it, board)).sort((a, b) => (LIB.sort === 'prio' ? (b.priority || 0) - (a.priority || 0) : 0) || new Date(b.created_at) - new Date(a.created_at));
   g.className = 'lib-' + LIB.view;
   if (!list.length) {
     g.className = 'lib-wall';
@@ -1808,7 +1822,7 @@ function libGrid() {
   }
   if (LIB.view === 'wall') {
     g.innerHTML = list.map(it => { const x = libParts(it); return `<figure class="wl" data-open="${it.id}">
-      <div class="wl-img">${it.kind === 'prompt' && it.prompt ? `<div class="lib-pt" style="position:static;height:150px">${escapeHtml(it.prompt)}</div>` : `<div class="lib-glyph" style="position:static;height:120px">${x.k[2]}</div>`}${x.img}<span class="wl-pf">${libPf(it.platform, true)}</span>${it.vis === 'public' ? '<span class="lib-pill">公開</span>' : ''}</div>
+      <div class="wl-img">${it.kind === 'prompt' && it.prompt ? `<div class="lib-pt" style="position:static;height:150px">${escapeHtml(it.prompt)}</div>` : `<div class="lib-glyph" style="position:static;height:120px">${x.k[2]}</div>`}${x.img}<span class="wl-pf">${libPf(it.platform, true)}</span><span class="wl-pr">${x.star}</span>${it.vis === 'public' ? '<span class="lib-pill">公開</span>' : ''}</div>
       <figcaption><b>${escapeHtml(libTitle(it))}</b><small>${libPf(it.platform)}${escapeHtml(libSrc(it))}・${x.k[1]}・${x.st[1]}</small>
       ${it.uses && it.uses.length ? `<div class="lib-tags">${x.uses}</div>` : ''}<div class="wl-act">${x.nextBtn}${x.delBtn}</div></figcaption></figure>`; }).join('');
   } else if (LIB.view === 'list') {
@@ -1816,9 +1830,9 @@ function libGrid() {
       <div class="ls-th">${x.img || `<span>${x.k[2]}</span>`}<i class="ls-pf">${libPf(it.platform)}</i></div>
       <div class="ls-main"><b>${escapeHtml(libTitle(it))}</b><small>${escapeHtml(x.meta)}</small>
       ${it.uses && it.uses.length || it.tags && it.tags.length ? `<div class="lib-tags">${x.uses}${x.tags}</div>` : ''}${x.pct >= 0 ? `<div class="lib-prog"><i style="width:${x.pct}%"></i></div>` : ''}</div>
-      <div class="ls-side"><span class="ls-st">${x.st[1]}</span>${x.nextBtn}${x.delBtn}</div></div>`; }).join('');
+      <div class="ls-side">${x.star}<span class="ls-st">${x.st[1]}</span>${x.nextBtn}${x.delBtn}</div></div>`; }).join('');
   } else {
-    g.innerHTML = LIB_ST.map(c => { const rows = list.filter(it => it.status === c[0]); return `<section class="bd"><header><b>${c[1]}</b><small>${rows.length}</small></header>${rows.map(it => { const x = libParts(it); return `<article class="bd-c" data-open="${it.id}">${x.img ? `<div class="bd-img">${x.img}</div>` : ''}<b>${escapeHtml(libTitle(it))}</b><small>${libPf(it.platform)}${escapeHtml(x.meta)}</small>${x.uses ? `<div class="lib-tags">${x.uses}</div>` : ''}${x.pct >= 0 ? `<div class="lib-prog"><i style="width:${x.pct}%"></i></div>` : ''}<div class="wl-act" style="opacity:1">${x.nextBtn}${x.delBtn}</div></article>`; }).join('') || '<div class="bd-e">空的</div>'}</section>`; }).join('');
+    g.innerHTML = LIB_ST.map(c => { const rows = list.filter(it => it.status === c[0]); return `<section class="bd"><header><b>${c[1]}</b><small>${rows.length}</small></header>${rows.map(it => { const x = libParts(it); return `<article class="bd-c" data-open="${it.id}"><div class="bd-top">${x.star}</div>${x.img ? `<div class="bd-img">${x.img}</div>` : ''}<b>${escapeHtml(libTitle(it))}</b><small>${libPf(it.platform)}${escapeHtml(x.meta)}</small>${x.uses ? `<div class="lib-tags">${x.uses}</div>` : ''}${x.pct >= 0 ? `<div class="lib-prog"><i style="width:${x.pct}%"></i></div>` : ''}<div class="wl-act" style="opacity:1">${x.nextBtn}${x.delBtn}</div></article>`; }).join('') || '<div class="bd-e">空的</div>'}</section>`; }).join('');
   }
   libBind(g);
 }
@@ -1881,6 +1895,7 @@ function libSheet() {
     ${it.url ? `<div class="field-hint" style="margin:-8px 0 14px"><a href="${A(it.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--rose);overflow-wrap:anywhere">${escapeHtml(it.url)} ↗</a></div>` : ''}
     <div class="lib-two"><div class="field"><label class="field-label">階段</label><select data-f="status">${sel(LIB_ST.map(s => [s[0], s[1]]), it.status)}</select></div>
       <div class="field"><label class="field-label">類型</label><select data-f="kind">${sel(LIB_KIND.map(k => [k[0], k[1]]), it.kind)}</select></div></div>
+    <div class="field"><label class="field-label">優先權重（跟網站、現況越有關，越設高，就排越前面）</label><div class="lib-seg" id="libPr">${LIB_PR.map((n, i) => `<button type="button" data-pr="${i}" class="${(it.priority || 0) === i ? 'on' : ''}">${i ? '★'.repeat(i) + ' ' : ''}${n}</button>`).join('')}</div></div>
     <div class="field"><label class="field-label">欄目</label><select data-f="column_name"><option value="">未分欄目</option>${sel(LIB_COL.map(c => [c, c]), it.column_name)}</select></div>
     <div class="field"><label class="field-label">來源類型（來自 ${escapeHtml(libSrc(it))}）</label><select data-f="origin_type">${sel(LIB_OT, it.origin_type || '')}</select></div>
     <div class="field"><label class="field-label">之後可以用在哪（可複選）</label><div class="lib-usepick">${LIB_USES.map(u => `<button type="button" class="lib-chip${(it.uses || []).includes(u) ? ' on' : ''}" data-u="${A(u)}">${escapeHtml(u)}</button>`).join('')}</div></div>
@@ -1916,6 +1931,7 @@ function libSheet() {
   v.querySelectorAll('[data-sx]').forEach(b => b.addEventListener('click', () => stepSave(steps.filter((_, j) => j !== +b.dataset.sx))));
   q('#libStepNew').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.value.trim()) { libFlush(); stepSave(steps.concat([{ t: e.target.value.trim(), done: false }])); } });
   q('#libLogNew').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.value.trim()) { libFlush(); libSet(LIB.open, { log: [{ d: Date.now(), t: e.target.value.trim() }].concat(it.log || []) }, false); libSheet(); } });
+  v.querySelectorAll('[data-pr]').forEach(b => b.addEventListener('click', () => { libSet(LIB.open, { priority: +b.dataset.pr }, false); v.querySelectorAll('[data-pr]').forEach(x => x.classList.toggle('on', x === b)); }));
   v.querySelectorAll('[data-u]').forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); queue('uses', [...v.querySelectorAll('[data-u].on')].map(x => x.dataset.u)); }));
   v.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => libDelete(LIB.open, b)));
 }

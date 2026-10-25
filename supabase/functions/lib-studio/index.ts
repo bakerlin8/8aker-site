@@ -27,6 +27,7 @@ function clean(b: any) {
   if (b.vis === 'private' || b.vis === 'public') p.vis = b.vis;
   if (ORIGIN_TYPE.includes(b.origin_type)) p.origin_type = b.origin_type;
   if (Array.isArray(b.uses)) p.uses = b.uses.map((t: unknown) => String(t).trim().slice(0, 30)).filter(Boolean).slice(0, 10);
+  if (Number.isInteger(b.priority) && b.priority >= 0 && b.priority <= 3) p.priority = b.priority;
   if (typeof b.show_origin === 'boolean') p.show_origin = b.show_origin;
   if (Array.isArray(b.tags)) p.tags = b.tags.map((t: unknown) => String(t).trim().slice(0, 30)).filter(Boolean).slice(0, 8);
   if (Array.isArray(b.steps)) p.steps = b.steps.slice(0, 30).map((s: any) => ({ t: String(s?.t ?? '').slice(0, 200), done: !!s?.done })).filter((s: any) => s.t);
