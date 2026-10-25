@@ -61,14 +61,13 @@ async function maybeSyncStrava(c: Record<string, string>) {
     const todo: any[] = (old || []).filter((o) => RUNS.includes(o.extra?.name) && o.extra?.id && !have.has(Number(o.extra.id))).slice(0, 35);
 
 
-    const out: any[] = []; let dbg = false;
+    const out: any[] = [];
     for (const t of todo) {
       const id = Number(t.extra.id);
       const r = await fetch(`https://www.strava.com/api/v3/activities/${id}`, { headers: H });
       if (r.status === 429 || r.status === 401 || r.status === 403) break;
       if (!r.ok) continue;
       const d = await r.json(); const be: any[] = Array.isArray(d.best_efforts) ? d.best_efforts : [];
-      if (!out.length && !dbg) { dbg = true; await cfgSet({ strava_dbg: JSON.stringify({ keys: Object.keys(d).slice(0, 60), has_be: Array.isArray(d.best_efforts), be: be.slice(0, 8).map((e) => [e.name, e.elapsed_time, e.value]) }).slice(0, 900) }); }
       const pick = (n: string) => { const x = be.find((e) => String(e.name || e.type_value || '').toLowerCase().replace('fastest', '') === n); return x ? Number(x.elapsed_time ?? x.value) : null; };
       out.push({ activity_id: id, day: dayStr(jstNum(new Date(t.recorded_at).getTime())), k1: pick('1k'), k5: pick('5k'), k10: pick('10k') });
     }
@@ -85,6 +84,7 @@ Deno.serve(async (req) => {
     const now = Date.now(), today = jstNum(now), thisWk = wkIdx(today);
     const wk: any[] = await db(`health_samples?metric=eq.workout&select=recorded_at,value,extra&order=recorded_at.asc&limit=5000`);
     const body: any[] = await db(`health_samples?metric=in.(weight_body_mass,body_fat_percentage)&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=metric,recorded_at,value&order=recorded_at.asc`);
+    const stepRows: any[] = await db(`health_samples?metric=eq.steps&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=recorded_at,value&order=recorded_at.asc`);
     const lastRows: any[] = await db('health_samples?select=received_at&order=received_at.desc&limit=1');
     const best: any[] = await db('strava_best?select=day,k1,k5,k10&limit=5000');
 
@@ -136,6 +136,20 @@ Deno.serve(async (req) => {
     const predict10k = rec5 ? { sec: Math.round(rec5.sec * Math.pow(2, 1.06)), from: '5k', day: rec5.day } : null;
 
     // ── calendar days (last 400 days) compact: [date, mins, km, elev, "跑步,瑜伽"]
+    // daily steps (one row per JST day); weeks.steps = average steps per recorded day
+    const stepDay = new Map<number, number>();
+    for (const r of stepRows || []) stepDay.set(jstNum(new Date(r.recorded_at).getTime()), Number(r.value) || 0);
+    const stepAvgOf = (idx: number) => { const v = [...stepDay].filter(([dn]) => wkIdx(dn) === idx).map(([, n]) => n); return v.length ? Math.round(avg(v) as number) : null; };
+    const stepWeeks = [...Array(12)].map((_, i) => stepAvgOf(thisWk - (11 - i)));
+    const stepDots: (number | null)[] = Array(7).fill(null);
+    for (const [dn, n] of stepDay) if (wkIdx(dn) === thisWk) stepDots[dowOf(dn)] = n;
+    const stepLastDn = stepDay.size ? Math.max(...stepDay.keys()) : null;
+    const steps = stepDay.size ? {
+      today: stepDay.get(today) ?? null, last_day: stepLastDn != null ? dayStr(stepLastDn) : null,
+      week_avg: stepAvgOf(thisWk), last_week_avg: stepAvgOf(thisWk - 1), dots: stepDots,
+      days: [...stepDay].filter(([dn]) => dn >= today - 60).sort((a, b) => a[0] - b[0]).map(([dn, n]) => [dayStr(dn), n]),
+    } : null;
+
     const cal: any[] = [];
     for (const [dn, d] of days) if (dn >= today - 400) cal.push([dayStr(dn), Math.round(d.m), r1(d.k), Math.round(d.e), Object.keys(d.t).map(typeLabel).join('・')]);
     cal.sort((a, b) => (a[0] < b[0] ? -1 : 1));
@@ -150,11 +164,12 @@ Deno.serve(async (req) => {
       this_week: cur, last_week: prev, week_start: dayStr(thisWk * 7 - 3),
       weeks: { labels: weeks.map((x) => x.end.slice(5).replace('-', '/')), mins: weeks.map((x) => Math.round(x.mins)), km: weeks.map((x) => r1(x.km)),
         types: topTypes.map((t) => ({ key: t, name: typeLabel(t), mins: weeks.map((x) => Math.round(x.by[t] || 0)) })) },
-      calendar: cal, records, predict10k, recent,
+      calendar: cal, steps, records, predict10k, recent,
       stats: { week_minutes: cur.mins, week_sessions: cur.n, streak_weeks: streak, fat_change: fatS.length > 1 && bw.filter((x) => x.f != null).length > 1 ? Math.round((fatS[fatS.length - 1] - fatS[0]) * 10) / 10 : null,
         scale_weeks: bw.filter((x) => x.f != null || x.w != null).length },
       scale_last_day: lw?.day || lf?.day || null,
     };
+    if (stepDay.size) out.weeks.steps = stepWeeks;
     if (show) { out.weeks.weight = fill('w'); out.weeks.fat = fill('f'); out.body_now = { weight: lw, fat: lf }; }
     return new Response(JSON.stringify(out), { headers: HEAD });
   } catch (e) {

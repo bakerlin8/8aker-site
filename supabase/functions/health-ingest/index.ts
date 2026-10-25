@@ -33,13 +33,15 @@ Deno.serve(async (req) => {
   const data = body?.data ?? body;
   const rows: any[] = [];
   // iPhone Shortcuts format: { date, weight, fat, exercise_minutes } — each field optional, date in ISO 8601.
-  if (body && (body.weight != null || body.fat != null || body.exercise_minutes != null)) {
+  if (body && (body.weight != null || body.fat != null || body.exercise_minutes != null || body.steps != null)) {
     const at = (body.date && toIso(String(body.date))) || new Date().toISOString();
     const num = (x: any) => { const n = Number(String(x).replace(/[^0-9.]/g, '')); return isFinite(n) && n > 0 ? n : null; };
-    const w = num(body.weight), f = num(body.fat), m = num(body.exercise_minutes);
+    const w = num(body.weight), f = num(body.fat), m = num(body.exercise_minutes), st = num(body.steps);
     if (w != null) rows.push({ metric: 'weight_body_mass', recorded_at: at, value: Math.round(w * 100) / 100, unit: 'kg' });
     if (f != null) rows.push({ metric: 'body_fat_percentage', recorded_at: at, value: Math.round((f <= 1 ? f * 100 : f) * 100) / 100, unit: '%' });
     const day = /^\d{4}-\d{2}-\d{2}/.test(String(body.date || '')) ? String(body.date).slice(0, 10) : new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+    // Daily step total (from Xiaomi → Apple Health → Shortcut). One row per day; re-sending the same day overwrites it.
+    if (st != null && st < 200000) rows.push({ metric: 'steps', recorded_at: `${day}T12:00:00+09:00`, value: Math.round(st), unit: 'count' });
     if (m != null) rows.push({ metric: 'exercise_minutes', recorded_at: `${day}T12:00:00+09:00`, value: Math.round(m), unit: 'min' });
   }
   for (const m of data?.metrics ?? []) {
@@ -53,6 +55,18 @@ Deno.serve(async (req) => {
       if (m.name === 'weight_body_mass' && /lb/i.test(unit)) { value = v * 0.45359237; unit = 'kg'; }
       rows.push({ metric: m.name, recorded_at: iso, value: Math.round(value * 100) / 100, unit });
     }
+  }
+  // Health Auto Export step_count: sum the samples of each JST day into one daily row.
+  for (const m of data?.metrics ?? []) {
+    if (m?.name !== 'step_count') continue;
+    const perDay: Record<string, number> = {};
+    for (const d of m.data ?? []) {
+      const v = Number(d.qty); const iso = d.date ? toIso(d.date) : null;
+      if (!iso || !isFinite(v) || v < 0) continue;
+      const day = new Date(new Date(iso).getTime() + 9 * 3600e3).toISOString().slice(0, 10);
+      perDay[day] = (perDay[day] || 0) + v;
+    }
+    for (const [day, v] of Object.entries(perDay)) if (v < 200000) rows.push({ metric: 'steps', recorded_at: `${day}T12:00:00+09:00`, value: Math.round(v), unit: 'count' });
   }
   for (const w of data?.workouts ?? []) {
     const start = (w.start || w.startDate) ? toIso(w.start || w.startDate) : null; if (!start) continue;
