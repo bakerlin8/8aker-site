@@ -61,14 +61,13 @@ async function maybeSyncStrava(c: Record<string, string>) {
     const todo: any[] = (old || []).filter((o) => RUNS.includes(o.extra?.name) && o.extra?.id && !have.has(Number(o.extra.id))).slice(0, 35);
 
 
-    const out: any[] = []; let dbg = false;
+    const out: any[] = [];
     for (const t of todo) {
       const id = Number(t.extra.id);
       const r = await fetch(`https://www.strava.com/api/v3/activities/${id}`, { headers: H });
       if (r.status === 429 || r.status === 401 || r.status === 403) break;
       if (!r.ok) continue;
       const d = await r.json(); const be: any[] = Array.isArray(d.best_efforts) ? d.best_efforts : [];
-      if (!out.length && !dbg) { dbg = true; await cfgSet({ strava_dbg: JSON.stringify({ keys: Object.keys(d).slice(0, 60), has_be: Array.isArray(d.best_efforts), be: be.slice(0, 8).map((e) => [e.name, e.elapsed_time, e.value]) }).slice(0, 900) }); }
       const pick = (n: string) => { const x = be.find((e) => String(e.name || e.type_value || '').toLowerCase().replace('fastest', '') === n); return x ? Number(x.elapsed_time ?? x.value) : null; };
       out.push({ activity_id: id, day: dayStr(jstNum(new Date(t.recorded_at).getTime())), k1: pick('1k'), k5: pick('5k'), k10: pick('10k') });
     }
