@@ -148,6 +148,10 @@ Deno.serve(async (req) => {
     // daily walking distance (km), same shape as steps
     const kmDay = new Map<number, number>();
     for (const r of kmRows || []) kmDay.set(jstNum(new Date(r.recorded_at).getTime()), Number(r.value) || 0);
+    // walking only: Apple Health's 步行＋跑步距離 includes runs, so take off that day's Strava run distance
+    const runKmDay = new Map<number, number>();
+    for (const a of acts) if (RUNS.includes(a.type)) runKmDay.set(a.dn, (runKmDay.get(a.dn) || 0) + a.km);
+    for (const [dn, v] of kmDay) kmDay.set(dn, Math.max(0, Math.round((v - (runKmDay.get(dn) || 0)) * 100) / 100));
     const kmSumOf = (idx: number) => r1([...kmDay].filter(([dn]) => wkIdx(dn) === idx).reduce((t, [, n]) => t + n, 0)) as number;
     const kmWeeks = [...Array(12)].map((_, i) => kmSumOf(thisWk - (11 - i)));
     const steps = (stepDay.size || kmDay.size) ? {
