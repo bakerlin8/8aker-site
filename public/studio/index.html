@@ -430,6 +430,54 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
   body.nav-open .tabbar{display:none;}
   body:not(.nav-open) .sidebar{box-shadow:none;}
 }
+/* ── 素材庫 ── */
+.lib-add{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.lib-add input{flex:1 1 260px;min-width:0;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:11px 13px;font-size:13.5px;color:var(--ink);}
+.lib-add input:focus{outline:none;border-color:var(--emerald);}
+.lib-note{font-size:12px;color:var(--ink-ghost);margin:2px 0 16px;min-height:1.2em;}
+.lib-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 18px;}
+.lib-chip{appearance:none;background:none;border:1px solid var(--border);border-radius:20px;padding:4px 13px;font-size:12px;color:var(--ink-mute);cursor:pointer;font-family:inherit;}
+.lib-chip.on{background:var(--ink);color:var(--warm-white);border-color:var(--ink);}
+.lib-chip.gold.on{background:var(--vermillion);border-color:var(--vermillion);color:var(--emerald-deep);}
+.lib-bar input[type=search]{margin-left:auto;flex:0 1 220px;min-width:130px;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:7px 12px;font-size:13px;color:var(--ink);}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:16px;}
+.lib-card{background:var(--warm-white);border:1px solid var(--border);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;min-width:0;transition:border-color .25s,transform .35s var(--ease);}
+.lib-card:hover{border-color:var(--vermillion);}
+.lib-th{display:block;width:100%;aspect-ratio:16/10;position:relative;overflow:hidden;background:var(--parchment);border:0;padding:0;cursor:pointer;}
+.lib-th img{width:100%;height:100%;object-fit:cover;display:block;}
+.lib-glyph{position:absolute;inset:0;display:grid;place-items:center;font-family:'Noto Serif TC',serif;font-size:56px;color:var(--rose);opacity:.35;}
+.lib-pt{position:absolute;inset:0;padding:12px 14px;font-size:11.5px;line-height:1.6;color:var(--ink-mute);overflow:hidden;white-space:pre-wrap;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent);}
+.lib-badge{position:absolute;top:8px;left:8px;background:rgba(28,15,20,.72);color:#FBF6F3;border-radius:3px;padding:1px 8px;font-size:10.5px;letter-spacing:.04em;}
+.lib-pill{position:absolute;top:8px;right:8px;background:var(--vermillion);color:var(--emerald-deep);border-radius:3px;padding:1px 8px;font-size:10.5px;}
+.lib-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:7px;flex:1;min-width:0;}
+.lib-meta{font-size:10.5px;color:var(--ink-ghost);letter-spacing:.03em;}
+.lib-title{font-family:'Noto Serif TC',serif;font-weight:500;font-size:14.5px;line-height:1.5;color:var(--ink);cursor:pointer;overflow-wrap:anywhere;}
+.lib-title:hover{color:var(--rose);}
+.lib-why{font-size:12px;color:var(--ink-ghost);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lib-tags{display:flex;gap:5px;flex-wrap:wrap;}.lib-tags span{background:var(--parchment);border-radius:20px;padding:0 9px;font-size:10.5px;color:var(--ink-mute);}
+.lib-prog{height:3px;background:var(--parchment);border-radius:2px;overflow:hidden;}.lib-prog i{display:block;height:100%;background:var(--vermillion);}
+.lib-foot{margin-top:auto;padding-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.lib-foot .btn{padding:6px 14px;font-size:12px;}
+.lib-empty{grid-column:1/-1;border:1px dashed var(--border);border-radius:4px;padding:36px 18px;text-align:center;color:var(--ink-ghost);}
+.lib-empty b{display:block;font-family:'Noto Serif TC',serif;font-weight:500;font-size:16px;color:var(--ink);margin-bottom:4px;}
+.lib-veil{position:fixed;inset:0;background:rgba(28,15,20,.55);z-index:80;display:flex;justify-content:flex-end;}
+.lib-sheet{background:var(--cream);width:min(560px,100%);height:100%;overflow-y:auto;overscroll-behavior:contain;padding:20px 22px 40px;border-left:1px solid var(--border);}
+.lib-sheet header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px;}
+.lib-saved{font-size:11.5px;color:var(--ink-ghost);}
+.lib-sheet h4{font-family:'Noto Serif TC',serif;font-weight:500;font-size:15px;margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--border-soft);}
+.lib-sheet .field{margin-bottom:14px;}
+.lib-two{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.lib-steps{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.lib-steps li{display:flex;gap:10px;align-items:flex-start;background:var(--warm-white);border:1px solid var(--border);border-radius:3px;padding:8px 10px;font-size:13px;}
+.lib-steps li.done span{text-decoration:line-through;color:var(--ink-ghost);}
+.lib-steps span{flex:1;min-width:0;overflow-wrap:anywhere;}
+.lib-steps button{background:none;border:0;color:var(--ink-ghost);cursor:pointer;font-size:15px;}
+.lib-steps input{margin-top:3px;accent-color:var(--emerald);}
+.lib-log{list-style:none;margin-top:8px;font-size:12.5px;display:flex;flex-direction:column;gap:6px;}.lib-log time{color:var(--ink-ghost);margin-right:10px;font-size:11px;}
+.lib-seg{display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;}
+.lib-seg button{flex:1;padding:8px;border:0;background:var(--warm-white);color:var(--ink-mute);font-family:inherit;font-size:13px;cursor:pointer;}
+.lib-seg button.on{background:var(--emerald-deep);color:var(--warm-white);}
+@media(max-width:560px){.lib-two{grid-template-columns:1fr;}.lib-bar input[type=search]{margin-left:0;flex:1 1 100%;}.lib-sheet{padding:16px 16px 40px;}}
 </style>
 </head>
 <body>
@@ -471,6 +519,7 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <div class="nav-group-label">收件</div>
       <div class="nav-item" data-view="inbox">需求收件匣 <span class="count" id="count-inbox"></span></div>
       <div class="nav-item" data-view="body">身體紀錄 <span class="count" id="count-body"></span></div>
+      <div class="nav-item" data-view="library">素材庫 <span class="count" id="count-library"></span></div>
     </div>
 
     <div class="nav-group">
@@ -550,6 +599,17 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
       <details class="ib-set"><summary>設定：台灣轉帳帳號</summary>
         <div id="bankBox"></div>
       </details>
+    </section>
+
+    <!-- LIBRARY -->
+    <section class="view" id="view-library">
+      <div class="page-eyebrow">Library</div>
+      <div class="page-title">素材庫</div>
+      <div class="page-sub">在 IG、Threads、YouTube 按分享，選「存進素材庫」，就會出現在這裡。先存，再消化，再動手做。只有你看得到。</div>
+      <div class="lib-add"><input type="text" id="libNew" placeholder="手動貼上連結或提示詞，按 Enter" autocomplete="off"><button class="btn btn-primary" id="libNewBtn" type="button">加入收件匣</button></div>
+      <div class="lib-note" id="libNote"></div>
+      <div class="lib-bar" id="libBar"></div>
+      <div class="lib-grid" id="libGrid"></div>
     </section>
 
     <!-- DREAMS -->
@@ -798,7 +858,7 @@ function slugify(title) {
 }
 
 /* ══════════════════════════ NAV / ROUTER ══════════════════════════ */
-const views = ['overview', 'inqq', 'notif', 'home', 'inbox', 'chapters', 'dreams', 'links', 'works', 'services', 'body', 'pillar', 'article'];
+const views = ['overview', 'library', 'inqq', 'notif', 'home', 'inbox', 'chapters', 'dreams', 'links', 'works', 'services', 'body', 'pillar', 'article'];
 let currentPillar = null;
 let currentArticle = null; // { path, sha, isNew }
 
@@ -847,6 +907,7 @@ document.querySelectorAll('.nav-item[data-view="home"]').forEach(el => el.addEve
 document.querySelectorAll('.nav-item[data-view="chapters"]').forEach(el => el.addEventListener('click', () => loadChapters()));
 document.querySelectorAll('.nav-item[data-view="works"]').forEach(el => el.addEventListener('click', () => loadWorks()));
 document.querySelectorAll('.nav-item[data-view="inbox"]').forEach(el => el.addEventListener('click', () => loadInbox()));
+document.querySelectorAll('.nav-item[data-view="library"]').forEach(el => el.addEventListener('click', () => loadLibrary()));
 document.querySelectorAll('.nav-item[data-view="dreams"]').forEach(el => el.addEventListener('click', () => loadDreams()));
 document.querySelectorAll('.nav-item[data-view="services"]').forEach(el => el.addEventListener('click', () => loadServices()));
 document.querySelectorAll('.nav-item[data-view="links"]').forEach(el => el.addEventListener('click', () => loadLinks()));
@@ -1581,6 +1642,173 @@ async function loadOverview() {
   draw();
   refreshInboxCount().then(() => { if (document.getElementById('view-overview').classList.contains('active')) draw(); });
 }
+
+/* ══════════════════════════ 素材庫 ══════════════════════════ */
+const LIB_ST = [['candidate', '候選', '收進收件匣'], ['inbox', '收件匣', '開始消化'], ['learning', '消化中', '開始實作'], ['practice', '實作中', '標為內化'], ['done', '已內化', '再回顧']];
+const LIB_KIND = [['learn', '學習', '學'], ['style', '設計風格', '風'], ['motion', '動畫', '動'], ['prompt', '提示詞', '詞'], ['other', '其他', '雜']];
+const LIB_COL = ['AI 實作', '成長紀錄', '日本生活', '療癒小事', '政策資訊', '設計美學'];
+const LIB = { items: [], stage: 'inbox', kind: 'all', q: '', pub: false, open: null, ready: false };
+async function libApi(method, body) {
+  const r = await fetch(`${HEALTH_BASE}/functions/v1/lib-studio`, { method, headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+  return d;
+}
+const libKind = k => LIB_KIND.find(x => x[0] === k) || LIB_KIND[4];
+const libTitle = it => it.title || (it.why ? it.why.slice(0, 38) : '') || (it.kind === 'prompt' && it.prompt ? it.prompt.split('\n')[0].slice(0, 40) : '') || ((it.platform || '連結') + ' 收藏');
+const libDate = s => { const d = new Date(s); return `${d.getMonth() + 1}/${d.getDate()}`; };
+function libCount() {
+  const n = LIB.items.filter(x => x.status === 'inbox').length;
+  const c = document.getElementById('count-library'); if (c) c.textContent = n || '';
+}
+async function loadLibrary() {
+  showView('library');
+  const g = document.getElementById('libGrid');
+  if (!LIB.ready) g.innerHTML = '<div class="lib-empty">讀取中…</div>';
+  try { LIB.items = (await libApi('GET')).items; LIB.ready = true; }
+  catch (e) { g.innerHTML = `<div class="lib-empty"><b>讀不到素材庫</b>${escapeHtml(e.message)}</div>`; return; }
+  libRender();
+}
+function libMatch(it) {
+  if (LIB.stage !== 'all' && it.status !== LIB.stage) return false;
+  if (LIB.kind !== 'all' && it.kind !== LIB.kind) return false;
+  if (LIB.pub && it.vis !== 'public') return false;
+  if (LIB.q) {
+    const hay = [it.title, it.why, it.takeaway, it.prompt, it.source_text, it.origin, it.column_name, it.pain, it.solution, it.result, it.platform, (it.tags || []).join(' ')].join(' ').toLowerCase();
+    if (!hay.includes(LIB.q.toLowerCase())) return false;
+  }
+  return true;
+}
+function libRender() {
+  libCount();
+  const cnt = k => LIB.items.filter(x => x.status === k).length;
+  setSubtabs('library', LIB_ST.map(s => ({ label: s[1], n: cnt(s[0]), on: LIB.stage === s[0], fn: () => { LIB.stage = s[0]; libRender(); } })).concat([{ label: '全部', n: LIB.items.length, on: LIB.stage === 'all', fn: () => { LIB.stage = 'all'; libRender(); } }]));
+  const bar = document.getElementById('libBar');
+  bar.innerHTML = [['all', '全部類型']].concat(LIB_KIND.map(k => [k[0], k[1]])).map(k => `<button type="button" class="lib-chip${LIB.kind === k[0] ? ' on' : ''}" data-k="${k[0]}">${k[1]}</button>`).join('') +
+    `<button type="button" class="lib-chip gold${LIB.pub ? ' on' : ''}" data-pub="1">只看公開</button><input type="search" id="libQ" placeholder="搜尋標題、標籤、筆記" value="${escapeAttr(LIB.q)}">`;
+  bar.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => { LIB.kind = b.dataset.k; libRender(); }));
+  bar.querySelector('[data-pub]').addEventListener('click', () => { LIB.pub = !LIB.pub; libRender(); });
+  const q = bar.querySelector('#libQ'); q.addEventListener('input', () => { LIB.q = q.value.trim(); libGrid(); }); 
+  const notes = { candidate: '自動整理出的候選會先放這裡，你決定收，才進收件匣。', inbox: '收件匣只負責接住。挑出現在最想學的，按「開始消化」。', learning: `專注名額 ${cnt('learning')} / 3：同時消化三個以內，比較容易真的吃下去。`, practice: '做過才算學會。拆成小步驟，打勾就有進度。', done: '已內化的是你自己的工具箱。有成果的可以寫成案例。', all: '' };
+  document.getElementById('libNote').textContent = notes[LIB.stage] || '';
+  libGrid();
+}
+function libGrid() {
+  const g = document.getElementById('libGrid');
+  const list = LIB.items.filter(libMatch);
+  if (!list.length) {
+    g.innerHTML = LIB.items.length && (LIB.kind !== 'all' || LIB.q || LIB.pub) ? '<div class="lib-empty"><b>沒有符合的素材</b>換個類型或關鍵字試試。</div>'
+      : '<div class="lib-empty"><b>這裡還沒有東西</b>在手機按分享選「存進素材庫」，或在上面貼一個連結。</div>';
+    return;
+  }
+  g.innerHTML = list.map(it => {
+    const k = libKind(it.kind), st = LIB_ST.find(s => s[0] === it.status) || LIB_ST[1], steps = it.steps || [], done = steps.filter(s => s.done).length;
+    const th = it.thumb_url ? `<img src="${escapeAttr(it.thumb_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '';
+    const body = it.kind === 'prompt' && it.prompt ? `<div class="lib-pt">${escapeHtml(it.prompt)}</div>` : `<div class="lib-glyph">${k[2]}</div>`;
+    const next = it.status === 'done' ? ['learning', '再回顧'] : [LIB_ST[LIB_ST.indexOf(st) + 1][0], st[2]];
+    return `<article class="lib-card" data-id="${it.id}"><button type="button" class="lib-th" data-open="${it.id}" aria-label="打開">${body}${th}${it.platform ? `<span class="lib-badge">${escapeHtml(it.platform)}</span>` : ''}${it.vis === 'public' ? '<span class="lib-pill">公開</span>' : ''}</button>
+      <div class="lib-body"><div class="lib-meta">${k[1]}${it.column_name ? '・' + escapeHtml(it.column_name) : ''}・${libDate(it.created_at)}・${st[1]}</div>
+      <div class="lib-title" data-open="${it.id}">${escapeHtml(libTitle(it))}</div>
+      ${it.why && it.title ? `<div class="lib-why">${escapeHtml(it.why)}</div>` : ''}
+      ${(it.tags || []).length ? `<div class="lib-tags">${it.tags.slice(0, 3).map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      ${steps.length ? `<div class="lib-prog" title="${done}/${steps.length}"><i style="width:${Math.round(done / steps.length * 100)}%"></i></div>` : ''}
+      <div class="lib-foot"><button type="button" class="btn btn-primary" data-next="${it.id}" data-to="${next[0]}">${next[1]}</button>${it.kind === 'prompt' && it.prompt ? `<button type="button" class="btn btn-ghost" data-copy="${it.id}">複製</button>` : ''}</div></div></article>`;
+  }).join('');
+  g.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', () => libOpen(el.dataset.open)));
+  g.querySelectorAll('[data-next]').forEach(el => el.addEventListener('click', () => libSet(el.dataset.next, { status: el.dataset.to }, true)));
+  g.querySelectorAll('[data-copy]').forEach(el => el.addEventListener('click', () => { const it = LIB.items.find(x => x.id === el.dataset.copy); navigator.clipboard?.writeText(it.prompt).then(() => toast('已複製'), () => toast('請手動選取複製', 'err')); }));
+}
+/* 寫回資料庫；先改畫面，失敗再提醒 */
+async function libSet(id, patch, redraw) {
+  const it = LIB.items.find(x => x.id === id); if (!it) return;
+  Object.assign(it, patch);
+  if (patch.status) it.done_at = patch.status === 'done' ? new Date().toISOString() : null;
+  if (patch.status === 'learning') { const n = LIB.items.filter(x => x.status === 'learning' && x.id !== id).length; if (n >= 3) toast(`消化中已有 ${n} 個，先完成一個會更好`); }
+  if (redraw) libRender();
+  try { await libApi('POST', { action: 'update', id, ...patch }); const s = document.getElementById('libSaved'); if (s) s.textContent = '已儲存'; }
+  catch (e) { toast('儲存失敗：' + e.message, 'err'); }
+}
+async function libAdd(raw) {
+  const v = raw.trim(); if (!v) return;
+  const isUrl = /^https?:\/\/\S+$/i.test(v);
+  try {
+    const d = await libApi('POST', isUrl ? { action: 'add', url: v } : { action: 'add', kind: 'prompt', prompt: v });
+    LIB.items.unshift(d.item); LIB.stage = 'inbox'; libRender(); toast(isUrl ? '已加入收件匣（標題與縮圖之後補）' : '已加入收件匣');
+    return true;
+  } catch (e) { toast(e.message, 'err'); }
+}
+/* 詳細頁 */
+let libTimer = null, libPend = {};
+function libOpen(id) {
+  const it = LIB.items.find(x => x.id === id); if (!it) return;
+  LIB.open = id; libPend = {};
+  let v = document.getElementById('libVeil'); if (v) v.remove();
+  v = document.createElement('div'); v.className = 'lib-veil'; v.id = 'libVeil'; document.body.append(v);
+  v.addEventListener('click', e => { if (e.target === v) libClose(); });
+  libSheet();
+}
+function libClose() {
+  clearTimeout(libTimer); libFlush();
+  const v = document.getElementById('libVeil'); if (v) v.remove();
+  LIB.open = null; libRender();
+}
+function libFlush() { clearTimeout(libTimer); const id = LIB.open; if (!id || !Object.keys(libPend).length) return; const p = libPend; libPend = {}; libSet(id, p, false); }
+function libSheet() {
+  const it = LIB.items.find(x => x.id === LIB.open), v = document.getElementById('libVeil'); if (!it || !v) return;
+  const A = escapeAttr, sel = (arr, cur) => arr.map(o => `<option value="${A(o[0])}"${o[0] === cur ? ' selected' : ''}>${escapeHtml(o[1])}</option>`).join('');
+  const txt = (label, k, ph, area, cls) => `<div class="field"><label class="field-label">${label}</label>${area ? `<textarea rows="${area}" data-f="${k}" class="${cls || ''}" placeholder="${A(ph || '')}">${escapeHtml(it[k] || '')}</textarea>` : `<input type="text" data-f="${k}" value="${A(it[k] || '')}" placeholder="${A(ph || '')}">`}</div>`;
+  const steps = it.steps || [];
+  v.innerHTML = `<div class="lib-sheet" role="dialog" aria-modal="true" aria-label="素材詳細">
+    <header><span class="lib-saved" id="libSaved">已儲存</span><button class="btn btn-primary" type="button" id="libDone">完成</button></header>
+    ${it.thumb_url ? `<img src="${A(it.thumb_url)}" alt="" referrerpolicy="no-referrer" style="width:100%;max-height:240px;object-fit:cover;border-radius:3px;margin-bottom:14px" onerror="this.remove()">` : ''}
+    ${txt('標題', 'title', '幫它取個名字')}
+    ${it.url ? `<div class="field-hint" style="margin:-8px 0 14px"><a href="${A(it.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--rose);overflow-wrap:anywhere">${escapeHtml(it.url)} ↗</a></div>` : ''}
+    <div class="lib-two"><div class="field"><label class="field-label">階段</label><select data-f="status">${sel(LIB_ST.map(s => [s[0], s[1]]), it.status)}</select></div>
+      <div class="field"><label class="field-label">類型</label><select data-f="kind">${sel(LIB_KIND.map(k => [k[0], k[1]]), it.kind)}</select></div></div>
+    <div class="field"><label class="field-label">欄目</label><select data-f="column_name"><option value="">未分欄目</option>${sel(LIB_COL.map(c => [c, c]), it.column_name)}</select></div>
+    <div class="field"><label class="field-label">標籤（用逗號分開）</label><input type="text" data-f="tags" value="${A((it.tags || []).join(', '))}" placeholder="Claude, 工作流"></div>
+    ${txt('為什麼存？', 'why', '我覺得它能用在哪裡', 3)}
+    <h4>提示詞</h4>${txt('提示詞全文', 'prompt', '貼在這裡', 5, 'mono')}
+    <h4>內容摘錄</h4>${txt('貼文文字、字幕或重點（選填）', 'source_text', '把原文貼進來，之後 AI 才讀得到內容', 4)}
+    <h4>實作步驟</h4><ul class="lib-steps">${steps.map((s, i) => `<li class="${s.done ? 'done' : ''}"><input type="checkbox" data-s="${i}"${s.done ? ' checked' : ''} aria-label="完成"><span>${escapeHtml(s.t)}</span><button type="button" data-sx="${i}" aria-label="移除">×</button></li>`).join('')}</ul>
+    <div class="field"><input type="text" id="libStepNew" placeholder="新增一個小步驟，按 Enter"></div>
+    ${txt('我學到什麼、可以用在哪', 'takeaway', '寫給之後的自己看', 3)}
+    <h4>實作紀錄</h4><div class="field"><input type="text" id="libLogNew" placeholder="今天做了什麼？按 Enter 記一筆"></div>
+    <ul class="lib-log">${(it.log || []).map(l => `<li><time>${libDate(l.d)}</time>${escapeHtml(l.t)}</li>`).join('')}</ul>
+    <h4>案例（之後公開頁用）</h4><div class="field-hint" style="margin:-4px 0 12px">只寫你自己做出來的東西：痛點、解法、結果。別人的圖文不放。</div>
+    ${txt('痛點', 'pain', '例：每次整理房客訊息要花 40 分鐘', 2)}${txt('解法', 'solution', '例：用 AI 做成固定回覆流程', 2)}${txt('結果', 'result', '例：每次縮短到 10 分鐘', 2)}${txt('下一步連結（導向你的服務）', 'cta', 'https://8aker0.com/…')}
+    <h4>公開設定</h4><div class="lib-seg"><button type="button" data-vis="private" class="${it.vis === 'public' ? '' : 'on'}">私人</button><button type="button" data-vis="public" class="${it.vis === 'public' ? 'on' : ''}">公開</button></div>
+    <div class="field-hint" style="margin:8px 0 14px">預設私人。「公開」只代表準備好給人看，目前網站沒有對外的素材庫頁面，不會有人看到。</div>
+    ${txt('來源（只有你看得到）', 'origin', '創作者、帳號或課程名稱')}
+    <div class="field field-checkbox"><input type="checkbox" id="libShowO" data-f="show_origin"${it.show_origin ? ' checked' : ''}><label for="libShowO">公開時顯示來源（預設不顯示）</label></div>
+    <div style="margin-top:28px"><button type="button" class="btn btn-danger" id="libDel">刪除這筆</button></div></div>`;
+  const q = s => v.querySelector(s);
+  q('#libDone').addEventListener('click', libClose);
+  const queue = (k, val) => { libPend[k] = val; const it2 = LIB.items.find(x => x.id === LIB.open); if (it2) it2[k] = val; q('#libSaved').textContent = '編輯中…'; clearTimeout(libTimer); libTimer = setTimeout(libFlush, 700); };
+  v.querySelectorAll('[data-f]').forEach(el => {
+    const k = el.dataset.f;
+    if (el.tagName === 'SELECT') el.addEventListener('change', () => { if (k === 'status') { libFlush(); libSet(LIB.open, { status: el.value }, false); } else queue(k, el.value); });
+    else if (el.type === 'checkbox') el.addEventListener('change', () => queue(k, el.checked));
+    else if (k === 'tags') el.addEventListener('input', () => queue('tags', el.value.split(/[,，、]/).map(s => s.trim()).filter(Boolean).slice(0, 8)));
+    else el.addEventListener('input', () => queue(k, el.value));
+  });
+  v.querySelectorAll('[data-vis]').forEach(b => b.addEventListener('click', () => { libSet(LIB.open, { vis: b.dataset.vis }, false); v.querySelectorAll('[data-vis]').forEach(x => x.classList.toggle('on', x === b)); }));
+  const stepSave = ns => { libSet(LIB.open, { steps: ns }, false); libFlush(); libSheet(); };
+  v.querySelectorAll('[data-s]').forEach(c => c.addEventListener('change', () => { const i = +c.dataset.s; stepSave(steps.map((s, j) => j === i ? { t: s.t, done: c.checked } : s)); if (steps.every((s, j) => j === i ? c.checked : s.done) && it.status !== 'done') toast('步驟都完成了，可以標為內化'); }));
+  v.querySelectorAll('[data-sx]').forEach(b => b.addEventListener('click', () => stepSave(steps.filter((_, j) => j !== +b.dataset.sx))));
+  q('#libStepNew').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.value.trim()) { libFlush(); stepSave(steps.concat([{ t: e.target.value.trim(), done: false }])); } });
+  q('#libLogNew').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.value.trim()) { libFlush(); libSet(LIB.open, { log: [{ d: Date.now(), t: e.target.value.trim() }].concat(it.log || []) }, false); libSheet(); } });
+  const del = q('#libDel');
+  del.addEventListener('click', async () => {
+    if (!del.dataset.arm) { del.dataset.arm = '1'; del.textContent = '再按一次，確認刪除'; setTimeout(() => { if (del.isConnected) { delete del.dataset.arm; del.textContent = '刪除這筆'; } }, 3500); return; }
+    const id = LIB.open; clearTimeout(libTimer); libPend = {};
+    try { await libApi('POST', { action: 'delete', id }); LIB.items = LIB.items.filter(x => x.id !== id); LIB.open = null; v.remove(); libRender(); toast('已刪除'); }
+    catch (e) { toast('刪除失敗：' + e.message, 'err'); }
+  });
+}
+document.getElementById('libNewBtn').addEventListener('click', async () => { const i = document.getElementById('libNew'); if (await libAdd(i.value)) i.value = ''; });
+document.getElementById('libNew').addEventListener('keydown', async e => { if (e.key === 'Enter') { if (await libAdd(e.target.value)) e.target.value = ''; } });
+addEventListener('keydown', e => { if (e.key === 'Escape' && LIB.open) libClose(); });
 
 /* ══════════════════════════ 需求收件匣 ══════════════════════════ */
 const SVC_NAME = { ai: 'AI・工作流優化', estate: '日本不動產', trip: '日本隨行地陪', property: '在日本置產陪跑', owner: '海外屋主代管', omakase: '大阪導覽', interpret: '單次隨行翻譯', tw_transfer: '台灣轉帳・索取帳號（未回報）', tw_transfer_paid: '台灣轉帳・已回報轉帳', other: '其他' };

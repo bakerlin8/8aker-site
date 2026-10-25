@@ -1,4 +1,4 @@
-# Supabase Edge Functions（10 個）
+# Supabase Edge Functions（12 個）
 
 這裡是 **唯一的原始碼來源**。改動一律改這裡，再用 Supabase MCP 或 CLI 部署，不要只在 Supabase 後台改。
 全部 `verify_jwt = false`（函式自己驗身份），部署時要把 `index.ts` 和同資料夾的其他檔案一起送。
@@ -14,6 +14,8 @@
 | `studio-inbox` | Studio | 收件匣、轉帳帳號設定 | Studio token |
 | `studio-suggest` | Studio | 即時 AI 寫作助手（Gemini：標題、角度、大綱、開頭、續寫、改寫、查錯字、查事實、摘要、標籤、FAQ、社群文案），金鑰在函式秘密變數 `GEMINI_API_KEY`，每天上限 60 次 | Studio token |
 | `studio-ai` | Studio | AI 佇列（ai_jobs）、通知設定 | Studio token |
+| `lib-collect` | iPhone 捷徑（IG／Threads／YouTube 分享選單） | 素材庫收件：收連結、去重、盡力抓標題與縮圖，存進 `lib_items` | `x-8aker-key`（只存 SHA-256，app_config.lib_key_sha256） |
+| `lib-studio` | Studio「素材庫」 | 列出、新增、更新、刪除 `lib_items` | Studio token |
 | `notify` | pg_cron `notify_tick()` | LINE 每日提醒／週統整 | `x-notify-key`（app_config.notify_key） |
 
 Studio token 的驗證都是回頭打 `https://8aker0.com/api/studio_verify`（Vercel）確認。
