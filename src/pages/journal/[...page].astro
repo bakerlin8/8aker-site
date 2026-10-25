@@ -14,7 +14,10 @@ const dot = (d: Date) => d.toISOString().slice(0, 10).replaceAll('-', '.');
 const counts = Object.fromEntries(pillars.map((p) => [p.slug, 0]));
 for (const a of await allEntries()) counts[a.dir]++;
 // 段位：10 篇初段、30 篇二段、60 篇三段、100 篇四段
-const dan = (c: number) => (c >= 100 ? '四段' : c >= 60 ? '三段' : c >= 30 ? '二段' : c >= 10 ? '初段' : '見習');
+const latest: Record<string, string> = {};
+for (const a of await allEntries()) if (!latest[a.dir]) latest[a.dir] = a.e.data.title;
+// 預設展開文章最多的方向
+const topDir = pillars.reduce((best, p) => (counts[p.slug] > counts[best.slug] ? p : best), pillars[0]).slug;
 const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
 const href = (n: number) => (n === 1 ? '/journal/' : `/journal/${n}/`);
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
@@ -41,17 +44,24 @@ const schema = [
 .jcats a i{font-style:normal;font-size:12px;color:#86707A;}
 .jcats a:hover{border-color:var(--dc,#D4A24C);color:#EFE5D6;}
 .jcats a[aria-current="page"]{border-color:#D4A24C;color:#D4A24C;}
-.jdirs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:30px;}
-.jdir{position:relative;display:grid;grid-template-rows:auto auto auto;gap:2px;padding:16px 16px 14px;border:1px solid var(--line);background:color-mix(in srgb,var(--dc) 5%,transparent);transition:border-color .3s,background .3s,transform .45s var(--ease);overflow:hidden;}
-.jdir .jk{font-family:var(--jp);font-weight:400;font-size:34px;line-height:1.1;color:var(--dc);}
-.jdir .jn{font-family:var(--serif);font-size:16px;margin-top:6px;}
-.jdir .jt{font-size:12.5px;color:var(--bone-2);}
-.jdir em{position:absolute;top:12px;right:14px;font-style:normal;font-size:12px;color:var(--ash);}
-.jdir .jd{position:absolute;right:14px;bottom:12px;font-size:11px;letter-spacing:.1em;color:var(--dc);opacity:.85;}
-.jdir:hover{border-color:var(--dc);background:color-mix(in srgb,var(--dc) 11%,transparent);transform:translateY(-3px);}
+/* 五個方向：展開式。滑過（手機是點一下）的那張展開，露出最新一篇 */
+.jdirs{display:flex;gap:10px;height:250px;margin-top:30px;}
+.jdir{position:relative;flex:1;min-width:0;padding:20px;border:1px solid var(--line);background:color-mix(in srgb,var(--dc) 5%,transparent);overflow:hidden;transition:flex .6s var(--ease),border-color .4s,background .4s,min-height .55s var(--ease);}
+.jdir.on{flex:3.2;border-color:var(--dc);background:color-mix(in srgb,var(--dc) 12%,transparent);}
+.jdir .jk{position:absolute;right:12px;bottom:-14px;font-family:var(--jp);font-weight:400;font-size:140px;line-height:1;color:var(--dc);opacity:.45;transition:opacity .5s;pointer-events:none;}
+.jdir.on .jk{opacity:.9;}
+.jdir .jtx{position:relative;z-index:1;max-width:72%;}
+.jdir .jn{display:block;font-family:var(--serif);font-size:20px;}
+.jdir .jt{display:block;font-size:12.5px;color:var(--bone-2);margin-top:2px;}
+.jdir em{position:absolute;top:16px;right:16px;z-index:1;font-style:normal;font-size:12px;color:var(--ash);}
+.jdir .jx{display:block;margin-top:14px;max-height:0;opacity:0;overflow:hidden;transition:max-height .5s var(--ease),opacity .4s .12s;}
+.jdir.on .jx{max-height:130px;opacity:1;}
+.jdir .jx i{display:block;font-style:normal;font-size:12px;color:var(--dc);letter-spacing:.1em;}
+.jdir .jx b{display:block;font-family:var(--serif);font-weight:500;font-size:15px;line-height:1.55;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.jdir .jx u{display:inline-block;margin-top:8px;text-decoration:none;font-size:13px;color:var(--dc);}
 .jdir:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-@media(max-width:900px){.jdirs{grid-template-columns:repeat(3,minmax(0,1fr));}}
-@media(max-width:560px){.jdirs{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}.jdir{padding:14px 14px 12px;min-height:88px;}.jdir:last-child{grid-column:1/-1;}}
+@media(max-width:700px){.jdirs{flex-direction:column;height:auto;gap:8px;}.jdir{flex:none;min-height:82px;padding:16px;}.jdir.on{flex:none;min-height:164px;}.jdir .jk{font-size:76px;bottom:-8px;}.jdir .jtx{max-width:74%;}}
+@media(prefers-reduced-motion:reduce){.jdir,.jdir .jx,.jdir .jk{transition:none;}}
 .jl-sec{padding:64px 40px 96px;background:var(--night);color:var(--bone);}
 .jl-in{max-width:1160px;margin:0 auto;}
 .jr{display:grid;grid-template-columns:96px 36px minmax(0,1fr) 24px;gap:18px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline;transition:padding .45s var(--ease);}
@@ -60,6 +70,8 @@ const schema = [
 .jr .k{font-family:var(--jp);font-size:19px;line-height:1;color:var(--dc);width:32px;height:32px;display:grid;place-items:center;border-radius:50%;align-self:start;transition:background .35s,color .35s;}
 .jr h2{font-family:var(--serif);font-weight:500;font-size:18px;line-height:1.55;transition:color .3s;text-wrap:pretty;}
 .jr p{font-size:13.5px;color:var(--bone-2);margin-top:4px;}
+.jr .kw{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline;font-size:12px;letter-spacing:.06em;color:var(--ash);margin:0 0 4px;}
+.jr .kw b{font-weight:500;color:var(--dc);letter-spacing:.1em;}
 .jr .arrow{color:var(--gold);opacity:0;transform:translateX(-8px);transition:opacity .35s,transform .45s var(--ease);}
 .jr:hover{padding-left:8px;}
 .jr:hover .k{background:var(--dc);color:var(--night);}
@@ -89,7 +101,7 @@ const schema = [
     <h1 class="rv" style="--i:1">日常紀錄</h1>
     <p class="count rv" style="--i:2">共<b>{total}</b>篇{page.lastPage > 1 && <>・第 {page.currentPage}／{page.lastPage} 頁</>}</p>
     <nav class="jdirs rv" style="--i:3" aria-label="依方向瀏覽">
-      {pillars.map((p) => <a class="jdir" style={`--dc:var(--c-${p.slug})`} href={`/pillars/${p.slug}/`}><b class="jk" aria-hidden="true">{p.kanji}</b><span class="jn">{p.type}</span><span class="jt">{p.title}</span><em>{counts[p.slug]}</em><small class="jd">{dan(counts[p.slug])}</small></a>)}
+      {pillars.map((p) => <a class={`jdir${p.slug === topDir ? ' on' : ''}`} style={`--dc:var(--c-${p.slug})`} href={`/pillars/${p.slug}/`}><b class="jk" aria-hidden="true">{p.kanji}</b><em>{counts[p.slug]} 篇</em><span class="jtx"><span class="jn">{p.type}</span><span class="jt">{p.title}</span></span><span class="jx">{latest[p.slug] && <><i>最新</i><b>{latest[p.slug]}</b></>}<u>進入 →</u></span></a>)}
     </nav>
   </div>
 </section>
@@ -98,7 +110,7 @@ const schema = [
     {page.data.map((a: any, i: number) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
       <a class="jr rv" style={`--i:${Math.min(i, 8)};--dc:var(--c-${a.dir})`} href={`/pillars/${a.dir}/${a.e.slug}/`}>
         <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
-        <div><h2>{a.e.data.draft && <span class="dft">草稿</span>}{a.e.data.title}</h2>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div>
+        <div><p class="kw"><b>{p.type}</b>{(a.e.data.tags ?? []).slice(0, 2).map((t: string) => <span>{t}</span>)}</p><h2>{a.e.data.draft && <span class="dft">草稿</span>}{a.e.data.title}</h2>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div>
         <span class="arrow" aria-hidden="true">→</span>
       </a>
     ); })}
@@ -112,4 +124,18 @@ const schema = [
     <p class="jl-foot"><a href="/">← 回首頁</a></p>
   </div>
 </section>
+<script>
+  // 展開式：電腦滑過就展開；手機/平板第一下點擊只展開，第二下才進入該方向
+  const box = document.querySelector('.jdirs');
+  if (box) {
+    const cards = Array.from(box.querySelectorAll<HTMLElement>('.jdir'));
+    const set = (c: HTMLElement) => cards.forEach((x) => x.classList.toggle('on', x === c));
+    const canHover = matchMedia('(hover:hover)').matches;
+    cards.forEach((c) => {
+      if (canHover) c.addEventListener('mouseenter', () => set(c));
+      c.addEventListener('focus', () => { if (c.matches(':focus-visible')) set(c); });
+      c.addEventListener('click', (e) => { if (!c.classList.contains('on')) { e.preventDefault(); set(c); } });
+    });
+  }
+</script>
 </BaseLayout>
