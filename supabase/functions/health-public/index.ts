@@ -84,8 +84,12 @@ Deno.serve(async (req) => {
     const now = Date.now(), today = jstNum(now), thisWk = wkIdx(today);
     const wk: any[] = await db(`health_samples?metric=eq.workout&select=recorded_at,value,extra&order=recorded_at.asc&limit=5000`);
     const body: any[] = await db(`health_samples?metric=in.(weight_body_mass,body_fat_percentage)&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=metric,recorded_at,value&order=recorded_at.asc`);
-    const stepRows: any[] = await db(`health_samples?metric=eq.steps&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=recorded_at,value&order=recorded_at.asc`);
-    const kmRows: any[] = await db(`health_samples?metric=eq.walking_distance_km&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=recorded_at,value&order=recorded_at.asc`);
+    // Steps / walking km are shown from 2023-01-01 on (older rows stay in the database but are not read). Paged because the API returns at most 1000 rows per call.
+    const SINCE = '2023-01-01T00:00:00%2B09:00';
+    const pageAll = async (metric: string) => { const all: any[] = []; for (let off = 0; off < 6000; off += 1000) { const part: any[] = await db(`health_samples?metric=eq.${metric}&recorded_at=gte.${SINCE}&select=recorded_at,value&order=recorded_at.asc&limit=1000&offset=${off}`); all.push(...(part || [])); if (!part || part.length < 1000) break; } return all; };
+    const stepRows: any[] = await pageAll('steps');
+    const kmRows: any[] = await pageAll('walking_distance_km');
+    
     const lastRows: any[] = await db('health_samples?select=received_at&order=received_at.desc&limit=1');
     const best: any[] = await db('strava_best?select=day,k1,k5,k10&limit=5000');
 
@@ -154,11 +158,18 @@ Deno.serve(async (req) => {
     for (const [dn, v] of kmDay) kmDay.set(dn, Math.max(0, Math.round((v - (runKmDay.get(dn) || 0)) * 100) / 100));
     const kmSumOf = (idx: number) => r1([...kmDay].filter(([dn]) => wkIdx(dn) === idx).reduce((t, [, n]) => t + n, 0)) as number;
     const kmWeeks = [...Array(12)].map((_, i) => kmSumOf(thisWk - (11 - i)));
+    // monthly averages (per recorded day) since 2023, for the long-term view
+    const mAgg = new Map<string, { s: number[]; k: number[] }>();
+    const mKey = (dn: number) => dayStr(dn).slice(0, 7);
+    for (const [dn, n] of stepDay) { const k = mKey(dn); if (!mAgg.has(k)) mAgg.set(k, { s: [], k: [] }); mAgg.get(k)!.s.push(n); }
+    for (const [dn, n] of kmDay) { const k = mKey(dn); if (!mAgg.has(k)) mAgg.set(k, { s: [], k: [] }); mAgg.get(k)!.k.push(n); }
+    const months = [...mAgg].sort((a, b) => (a[0] < b[0] ? -1 : 1)).map(([k, v]) => [k, v.s.length ? Math.round(avg(v.s) as number) : null, v.k.length ? r1(avg(v.k) as number) : null, Math.max(v.s.length, v.k.length)]);
     const steps = (stepDay.size || kmDay.size) ? {
       today: stepDay.get(today) ?? null, last_day: stepLastDn != null ? dayStr(stepLastDn) : null,
       week_avg: stepAvgOf(thisWk), last_week_avg: stepAvgOf(thisWk - 1), dots: stepDots,
       days: [...stepDay].filter(([dn]) => dn >= today - 60).sort((a, b) => a[0] - b[0]).map(([dn, n]) => [dayStr(dn), n]),
       km_today: kmDay.get(today) ?? null, km_week: kmSumOf(thisWk), km_last_week: kmSumOf(thisWk - 1),
+      months,
       km_days: [...kmDay].filter(([dn]) => dn >= today - 60).sort((a, b) => a[0] - b[0]).map(([dn, n]) => [dayStr(dn), r1(n)]),
     } : null;
 
