@@ -110,7 +110,7 @@ const schema = [
     {page.data.map((a: any, i: number) => { const p = pillars.find((x) => x.slug === a.dir)!; return (
       <a class="jr rv" style={`--i:${Math.min(i, 8)};--dc:var(--c-${a.dir})`} href={`/pillars/${a.dir}/${a.e.slug}/`}>
         <time>{dot(a.e.data.date)}</time><span class="k" title={p.type}>{p.kanji}</span>
-        <div><p class="kw"><b>{p.type}</b>{(a.e.data.tags ?? []).slice(0, 2).map((t: string) => <span>{t}</span>)}</p><h2>{a.e.data.draft && <span class="dft">草稿</span>}{a.e.data.title}</h2>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div>
+        <div>{(a.e.data.tags ?? []).length > 0 && <p class="kw">{(a.e.data.tags ?? []).slice(0, 2).map((t: string) => <span>{t}</span>)}</p>}<h2>{a.e.data.draft && <span class="dft">草稿</span>}{a.e.data.title}</h2>{a.e.data.excerpt && <p>{a.e.data.excerpt}</p>}</div>
         <span class="arrow" aria-hidden="true">→</span>
       </a>
     ); })}
