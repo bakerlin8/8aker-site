@@ -6,7 +6,7 @@
 | 函式 | 誰呼叫 | 用途 | 驗證方式 |
 |---|---|---|---|
 | `health-public` | 強化頁（公開） | 身體儀表的彙總資料；每 6 小時順便同步 Strava（全部歷史＋1/5/10 公里最佳成績） | 無（只回彙總） |
-| `health-ingest` | iPhone 捷徑 | 收體重、體脂、運動 | `x-8aker-key`（只存 SHA-256） |
+| `health-ingest` | iPhone 捷徑 | 收體重、體脂、步數、步行距離（`walk_km`，公里）、運動分鐘 | `x-8aker-key`（只存 SHA-256） |
 | `health-studio` | Studio | 後台身體資料、Strava 連線設定、金鑰重生 | Studio token（s8.*） |
 | `inquiry` | 需求填表（公開） | 存進 inquiries | Origin＋蜜罐＋IP 限流 |
 | `tw-bank` | 支持贊助（公開） | 留資料後回傳台灣轉帳帳號 | Origin＋蜜罐＋IP 限流 |

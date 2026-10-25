@@ -164,21 +164,27 @@ function wStreak(){var n=D.streak_weeks||0;return '<div class="w w-streak bp-in"
 function dotRow(arr){var N='一二三四五六日',h='',ws=D.week_start||THISMON;for(var i=0;i<7;i++){var on=arr&&arr[i]!=null;h+='<i class="'+(on?'on ':'')+(i===tdow?'now':'')+'" '+(on?'data-day="'+addDays(ws,i)+'" role="button" tabindex="0"':'')+' title="'+(on?arr[i]+' 分鐘・點一下看月曆':'休息')+'">'+N[i]+'</i>';}return '<div class="dots">'+h+'</div>';}
 function wWeek(){var a=D.this_week;if(!a)return '<div class="w w-week bp-in"><h3>本週</h3><p class="dim">累積中</p></div>';
   return '<div class="w w-week bp-in"><h3>本週<small>週一起算・點圓點看當天</small></h3><div class="wk2"><div><b class="num" data-to="'+a.mins+'" data-f="hm">'+hm(a.mins)+'</b><small>運動時間</small></div><div><b class="num"><i class="cn" data-to="'+(a.km||0)+'" data-dec="1">'+(a.km||0)+'</i><i class="u">km</i></b><small>距離</small></div></div><div class="wkrow">'+dotRow(a.dots)+'</div></div>';}
-var stSel=null;
-function stDays(){var S=D.steps;if(!S||!S.days)return [];var m={};S.days.forEach(function(r){m[r[0]]=r[1];});var out=[];for(var i=29;i>=0;i--){var k=addDays(TODAY,-i);out.push([k,m[k]==null?null:m[k]]);}return out;}
-function wSteps(){var S=D.steps;if(!S)return '';var big=S.today!=null?S.today:null,lbl='今天',lastD=null;
+var stSel=null,stM='steps';
+function hasKm(){var S=D.steps;return !!(S&&S.km_days&&S.km_days.length);}
+function stDays(){var S=D.steps;if(!S)return [];var src=stM==='km'?S.km_days:S.days;if(!src)return [];var m={};src.forEach(function(r){m[r[0]]=r[1];});var out=[];for(var i=29;i>=0;i--){var k=addDays(TODAY,-i);out.push([k,m[k]==null?null:m[k]]);}return out;}
+function fmtS(n){return stM==='km'?(Math.round(n*10)/10).toString():Math.round(n).toLocaleString();}
+function wSteps(){var S=D.steps;if(!S)return '';var km=stM==='km';if(km&&!hasKm())stM='steps',km=false;
+  var big=S[km?'km_today':'today'],lbl='今天',unit=km?'公里':'步';
   if(big==null){var ds=stDays().filter(function(r){return r[1]!=null;});var l=ds[ds.length-1];if(l){big=l[1];lbl=md(l[0]);}}
-  var cmp=S.week_avg!=null?'本週平均 <b class="num">'+S.week_avg.toLocaleString()+'</b> 步／日'+(S.last_week_avg!=null?'<br><span class="dim">上週 '+S.last_week_avg.toLocaleString()+' 步／日</span>':''):'';
-  return '<div class="w w-steps bp-in"><h3>每日步數<small>近 30 天・點長條看當天</small></h3><div class="st"><div class="big"><b class="num" data-to="'+(big||0)+'" data-f="c">'+(big!=null?big.toLocaleString():'—')+'</b><small>'+lbl+'的步數</small><p class="cmp">'+cmp+'</p></div><div><svg id="stSvg" viewBox="0 0 600 120" role="img" aria-label="近 30 天每日步數"></svg><div class="st-det" id="stDet"></div></div></div></div>';}
-function drawSteps(){var S=document.getElementById('stSvg');if(!S||!D||!D.steps)return;var ds=stDays(),W=600,H=120,pl=2,pr=2,pt=10,pb=20,cw=(W-pl-pr)/ds.length,mx=Math.max(8000,Math.max.apply(0,ds.map(function(r){return r[1]||0;}))),y=function(n){return pt+(H-pt-pb)*(1-n/mx);},o='';
-  o+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y(8000)+'" y2="'+y(8000)+'" style="stroke:var(--gold)" stroke-dasharray="3 4" opacity=".4"/><text x="'+(W-pr)+'" y="'+(y(8000)-4)+'" text-anchor="end" font-size="10" style="fill:var(--ash)">8,000</text>';
-  ds.forEach(function(r,i){var n=r[1],x=pl+cw*i,last=r[0]===TODAY;if(n!=null){var bh=Math.max(2,(H-pb)-y(n));o+='<rect x="'+(x+cw*.18)+'" y="'+(H-pb-bh)+'" width="'+(cw*.64)+'" height="'+bh+'" style="fill:'+(last?'var(--gold)':'rgba(212,162,76,.35)')+';stroke:var(--gold);stroke-width:'+(r[0]===stSel?1.6:(last?0:.8))+'"><title>'+md(r[0])+'：'+n.toLocaleString()+' 步</title></rect>';}
+  var cmp=km?(S.km_week!=null?'本週累計 <b class="num">'+S.km_week+'</b> 公里'+(S.km_last_week!=null?'<br><span class="dim">上週 '+S.km_last_week+' 公里</span>':''):'')
+    :(S.week_avg!=null?'本週平均 <b class="num">'+S.week_avg.toLocaleString()+'</b> 步／日'+(S.last_week_avg!=null?'<br><span class="dim">上週 '+S.last_week_avg.toLocaleString()+' 步／日</span>':''):'');
+  var seg=hasKm()?'<div class="seg" id="stSeg" style="margin-bottom:8px"><button data-sm="steps" aria-pressed="'+!km+'">步數</button><button data-sm="km" aria-pressed="'+km+'">距離</button></div>':'';
+  return '<div class="w w-steps bp-in"><h3>每日步行<small>近 30 天・點長條看當天</small></h3><div class="st"><div class="big"><b class="num" data-to="'+(big||0)+'" data-f="'+(km?'n':'c')+'" data-dec="'+(km?1:0)+'">'+(big!=null?(km?big:big.toLocaleString()):'—')+'</b><small>'+lbl+'的'+(km?'步行距離':'步數')+(km?'（公里）':'')+'</small><p class="cmp">'+cmp+'</p></div><div>'+seg+'<svg id="stSvg" viewBox="0 0 600 120" role="img" aria-label="近 30 天每日'+(km?'步行距離':'步數')+'"></svg><div class="st-det" id="stDet"></div></div></div></div>';}
+function drawSteps(){var S=document.getElementById('stSvg');if(!S||!D||!D.steps)return;var km=stM==='km',ref=km?5:8000,ds=stDays(),W=600,H=120,pl=2,pr=2,pt=10,pb=20,cw=(W-pl-pr)/ds.length,mx=Math.max(ref,Math.max.apply(0,ds.map(function(r){return r[1]||0;}))),y=function(n){return pt+(H-pt-pb)*(1-n/mx);},o='',uni=km?' 公里':' 步';
+  o+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y(ref)+'" y2="'+y(ref)+'" style="stroke:var(--gold)" stroke-dasharray="3 4" opacity=".4"/><text x="'+(W-pr)+'" y="'+(y(ref)-4)+'" text-anchor="end" font-size="10" style="fill:var(--ash)">'+(km?'5 km':'8,000')+'</text>';
+  ds.forEach(function(r,i){var n=r[1],x=pl+cw*i,last=r[0]===TODAY;if(n!=null){var bh=Math.max(2,(H-pb)-y(n));o+='<rect x="'+(x+cw*.18)+'" y="'+(H-pb-bh)+'" width="'+(cw*.64)+'" height="'+bh+'" style="fill:'+(last?'var(--gold)':'rgba(212,162,76,.35)')+';stroke:var(--gold);stroke-width:'+(r[0]===stSel?1.6:(last?0:.8))+'"><title>'+md(r[0])+'：'+fmtS(n)+uni+'</title></rect>';}
     o+='<rect class="hit" data-sd="'+r[0]+'" x="'+x+'" y="0" width="'+cw+'" height="'+(H-pb)+'" fill="transparent"/>';
     if(i%7===0)o+='<text x="'+(x+cw/2)+'" y="'+(H-5)+'" text-anchor="middle" font-size="10.5" style="fill:var(--ash)">'+md(r[0])+'</text>';});
   S.innerHTML=o;
   var sel=stSel&&ds.filter(function(r){return r[0]===stSel;})[0],det=document.getElementById('stDet');
-  var ok=ds.filter(function(r){return r[1]!=null;}),avg=ok.length?Math.round(ok.reduce(function(a,r){return a+r[1];},0)/ok.length):null;
-  det.innerHTML=sel?'<b>'+md(sel[0])+'</b>　'+(sel[1]!=null?sel[1].toLocaleString()+' 步':'沒有紀錄'):(avg!=null?'<span class="dim">近 30 天平均 '+avg.toLocaleString()+' 步／日（有紀錄的日子）</span>':'');}
+  var ok=ds.filter(function(r){return r[1]!=null;}),avg=ok.length?ok.reduce(function(a,r){return a+r[1];},0)/ok.length:null;
+  det.innerHTML=sel?'<b>'+md(sel[0])+'</b>　'+(sel[1]!=null?fmtS(sel[1])+uni:'沒有紀錄'):(avg!=null?'<span class="dim">近 30 天平均 '+fmtS(avg)+uni+'／日（有紀錄的日子）</span>':'');}
+function repaintSteps(){var el=root.querySelector('.w-steps');if(!el)return;el.outerHTML=wSteps();var n=root.querySelector('.w-steps');if(n){n.classList.add('bp-in');[].forEach.call(n.querySelectorAll('[data-to]'),countUp);}drawSteps();}
 function buildCal(){CAL={};(D.calendar||[]).forEach(function(r){CAL[r[0]]={m:r[1],k:r[2],e:r[3],t:r[4]};});}
 function lvOf(m,mx){return Math.round(18+Math.min(1,m/mx)*52);}
 function monthHtml(){var ym=calMonth,y=+ym.slice(0,4),m=+ym.slice(5,7),lead=(new Date(Date.UTC(y,m-1,1)).getUTCDay()+6)%7,days=new Date(Date.UTC(y,m,0)).getUTCDate(),h='<div class="cal">',mx=60,n=0;
@@ -212,13 +218,13 @@ function pickDay(key,scroll){var c=CAL[key];if(!c)return;if(calView==='month'&&m
   if(scroll){var w=root.querySelector('.w-cal');if(w)w.scrollIntoView({behavior:RM?'auto':'smooth',block:'center'});}}
 
 /* ── 趨勢圖 ── */
-var NM={mins:'時間',km:'距離',steps:'步數',fat:'體脂',weight:'體重'},UN={mins:'分鐘',km:'km',steps:'步／日',fat:'%',weight:'kg'};
-function series(){var W=D.weeks||{},s={mins:W.mins||[]};if(W.km&&W.km.some(function(x){return x}))s.km=W.km;if(W.steps&&W.steps.some(function(x){return x}))s.steps=W.steps;if(W.fat&&W.fat.some(function(x){return x!=null}))s.fat=W.fat;if(W.weight&&W.weight.some(function(x){return x!=null}))s.weight=W.weight;return s;}
+var NM={mins:'時間',km:'距離',steps:'步數',walk:'步行距離',fat:'體脂',weight:'體重'},UN={mins:'分鐘',km:'km',steps:'步／日',walk:'km／週',fat:'%',weight:'kg'};
+function series(){var W=D.weeks||{},s={mins:W.mins||[]};if(W.km&&W.km.some(function(x){return x}))s.km=W.km;if(W.steps&&W.steps.some(function(x){return x}))s.steps=W.steps;if(W.walk_km&&W.walk_km.some(function(x){return x}))s.walk=W.walk_km;if(W.fat&&W.fat.some(function(x){return x!=null}))s.fat=W.fat;if(W.weight&&W.weight.some(function(x){return x!=null}))s.weight=W.weight;return s;}
 function wTrend(){return '<div class="w w-trend tr bp-in"><div class="tr-top"><h3><span>近 12 週</span></h3><div class="seg" id="trSeg"></div></div><svg id="trSvg" viewBox="0 0 600 200" role="img" aria-label="近 12 週趨勢"></svg><div class="tr-det" id="trDet"></div></div>';}
 function weekStart(i){return addDays(THISMON,-7*(11-i));}
 function drawTrend(){var S=document.getElementById('trSvg');if(!S||!D)return;var ser=series(),keys=Object.keys(ser);if(!ser[metric])metric='mins';
   document.getElementById('trSeg').innerHTML=keys.map(function(k){return '<button data-m="'+k+'" aria-pressed="'+(k===metric)+'">'+NM[k]+'</button>';}).join('');
-  var v=ser[metric],labels=(D.weeks&&D.weeks.labels)||[],nums=v.filter(function(x){return x!=null;}),bar=metric==='mins'||metric==='km'||metric==='steps';
+  var v=ser[metric],labels=(D.weeks&&D.weeks.labels)||[],nums=v.filter(function(x){return x!=null;}),bar=metric==='mins'||metric==='km'||metric==='steps'||metric==='walk';
   var W=Math.max(260,Math.min(640,Math.round(S.getBoundingClientRect().width)||500)),H=190,pl=4,pr=4,pt=20,pb=24,cw=(W-pl-pr)/Math.max(1,v.length);
   if(!nums.length){S.innerHTML='<text x="'+W/2+'" y="90" text-anchor="middle" style="fill:var(--ash)" font-size="13">資料累積中</text>';return;}
   var mx=Math.max.apply(0,nums),mn=bar?0:Math.min.apply(0,nums),rg=(mx-mn)||1,y=function(x){return pt+(H-pt-pb)*(1-(x-mn)/rg);},g='',out='';
@@ -230,7 +236,7 @@ function drawTrend(){var S=document.getElementById('trSvg');if(!S||!D)return;var
     var last=v[v.length-1];if(last!=null){var cx=pl+cw*(v.length-1)+cw/2;out+='<text x="'+cx+'" y="'+(y(last)-12)+'" text-anchor="end" style="fill:var(--bone)" font-size="13">'+last+'</text>';}}
   var xl=labels.map(function(t,i){return (i%4===0||i===labels.length-1)?'<text x="'+(pl+cw*i+cw/2)+'" y="'+(H-6)+'" text-anchor="middle" style="fill:var(--ash)" font-size="11">'+esc(t)+'</text>':'';}).join('');
   S.setAttribute('viewBox','0 0 '+W+' '+H);S.innerHTML=g+out+xl;
-  var det=document.getElementById('trDet');det.innerHTML=bar?(selWeek>=0?weekDetail(selWeek):'<span class="dim">單位：'+UN[metric]+(metric==='steps'?'・每週平均':'・點長條看那一週每天')+'</span>'):'<span class="dim">單位：'+UN[metric]+'・每週平均</span>';}
+  var det=document.getElementById('trDet');det.innerHTML=bar?(selWeek>=0?weekDetail(selWeek):'<span class="dim">單位：'+UN[metric]+(metric==='steps'?'・每週平均':metric==='walk'?'・每週合計':'・點長條看那一週每天')+'</span>'):'<span class="dim">單位：'+UN[metric]+'・每週平均</span>';}
 function weekDetail(i){var st=weekStart(i),N='一二三四五六日',h='',tm=0,tk=0;for(var d=0;d<7;d++){var c=CAL[addDays(st,d)];if(c){tm+=c.m;tk+=c.k||0;}h+='<div class="'+(c?'on':'')+'">'+N[d]+'<b>'+(c?c.m:'·')+'</b></div>';}
   return '<b>'+md(st)+' – '+md(addDays(st,6))+'</b>　共 '+hm(tm)+(tk?'・'+Math.round(tk*10)/10+' km':'')+'<div class="wdays">'+h+'</div>';}
 
@@ -262,6 +268,7 @@ root.addEventListener('click',function(e){var t=e.target;
   var cell=t.closest('.cal .d.on,.yr rect.on');if(cell){pickDay(cell.dataset.d,false);return;}
   var dot=t.closest('.dots i[data-day]');if(dot){if(calView!=='month'){calView='month';}calMonth=monthOf(dot.dataset.day);paintCal();pickDay(dot.dataset.day,true);return;}
   var tm=t.closest('#trSeg button');if(tm){metric=tm.dataset.m;selWeek=-1;drawTrend();return;}
+  var sm=t.closest('#stSeg button');if(sm){stM=sm.dataset.sm;stSel=null;repaintSteps();return;}
   var sh=t.closest('#stSvg rect.hit');if(sh){stSel=stSel===sh.dataset.sd?null:sh.dataset.sd;drawSteps();return;}
   var hit=t.closest('.tr rect.hit');if(hit){var i=+hit.dataset.i;selWeek=selWeek===i?-1:i;drawTrend();return;}
   var rc=t.closest('.rec');if(rc){recOpen=recOpen===rc.dataset.k?null:rc.dataset.k;openRec(rc.dataset.k);}

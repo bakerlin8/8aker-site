@@ -32,16 +32,18 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch { return json({ error: 'bad_json' }, 400); }
   const data = body?.data ?? body;
   const rows: any[] = [];
-  // iPhone Shortcuts format: { date, weight, fat, exercise_minutes } — each field optional, date in ISO 8601.
-  if (body && (body.weight != null || body.fat != null || body.exercise_minutes != null || body.steps != null)) {
+  // iPhone Shortcuts format: { date, weight, fat, exercise_minutes, steps, walk_km } — each field optional, date in ISO 8601.
+  if (body && (body.weight != null || body.fat != null || body.exercise_minutes != null || body.steps != null || body.walk_km != null)) {
     const at = (body.date && toIso(String(body.date))) || new Date().toISOString();
     const num = (x: any) => { const n = Number(String(x).replace(/[^0-9.]/g, '')); return isFinite(n) && n > 0 ? n : null; };
-    const w = num(body.weight), f = num(body.fat), m = num(body.exercise_minutes), st = num(body.steps);
+    const w = num(body.weight), f = num(body.fat), m = num(body.exercise_minutes), st = num(body.steps), wk = num(body.walk_km);
     if (w != null) rows.push({ metric: 'weight_body_mass', recorded_at: at, value: Math.round(w * 100) / 100, unit: 'kg' });
     if (f != null) rows.push({ metric: 'body_fat_percentage', recorded_at: at, value: Math.round((f <= 1 ? f * 100 : f) * 100) / 100, unit: '%' });
     const day = /^\d{4}-\d{2}-\d{2}/.test(String(body.date || '')) ? String(body.date).slice(0, 10) : new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
     // Daily step total (from Xiaomi → Apple Health → Shortcut). One row per day; re-sending the same day overwrites it.
     if (st != null && st < 200000) rows.push({ metric: 'steps', recorded_at: `${day}T12:00:00+09:00`, value: Math.round(st), unit: 'count' });
+    // Daily walking+running distance in km (Apple Health 步行＋跑步距離). One row per day; re-sending overwrites.
+    if (wk != null && wk < 200) rows.push({ metric: 'walking_distance_km', recorded_at: `${day}T12:00:00+09:00`, value: Math.round(wk * 100) / 100, unit: 'km' });
     if (m != null) rows.push({ metric: 'exercise_minutes', recorded_at: `${day}T12:00:00+09:00`, value: Math.round(m), unit: 'min' });
   }
   for (const m of data?.metrics ?? []) {

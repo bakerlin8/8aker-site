@@ -85,6 +85,7 @@ Deno.serve(async (req) => {
     const wk: any[] = await db(`health_samples?metric=eq.workout&select=recorded_at,value,extra&order=recorded_at.asc&limit=5000`);
     const body: any[] = await db(`health_samples?metric=in.(weight_body_mass,body_fat_percentage)&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=metric,recorded_at,value&order=recorded_at.asc`);
     const stepRows: any[] = await db(`health_samples?metric=eq.steps&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=recorded_at,value&order=recorded_at.asc`);
+    const kmRows: any[] = await db(`health_samples?metric=eq.walking_distance_km&recorded_at=gte.${new Date(now - 100 * DAY).toISOString()}&select=recorded_at,value&order=recorded_at.asc`);
     const lastRows: any[] = await db('health_samples?select=received_at&order=received_at.desc&limit=1');
     const best: any[] = await db('strava_best?select=day,k1,k5,k10&limit=5000');
 
@@ -144,10 +145,17 @@ Deno.serve(async (req) => {
     const stepDots: (number | null)[] = Array(7).fill(null);
     for (const [dn, n] of stepDay) if (wkIdx(dn) === thisWk) stepDots[dowOf(dn)] = n;
     const stepLastDn = stepDay.size ? Math.max(...stepDay.keys()) : null;
-    const steps = stepDay.size ? {
+    // daily walking distance (km), same shape as steps
+    const kmDay = new Map<number, number>();
+    for (const r of kmRows || []) kmDay.set(jstNum(new Date(r.recorded_at).getTime()), Number(r.value) || 0);
+    const kmSumOf = (idx: number) => r1([...kmDay].filter(([dn]) => wkIdx(dn) === idx).reduce((t, [, n]) => t + n, 0)) as number;
+    const kmWeeks = [...Array(12)].map((_, i) => kmSumOf(thisWk - (11 - i)));
+    const steps = (stepDay.size || kmDay.size) ? {
       today: stepDay.get(today) ?? null, last_day: stepLastDn != null ? dayStr(stepLastDn) : null,
       week_avg: stepAvgOf(thisWk), last_week_avg: stepAvgOf(thisWk - 1), dots: stepDots,
       days: [...stepDay].filter(([dn]) => dn >= today - 60).sort((a, b) => a[0] - b[0]).map(([dn, n]) => [dayStr(dn), n]),
+      km_today: kmDay.get(today) ?? null, km_week: kmSumOf(thisWk), km_last_week: kmSumOf(thisWk - 1),
+      km_days: [...kmDay].filter(([dn]) => dn >= today - 60).sort((a, b) => a[0] - b[0]).map(([dn, n]) => [dayStr(dn), r1(n)]),
     } : null;
 
     const cal: any[] = [];
@@ -170,6 +178,7 @@ Deno.serve(async (req) => {
       scale_last_day: lw?.day || lf?.day || null,
     };
     if (stepDay.size) out.weeks.steps = stepWeeks;
+    if (kmDay.size) out.weeks.walk_km = kmWeeks;
     if (show) { out.weeks.weight = fill('w'); out.weeks.fat = fill('f'); out.body_now = { weight: lw, fat: lf }; }
     return new Response(JSON.stringify(out), { headers: HEAD });
   } catch (e) {
