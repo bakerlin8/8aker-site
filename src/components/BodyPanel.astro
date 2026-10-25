@@ -260,7 +260,7 @@ function wBody(){var b=D.body_now;if(!b||(!b.weight&&!b.fat))return '<div class=
 function render(d,isLive){D=d;buildCal();calMonth=monthOf(TODAY);
   G.innerHTML=wStreak()+wWeek()+wSteps()+wCal()+wTrend()+wRec()+wBody();
   paintCal();drawTrend();drawSteps();
-  if(isLive){var s=ago(d.strava_synced_at);live.textContent='自動同步中'+(s?'・Strava '+s+'同步':'');}
+  if(isLive){var s=ago(d.strava_synced_at);live.textContent='自動同步中・運動來自 Strava'+(s?'（'+s+'同步）':'')+'・步數、體重來自 iPhone 健康';}
   else{live.parentElement.classList.add('stale');live.textContent='暫時讀不到即時資料，顯示的是上次發布時的數字';}
   if(seen){root.classList.add('vis');runCounts();}}
 var seen=false;
