@@ -16,25 +16,10 @@
       "video": "",
       "link": "https://8aker0.com",
       "link_label": "",
-      "color": ""
-    },
-    {
-      "dir": "operate",
-      "date": "2026.09",
-      "title": "民宿線上 check-in 系統",
-      "desc": "旅客入住前線上填名簿、上傳護照、簽名同意。",
-      "spent": "—",
-      "saved": "—",
-      "service": "owner",
-      "why": "房客入住前，我總在 LINE 上一張一張追護照、手打名簿。",
-      "result": "房客出發前就在手機上填好名簿、上傳護照、簽名，我只要確認一次。",
-      "slug": "checkin",
-      "intro": "",
-      "images": [],
-      "video": "",
-      "link": "",
-      "link_label": "",
-      "color": ""
+      "color": "",
+      "cta_label": "",
+      "engage": "",
+      "ask": ""
     },
     {
       "dir": "conjure",
@@ -316,7 +301,9 @@
       "thumb": {
         "desktop": "/works/back-to-dance/03_daily_billing_desktop.png",
         "mobile": "/works/back-to-dance/09_daily_billing_mobile.png"
-      }
+      },
+      "engage": "",
+      "ask": ""
     },
     {
       "dir": "conjure",
@@ -569,7 +556,9 @@
       "thumb": {
         "desktop": "/works/checkin-system/01_checkin_form_desktop.png",
         "mobile": "/works/checkin-system/06_checkin_form_mobile.png"
-      }
+      },
+      "engage": "",
+      "ask": ""
     }
   ]
 }
