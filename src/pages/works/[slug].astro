@@ -223,6 +223,9 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 .mg-cta{margin-top:72px;padding:48px 0 8px;border-top:1px solid rgba(212,162,76,.38);text-align:left;}
 .mg-cta h2{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.4vw,34px);line-height:1.45;color:#EBD3A8;display:block;margin:0;}
 .mg-cta p{margin-top:14px;font-family:var(--serif);font-size:16px;line-height:2;color:#D9CCBD;max-width:30em;}
+.mg-live{display:flex;gap:10px;align-items:flex-start;margin:0 0 18px;padding:12px 14px;border:1px solid rgba(212,162,76,.45);background:rgba(75,22,35,.45);font-family:var(--serif);font-size:15px;line-height:1.85;color:#EBD3A8;}
+.mg-live i{flex:none;width:8px;height:8px;margin-top:.8em;border-radius:50%;background:#D4A24C;animation:mgpulse 2.4s ease-out infinite;}
+@media(prefers-reduced-motion:reduce){.mg-live i{animation:none;}}
 /* 試玩按鈕：光暈脈動、掃光、箭頭彈跳 */
 .mg-go{position:relative;}
 .mg-go::after{content:'';position:absolute;inset:0;pointer-events:none;animation:mgpulse 2.4s ease-out infinite;}
@@ -328,6 +331,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       <ul class="mg-fonts">{(design.fonts || []).map((f: any) => <li><span class={`spec ${f.css || ''}`}>{f.sample}</span><div><b>{f.name}</b><p>{f.role}</p></div></li>)}</ul>
       {(design.notes || []).map((t: string) => <p class="mg-extra">{t}</p>)}</section>}
     {mag && w.impact && <section aria-label="成效" class="mg-sec"><h2>成效<small>RESULT</small></h2>
+      {w.impact.live && <p class="mg-live"><i aria-hidden="true"></i>{w.impact.live}</p>}
       <p class="mg-lead">{w.impact.lead}</p>
       <ul class="mg-rows">{(w.impact.rows || []).map((r: any) => <li><b>{r.item}</b><span><small>以前</small>{r.before}</span><span><small>現在</small>{r.after}</span><em><small>省下</small>{r.saved}</em></li>)}</ul>
       <p class="mg-total"><b>{w.impact.total}</b><span>{w.impact.cost}</span></p>
