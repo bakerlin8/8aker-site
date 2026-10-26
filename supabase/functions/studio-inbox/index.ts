@@ -27,6 +27,16 @@ Deno.serve(async (req) => {
       await db(`inquiries?id=eq.${b.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
       return reply({ ok: true });
     }
+    // 祈願所：訪客的想法與建議（純文字）＋各燈籠點亮人數
+    if (b.action === 'wish_ideas') {
+      const items = await db('wish_events?kind=eq.idea&select=id,created_at,wish_id,body,status&order=created_at.desc&limit=200');
+      const counts = await db('rpc/wish_counts', { method: 'POST', body: '{}' });
+      return reply({ items, counts });
+    }
+    if (b.action === 'wish_idea_update' && /^[0-9a-f-]{36}$/.test(b.id) && ['new', 'read', 'used', 'spam'].includes(b.status)) {
+      await db(`wish_events?id=eq.${b.id}&kind=eq.idea`, { method: 'PATCH', body: JSON.stringify({ status: b.status }) });
+      return reply({ ok: true });
+    }
     // 台灣轉帳帳號（私密）：只存在 app_config，不進 GitHub
     if (b.action === 'bank_get') {
       const cfg: any[] = await db('app_config?key=eq.tw_bank&select=value,updated_at');

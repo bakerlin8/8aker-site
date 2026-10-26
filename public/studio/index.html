@@ -302,6 +302,11 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .sl-mini{display:flex;justify-content:center;background:radial-gradient(120% 90% at 50% 0%,#4A1524,#24101A);padding:6px 14px 8px;}
 
 
+/* 作品互動數字 */
+.ws-tb{width:100%;border-collapse:collapse;font-size:14px;min-width:520px;}
+.ws-tb th,.ws-tb td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-soft,#e6dcd6);white-space:nowrap;}
+.ws-tb th{font-weight:500;font-size:12.5px;color:var(--ink-ghost,#8a7f78);letter-spacing:.04em;}
+.ws-tb small{color:var(--ink-ghost,#8a7f78);margin-left:4px;}
 /* 祈願所分頁 */
 .we-wall{margin-bottom:18px;}
 .sl-btn{position:relative;display:flex;flex-direction:column;align-items:center;padding:6px 4px 10px;border:1px solid transparent;background:none;cursor:pointer;color:inherit;font-family:inherit;border-radius:4px;}
@@ -1225,7 +1230,7 @@ async function loadWorks() {
   }
   const IN = 'width:100%';
   function render() {
-    form.innerHTML = `<div class="field-hint" style="margin-bottom:16px">每件作品都有自己的介紹頁（網址 8aker0.com/works/代號/）。日常紀錄在編輯時選「屬於哪個作品」，就會自動列進該作品的製作紀錄。</div>` + data.works.map((w, i) => `
+    form.innerHTML = `<div id="workStats"></div><div class="field-hint" style="margin-bottom:16px">每件作品都有自己的介紹頁（網址 8aker0.com/works/代號/）。日常紀錄在編輯時選「屬於哪個作品」，就會自動列進該作品的製作紀錄。</div>` + data.works.map((w, i) => `
       <div style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px"><span class="field-label" style="margin:0">No.${String(i + 1).padStart(2, '0')}</span>
           <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">從列表移除</button></span></div>
@@ -1244,6 +1249,11 @@ async function loadWorks() {
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
           <div class="field"><label class="field-label">網站名稱（選填，空白就顯示網域）</label><input type="text" data-w="${i}" data-key="link_label" value="${escapeAttr(w.link_label || '')}" placeholder="例：8AKER零 官方網站"></div>
           <div class="field"><label class="field-label">卡片色塊</label><select data-w="${i}" data-key="color">${[['', '自動（依順序輪替）'], ['wine', '葡萄酒'], ['pine', '松綠'], ['navy', '藏青'], ['chestnut', '栗色'], ['plum', '葡萄紫'], ['celadon', '青磁']].map(([k, n]) => `<option value="${k}" ${(w.color || '') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <div class="field"><label class="field-label">試玩按鈕文字（選填，例：試玩範例網站）</label><input type="text" data-w="${i}" data-key="cta_label" value="${escapeAttr(w.cta_label || '')}" placeholder="空白＝前往網站使用"></div>
+          <div class="field"><label class="field-label">互動（愛心「我有興趣」＋玩完回來的小提示）</label><select data-w="${i}" data-key="engage"><option value="" ${w.engage !== 'off' ? 'selected' : ''}>開啟（預設）</option><option value="off" ${w.engage === 'off' ? 'selected' : ''}>關閉</option></select><div class="field-hint">只有「有網站網址」的雜誌版作品會出現。</div></div>
+          <div class="field"><label class="field-label">玩完回來的小提示問句（選填）</label><input type="text" data-w="${i}" data-key="ask" value="${escapeAttr(w.ask || '')}" placeholder="玩得還開心嗎？"></div>
         </div>
         <div class="field"><label class="field-label">截圖（第一張會當作品卡的縮圖；作品頁會放在「畫面」區）</label>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${(w.images || []).map((im, j) => `
@@ -1287,8 +1297,35 @@ async function loadWorks() {
       catch (e) { toast('儲存失敗：' + e.message, 'err'); }
       btn.disabled = false; btn.textContent = '儲存變更';
     });
+    paintWorkStats();
+  }
+  /* 互動數字：作品頁的試玩次數、♡ 我有興趣、想要自己的版本（只記數字，不存個人資料） */
+  let WST = null, WST_ERR = '';
+  async function loadWorkStats() {
+    WST_ERR = ''; WST = null; paintWorkStats();
+    try {
+      const r = await fetch(`${HEALTH_BASE}/functions/v1/work-actions`, { method: 'POST', headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stats' }) });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
+      WST = (await r.json()).items || [];
+    } catch (e) { WST_ERR = e.message; }
+    paintWorkStats();
+  }
+  function paintWorkStats() {
+    const box = document.getElementById('workStats'); if (!box) return;
+    const by = {}; (WST || []).forEach(x => { by[x.slug] = x; });
+    const rows = data.works.filter(w => w.slug).map(w => {
+      const x = by[w.slug] || { plays: 0, players: 0, plays7: 0, likes: 0, wants: 0 };
+      const rate = x.players ? Math.round(x.wants / x.players * 100) + '%' : '—';
+      return `<tr><td>${escapeHtml(w.title || w.slug)}</td><td>${x.plays}<small>（近 7 日 ${x.plays7}）</small></td><td>${x.players}</td><td>${x.likes}</td><td>${x.wants}</td><td>${rate}</td></tr>`;
+    }).join('');
+    box.innerHTML = `<details open style="border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:18px;background:var(--warm-white)"><summary style="cursor:pointer;font-weight:500">互動數字　<small style="color:var(--ink-ghost,#8a7f78);font-weight:400">試玩・我有興趣・想要自己的版本</small></summary>
+      <div style="margin-top:12px;overflow-x:auto">${WST === null && !WST_ERR ? '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>' : WST_ERR ? `<div class="field-hint" style="color:#a33">讀不到數字：${escapeHtml(WST_ERR)}</div>` : `<table class="ws-tb"><thead><tr><th>作品</th><th>試玩次數</th><th>不重複訪客</th><th>♡ 我有興趣</th><th>想要自己的版本</th><th>轉換率</th></tr></thead><tbody>${rows || '<tr><td colspan="6">還沒有作品</td></tr>'}</tbody></table>`}</div>
+      <div class="field-hint" style="margin-top:10px">只記數字，不存姓名或 email。同一人 5 分鐘內重複點，只算一次；「不重複訪客」是用網路位址估的，換網路會被算成兩個人。「想要自己的版本」＝玩完回來的小提示或頁尾按了「填寫需求表」；轉換率＝想要自己的版本 ÷ 不重複訪客。</div>
+      <div style="margin-top:8px"><button class="btn btn-ghost" id="wsRefresh" style="padding:4px 12px">重新整理</button></div></details>`;
+    const rb = document.getElementById('wsRefresh'); if (rb) rb.addEventListener('click', loadWorkStats);
   }
   render();
+  loadWorkStats();
 }
 
 

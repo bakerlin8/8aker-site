@@ -30,6 +30,8 @@ const mag = shots.length > 0;
 const gIdx = (x: any) => shots.indexOf(x);
 const lum = (hex: string) => { const n = parseInt(hex.slice(1), 16); const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255); };
 const how = w.how || null;
+const engage = mag && !!link && w.engage !== 'off';
+const ask = (w.ask || '').trim() || '玩得還開心嗎？';
 const design = w.design || null;
 const layout = vid ? (vid.vertical ? 'v' : 'h') : 'none';
 const schema = [
@@ -226,6 +228,25 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 .mg-live{display:flex;gap:10px;align-items:flex-start;margin:0 0 18px;padding:12px 14px;border:1px solid rgba(212,162,76,.45);background:rgba(75,22,35,.45);font-family:var(--serif);font-size:15px;line-height:1.85;color:#EBD3A8;}
 .mg-live i{flex:none;width:8px;height:8px;margin-top:.8em;border-radius:50%;background:#D4A24C;animation:mgpulse 2.4s ease-out infinite;}
 @media(prefers-reduced-motion:reduce){.mg-live i{animation:none;}}
+/* 愛心「我有興趣」與回來提示 */
+.mg-heart{appearance:none;display:inline-flex;align-items:center;gap:9px;min-height:52px;padding:0 18px;background:transparent;border:1px solid rgba(212,162,76,.55);color:#EFE5D6;font:inherit;font-size:14px;letter-spacing:.06em;cursor:pointer;transition:border-color .3s,background .3s,color .3s;}
+.mg-heart:hover{border-color:#D4A24C;background:rgba(212,162,76,.08);}
+.mg-heart svg{width:20px;height:20px;fill:none;stroke:#D4A24C;stroke-width:1.5;stroke-linejoin:round;transition:fill .3s;}
+.mg-heart[aria-pressed="true"]{border-color:#D4A24C;color:#EBD3A8;background:rgba(75,22,35,.55);}
+.mg-heart[aria-pressed="true"] svg{fill:#D4A24C;animation:mgpop .5s var(--ease,ease-out);}
+.mg-heart .n{font-weight:500;font-family:var(--latin);font-size:13px;color:#D4A24C;}
+@keyframes mgpop{0%{transform:scale(.7);}55%{transform:scale(1.28);}100%{transform:scale(1);}}
+.mg-chip{position:fixed;right:20px;bottom:20px;z-index:60;width:min(340px,calc(100vw - 32px));padding:16px 16px 14px;background:#26141B;border:1px solid rgba(212,162,76,.5);color:#EFE5D6;box-shadow:0 14px 40px rgba(0,0,0,.45);animation:mgchip .5s var(--ease,ease-out);}
+.mg-chip p{margin:0 22px 12px 0;font-family:var(--serif);font-size:15px;line-height:1.7;color:#EBD3A8;}
+.mg-chip .row{display:flex;flex-wrap:wrap;gap:8px;}
+.mg-chip button,.mg-chip a{appearance:none;display:inline-flex;align-items:center;min-height:40px;padding:0 14px;background:transparent;border:1px solid rgba(212,162,76,.5);color:#EFE5D6;font:inherit;font-size:13.5px;text-decoration:none;cursor:pointer;}
+.mg-chip button:hover,.mg-chip a:hover{background:rgba(212,162,76,.12);}
+.mg-chip a.want{background:#D4A24C;color:#1C0F14;border-color:#D4A24C;}
+.mg-chip a.want:hover{background:#F0C878;}
+.mg-chip .x{position:absolute;top:6px;right:6px;min-height:32px;width:32px;padding:0;justify-content:center;border:0;color:#B9A89E;font-size:16px;}
+@keyframes mgchip{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+@media(max-width:600px){.mg-chip{right:16px;left:16px;width:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);}}
+@media(prefers-reduced-motion:reduce){.mg-chip{animation:none;}.mg-heart[aria-pressed="true"] svg{animation:none;}}
 /* 試玩按鈕：光暈脈動、掃光、箭頭彈跳 */
 .mg-go{position:relative;}
 .mg-go::after{content:'';position:absolute;inset:0;pointer-events:none;animation:mgpulse 2.4s ease-out infinite;}
@@ -283,7 +304,8 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
         <div class="mg-tags">{w.tag && <span class="mg-tag">{w.tag}</span>}<span>{w.date}</span></div>
         {w.deck && <p class="mg-deck">{w.deck}</p>}
         <div class="acts">
-          {link && <a class="go-site mg-go" href={link} target="_blank" rel="noopener"><span><b>{w.cta_label || '前往網站使用'}</b>{!w.cta_label && <small>{siteName}</small>}</span><i aria-hidden="true">↗</i></a>}
+          {link && <a class="go-site mg-go" href={link} target="_blank" rel="noopener" data-play={engage ? '' : undefined}><span><b>{w.cta_label || '前往網站使用'}</b>{!w.cta_label && <small>{siteName}</small>}</span><i aria-hidden="true">↗</i></a>}
+          {engage && <button type="button" class="mg-heart" data-heart aria-pressed="false" aria-label="我有興趣"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg><span class="t">我有興趣</span><b class="n" hidden></b></button>}
           <a class="go-log" href="#log">看作品日誌 <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -342,8 +364,8 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       <div class="mg-fut"><div><h3 class="mg-sub">可以再新增的功能</h3><ul>{(w.future.add || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div>
       <div><h3 class="mg-sub">想再優化的地方</h3><ul>{(w.future.improve || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div></div></section>}
     {mag && w.cta && <section aria-label="下一步" class="mg-cta"><h2>{w.cta.title}</h2><p>{w.cta.body}</p>
-      <div class="acts">{/^\/[a-z0-9\/-]*$/.test(w.cta.href || '') && <a class="go-site mg-go" href={w.cta.href}><span><b>{w.cta.primary}</b></span><i aria-hidden="true">→</i></a>}
-      {link && <a class="go-log" href={link} target="_blank" rel="noopener">{w.cta.secondary} <span aria-hidden="true">↗</span></a>}</div></section>}
+      <div class="acts">{/^\/[a-z0-9\/-]*$/.test(w.cta.href || '') && <a class="go-site mg-go" href={w.cta.href} data-want={engage ? '' : undefined}><span><b>{w.cta.primary}</b></span><i aria-hidden="true">→</i></a>}
+      {link && <a class="go-log" href={link} target="_blank" rel="noopener" data-play={engage ? '' : undefined}>{w.cta.secondary} <span aria-hidden="true">↗</span></a>}</div></section>}
     {!mag && imgs.length > 0 && <section aria-label="畫面"><h2>畫面<small>SCREENS</small></h2>
       <div class={`gal${imgs.length === 1 ? ' one' : ''}`}>{imgs.map((src, i) => (
         <figure><button type="button" data-lb={src} data-cap={caps[i] || ''} aria-label={`放大第 ${i + 1} 張畫面`}><img src={src} alt={caps[i] || `${w.title} 畫面 ${i + 1}`} loading={i ? 'lazy' : 'eager'} decoding="async" /></button>{caps[i] && <figcaption>{caps[i]}</figcaption>}</figure>))}</div></section>}
@@ -358,6 +380,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 {mag && <script is:inline type="application/json" id="mgData" set:html={JSON.stringify(shots.map((x: any) => ({ src: x.src, title: x.title, url: x.url || '', note: x.note || '', points: x.points || [] }))).replace(/</g, '\u003c')}></script>}
 <dialog class="lb" id="lb" aria-label="放大畫面"><button class="x" type="button" aria-label="關閉">×</button><img alt="" /><p></p></dialog>
 </div>
+{engage && <div id="mgEng" data-slug={w.slug} data-ask={ask} hidden></div>}
 <script>
 (function(){var d=document.getElementById('lb') as HTMLDialogElement|null;if(!d||!d.showModal)return;var im=d.querySelector('img') as HTMLImageElement,cp=d.querySelector('p') as HTMLElement;
   document.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('[data-lb]') as HTMLElement|null;if(!b)return;im.src=b.dataset.lb||'';im.alt=b.dataset.cap||'';cp.textContent=b.dataset.cap||'';d.showModal();});
@@ -395,5 +418,54 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 /* 自己上傳的 .mp4：如果是直式影片，把橫幅改成置中的直式比例 */
 (function(){var v=document.querySelector('.cinema video') as HTMLVideoElement|null;if(!v)return;
   v.addEventListener('loadedmetadata',function(){if(v.videoHeight>v.videoWidth){var fr=v.parentElement as HTMLElement;fr.style.aspectRatio='9/16';fr.style.maxWidth='360px';fr.style.margin='0 auto';}});})();
+/* 互動：試玩次數（靜默）、♡ 我有興趣、玩完回來的小提示。只記數字，不存個人資料；任何失敗都不影響頁面使用 */
+(function () {
+  var box = document.getElementById('mgEng'); if (!box) return;
+  var API = 'https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/work-actions';
+  var slug = box.getAttribute('data-slug') || '', ask = box.getAttribute('data-ask') || '';
+  var ls = { g: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, s: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  function post(a) { try { fetch(API, { method: 'POST', keepalive: true, body: JSON.stringify({ slug: slug, action: a, website: '' }) }).catch(function () {}); } catch (e) {} }
+  var heart = document.querySelector('[data-heart]'), liked = ls.g('liked:' + slug) === '1', likes = 0;
+  function paint() {
+    if (!heart) return;
+    heart.setAttribute('aria-pressed', liked ? 'true' : 'false');
+    var n = heart.querySelector('.n'); if (n) { n.textContent = likes; n.hidden = likes < 5; }
+  }
+  function setLiked(on) {
+    if (on === liked) return;
+    liked = on; likes = Math.max(0, likes + (on ? 1 : -1)); ls.s('liked:' + slug, on ? '1' : '0'); paint(); post(on ? 'like' : 'unlike');
+  }
+  paint();
+  try {
+    fetch(API + '?slug=' + encodeURIComponent(slug)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return; likes = +d.likes || 0; if (typeof d.liked === 'boolean') { liked = d.liked; ls.s('liked:' + slug, liked ? '1' : '0'); } paint();
+    }).catch(function () {});
+  } catch (e) {}
+  if (heart) heart.addEventListener('click', function () { setLiked(!liked); });
+  document.querySelectorAll('[data-play]').forEach(function (a) { a.addEventListener('click', function () { post('play'); ls.s('played:' + slug, String(Date.now())); }); });
+  document.querySelectorAll('[data-want]').forEach(function (a) { a.addEventListener('click', function () { post('want'); }); });
+
+  var chip = null;
+  function closeChip() { if (chip) { chip.remove(); chip = null; } }
+  function showChip() {
+    if (chip) return;
+    ls.s('asked:' + slug, String(Date.now()));
+    chip = document.createElement('aside'); chip.className = 'mg-chip'; chip.setAttribute('role', 'dialog'); chip.setAttribute('aria-label', ask);
+    var p = document.createElement('p'); p.textContent = ask; chip.appendChild(p);
+    var row = document.createElement('div'); row.className = 'row'; chip.appendChild(row);
+    if (!liked) { var b = document.createElement('button'); b.type = 'button'; b.textContent = '♡ 喜歡'; b.addEventListener('click', function () { setLiked(true); closeChip(); }); row.appendChild(b); }
+    var w = document.createElement('a'); w.className = 'want'; w.href = '/chat/'; w.textContent = '想要自己的版本'; w.addEventListener('click', function () { post('want'); }); row.appendChild(w);
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'x'; x.setAttribute('aria-label', '關閉'); x.textContent = '✕'; x.addEventListener('click', closeChip); chip.appendChild(x);
+    document.body.appendChild(chip);
+  }
+  function maybeAsk() {
+    var t = +ls.g('played:' + slug) || 0; if (!t) return;
+    var away = Date.now() - t; if (away < 15000 || away > 6 * 3600e3) return;
+    var last = +ls.g('asked:' + slug) || 0; if (last && Date.now() - last < 14 * 86400e3) return;
+    showChip();
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) maybeAsk(); });
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeChip(); });
+})();
 </script>
 </BaseLayout>
