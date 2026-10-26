@@ -2329,23 +2329,22 @@ function renderArticleForm(fm) {
 
   form.innerHTML = `
     <div class="field tg" id="gmBox">
-      <label class="field-label">✨ AI 寫作助手（約幾秒就有結果）</label>
+      <label class="field-label">✨ AI 助手（Gemini・約幾秒就有結果）：按鈕放在各個欄位旁邊</label>
       <div class="tg-row"><input type="text" id="f-kw" placeholder="主要關鍵字（選填，例如：Airbnb 民宿經營、跑步入門）"><button type="button" class="btn btn-ghost" id="f-kw-go">快速標題範本</button></div>
       <div class="tg-list" id="f-tg"></div>
-      <div id="gm-groups"></div>
       <div class="field-hint" id="gm-hint"></div>
-      <div class="gm-r" id="gm-r"></div>
     </div>
     <div class="field seo" id="seoBox"></div>
-    <div class="field"><label class="field-label">標題</label><input type="text" id="f-title" value="${escapeAttr(fm.title)}"></div>
+    <div class="field"><label class="field-label">標題</label><input type="text" id="f-title" value="${escapeAttr(fm.title)}"><div class="gm-b" data-gm="titles,angles" data-r="gm-r-title"></div><div class="gm-r" id="gm-r-title"></div></div>
     <div class="field"><label class="field-label">日期</label><input type="date" id="f-date" value="${escapeAttr(fm.date)}"></div>
     <div class="field"><label class="field-label">摘要</label><textarea id="f-excerpt" rows="2">${escapeHtml(fm.excerpt)}</textarea>
-      <div class="gm-b"><button type="button" class="btn btn-ghost" id="ex-ai">✨ 用 AI 從正文擷取</button><button type="button" class="btn btn-ghost" id="ex-local">✂️ 直接截取開頭（不用 AI）</button></div>
+      <div class="gm-b"><button type="button" class="btn btn-ghost" id="ex-ai">✨ 用 AI 從正文擷取</button><button type="button" class="btn btn-ghost" id="ex-local">✂️ 直接截取開頭（不用 AI）</button></div><div class="gm-r" id="gm-r-ex"></div>
       <div class="field-hint">摘要會顯示在搜尋結果裡，建議 40–110 字。AI 版會把正文送到 Gemini；截取版完全在你的瀏覽器裡做，不送出去。</div></div>
     <div class="field">
       <label class="field-label">標籤（按 Enter 新增）</label>
       <input type="text" id="f-tag-input" placeholder="輸入標籤後按 Enter">
       <div class="tag-row" id="f-tags"></div>
+      <div class="gm-b" data-gm="tags,keywords" data-r="gm-r-tags"></div><div class="gm-r" id="gm-r-tags"></div>
     </div>
     <div class="field"><label class="field-label">也屬於哪個方向（選填，最多一個）</label><select id="f-also" style="${SEL_STYLE}"><option value="">（只屬於「${PILLARS[currentPillar].jp}」）</option>${Object.keys(PILLARS).filter(k => k !== currentPillar).map(k => `<option value="${k}" ${fm.also === k ? 'selected' : ''}>${PILLARS[k].jp}・${PILLARS[k].title}</option>`).join('')}</select><div class="field-hint">網址和分類顏色仍以「${PILLARS[currentPillar].jp}」為主；選了之後，這篇也會列在另一個方向的清單裡，並標示「來自・${PILLARS[currentPillar].jp}」。</div></div>
     <div class="field"><label class="field-label">屬於哪個作品（選填：選了會自動出現在該作品頁的「製作紀錄」）</label><select id="f-work" style="${SEL_STYLE}"><option value="">（不屬於任何作品）</option></select></div>
@@ -2359,8 +2358,12 @@ function renderArticleForm(fm) {
       <label class="field-label">正文（Markdown）</label>
       <textarea id="f-body" class="mono" rows="16">${escapeHtml(fm.body)}</textarea>
       <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等</div>
+      <div class="gm-g"><span>起稿與續寫</span><div class="gm-b" data-gm="outline,hooks,continue" data-r="gm-r-body"></div></div>
+      <div class="gm-g"><span>改寫選取文字（先在正文框框選一段）</span><div class="gm-b" data-gm="rewrite:short,rewrite:casual,rewrite:vivid" data-r="gm-r-body"></div></div>
+      <div class="gm-g"><span>整篇處理</span><div class="gm-b" data-gm="polish,dehuman,review,translate" data-r="gm-r-body"></div></div>
+      <div class="gm-g"><span>檢查與發布</span><div class="gm-b" data-gm="proofread,factcheck,faq,social" data-r="gm-r-body"></div></div>
+      <div class="gm-r" id="gm-r-body"></div>
     </div>
-    <div class="field ai-box" id="aiBox"></div>
     <div class="btn-row">
       <button class="btn btn-primary" id="saveArticleBtn">${currentArticle.isNew ? '建立文章' : '儲存變更'}</button>
       <button class="btn btn-ghost" id="backToListBtn">返回列表</button>
@@ -2370,7 +2373,6 @@ function renderArticleForm(fm) {
   `;
 
   worksOptions().then(list => { const sel = document.getElementById('f-work'); if (!sel) return; sel.innerHTML = '<option value="">（不屬於任何作品）</option>' + list.map(w => `<option value="${escapeAttr(w.slug)}" ${w.slug === fm.work ? 'selected' : ''}>${escapeHtml(w.title)}</option>`).join('') + (fm.work && !list.some(w => w.slug === fm.work) ? `<option value="${escapeAttr(fm.work)}" selected>${escapeHtml(fm.work)}（已不在作品列表）</option>` : ''); }).catch(() => {});
-  initAiBox();
   let tags = [...fm.tags];
   const tagsWrap = document.getElementById('f-tags');
   function renderTags() {
@@ -2436,13 +2438,8 @@ function renderArticleForm(fm) {
   checkSeo();
 
   /* AI 即時建議（Gemini，走後端函式；金鑰不在網頁） */
-  const GM = [
-    ['起題', [['titles', '💡', '想標題'], ['angles', '🧭', '切入角度'], ['outline', '🧱', '文章大綱'], ['hooks', '🎣', '開頭第一段'], ['keywords', '🔑', 'SEO 關鍵字']]],
-    ['寫作', [['continue', '➡️', '接著往下寫'], ['rewrite:short', '✂️', '精簡選取文字'], ['rewrite:casual', '💬', '口語化選取文字'], ['rewrite:vivid', '🖼', '更有畫面選取文字']]],
-    ['檢查', [['proofread', '🔍', '錯字與語病'], ['factcheck', '⚠️', '待確認的事實']]],
-    ['發布', [['excerpt', '📝', '寫摘要'], ['tags', '🏷', '建議標籤'], ['faq', '❓', '常見問題（AEO）'], ['social', '📣', '社群文案']]],
-  ];
-  $('gm-groups').innerHTML = GM.map(([g, bs]) => `<div class="gm-g"><span>${g}</span><div class="gm-b">${bs.map(([k, ic, t]) => `<button type="button" class="btn btn-ghost" data-k="${k}">${ic} ${t}</button>`).join('')}</div></div>`).join('');
+  const GML = { titles: ['💡', '想標題'], angles: ['🧭', '切入角度'], tags: ['🏷', '建議標籤'], keywords: ['🔑', 'SEO 關鍵字'], outline: ['🧱', '文章大綱'], hooks: ['🎣', '開頭第一段'], continue: ['➡️', '接著往下寫'], 'rewrite:short': ['✂️', '精簡'], 'rewrite:casual': ['💬', '口語化'], 'rewrite:vivid': ['🖼', '更有畫面'], polish: ['✨', '順稿'], dehuman: ['🫧', '去 AI 化的口氣'], review: ['👀', '讀者視角'], translate: ['🌐', '三語版本'], proofread: ['🔍', '錯字與語病'], factcheck: ['⚠️', '待確認的事實'], faq: ['❓', '常見問題（AEO）'], social: ['📣', '社群文案'] };
+  document.querySelectorAll('[data-gm]').forEach(g => { g.innerHTML = g.dataset.gm.split(',').map(k => `<button type="button" class="btn btn-ghost" data-k="${k}" data-r="${g.dataset.r}">${GML[k][0]} ${GML[k][1]}</button>`).join(''); });
   $('gm-hint').textContent = '會依照關鍵字、標題、摘要和正文來建議。內容會送到 Google Gemini（免費方案可能被 Google 用來改善產品），不要放客戶個資、價格等私密內容。AI 的建議請自己看過再用，尤其是數字和經歷。「選取文字」類的功能，請先在正文框框選一段文字。';
   const gmCall = async (kind, mode, sel) => {
     const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-suggest`, { method: 'POST', headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suggest', kind, mode, selection: sel, keyword: kwv(), pillar: currentPillar, title: $('f-title').value, excerpt: $('f-excerpt').value, body: $('f-body').value }) });
@@ -2450,15 +2447,16 @@ function renderArticleForm(fm) {
     if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
     return d;
   };
-  const USE = { titles: '用這個標題', excerpt: '用這個摘要', tags: '加入標籤', keywords: '加入標籤', hooks: '放到正文最前面', outline: '放到正文最前面', continue: '接到正文最後', faq: '加到正文最後', rewrite: '取代選取的文字' };
-  const gmShow = (kind, d, range) => {
+  const USE = { polish: '取代整篇正文', dehuman: '取代整篇正文', titles: '用這個標題', excerpt: '用這個摘要', tags: '加入標籤', keywords: '加入標籤', hooks: '放到正文最前面', outline: '放到正文最前面', continue: '接到正文最後', faq: '加到正文最後', rewrite: '取代選取的文字' };
+  const gmShow = (kind, d, range, rid) => {
     $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
-    const box = $('gm-r');
+    const box = $(rid || 'gm-r-body');
     box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${USE[kind] ? `<button type="button" class="btn btn-primary gm-use">${USE[kind]}</button>` : ''}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
     box.querySelectorAll('.gm-i').forEach(el => {
       const x = d.items[+el.dataset.i], body = $('f-body');
       const u = el.querySelector('.gm-use'); if (u) u.addEventListener('click', () => {
-        if (kind === 'titles') $('f-title').value = x.text;
+        if (kind === 'polish' || kind === 'dehuman') { if (!confirm('用這個版本取代整篇正文？（還沒儲存前，重新整理頁面可以還原）')) return; body.value = x.text; }
+        else if (kind === 'titles') $('f-title').value = x.text;
         else if (kind === 'excerpt') $('f-excerpt').value = x.text;
         else if (kind === 'tags' || kind === 'keywords') { if (!tags.includes(x.text)) { tags.push(x.text); renderTags(); } }
         else if (kind === 'hooks' || kind === 'outline') body.value = x.text + '\n\n' + body.value;
@@ -2471,12 +2469,12 @@ function renderArticleForm(fm) {
     });
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
-  $('gm-groups').querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+  document.querySelectorAll('[data-gm] button').forEach(b => b.addEventListener('click', async () => {
     const [kind, mode] = b.dataset.k.split(':'); let sel = '', range = null;
     if (kind === 'rewrite') { const ta = $('f-body'), a = ta.selectionStart, z = ta.selectionEnd; sel = ta.value.slice(a, z); if (sel.trim().length < 5) { toast('先在正文框框選要修改的一段文字'); return; } range = [a, z, sel]; }
     if (kind === 'continue' && $('f-body').value.trim().length < 40) { toast('正文先寫幾句，才能接著往下寫'); return; }
     b.disabled = true; const old = b.textContent; b.textContent = '思考中…';
-    try { gmShow(kind, await gmCall(kind, mode, sel), range); } catch (e) { toast(e.message, 'err'); }
+    try { gmShow(kind, await gmCall(kind === 'dehuman' ? 'dehuman' : kind, mode, sel), range, b.dataset.r); } catch (e) { toast(e.message, 'err'); }
     b.disabled = false; b.textContent = old;
   }));
   /* 摘要：自動擷取 */
@@ -2490,7 +2488,7 @@ function renderArticleForm(fm) {
   $('ex-ai').addEventListener('click', async () => {
     const b = $('ex-ai'); if ($('f-body').value.trim().length < 40) { toast('正文太短，先寫一些內容'); return; }
     const old = b.textContent; b.disabled = true; b.textContent = '擷取中…';
-    try { const d = await gmCall('excerpt'); $('f-excerpt').value = d.items[0].text; checkSeo(); gmShow('excerpt', d); toast('已填入第一個，下方還有其他版本可換'); } catch (e) { toast(e.message, 'err'); }
+    try { const d = await gmCall('excerpt'); $('f-excerpt').value = d.items[0].text; checkSeo(); gmShow('excerpt', d, null, 'gm-r-ex'); toast('已填入第一個，下方還有其他版本可換'); } catch (e) { toast(e.message, 'err'); }
     b.disabled = false; b.textContent = old;
   });
 

@@ -1,4 +1,4 @@
-// Studio 即時 AI 寫作助手（Gemini）：標題、角度、大綱、開頭、續寫、改寫選取文字、錯字語病、待確認事實、摘要、標籤、FAQ、社群文案。
+// Studio 即時 AI 寫作助手（Gemini）：標題、角度、大綱、開頭、續寫、改寫選取文字、錯字語病、待確認事實、摘要、標籤、FAQ、社群文案、順稿、去 AI 化口氣、讀者視角、三語版本。
 // 金鑰放在 Supabase 函式秘密變數 GEMINI_API_KEY，不會出現在網頁或程式碼。
 // 只有站長（Studio token）能呼叫；每天有次數上限。
 import { db, json, SITE } from './shared.ts';
@@ -42,6 +42,10 @@ const TASKS: Record<string, string> = {
   rewrite: '請改寫「選取文字」。保留原意與所有事實，不得新增文中沒有的資訊。給 2 個版本。回傳 JSON：{"items":[{"text":"改寫後的文字","note":"版本特色"}]}',
   proofread: '請檢查正文的錯字、用詞不當、語病與不通順處（繁體中文台灣用法）。最多列 8 項，每項 text 寫「原句片段 → 建議修改」，note 寫類型（錯字／語病／用詞／冗長）。沒有問題就回傳空的 items。回傳 JSON：{"items":[{"text":"…","note":"…"}]}',
   factcheck: '請找出正文裡「發表前需要作者自己確認」的地方：具體數字、日期、價格、法規或制度說法、絕對化的斷言、可能涉及他人隱私的細節。最多列 8 項，text 寫原句片段，note 寫為什麼要確認。沒有就回傳空的 items。回傳 JSON：{"items":[{"text":"…","note":"…"}]}',
+  polish: '請「順稿」：把整篇正文修順。只修正錯字、語病、贅詞、不通順與重複的地方，保留作者原本的語氣、段落與 Markdown 結構（## 小標題、清單、連結、粗體、【待補：…】標記都原樣保留），不得改變意思，不得新增文中沒有的事實、數字或經歷。回傳 JSON：{"items":[{"text":"順好的完整正文（只給正文，不含 front matter）","note":"改了哪幾類（一句話）"}]}，只給 1 個版本。',
+  dehuman: '請把整篇正文改成「去 AI 化的口氣」：讓它讀起來像作者本人坐下來跟朋友講話。要去掉的 AI 味：「總而言之」「值得一提的是」「不僅…更…」「讓我們」「在當今…的時代」「綜上所述」、過度工整的排比與三段式、每段都收尾升華、空泛的形容詞與行銷口號。改用短句、具體的細節、偶爾的口語停頓。保留所有事實、數字、Markdown 結構與【待補：…】標記，不得新增文中沒有的資訊或經歷。回傳 JSON：{"items":[{"text":"改好的完整正文","note":"主要去掉了哪些 AI 慣用說法（一句話）"}]}，只給 1 個版本。',
+  review: '請站在「第一次來到這個網站的讀者」的視角讀這篇文章，指出：看不懂的地方（沒解釋的術語或前提）、會卡住或想離開的地方、讀完還想追問的問題、缺少的例子或畫面、標題與內容不符之處。最多 8 項，每項 text 寫「原句片段或段落位置 → 讀者會有的疑問」，note 寫建議怎麼補（一句話）。最後一項固定總結：整體讀起來順不順、讀者最可能帶走的一句話。不得替作者編造內容。回傳 JSON：{"items":[{"text":"…","note":"…"}]}',
+  translate: '請把標題與整篇正文翻成「日文」與「英文」兩個版本（原文為繁體中文，所以三語 = 繁中原文＋日＋英）。語氣自然、像母語者會說的話，不要逐字直譯；保留 Markdown 結構、連結與【待補：…】標記，不得新增或刪減事實。日文用です・ます調，英文用自然的第一人稱口吻。回傳 JSON：{"items":[{"text":"第一行是譯後標題，空一行後是譯後完整正文","note":"日本語"},{"text":"…","note":"English"}]}，如果兩個語言之間有語感差異，請在對應 note 後面加一句說明。',
   faq: '請根據正文，寫 3–5 組「常見問題」。只能用正文已有的資訊回答，不得編造；每個答案 1–3 句、直接回答。輸出一個 Markdown 區塊，格式：「## 常見問題」換行，然後每組「### 問題」換行「答案」。回傳 JSON：{"items":[{"text":"Markdown 區塊","note":"常見問題"}]}',
   social: '請根據文章產生社群文案。回傳 JSON：{"items":[{"text":"內容","note":"平台"}]}，共 4 筆，note 依序為：「Instagram 貼文」（150–250 字，分段、結尾 5 個 hashtag）、「Threads 短貼文」（80 字內，像隨口分享，不放 hashtag）、「Threads 串文」（3 則，用 --- 分隔每則）、「YouTube 短影音腳本」（30–45 秒口播，標出開場一句話、3 個重點、結尾；再附一行建議標題）。',
 };
@@ -55,15 +59,16 @@ Deno.serve(async (req) => {
     if (b.action !== 'suggest' || !TASKS[b.kind]) return reply({ error: 'bad_request' }, 400);
     const key = Deno.env.get('GEMINI_API_KEY');
     if (!key) return reply({ error: '還沒設定 Gemini 金鑰（GEMINI_API_KEY）' }, 503);
+    const LONG = ['polish', 'dehuman', 'translate'];
     const s = (v: unknown, n: number) => String(v ?? '').trim().slice(0, n);
-    const ctx = [`主要關鍵字：${s(b.keyword, 60) || '（未指定，請從內容判斷）'}`, `所屬方向：${s(b.pillar, 20)}`, `目前標題：${s(b.title, 200)}`, `目前摘要：${s(b.excerpt, 500)}`, `正文：\n${s(b.body, 6000)}`, s(b.selection, 3000) ? `選取文字：\n${s(b.selection, 3000)}` : '', b.kind === 'rewrite' ? `改寫方向：${({ short: '精簡成約六成長度，保留所有重點', casual: '改成更口語自然、像對朋友說話', vivid: '加入具體畫面與感官細節，但不得新增事實' } as Record<string, string>)[String(b.mode)] || '更清楚順暢'}` : ''].filter(Boolean).join('\n');
+    const ctx = [`主要關鍵字：${s(b.keyword, 60) || '（未指定，請從內容判斷）'}`, `所屬方向：${s(b.pillar, 20)}`, `目前標題：${s(b.title, 200)}`, `目前摘要：${s(b.excerpt, 500)}`, `正文：\n${s(b.body, LONG.includes(String(b.kind)) ? 20000 : 6000)}`, s(b.selection, 3000) ? `選取文字：\n${s(b.selection, 3000)}` : '', b.kind === 'rewrite' ? `改寫方向：${({ short: '精簡成約六成長度，保留所有重點', casual: '改成更口語自然、像對朋友說話', vivid: '加入具體畫面與感官細節，但不得新增事實' } as Record<string, string>)[String(b.mode)] || '更清楚順暢'}` : ''].filter(Boolean).join('\n');
     if (b.kind === 'rewrite' && s(b.selection, 3000).length < 5) return reply({ error: '先框選要修改的文字' }, 400);
     if (ctx.replace(/\s/g, '').length < 40) return reply({ error: '內容太少，先寫關鍵字、標題或幾句正文再試' }, 400);
     const u = await usage();
     if (u.n >= DAILY_LIMIT) return reply({ error: `今天的 AI 建議已用完 ${DAILY_LIMIT} 次，明天再來` }, 429);
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${await modelName()}:generateContent`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: VOICE }] }, contents: [{ role: 'user', parts: [{ text: `${TASKS[b.kind]}\n\n===== 文章資料 =====\n${ctx}` }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.8, maxOutputTokens: 3072 } }),
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: VOICE }] }, contents: [{ role: 'user', parts: [{ text: `${TASKS[b.kind]}\n\n===== 文章資料 =====\n${ctx}` }] }], generationConfig: { responseMimeType: 'application/json', temperature: 0.8, maxOutputTokens: LONG.includes(String(b.kind)) ? 12000 : 3072 } }),
     });
     if (r.status === 429) return reply({ error: 'Gemini 免費額度暫時用完，過幾分鐘再試' }, 429);
     if (!r.ok) return reply({ error: `Gemini 回應錯誤（${r.status}）` }, 502);
