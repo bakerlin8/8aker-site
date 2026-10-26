@@ -322,7 +322,7 @@
       "dir": "conjure",
       "date": "2026.10",
       "title": "民宿線上入住登記與通知系統",
-      "desc": "客人用手機完成入住登記與簽名，系統自動整理名單，並在前一晚把退房、打掃、門鎖資訊推送到 LINE 群組。",
+      "desc": "客人用手機完成入住登記、上傳護照（自動加浮水印）與簽名，系統自動整理名單，並即時、前一晚兩次通知 LINE 群組。",
       "spent": "—",
       "saved": "—",
       "service": "owner",
@@ -352,7 +352,7 @@
           "key": "F",
           "label": "客人端",
           "en": "Guest",
-          "cols": 2,
+          "cols": 3,
           "shots": [
             {
               "src": "/works/checkin-system/01_checkin_form_desktop.png",
@@ -360,11 +360,23 @@
               "url": "/checkin",
               "note": "客人填寫姓名、地址、護照與簽名。",
               "points": [
-                "護照照片自動加浮水印",
+                "護照照片上傳後自動加浮水印",
                 "可一次填全部人，也可只填自己",
-                "六種語言切換"
+                "六種語言切換：繁中、簡中、日、英、韓、法"
               ],
               "mobile": "/works/checkin-system/06_checkin_form_mobile.png"
+            },
+            {
+              "src": "/works/checkin-system/09_passport_watermark_desktop.png",
+              "title": "護照上傳與浮水印",
+              "url": "/checkin/passport",
+              "note": "客人上傳護照照片，系統自動加上浮水印。",
+              "points": [
+                "浮水印寫明「宿泊者名簿專用」",
+                "照片只用於住宿者名簿，即使外流也無法轉作他用",
+                "讓客人在上傳時比較安心"
+              ],
+              "mobile": "/works/checkin-system/09_passport_watermark_mobile.png"
             },
             {
               "src": "/works/checkin-system/02_arrival_time_desktop.png",
@@ -383,7 +395,7 @@
           "key": "O",
           "label": "管理與通知",
           "en": "Admin & Notice",
-          "cols": 3,
+          "cols": 4,
           "shots": [
             {
               "src": "/works/checkin-system/03_admin_list_desktop.png",
@@ -415,6 +427,18 @@
                 "同日入住有紅字提醒"
               ],
               "mobile": "/works/checkin-system/08_line_group_notice_mobile.png"
+            },
+            {
+              "src": "/works/checkin-system/10_line_registered_desktop.png",
+              "title": "客人完成登記通知",
+              "url": "/notice/registered",
+              "note": "客人一填完，LINE 群組馬上收到通知。",
+              "points": [
+                "顯示住宿者、入住日、預計抵達",
+                "護照與簽名是否完成一目了然",
+                "早到客人會有紅字提醒現場同仁"
+              ],
+              "mobile": "/works/checkin-system/10_line_registered_mobile.png"
             }
           ]
         }
@@ -423,11 +447,15 @@
         "steps": [
           {
             "t": "客人登記",
-            "d": "右上可切換繁中、日文、英文。"
+            "d": "右上可切換六種語言：繁中、簡中、日文、英文、韓文、法文。"
           },
           {
             "t": "填寫資料",
             "d": "輸入任意虛構姓名、地址、Email，用手指或滑鼠簽名。"
+          },
+          {
+            "t": "上傳護照",
+            "d": "按「上傳護照照片」，會用一張虛構的範例護照示範：上傳後自動加上浮水印，還能對照加浮水印前後。"
           },
           {
             "t": "選抵達時間",
@@ -439,10 +467,10 @@
           },
           {
             "t": "看 LINE 通知",
-            "d": "看前一晚推送給現場人員的卡片；勾選「同日入住」會出現 15:00 紅字提醒。"
+            "d": "客人送出後，LINE 群組會馬上收到「登記完成」通知；也能看前一晚推送的退房檢查卡片，勾選「同日入住」會出現 15:00 紅字提醒。"
           }
         ],
-        "notice": "這是虛構的範例：所有姓名、住址、預約資料皆為假資料。範例站不會把任何資料存到雲端，重新整理就還原。"
+        "notice": "這是虛構的範例：所有姓名、住址、預約資料與護照皆為假資料。範例站不會讀取你的任何檔案，也不會把資料存到雲端，重新整理就還原。"
       },
       "bg": {
         "lead": "小型民宿一天要處理很多事：確認客人資料、備好門鎖密碼、通知打掃的人。這些事原本靠人記、靠訊息一則一則傳，很容易漏。我想用一套自己做的小系統，把這些固定流程交給電腦。",
