@@ -35,6 +35,61 @@
       "link": "",
       "link_label": "",
       "color": ""
+    },
+    {
+      "dir": "conjure",
+      "date": "2026.10",
+      "title": "Back to Dance Studio 營運管理系統（範例站）",
+      "desc": "課程登記、薪資自動結算、場地預約與帳務退費，一站完成；免登入即可試玩。",
+      "spent": "—",
+      "saved": "—",
+      "service": "ai",
+      "why": "舞蹈教室每天的記課、算薪、收退費、借場地，原本散在表格和群組裡，很容易漏、很難對帳。",
+      "result": "一個系統完成課程登記、薪資自動結算、場地預約與帳務；退費以負數收入留下軌跡，重要操作都有稽核紀錄。",
+      "slug": "back-to-dance",
+      "intro": "這是我為舞蹈教室打造的營運管理系統範例：課程登記、薪資自動結算、場地預約與帳務退費一站完成。免登入、免安裝，點開即可試玩。\n\n【請先知道】\n・店名、老師、學員、金額全是虛構的假資料。\n・範例站沒有連接任何資料庫，你操作的內容只存在自己的瀏覽器，不會上傳、別人也看不到；左下角「重置範例資料」可隨時還原。\n\n【怎麼試玩】\n登入頁直接點角色按鈕：經營者（看全部，含薪資與收支彙總）、主管（日常營運）、櫃檯（記課、打卡、記帳、場地預約）。\n建議路線：櫃檯 → 每日帳務（試退費、關鍵字搜尋）→ 切換經營者 → 薪資總覽，看自動結算。\n\n【特色】\n・課程登記：老師出勤、人數，支援內部／外師代課\n・薪資自動結算：依課程類型、人數、時數計算，月結一目了然\n・每日帳務：退費、作廢沖銷、關鍵字搜尋\n・場地預約：多空間時段、收費、取消與退款\n・三級權限：帳務彙總需經營者臨時授權（24 小時／3 天／7 天，可提早收回）\n・稽核紀錄：重要操作皆留痕\n・響應式：手機上表格自動轉成卡片列表，不是單純縮小\n\n【設計與技術】\n單檔 HTML＋原生 JavaScript，不使用框架；範例版以瀏覽器內建的模擬層取代後端，零後端、零成本。配色取「桜鼠」，經營者後台為深色；字體為 Noto Sans TC、Fraunces 斜體與 JetBrains Mono。",
+      "images": [
+        {
+          "src": "/works/back-to-dance/01_login_desktop.png",
+          "caption": "登入頁：不用帳號密碼，選一個身分就能進去"
+        },
+        {
+          "src": "/works/back-to-dance/02_class_log_desktop.png",
+          "caption": "課程登記：老師、課程、人數，一筆記錄自動算進薪資"
+        },
+        {
+          "src": "/works/back-to-dance/03_daily_billing_desktop.png",
+          "caption": "每日帳務：收支、退費與現金對帳"
+        },
+        {
+          "src": "/works/back-to-dance/04_venue_booking_desktop.png",
+          "caption": "場地預約：多教室時段、自動計價與擋重複"
+        },
+        {
+          "src": "/works/back-to-dance/05_payroll_desktop.png",
+          "caption": "薪資總覽（經營者）：依課程與人數自動結算"
+        },
+        {
+          "src": "/works/back-to-dance/06_finance_summary_desktop.png",
+          "caption": "收支彙總（經營者）：需經營者臨時授權才看得到"
+        },
+        {
+          "src": "/works/back-to-dance/07_login_mobile.png",
+          "caption": "手機版登入"
+        },
+        {
+          "src": "/works/back-to-dance/08_class_log_mobile.png",
+          "caption": "手機版課程登記：表格自動轉成好按的版面"
+        },
+        {
+          "src": "/works/back-to-dance/09_daily_billing_mobile.png",
+          "caption": "手機版每日帳務"
+        }
+      ],
+      "video": "",
+      "link": "https://back-to-dance-studio.vercel.app",
+      "link_label": "立即試玩",
+      "color": ""
     }
   ]
 }
