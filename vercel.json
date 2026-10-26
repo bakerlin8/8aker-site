@@ -45,6 +45,17 @@
       "statusCode": 302
     },
     {
+      "source": "/checkin-system",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/checkin-system/",
+      "statusCode": 302
+    },
+    {
       "source": "/site",
       "has": [
         {
@@ -75,6 +86,17 @@
         }
       ],
       "destination": "https://8aker0.com/works/back-to-dance/",
+      "statusCode": 302
+    },
+    {
+      "source": "/checkin-system",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/checkin-system/",
       "statusCode": 302
     },
     {
