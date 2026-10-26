@@ -334,7 +334,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       {w.impact.live && <p class="mg-live"><i aria-hidden="true"></i>{w.impact.live}</p>}
       <p class="mg-lead">{w.impact.lead}</p>
       <ul class="mg-rows">{(w.impact.rows || []).map((r: any) => <li><b>{r.item}</b><span><small>以前</small>{r.before}</span><span><small>現在</small>{r.after}</span><em><small>省下</small>{r.saved}</em></li>)}</ul>
-      <p class="mg-total"><b>{w.impact.total}</b><span>{w.impact.cost}</span></p>
+      {w.impact.total && <p class="mg-total"><b>{w.impact.total}</b><span>{w.impact.cost}</span></p>}
       {w.impact.extra && <p class="mg-extra">{w.impact.extra}</p>}
       {w.impact.joke && <p class="mg-joke">{w.impact.joke}</p>}</section>}
     {mag && w.future && <section aria-label="未來規劃" class="mg-sec"><h2>未來規劃<small>NEXT</small></h2>
