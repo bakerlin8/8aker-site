@@ -897,7 +897,7 @@ async function ghPutFile(path, content, sha, message) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e.message || `save ${path} failed`); }
+  if (!res.ok) { const e = await res.json().catch(() => ({})); if (res.status === 409 || /does not match/.test(e.message || '')) throw new Error('這篇在你開著的這段時間被別處更新過了（例如 Claude 剛改過）。請先把你改的內容複製起來，重新整理後台、再開啟這篇，貼上修改後再儲存。'); throw new Error(e.message || `save ${path} failed`); }
   return res.json();
 }
 
