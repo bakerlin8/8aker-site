@@ -555,6 +555,28 @@ body{font-family:'Noto Sans TC',system-ui,sans-serif;font-weight:300;}
 .lib-top button{justify-content:flex-start;}.lib-top span{text-align:left;flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lib-top i{font-style:normal;color:#C9922E;font-size:12px;flex:none;}
 .lib-top .pf{margin:0;}
+
+.wk{border:1px solid var(--border);border-radius:6px;margin-bottom:12px;background:var(--warm-white);overflow:hidden}
+.wk[open]{border-color:rgba(42,24,30,.28);box-shadow:0 6px 22px -14px rgba(42,24,30,.35)}
+.wk-sum{display:flex;align-items:center;gap:14px;padding:12px 16px;cursor:pointer;list-style:none}
+.wk-sum::-webkit-details-marker{display:none}
+.wk-sum::after{content:'＋';margin-left:auto;color:var(--ink-ghost);font-size:16px}
+.wk[open]>.wk-sum::after{content:'－'}
+.wk-sum:hover{background:rgba(42,24,30,.03)}
+.wk-th{flex:none;width:86px;height:54px;border-radius:3px;overflow:hidden;background:var(--parchment);display:grid;place-items:center;color:var(--ink-ghost);font-size:11px}
+.wk-th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.wk-t{display:flex;flex-direction:column;min-width:0;gap:2px}.wk-t b{font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wk-t small{font-size:11.5px;color:var(--ink-ghost)}
+.wk-chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;margin-right:26px}
+.wk-chips em{font-style:normal;font-size:11px;padding:2px 9px;border-radius:10px;background:rgba(42,24,30,.07);color:var(--ink-mute)}
+.wk-chips em.pub{background:#E3EBDD;color:#3F5F30}.wk-chips em.dr{background:#F3E3D6;color:#8A4B1F}
+.wk-body{padding:4px 20px 20px;border-top:1px solid var(--border-soft)}
+.wk-tools{display:flex;gap:6px;justify-content:flex-end;margin:12px 0 4px}
+.wk-sec{border:1px solid var(--border-soft);border-radius:4px;margin-top:12px;background:#fff6}
+.wk-sec>summary{cursor:pointer;padding:10px 14px;font-size:13px;font-weight:500;color:var(--ink-soft);list-style:none;display:flex;justify-content:space-between}
+.wk-sec>summary::-webkit-details-marker{display:none}.wk-sec>summary::after{content:'展開';font-size:11px;color:var(--ink-ghost);font-weight:400}
+.wk-sec[open]>summary::after{content:'收合'}
+.wk-sec-b{padding:2px 14px 14px}
+@media(max-width:700px){.wk-chips{display:none}.wk-th{width:64px;height:42px}}
 </style>
 </head>
 <body>
@@ -1225,22 +1247,33 @@ async function loadWorks() {
   const data = JSON.parse(file.content);
   data.works.forEach(w => { w.images = (w.images || []).map(x => typeof x === 'string' ? { src: x, caption: '' } : x); });
   function collect() {
-    form.querySelectorAll('[data-w]').forEach(el => { data.works[+el.dataset.w][el.dataset.key] = el.value.trim ? el.value : el.value; });
+    form.querySelectorAll('[data-w]').forEach(el => { const w = data.works[+el.dataset.w]; if (el.dataset.key === 'draft') { if (el.value === '1') w.draft = true; else delete w.draft; } else w[el.dataset.key] = el.value; });
     form.querySelectorAll('[data-cap]').forEach(el => { const [i, j] = el.dataset.cap.split(':').map(Number); data.works[i].images[j].caption = el.value; });
   }
   const IN = 'width:100%';
+  const OPEN = new Set();
   function render() {
-    form.innerHTML = `<div id="workStats"></div><div class="field-hint" style="margin-bottom:16px">每件作品都有自己的介紹頁（網址 8aker0.com/works/代號/）。日常紀錄在編輯時選「屬於哪個作品」，就會自動列進該作品的製作紀錄。</div>` + data.works.map((w, i) => `
-      <div style="border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:18px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px"><span class="field-label" style="margin:0">No.${String(i + 1).padStart(2, '0')}</span>
-          <span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">從列表移除</button></span></div>
+    form.querySelectorAll('details[data-k]').forEach(d => { if (d.open) OPEN.add(d.dataset.k); else OPEN.delete(d.dataset.k); });
+    form.innerHTML = `<div id="workStats"></div><div class="field-hint" style="margin-bottom:16px">點一件作品展開編輯。日常紀錄在編輯時選「屬於哪個作品」，就會自動列進該作品的製作紀錄。</div>` + data.works.map((w, i) => `
+      <details class="wk" data-k="w${i}" ${OPEN.has('w' + i) ? 'open' : ''}>
+        <summary class="wk-sum">
+          <span class="wk-th">${(() => { const t = ((w.thumb && w.thumb.desktop) || (w.images && w.images[0] && w.images[0].src) || ''); return t ? `<img src="${escapeAttr(t)}" alt="">` : '<i>無圖</i>'; })()}</span>
+          <span class="wk-t"><b>${escapeHtml(w.title || '（未命名）')}</b><small>No.${String(i + 1).padStart(2, '0')}　${escapeHtml(w.date || '')}　/works/${escapeHtml(w.slug || '')}/</small></span>
+          <span class="wk-chips"><em class="${w.draft ? 'dr' : 'pub'}">${w.draft ? '草稿' : '公開'}</em><em>截圖 ${(w.images || []).length}</em></span>
+        </summary>
+        <div class="wk-body">
+          <div class="wk-tools"><span style="display:flex;gap:6px"><button class="btn btn-ghost" style="padding:4px 10px" data-up="${i}" ${i === 0 ? 'disabled' : ''}>往左移</button><button class="btn btn-danger" style="padding:4px 10px" data-del="${i}">從列表移除</button></span></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
           <div class="field"><label class="field-label">名稱</label><input type="text" data-w="${i}" data-key="title" value="${escapeAttr(w.title)}"></div>
           <div class="field"><label class="field-label">年月（例：2026.09）</label><input type="text" data-w="${i}" data-key="date" value="${escapeAttr(w.date)}"></div>
           <div class="field"><label class="field-label">網址代號（英文小寫、數字、-）</label><input type="text" data-w="${i}" data-key="slug" value="${escapeAttr(w.slug || '')}" placeholder="例：checkin"></div>
         </div>
+
+          <div class="field"><label class="field-label">狀態</label><select data-w="${i}" data-key="draft"><option value="" ${!w.draft ? 'selected' : ''}>公開（會出現在首頁）</option><option value="1" ${w.draft ? 'selected' : ''}>草稿（只有知道網址的人看得到）</option></select><div class="field-hint">草稿：不會出現在首頁與網站地圖，搜尋引擎也不收錄；確認沒問題再改成「公開」。</div></div>
         <div class="field"><label class="field-label">BEFORE・為什麼做（當時卡住的狀況，一句話）</label><textarea rows="2" data-w="${i}" data-key="why">${escapeHtml(w.why || '')}</textarea></div>
         <div class="field"><label class="field-label">AFTER・做出來之後（現在變成怎樣，一句話）</label><textarea rows="2" data-w="${i}" data-key="result">${escapeHtml(w.result || '')}</textarea></div>
+
+          <details class="wk-sec" data-k="w${i}-link" ${OPEN.has('w' + i + '-link') ? 'open' : ''}><summary>連結與按鈕</summary><div class="wk-sec-b">
         <div class="field"><label class="field-label">作品頁的簡短介紹（選填）</label><textarea rows="3" data-w="${i}" data-key="intro">${escapeHtml(w.intro || '')}</textarea></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
           <div class="field"><label class="field-label">介紹影片（Instagram Reels／YouTube／Vimeo 連結，選填）</label><input type="text" data-w="${i}" data-key="video" value="${escapeAttr(w.video || '')}" placeholder="https://www.instagram.com/reel/…"><div class="field-hint">IG Reels、YouTube Shorts 會用手機外框放在標題旁；一般 YouTube 會放成一整幅橫式。</div></div>
@@ -1250,11 +1283,15 @@ async function loadWorks() {
           <div class="field"><label class="field-label">網站名稱（選填，空白就顯示網域）</label><input type="text" data-w="${i}" data-key="link_label" value="${escapeAttr(w.link_label || '')}" placeholder="例：8AKER零 官方網站"></div>
           <div class="field"><label class="field-label">卡片色塊</label><select data-w="${i}" data-key="color">${[['', '自動（依順序輪替）'], ['wine', '葡萄酒'], ['pine', '松綠'], ['navy', '藏青'], ['chestnut', '栗色'], ['plum', '葡萄紫'], ['celadon', '青磁']].map(([k, n]) => `<option value="${k}" ${(w.color || '') === k ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
         </div>
+          </div></details>
+          <details class="wk-sec" data-k="w${i}-eng" ${OPEN.has('w' + i + '-eng') ? 'open' : ''}><summary>試玩按鈕與互動</summary><div class="wk-sec-b">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
           <div class="field"><label class="field-label">試玩按鈕文字（選填，例：試玩範例網站）</label><input type="text" data-w="${i}" data-key="cta_label" value="${escapeAttr(w.cta_label || '')}" placeholder="空白＝前往網站使用"></div>
           <div class="field"><label class="field-label">互動（玩完回來的小提示：喜歡／想要自己的版本）</label><select data-w="${i}" data-key="engage"><option value="" ${w.engage !== 'off' ? 'selected' : ''}>開啟（預設）</option><option value="off" ${w.engage === 'off' ? 'selected' : ''}>關閉</option></select><div class="field-hint">只有「有網站網址」的雜誌版作品會出現。</div></div>
           <div class="field"><label class="field-label">玩完回來的小提示問句（選填）</label><input type="text" data-w="${i}" data-key="ask" value="${escapeAttr(w.ask || '')}" placeholder="玩得還開心嗎？"></div>
         </div>
+</div></details>
+          <details class="wk-sec" data-k="w${i}-img" ${OPEN.has('w' + i + '-img') ? 'open' : ''}><summary>截圖（${(w.images || []).length} 張）</summary><div class="wk-sec-b">
         <div class="field"><label class="field-label">截圖（第一張會當作品卡的縮圖；作品頁會放在「畫面」區）</label>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">${(w.images || []).map((im, j) => `
             <div style="border:1px solid var(--border);padding:6px;background:var(--warm-white)"><img src="${escapeAttr(im.src)}" alt="" style="width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:#ddd">
@@ -1263,8 +1300,10 @@ async function loadWorks() {
             <label style="border:1px dashed var(--border);display:grid;place-items:center;min-height:110px;cursor:pointer;font-size:13px;color:var(--text-muted,#7a716a);text-align:center;padding:8px">＋ 上傳截圖<br><small>可一次選多張</small><input type="file" accept="image/*" multiple data-upload="${i}" style="display:none"></label>
           </div>
           <div class="field-hint">⚠️ 截圖前請用假資料示範，或先遮掉房客姓名、護照、簽名等個資。上傳後記得按下方「儲存變更」。</div>
+        </div></div></details>
+          <div class="field-hint" style="margin-top:14px">作品頁裡的「背景原因、怎麼試玩、成效、未來規劃、畫面分組」目前請 Claude 幫你更新；這裡負責卡片、連結與截圖。</div>
         </div>
-      </div>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addWork">＋ 新增一件成果</button><div class="spacer"></div><button class="btn btn-primary" id="saveWorks">儲存變更</button></div>`;
+      </details>`).join('') + `<div class="btn-row"><button class="btn btn-ghost" id="addWork">＋ 新增一件成果</button><div class="spacer"></div><button class="btn btn-primary" id="saveWorks">儲存變更</button></div>`;
     form.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => { if (!confirm('確定從「有點樣子」移除這件成果嗎？儲存後才會生效（已上傳的截圖檔案會保留）。')) return; collect(); data.works.splice(+b.dataset.del, 1); render(); }));
     form.querySelectorAll('[data-up]').forEach(b => b.addEventListener('click', () => { collect(); const i = +b.dataset.up; [data.works[i - 1], data.works[i]] = [data.works[i], data.works[i - 1]]; render(); }));
     form.querySelectorAll('[data-imup]').forEach(b => b.addEventListener('click', () => { collect(); const [i, j] = b.dataset.imup.split(':').map(Number); const a = data.works[i].images; [a[j - 1], a[j]] = [a[j], a[j - 1]]; render(); }));
@@ -1280,7 +1319,7 @@ async function loadWorks() {
       }
       if (ok) { toast(`已上傳 ${ok} 張，記得按「儲存變更」`); render(); }
     }));
-    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.push({ date: '', title: '', desc: '', why: '', result: '', slug: '', intro: '', images: [], video: '', link: '' }); render(); });
+    document.getElementById('addWork').addEventListener('click', () => { collect(); data.works.push({ date: '', title: '', desc: '', why: '', result: '', slug: '', intro: '', images: [], video: '', link: '', draft: true }); OPEN.add('w' + (data.works.length - 1)); render(); });
     document.getElementById('saveWorks').addEventListener('click', async () => {
       collect();
       const slugs = data.works.map(w => (w.slug || '').trim());
@@ -1318,7 +1357,7 @@ async function loadWorks() {
       const rate = x.players ? Math.round(x.wants / x.players * 100) + '%' : '—';
       return `<tr><td>${escapeHtml(w.title || w.slug)}</td><td>${x.plays}<small>（近 7 日 ${x.plays7}）</small></td><td>${x.players}</td><td>${x.likes}</td><td>${x.wants}</td><td>${rate}</td></tr>`;
     }).join('');
-    box.innerHTML = `<details open style="border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:18px;background:var(--warm-white)"><summary style="cursor:pointer;font-weight:500">互動數字　<small style="color:var(--ink-ghost,#8a7f78);font-weight:400">試玩・喜歡・想要自己的版本</small></summary>
+    box.innerHTML = `<details style="border:1px solid var(--border);border-radius:4px;padding:12px 18px;margin-bottom:16px;background:var(--warm-white)"><summary style="cursor:pointer;font-weight:500">互動數字　<small style="color:var(--ink-ghost,#8a7f78);font-weight:400">試玩・喜歡・想要自己的版本</small></summary>
       <div style="margin-top:12px;overflow-x:auto">${WST === null && !WST_ERR ? '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>' : WST_ERR ? `<div class="field-hint" style="color:#a33">讀不到數字：${escapeHtml(WST_ERR)}</div>` : `<table class="ws-tb"><thead><tr><th>作品</th><th>試玩次數</th><th>不重複訪客</th><th>♡ 喜歡</th><th>想要自己的版本</th><th>轉換率</th></tr></thead><tbody>${rows || '<tr><td colspan="6">還沒有作品</td></tr>'}</tbody></table>`}</div>
       <div class="field-hint" style="margin-top:10px">只記數字，不存姓名或 email。同一人 5 分鐘內重複點，只算一次；「不重複訪客」是用網路位址估的，換網路會被算成兩個人。「想要自己的版本」＝玩完回來的小提示或頁尾按了「填寫需求表」；轉換率＝想要自己的版本 ÷ 不重複訪客。</div>
       <div style="margin-top:8px"><button class="btn btn-ghost" id="wsRefresh" style="padding:4px 12px">重新整理</button></div></details>`;
