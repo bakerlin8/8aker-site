@@ -380,7 +380,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 {mag && <script is:inline type="application/json" id="mgData" set:html={JSON.stringify(shots.map((x: any) => ({ src: x.src, title: x.title, url: x.url || '', note: x.note || '', points: x.points || [] }))).replace(/</g, '\u003c')}></script>}
 <dialog class="lb" id="lb" aria-label="放大畫面"><button class="x" type="button" aria-label="關閉">×</button><img alt="" /><p></p></dialog>
 </div>
-{engage && <div id="mgEng" data-slug={w.slug} data-ask={ask} hidden></div>}
+{engage && <div id="mgEng" data-slug={w.slug} data-ask={ask} data-show={w.show_likes ? '1' : ''} hidden></div>}
 <script>
 (function(){var d=document.getElementById('lb') as HTMLDialogElement|null;if(!d||!d.showModal)return;var im=d.querySelector('img') as HTMLImageElement,cp=d.querySelector('p') as HTMLElement;
   document.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('[data-lb]') as HTMLElement|null;if(!b)return;im.src=b.dataset.lb||'';im.alt=b.dataset.cap||'';cp.textContent=b.dataset.cap||'';d.showModal();});
@@ -429,7 +429,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
   function paint() {
     if (!heart) return;
     heart.setAttribute('aria-pressed', liked ? 'true' : 'false');
-    var n = heart.querySelector('.n'); if (n) { n.textContent = likes; n.hidden = likes < 5; }
+    var n = heart.querySelector('.n'); if (n) { n.textContent = likes; n.hidden = !(box.getAttribute('data-show') === '1' && likes >= 5); }
   }
   function setLiked(on) {
     if (on === liked) return;
