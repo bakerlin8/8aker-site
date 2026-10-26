@@ -2426,7 +2426,6 @@ function renderArticleForm(fm) {
       [heads >= 2, `有 2 個以上的小標題（## ）`],
       [tags.length >= 2, `標籤 2 個以上`],
     ];
-    if (k) R.push([t.toLowerCase().includes(k.toLowerCase()), '標題含關鍵字'], [t.toLowerCase().indexOf(k.toLowerCase()) >= 0 && t.toLowerCase().indexOf(k.toLowerCase()) <= 8, '關鍵字在標題前段'], [ex.toLowerCase().includes(k.toLowerCase()), '摘要含關鍵字'], [body.slice(0, 200).toLowerCase().includes(k.toLowerCase()), '正文開頭 200 字內提到關鍵字']);
     R.push([faq, 'AEO：有「## 常見問題」區塊，網站會自動產生 AI 問答能讀的結構（FAQ）']);
     const ok = R.filter(r => r[0]).length;
     $('seoBox').innerHTML = `<div class="seo-h"><span>搜尋與 AI 問答檢查</span><b>${ok} / ${R.length}</b></div><div class="seo-l">${R.map(([o, m]) => `<div class="${o ? 'ok' : 'no'}"><span>${o ? '✓' : '△'}</span><span>${m}</span></div>`).join('')}</div>${faq ? '' : '<div class="btn-row"><button type="button" class="btn btn-ghost" id="seo-faq">加入「常見問題」範本到正文最後</button></div>'}${k ? '' : '<div class="field-hint">在上方輸入關鍵字，會多出 4 項關鍵字檢查。</div>'}`;
