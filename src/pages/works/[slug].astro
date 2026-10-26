@@ -198,6 +198,12 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 .mg-fonts .spec.mono{font-family:'JetBrains Mono',monospace;font-size:24px;}
 @media(max-width:860px){.mg-spread{grid-template-columns:1fr;margin-top:30px;row-gap:44px;}.mg-fig{margin-right:0;}.mg-fig::before{inset:10px -8px -10px 10px;}.mg-ph{left:auto;right:-6px;bottom:-24px;width:104px;}.mg-cap{padding-left:0;}.mg-groups{grid-template-columns:1fr;row-gap:20px;}.mg-grp.gF .mg-items{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:720px){.mg{padding:92px 20px 48px;}.mg-steps{grid-template-columns:1fr;gap:16px;}.mg-pal{grid-template-columns:1fr;}.mg-pal li{grid-template-columns:72px 1fr;}.mg-fonts li{grid-template-columns:1fr;}}
+@media(hover:hover) and (pointer:fine){
+.mg-cap p,.mg-cap ul{opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;}
+.mg-cap .tt::after{content:'　＋';font-size:13px;color:#86707A;transition:opacity .3s;}
+.mg-in:has(.mg-plate:hover,.mg-plate:focus-within,.mg-toc:hover,.mg-toc:focus-within) .mg-cap :is(p,ul){opacity:1;transform:none;}
+.mg-in:has(.mg-plate:hover,.mg-plate:focus-within,.mg-toc:hover,.mg-toc:focus-within) .mg-cap .tt::after{opacity:0;}
+}
 @media(prefers-reduced-motion:reduce){.mg *{transition:none!important;animation:none!important;}.mg-toc.auto .mg-items button[aria-pressed="true"]::before{width:100%;}}
 
 /* 雜誌版：背景、成效、未來、CTA */
