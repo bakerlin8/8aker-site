@@ -23,6 +23,14 @@ const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '
 const url = `${SITE}/works/${w.slug}/`;
 const desc = w.result || w.desc || '';
 // 版面：直式影片（IG／Shorts）→ 左文右手機框；橫式影片 → 標題下方一整幅；沒有影片 → 只有文字
+// 雜誌版：作品資料有 groups（分組的畫面）時，開頭改成跨頁版面
+const groups: any[] = (Array.isArray(w.groups) ? w.groups : []).map((g: any) => ({ ...g, shots: (g.shots || []).map((x: any) => ({ ...x, src: safeImg(x.src), mobile: safeImg(x.mobile || '') })).filter((x: any) => x.src) })).filter((g: any) => g.shots.length);
+const shots: any[] = groups.flatMap((g: any) => g.shots.map((x: any) => ({ ...x, g: g.key })));
+const mag = shots.length > 0;
+const gIdx = (x: any) => shots.indexOf(x);
+const lum = (hex: string) => { const n = parseInt(hex.slice(1), 16); const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255); };
+const how = w.how || null;
+const design = w.design || null;
 const layout = vid ? (vid.vertical ? 'v' : 'h') : 'none';
 const schema = [
   { '@type': 'CreativeWork', '@id': `${url}#work`, name: w.title, description: desc, creator: { '@id': `${SITE}/#person` }, url, inLanguage: 'zh-Hant-TW', ...(imgs[0] ? { image: imgs[0].startsWith('/') ? SITE + imgs[0] : imgs[0] } : {}) },
@@ -104,11 +112,96 @@ dialog.lb::backdrop{background:rgba(10,5,7,.88);}
 dialog.lb img{display:block;max-width:96vw;max-height:88vh;width:auto;height:auto;}
 dialog.lb p{color:#EFE5D6;font-size:13px;text-align:center;margin-top:8px;}
 dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;background:rgba(239,229,214,.12);color:#EFE5D6;font-size:20px;cursor:pointer;}
+
+/* 雜誌版開頭（作品資料有 groups 時使用） */
+.mg{position:relative;overflow:hidden;background:radial-gradient(70% 60% at 100% 0%,#2A1520 0%,transparent 70%),#1C0F14;color:#EFE5D6;padding:112px 40px 64px;}
+.mg-in{max-width:1120px;margin:0 auto;}
+.mg-run{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(212,162,76,.38);padding-bottom:10px;font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-size:15px;letter-spacing:.08em;color:#D4A24C;}
+.mg-run span:last-child{color:#B9A89E;}
+.mg-spread{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:clamp(24px,4vw,56px);margin-top:44px;align-items:start;}
+.mg-kick{font-size:12px;letter-spacing:.34em;color:#D4A24C;display:flex;align-items:center;gap:14px;}
+.mg-kick::after{content:'';height:1px;width:48px;background:rgba(212,162,76,.38);}
+.mg-h1{margin-top:18px;font-weight:500;}
+.mg-h1 .en{display:block;font-family:'Cormorant Garamond','Noto Serif TC',serif;font-style:italic;font-weight:500;font-size:clamp(54px,8.4vw,104px);line-height:.92;letter-spacing:-.01em;color:#EBD3A8;}
+.mg-h1 .zh{display:block;margin-top:16px;font-family:var(--serif);font-weight:400;font-size:clamp(20px,2.4vw,28px);letter-spacing:.14em;color:#EFE5D6;}
+.mg-tags{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12.5px;letter-spacing:.12em;color:#86707A;}
+.mg-tag{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.18em;color:#EBD3A8;background:#4B1623;border:1px solid #D4A24C;padding:1px 12px;border-radius:2px;}
+.mg-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:#D4A24C;}
+.mg-deck{margin-top:28px;font-family:var(--serif);font-size:clamp(17px,1.7vw,20px);line-height:2;color:#EFE5D6;max-width:min(23em,100%);}
+.mg .acts{margin-top:30px;}
+.mg-plate{position:relative;min-width:0;}
+.mg-fig{position:relative;margin-right:-40px;}
+.mg-fig::before{content:'';position:absolute;inset:14px -14px -14px 14px;border:1px solid rgba(212,162,76,.38);pointer-events:none;}
+.mg-desk{position:relative;background:#26141B;border:1px solid rgba(255,255,255,.12);box-shadow:0 50px 90px -40px #000;}
+.mg-bar{height:28px;background:#2c1a22;display:flex;align-items:center;gap:6px;padding:0 12px;}
+.mg-bar i{width:8px;height:8px;border-radius:50%;background:#5a4048;flex:none;}
+.mg-bar span{margin-left:12px;font-size:11px;color:#B9A89E;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.mg-shot{position:relative;display:block;width:100%;aspect-ratio:1280/900;border:0;padding:0;background:#1C0F14;cursor:zoom-in;}
+.mg-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transition:opacity .5s;}
+.mg-shot img.on{opacity:1;}
+.mg-ph{position:absolute;left:-36px;bottom:-4px;width:clamp(120px,15vw,172px);padding:6px;border-radius:26px;background:#14090d;border:1px solid rgba(239,229,214,.2);box-shadow:0 36px 60px -20px #000;transition:opacity .4s,transform .4s;}
+.mg-ph.off{opacity:0;transform:translateY(12px);pointer-events:none;}
+.mg-scr{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:9/17;background:#000;}
+.mg-scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transition:opacity .5s;}
+.mg-scr img.on{opacity:1;}
+.mg-cap{margin-top:34px;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:baseline;padding-left:clamp(110px,14vw,150px);}
+.mg-cap .no{font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-size:15px;letter-spacing:.1em;color:#D4A24C;}
+.mg-cap .tt{font-family:var(--serif);font-size:18px;color:#EBD3A8;}
+.mg-cap p{grid-column:2;font-size:14px;color:#B9A89E;line-height:1.8;max-width:34em;}
+.mg-cap ul{grid-column:2;list-style:none;margin:6px 0 0;padding:0;max-width:34em;}
+.mg-cap li{position:relative;padding:7px 0 7px 18px;border-top:1px solid rgba(239,229,214,.1);font-size:13.5px;line-height:1.7;color:#D9CCBD;}
+.mg-cap li::before{content:'';position:absolute;left:0;top:1.2em;width:8px;height:1px;background:#D4A24C;}
+.mg-toc{margin-top:46px;border-top:1px solid rgba(212,162,76,.38);padding-top:14px;}
+.mg-toc-h{display:flex;align-items:center;gap:14px;font-size:12px;letter-spacing:.34em;color:#D4A24C;}
+.mg-toc-h .sp{flex:1;}
+.mg-play{border:1px solid rgba(239,229,214,.14);background:transparent;padding:2px 12px;font-size:12px;letter-spacing:.1em;color:#B9A89E;cursor:pointer;}
+.mg-play:hover,.mg-play[aria-pressed="true"]{color:#D4A24C;border-color:#D4A24C;}
+.mg-groups{display:grid;grid-template-columns:4fr 2fr;gap:0 clamp(16px,3vw,40px);margin-top:14px;}
+.mg-grp h3{font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-weight:500;font-size:15px;letter-spacing:.06em;color:#86707A;margin-bottom:6px;}
+.mg-grp h3 b{font-family:var(--sans);font-style:normal;font-weight:400;font-size:12.5px;letter-spacing:.2em;color:#B9A89E;margin-right:10px;}
+.mg-items{display:grid;gap:0 14px;}
+.mg-grp.gF .mg-items{grid-template-columns:repeat(4,1fr);}
+.mg-grp.gO .mg-items{grid-template-columns:repeat(2,1fr);}
+.mg-items button{position:relative;text-align:left;border:0;border-top:1px solid rgba(239,229,214,.14);background:none;padding:10px 0 4px;display:grid;color:#B9A89E;cursor:pointer;font:inherit;}
+.mg-items .n{font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-size:22px;line-height:1;color:#86707A;transition:color .3s;}
+.mg-items .t{font-family:var(--serif);font-size:14.5px;margin-top:4px;}
+.mg-items button:hover{color:#EFE5D6;}
+.mg-items button[aria-pressed="true"]{color:#EBD3A8;}
+.mg-items button[aria-pressed="true"] .n{color:#D4A24C;}
+.mg-items button::before{content:'';position:absolute;left:0;top:-1px;height:2px;width:0;background:#D4A24C;}
+.mg-items button[aria-pressed="true"]::before{width:100%;}
+.mg-toc.auto .mg-items button[aria-pressed="true"]::before{width:0;animation:mgfill var(--dur,4500ms) linear forwards;}
+@keyframes mgfill{to{width:100%;}}
+/* 雜誌版內文區塊 */
+.mg-sec h3.mg-sub{font-family:var(--serif);font-weight:500;font-size:16px;color:var(--gold);margin:30px 0 12px;}
+.mg-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;counter-reset:s;}
+.mg-steps li{counter-increment:s;border-top:1px solid rgba(212,162,76,.38);padding-top:12px;display:grid;gap:4px;align-content:start;}
+.mg-steps li::before{content:counter(s);font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-size:26px;line-height:1;color:var(--gold);}
+.mg-steps b{font-family:var(--serif);font-weight:500;font-size:16px;}
+.mg-steps span{font-size:14px;line-height:1.8;color:var(--bone-2);}
+.mg-note{margin-top:24px;padding:12px 16px;border-left:2px solid var(--gold);background:rgba(212,162,76,.07);font-size:14px;line-height:1.85;color:#D9CCBD;}
+.mg-extra{margin-top:16px;font-size:14.5px;line-height:1.95;color:#D9CCBD;max-width:40em;}
+.mg-lead{font-family:var(--serif);font-size:17px;line-height:2;color:#EFE5D6;max-width:36em;}
+.mg-pal{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:16px 28px;}
+.mg-pal li{display:grid;grid-template-columns:96px 1fr;gap:14px;align-items:start;min-width:0;}
+.mg-pal .sw{display:flex;align-items:flex-end;aspect-ratio:1;padding:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;border:1px solid rgba(239,229,214,.18);}
+.mg-pal b,.mg-fonts b{font-family:var(--serif);font-weight:500;font-size:15px;}
+.mg-pal p,.mg-fonts p{font-size:13.5px;line-height:1.8;color:var(--bone-2);margin-top:2px;}
+.mg-fonts{list-style:none;margin:0;padding:0;display:grid;gap:0;}
+.mg-fonts li{display:grid;grid-template-columns:minmax(0,220px) 1fr;gap:6px 28px;align-items:center;padding:16px 0;border-top:1px solid rgba(239,229,214,.12);}
+.mg-fonts li:last-child{border-bottom:1px solid rgba(239,229,214,.12);}
+.mg-fonts .spec{font-size:26px;line-height:1.3;color:#EBD3A8;overflow-wrap:anywhere;}
+.mg-fonts .spec.fraunces{font-family:'Fraunces','Cormorant Garamond',serif;font-style:italic;font-size:30px;}
+.mg-fonts .spec.sans{font-family:'Noto Sans TC',sans-serif;font-size:19px;}
+.mg-fonts .spec.mono{font-family:'JetBrains Mono',monospace;font-size:24px;}
+@media(max-width:860px){.mg-spread{grid-template-columns:1fr;margin-top:30px;row-gap:44px;}.mg-fig{margin-right:0;}.mg-fig::before{inset:10px -8px -10px 10px;}.mg-ph{left:auto;right:-6px;bottom:-24px;width:104px;}.mg-cap{padding-left:0;}.mg-groups{grid-template-columns:1fr;row-gap:20px;}.mg-grp.gF .mg-items{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:720px){.mg{padding:92px 20px 48px;}.mg-steps{grid-template-columns:1fr;gap:16px;}.mg-pal{grid-template-columns:1fr;}.mg-pal li{grid-template-columns:72px 1fr;}.mg-fonts li{grid-template-columns:1fr;}}
+@media(prefers-reduced-motion:reduce){.mg *{transition:none!important;animation:none!important;}.mg-toc.auto .mg-items button[aria-pressed="true"]::before{width:100%;}}
 @media(max-width:900px){.wh[data-layout="v"] .wh-in{grid-template-columns:1fr;gap:40px;}.wpage{--frame:300px;}}
 @media(max-width:720px){.wh{padding:96px 20px 48px;}.wh .ba{grid-template-columns:1fr;gap:18px;}.wb{padding:44px 20px 80px;}.wh .wq{font-size:16px;}.cinema{padding:0;margin-top:0;}.cinema .frame{border-left:0;border-right:0;}.acts>a{flex:1 1 100%;justify-content:space-between;}}
 </style>
 <div class="wpage" style={colorVars(C)}>
-<header class="wh" data-layout={layout}>
+{!mag && <header class="wh" data-layout={layout}>
   <div class="wh-in">
     <div class="wh-txt">
       <span class="no" aria-hidden="true">{NO}</span>
@@ -136,13 +229,62 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       <p class="vcap"><b>FILM</b>{vid.kind === 'instagram' ? '介紹影片・Instagram' : '介紹影片'}</p>
     </div>}
   </div>
-</header>
+</header>}
+{mag && <header class="mg">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Fraunces:ital,wght@1,500&family=JetBrains+Mono:wght@500&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.$,%20" />
+  <div class="mg-in">
+    <div class="mg-run"><span>8AKER零 ・ 有點樣子</span><span>No.{NO}</span></div>
+    <div class="mg-spread">
+      <div class="mg-txt">
+        <div class="mg-kick">{w.kicker || '作品'}</div>
+        <h1 class="mg-h1">{w.title_en ? <><span class="en">{w.title_en}</span><span class="zh">{w.title_zh}</span></> : w.title}</h1>
+        <div class="mg-tags">{w.tag && <span class="mg-tag">{w.tag}</span>}<span>{w.date}</span></div>
+        {w.deck && <p class="mg-deck">{w.deck}</p>}
+        <div class="acts">
+          {link && <a class="go-site" href={link} target="_blank" rel="noopener"><span><b>前往網站使用</b><small>{siteName}</small></span><i aria-hidden="true">↗</i></a>}
+          <a class="go-log" href="#log">看作品日誌 <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="mg-plate">
+        <div class="mg-fig">
+          <div class="mg-desk">
+            <div class="mg-bar"><i></i><i></i><i></i><span id="mgUrl">{shots[0].url || ''}</span></div>
+            <button type="button" class="mg-shot" id="mgShot" data-lb={shots[0].src} data-cap={shots[0].title} aria-label="放大目前畫面">
+              {shots.map((x: any, i: number) => <img class={i === 0 ? 'on' : ''} src={x.src} alt={`${x.title}畫面`} loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />)}
+            </button>
+          </div>
+          <div class="mg-ph" id="mgPh" aria-hidden="true"><div class="mg-scr">{shots.filter((x: any) => x.mobile).map((x: any) => <img src={x.mobile} alt="" loading="lazy" decoding="async" data-for={String(gIdx(x))} class={gIdx(x) === 0 ? 'on' : ''} />)}</div></div>
+        </div>
+        <div class="mg-cap" id="mgCap" aria-live="polite">
+          <span class="no">Fig. 1</span><span class="tt">{shots[0].title}</span>
+          <p>{shots[0].note}</p>
+          <ul>{(shots[0].points || []).map((t: string) => <li>{t}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+    <nav class="mg-toc" id="mgToc" aria-label="畫面目次">
+      <div class="mg-toc-h"><span>目次 ・ 試玩路線</span><span class="sp"></span><button type="button" class="mg-play" id="mgPlay" aria-pressed="false">自動導覽</button></div>
+      <div class="mg-groups">{groups.map((g: any) => <div class={`mg-grp g${g.key}`}><h3><b>{g.label}</b>{g.en}</h3><div class="mg-items">{g.shots.map((x: any) => { const i = gIdx(shots.find((y: any) => y.src === x.src)); return <button type="button" data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}><span class="n">{String(i + 1).padStart(2, '0')}</span><span class="t">{x.title}</span></button>; })}</div></div>)}</div>
+    </nav>
+  </div>
+</header>}
 {layout === 'h' && vid && <div class="cinema" aria-label="介紹影片"><div class="frame">{vid.kind === 'file'
   ? <video src={vid.src} controls preload="metadata" playsinline data-auto></video>
   : <iframe src={vid.src} title={`${w.title} 介紹影片`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>}</div></div>}
 <main class="wb">
   <div class="wb-in">
-    {imgs.length > 0 && <section aria-label="畫面"><h2>畫面<small>SCREENS</small></h2>
+    {mag && how && <section aria-label="怎麼試玩" class="mg-sec"><h2>怎麼試玩<small>TRY IT</small></h2>
+      <ol class="mg-steps">{(how.steps || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ol>
+      {how.notice && <p class="mg-note">{how.notice}</p>}
+      {how.extra && <p class="mg-extra">{how.extra}</p>}</section>}
+    {mag && design && <section aria-label="設計" class="mg-sec"><h2>設計<small>DESIGN</small></h2>
+      {design.lead && <p class="mg-lead">{design.lead}</p>}
+      <h3 class="mg-sub">配色</h3>
+      <ul class="mg-pal">{(design.palette || []).map((c: any) => <li><span class="sw" style={`background:${c.hex};color:${lum(c.hex) > 0.4 ? '#211A1B' : '#F7F1F0'}`}>{c.hex}</span><div><b>{c.name}</b><p>{c.role}</p></div></li>)}</ul>
+      <h3 class="mg-sub">字體</h3>
+      <ul class="mg-fonts">{(design.fonts || []).map((f: any) => <li><span class={`spec ${f.css || ''}`}>{f.sample}</span><div><b>{f.name}</b><p>{f.role}</p></div></li>)}</ul>
+      {(design.notes || []).map((t: string) => <p class="mg-extra">{t}</p>)}</section>}
+    {!mag && imgs.length > 0 && <section aria-label="畫面"><h2>畫面<small>SCREENS</small></h2>
       <div class={`gal${imgs.length === 1 ? ' one' : ''}`}>{imgs.map((src, i) => (
         <figure><button type="button" data-lb={src} data-cap={caps[i] || ''} aria-label={`放大第 ${i + 1} 張畫面`}><img src={src} alt={caps[i] || `${w.title} 畫面 ${i + 1}`} loading={i ? 'lazy' : 'eager'} decoding="async" /></button>{caps[i] && <figcaption>{caps[i]}</figcaption>}</figure>))}</div></section>}
     <section aria-label="作品日誌" id="log"><h2>作品日誌<small>LOG</small></h2>
@@ -153,12 +295,39 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
     <a class="back" href="/#works">← 回到有點樣子</a>
   </div>
 </main>
+{mag && <script is:inline type="application/json" id="mgData" set:html={JSON.stringify(shots.map((x: any) => ({ src: x.src, title: x.title, url: x.url || '', note: x.note || '', points: x.points || [] }))).replace(/</g, '\u003c')}></script>}
 <dialog class="lb" id="lb" aria-label="放大畫面"><button class="x" type="button" aria-label="關閉">×</button><img alt="" /><p></p></dialog>
 </div>
 <script>
 (function(){var d=document.getElementById('lb') as HTMLDialogElement|null;if(!d||!d.showModal)return;var im=d.querySelector('img') as HTMLImageElement,cp=d.querySelector('p') as HTMLElement;
   document.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('[data-lb]') as HTMLElement|null;if(!b)return;im.src=b.dataset.lb||'';im.alt=b.dataset.cap||'';cp.textContent=b.dataset.cap||'';d.showModal();});
   d.addEventListener('click',function(e){if(e.target===d||(e.target as HTMLElement).closest('.x'))d.close();});})();
+
+/* 雜誌版：目次切換畫面、手機同步、自動導覽（預設關閉） */
+(function(){var shot=document.getElementById('mgShot') as HTMLElement|null;if(!shot)return;
+  var imgs=Array.prototype.slice.call(shot.querySelectorAll('img')) as HTMLElement[];
+  var ph=document.getElementById('mgPh') as HTMLElement,phImgs=Array.prototype.slice.call(ph.querySelectorAll('img')) as HTMLElement[];
+  var btns=Array.prototype.slice.call(document.querySelectorAll('.mg-items button')) as HTMLElement[];
+  var toc=document.getElementById('mgToc') as HTMLElement,play=document.getElementById('mgPlay') as HTMLElement,cap=document.getElementById('mgCap') as HTMLElement,url=document.getElementById('mgUrl') as HTMLElement;
+  var data:any[]=JSON.parse((document.getElementById('mgData') as HTMLElement).textContent||'[]');
+  var cur=0,auto=false,timer:any=0,DUR=4500;
+  function esc(t:string){return t.replace(/[&<>]/g,function(c){return c==='&'?'&amp;':c==='<'?'&lt;':'&gt;';});}
+  function show(i:number){cur=i;var s=data[i];
+    imgs.forEach(function(im,k){im.classList.toggle('on',k===i);});
+    var hasPh=false;phImgs.forEach(function(im){var on=im.getAttribute('data-for')===String(i);im.classList.toggle('on',on);if(on)hasPh=true;});
+    ph.classList.toggle('off',!hasPh);
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-i')===String(i)));});
+    if(url)url.textContent=s.url||'';
+    shot!.setAttribute('data-lb',s.src);shot!.setAttribute('data-cap',s.title);
+    cap.innerHTML='<span class="no">Fig. '+(i+1)+'</span><span class="tt">'+esc(s.title)+'</span><p>'+esc(s.note||'')+'</p><ul>'+(s.points||[]).map(function(t:string){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>';
+    toc.classList.toggle('auto',auto);
+    clearTimeout(timer);if(auto)timer=setTimeout(function(){show((cur+1)%data.length);},DUR);}
+  btns.forEach(function(b){b.addEventListener('click',function(){auto=false;play.setAttribute('aria-pressed','false');show(+(b.getAttribute('data-i')||0));});});
+  play.addEventListener('click',function(){auto=!auto;play.setAttribute('aria-pressed',String(auto));play.textContent=auto?'暫停':'自動導覽';show(cur);});
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)DUR=7000;
+  if('IntersectionObserver' in window){new IntersectionObserver(function(es){if(!es[0].isIntersecting)clearTimeout(timer);else if(auto)show(cur);},{threshold:.2}).observe(toc);}
+})();
+
 /* Instagram 嵌入：依 Instagram 回傳的實際高度調整，不會被裁切或留白 */
 (function(){var f=document.querySelector('iframe[data-ig]') as HTMLIFrameElement|null;if(!f)return;
   addEventListener('message',function(e){if(e.origin!=='https://www.instagram.com'||e.source!==f.contentWindow)return;

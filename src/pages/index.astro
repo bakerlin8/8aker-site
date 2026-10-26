@@ -1169,6 +1169,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 .deck.tint .work .meta span:first-child{color:var(--dc);}
 .deck.tint .work .wq.bf{border-left-color:rgba(255,255,255,.18);}
 .deck.tint .work::after{opacity:.16;}
+.work .meta .wtag{font-size:11px;letter-spacing:.14em;color:#EBD3A8;background:#4B1623;border:1px solid #D4A24C;padding:0 8px;border-radius:2px;}
 .vinyl{position:absolute;left:50%;top:10px;width:540px;height:540px;margin-left:-270px;border-radius:50%;
   background:radial-gradient(circle,#D4A24C 0 9%,#1a0d12 9.5% 10.5%,transparent 11%),repeating-radial-gradient(circle,#140a0e 0 2px,#22121a 2.5px 3.5px),#140a0e;
   box-shadow:0 20px 50px -20px #000,inset 0 0 0 1px rgba(239,229,214,.06);transition:transform .9s var(--ease),opacity .6s;animation:spin 9s linear infinite;}
@@ -1269,7 +1270,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
       <div class="deck tint rv" style="--i:2" id="deck" tabindex="0" role="region" aria-roledescription="輪播" aria-label="作品唱盤：左右滑動或用方向鍵切換">
         <div class="deck-stage" id="deckStage">
         {worksData.works.map((w, i) => { return (
-          <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};${colorVars(workColor(w, i))}`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span></div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品日誌<i aria-hidden="true">→</i></span>}</a>
+          <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};${colorVars(workColor(w, i))}`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span>{(w as any).tag && <span class="wtag">{(w as any).tag}</span>}</div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品日誌<i aria-hidden="true">→</i></span>}</a>
         ); })}
         </div>
       </div>

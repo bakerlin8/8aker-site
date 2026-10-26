@@ -39,7 +39,7 @@
     {
       "dir": "conjure",
       "date": "2026.10",
-      "title": "Back to Dance Studio 營運管理系統（範例站）",
+      "title": "Back to Dance Studio 營運管理系統",
       "desc": "課程登記、薪資自動結算、場地預約與帳務退費，一站完成；免登入即可試玩。",
       "spent": "—",
       "saved": "—",
@@ -47,49 +47,199 @@
       "why": "舞蹈教室每天的記課、算薪、收退費、借場地，原本散在表格和群組裡，很容易漏、很難對帳。",
       "result": "一個系統完成課程登記、薪資自動結算、場地預約與帳務；退費以負數收入留下軌跡，重要操作都有稽核紀錄。",
       "slug": "back-to-dance",
-      "intro": "這是我為舞蹈教室打造的營運管理系統範例：課程登記、薪資自動結算、場地預約與帳務退費一站完成。免登入、免安裝，點開即可試玩。\n\n【請先知道】\n・店名、老師、學員、金額全是虛構的假資料。\n・範例站沒有連接任何資料庫，你操作的內容只存在自己的瀏覽器，不會上傳、別人也看不到；左下角「重置範例資料」可隨時還原。\n\n【怎麼試玩】\n登入頁直接點角色按鈕：經營者（看全部，含薪資與收支彙總）、主管（日常營運）、櫃檯（記課、打卡、記帳、場地預約）。\n建議路線：櫃檯 → 每日帳務（試退費、關鍵字搜尋）→ 切換經營者 → 薪資總覽，看自動結算。\n\n【特色】\n・課程登記：老師出勤、人數，支援內部／外師代課\n・薪資自動結算：依課程類型、人數、時數計算，月結一目了然\n・每日帳務：退費、作廢沖銷、關鍵字搜尋\n・場地預約：多空間時段、收費、取消與退款\n・三級權限：帳務彙總需經營者臨時授權（24 小時／3 天／7 天，可提早收回）\n・稽核紀錄：重要操作皆留痕\n・響應式：手機上表格自動轉成卡片列表，不是單純縮小\n\n【設計與技術】\n單檔 HTML＋原生 JavaScript，不使用框架；範例版以瀏覽器內建的模擬層取代後端，零後端、零成本。配色取「桜鼠」，經營者後台為深色；字體為 Noto Sans TC、Fraunces 斜體與 JetBrains Mono。",
+      "intro": "",
       "images": [
         {
           "src": "/works/back-to-dance/01_login_desktop.png",
-          "caption": "登入頁：不用帳號密碼，選一個身分就能進去"
+          "caption": "登入頁"
         },
         {
           "src": "/works/back-to-dance/02_class_log_desktop.png",
-          "caption": "課程登記：老師、課程、人數，一筆記錄自動算進薪資"
+          "caption": "課程登記"
         },
         {
           "src": "/works/back-to-dance/03_daily_billing_desktop.png",
-          "caption": "每日帳務：收支、退費與現金對帳"
+          "caption": "每日帳務"
         },
         {
           "src": "/works/back-to-dance/04_venue_booking_desktop.png",
-          "caption": "場地預約：多教室時段、自動計價與擋重複"
+          "caption": "場地預約"
         },
         {
           "src": "/works/back-to-dance/05_payroll_desktop.png",
-          "caption": "薪資總覽（經營者）：依課程與人數自動結算"
+          "caption": "薪資總覽"
         },
         {
           "src": "/works/back-to-dance/06_finance_summary_desktop.png",
-          "caption": "收支彙總（經營者）：需經營者臨時授權才看得到"
-        },
-        {
-          "src": "/works/back-to-dance/07_login_mobile.png",
-          "caption": "手機版登入"
-        },
-        {
-          "src": "/works/back-to-dance/08_class_log_mobile.png",
-          "caption": "手機版課程登記：表格自動轉成好按的版面"
-        },
-        {
-          "src": "/works/back-to-dance/09_daily_billing_mobile.png",
-          "caption": "手機版每日帳務"
+          "caption": "收支彙總"
         }
       ],
       "video": "",
       "link": "https://back-to-dance-studio.vercel.app",
       "link_label": "立即試玩",
-      "color": ""
+      "color": "",
+      "title_en": "Back to Dance",
+      "title_zh": "Studio 營運管理系統",
+      "tag": "範例站",
+      "kicker": "具現 ・ 作品",
+      "deck": "課程登記、薪資結算、場地預約與帳務退費，一個系統就完成。點開就能玩，所有資料都是虛構的。",
+      "groups": [
+        {
+          "key": "F",
+          "label": "櫃檯",
+          "en": "Front desk",
+          "shots": [
+            {
+              "src": "/works/back-to-dance/01_login_desktop.png",
+              "title": "登入",
+              "url": "/login",
+              "note": "不用帳號密碼，點一個身分就能進去。",
+              "points": [
+                "三種身分：經營者、主管、櫃檯",
+                "你改的資料只存在自己的瀏覽器",
+                "左下角「重置範例資料」隨時還原"
+              ],
+              "mobile": "/works/back-to-dance/07_login_mobile.png"
+            },
+            {
+              "src": "/works/back-to-dance/02_class_log_desktop.png",
+              "title": "課程登記",
+              "url": "/class-log",
+              "note": "櫃檯每天輸入上課紀錄，後台薪資即時算好。",
+              "points": [
+                "老師、課程、人數一次記下",
+                "支援內部與外聘老師代課，只產生一筆記錄",
+                "當天沒有學生就填 0，該堂不計堂費"
+              ],
+              "mobile": "/works/back-to-dance/08_class_log_mobile.png"
+            },
+            {
+              "src": "/works/back-to-dance/03_daily_billing_desktop.png",
+              "title": "每日帳務",
+              "url": "/daily-billing",
+              "note": "每天的收入、支出與現金抽屜，在這裡對帳。",
+              "points": [
+                "退費以負數收入留下帳務軌跡，也能作廢沖銷",
+                "零用金補款與匯款分開統計",
+                "可用關鍵字搜尋，找帳不用逐日翻"
+              ],
+              "mobile": "/works/back-to-dance/09_daily_billing_mobile.png"
+            },
+            {
+              "src": "/works/back-to-dance/04_venue_booking_desktop.png",
+              "title": "場地預約",
+              "url": "/venue-booking",
+              "note": "教室出租的時段、價格與預約狀態一目了然。",
+              "points": [
+                "A、B 教室與打通兩間，點開始與結束時段就能預約",
+                "平日白天與晚上的費率不同，系統自動計價",
+                "自動擋掉重複預約；取消會保留紀錄，不會刪除"
+              ]
+            }
+          ]
+        },
+        {
+          "key": "O",
+          "label": "經營者",
+          "en": "Owner",
+          "shots": [
+            {
+              "src": "/works/back-to-dance/05_payroll_desktop.png",
+              "title": "薪資總覽",
+              "url": "/payroll",
+              "note": "切換成經營者，深色後台就是看錢的地方。",
+              "points": [
+                "依課程類型、人數與堂數自動結算",
+                "人數加給與達標獎金分開計算",
+                "代課只給基本薪資與車資"
+              ]
+            },
+            {
+              "src": "/works/back-to-dance/06_finance_summary_desktop.png",
+              "title": "收支彙總",
+              "url": "/finance-summary",
+              "note": "整間教室這個月賺多少、花多少。",
+              "points": [
+                "只有經營者看得到",
+                "管理者需要經營者臨時授權：24 小時、3 天或 7 天，可提早收回",
+                "收入與支出各自分類統計，可存成圖片"
+              ]
+            }
+          ]
+        }
+      ],
+      "how": {
+        "steps": [
+          {
+            "t": "選一個身分",
+            "d": "登入頁直接點角色按鈕，不用帳號密碼。"
+          },
+          {
+            "t": "從櫃檯開始",
+            "d": "先到「每日帳務」，試試登記一筆退費，再用關鍵字搜尋找回它。"
+          },
+          {
+            "t": "換成經營者",
+            "d": "打開「薪資總覽」，看剛才的記錄怎麼自動算進薪資。"
+          }
+        ],
+        "notice": "這是虛構的範例：店名、老師、學員與金額都是假資料。範例站沒有連接任何資料庫，你操作的內容只存在自己的瀏覽器，不會上傳，別人也看不到。",
+        "extra": "另外，重要操作都有稽核紀錄；手機上，表格會自動轉成卡片列表，說明文字也能收合，不是單純把畫面縮小。"
+      },
+      "design": {
+        "lead": "帳務系統每天要看好幾個小時，所以我想做的是「耐看」，而不是搶眼。整個畫面像一間安靜的舞蹈教室：暖灰白的牆、玫瑰色的重點、一點灰綠的植物。",
+        "palette": [
+          {
+            "name": "桜鼠",
+            "hex": "#F7F1F0",
+            "role": "底色。帶粉的暖灰白，來自日本傳統色「桜鼠」，比純白柔和，長時間看不刺眼。"
+          },
+          {
+            "name": "乾燥玫瑰",
+            "hex": "#B4555E",
+            "role": "主色。用在按鈕與目前所在的分頁，只在需要你注意的地方出現。"
+          },
+          {
+            "name": "灰綠",
+            "hex": "#5F7A66",
+            "role": "輔色。區分 B 教室與「已完成」的狀態，冷色讓畫面不甜膩。"
+          },
+          {
+            "name": "深炭褐",
+            "hex": "#211A1B",
+            "role": "經營者後台的底色。帶一點暖褐的深色，進到這裡就像換了一個房間。"
+          },
+          {
+            "name": "淡玫瑰粉",
+            "hex": "#E8A0A7",
+            "role": "後台的強調色，是主色在深色背景上的亮版本，同一家人。"
+          }
+        ],
+        "fonts": [
+          {
+            "name": "Fraunces 斜體",
+            "sample": "Back to Dance",
+            "css": "fraunces",
+            "role": "只用在品牌字。斜體有一點舞蹈的動勢，整個系統只有這裡放縱一下。"
+          },
+          {
+            "name": "Noto Sans TC",
+            "sample": "課程登記　薪資管理",
+            "css": "sans",
+            "role": "所有內文與按鈕。筆畫清楚，中文密集的表格也不會糊在一起。"
+          },
+          {
+            "name": "JetBrains Mono",
+            "sample": "$165,725",
+            "css": "mono",
+            "role": "金額與數字專用。等寬，直排時小數點與位數自然對齊，一眼就能比較。"
+          }
+        ],
+        "notes": [
+          "櫃檯用亮、經營者用暗，是想讓人一眼就知道現在站在哪個身分：進到深色的畫面，處理的就是薪資與整體帳務，不是日常記帳。",
+          "動態只留兩處：載入時的淡入，以及分頁滑過的細微變化。它們讓介面有呼吸，但不會在你忙的時候搶走注意力。"
+        ]
+      }
     }
   ]
 }
