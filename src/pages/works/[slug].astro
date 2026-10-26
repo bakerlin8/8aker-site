@@ -197,6 +197,45 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 @media(max-width:860px){.mg-spread{grid-template-columns:1fr;margin-top:30px;row-gap:44px;}.mg-fig{margin-right:0;}.mg-fig::before{inset:10px -8px -10px 10px;}.mg-ph{left:auto;right:-6px;bottom:-24px;width:104px;}.mg-cap{padding-left:0;}.mg-groups{grid-template-columns:1fr;row-gap:20px;}.mg-grp.gF .mg-items{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:720px){.mg{padding:92px 20px 48px;}.mg-steps{grid-template-columns:1fr;gap:16px;}.mg-pal{grid-template-columns:1fr;}.mg-pal li{grid-template-columns:72px 1fr;}.mg-fonts li{grid-template-columns:1fr;}}
 @media(prefers-reduced-motion:reduce){.mg *{transition:none!important;animation:none!important;}.mg-toc.auto .mg-items button[aria-pressed="true"]::before{width:100%;}}
+
+/* 雜誌版：背景、成效、未來、CTA */
+.mg-prob{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;counter-reset:p;}
+.mg-prob li{counter-increment:p;border-top:1px solid rgba(212,162,76,.38);padding-top:12px;display:grid;gap:6px;align-content:start;}
+.mg-prob li::before{content:counter(p);font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-size:26px;line-height:1;color:var(--gold);}
+.mg-prob b{font-family:var(--serif);font-weight:500;font-size:16px;line-height:1.5;}
+.mg-prob span{font-size:14px;line-height:1.85;color:var(--bone-2);}
+.mg-rows{list-style:none;margin:24px 0 0;padding:0;}
+.mg-rows li{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:6px 20px;align-items:baseline;padding:14px 0;border-top:1px solid rgba(239,229,214,.12);font-size:14px;color:var(--bone-2);}
+.mg-rows li:last-child{border-bottom:1px solid rgba(239,229,214,.12);}
+.mg-rows b{font-family:var(--serif);font-weight:500;font-size:15px;color:var(--bone);}
+.mg-rows small{display:none;font-size:11.5px;letter-spacing:.18em;color:var(--ash);margin-right:8px;}
+.mg-rows em{font-style:normal;color:var(--gold-hi,#EBD3A8);}
+.mg-total{margin-top:26px;display:grid;gap:4px;}
+.mg-total b{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3vw,30px);color:#EBD3A8;line-height:1.4;}
+.mg-total span{font-size:14.5px;color:#D9CCBD;}
+.mg-joke{margin-top:22px;padding-left:16px;border-left:2px solid rgba(212,162,76,.5);font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.95;color:#EBD3A8;max-width:34em;}
+.mg-fut{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin-top:6px;}
+.mg-fut ul{list-style:none;margin:0;padding:0;}
+.mg-fut li{position:relative;padding:10px 0 10px 18px;border-top:1px solid rgba(239,229,214,.1);display:grid;gap:2px;}
+.mg-fut li::before{content:'';position:absolute;left:0;top:1.35em;width:8px;height:1px;background:var(--gold);}
+.mg-fut b{font-family:var(--serif);font-weight:500;font-size:15px;}
+.mg-fut span{font-size:13.5px;line-height:1.8;color:var(--bone-2);}
+.mg-cta{margin-top:72px;padding:48px 0 8px;border-top:1px solid rgba(212,162,76,.38);text-align:left;}
+.mg-cta h2{font-family:var(--serif);font-weight:500;font-size:clamp(24px,3.4vw,34px);line-height:1.45;color:#EBD3A8;display:block;margin:0;}
+.mg-cta p{margin-top:14px;font-family:var(--serif);font-size:16px;line-height:2;color:#D9CCBD;max-width:30em;}
+/* 試玩按鈕：光暈脈動、掃光、箭頭彈跳 */
+.mg-go{position:relative;}
+.mg-go::after{content:'';position:absolute;inset:0;pointer-events:none;animation:mgpulse 2.4s ease-out infinite;}
+@keyframes mgpulse{0%{box-shadow:0 0 0 0 rgba(212,162,76,.55);}70%,100%{box-shadow:0 0 0 16px rgba(212,162,76,0);}}
+.mg-go span{position:relative;z-index:1;}
+.mg-go b{background:linear-gradient(100deg,#1C0F14 0 40%,#6b3b12 50%,#1C0F14 60% 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:mgshine 3.2s ease-in-out infinite;}
+@keyframes mgshine{0%,35%{background-position:100% 0;}75%,100%{background-position:0 0;}}
+.mg-go i{animation:mgnudge 1.6s ease-in-out infinite;}
+@keyframes mgnudge{0%,100%{transform:translate(0,0);}50%{transform:translate(4px,-4px);}}
+.mg-cta .mg-go i{animation-name:mgnudgeR;}
+@keyframes mgnudgeR{0%,100%{transform:translateX(0);}50%{transform:translateX(5px);}}
+@media(max-width:860px){.mg-prob{grid-template-columns:1fr;gap:18px;}.mg-fut{grid-template-columns:1fr;gap:20px;}.mg-rows li{grid-template-columns:1fr;gap:2px;}.mg-rows small{display:inline;}.mg-rows b{margin-bottom:4px;}}
+@media(prefers-reduced-motion:reduce){.mg-go::after,.mg-go b,.mg-go i{animation:none!important;}.mg-go b{background:none;color:#1C0F14;-webkit-text-fill-color:#1C0F14;}}
 @media(max-width:900px){.wh[data-layout="v"] .wh-in{grid-template-columns:1fr;gap:40px;}.wpage{--frame:300px;}}
 @media(max-width:720px){.wh{padding:96px 20px 48px;}.wh .ba{grid-template-columns:1fr;gap:18px;}.wb{padding:44px 20px 80px;}.wh .wq{font-size:16px;}.cinema{padding:0;margin-top:0;}.cinema .frame{border-left:0;border-right:0;}.acts>a{flex:1 1 100%;justify-content:space-between;}}
 </style>
@@ -241,7 +280,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
         <div class="mg-tags">{w.tag && <span class="mg-tag">{w.tag}</span>}<span>{w.date}</span></div>
         {w.deck && <p class="mg-deck">{w.deck}</p>}
         <div class="acts">
-          {link && <a class="go-site" href={link} target="_blank" rel="noopener"><span><b>前往網站使用</b><small>{siteName}</small></span><i aria-hidden="true">↗</i></a>}
+          {link && <a class="go-site mg-go" href={link} target="_blank" rel="noopener"><span><b>{w.cta_label || '前往網站使用'}</b>{!w.cta_label && <small>{siteName}</small>}</span><i aria-hidden="true">↗</i></a>}
           <a class="go-log" href="#log">看作品日誌 <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -273,6 +312,10 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
   : <iframe src={vid.src} title={`${w.title} 介紹影片`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>}</div></div>}
 <main class="wb">
   <div class="wb-in">
+    {mag && w.bg && <section aria-label="背景原因" class="mg-sec"><h2>背景原因<small>BACKGROUND</small></h2>
+      <p class="mg-lead">{w.bg.lead}</p>
+      <ol class="mg-prob">{(w.bg.problems || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ol>
+      {w.bg.close && <p class="mg-extra">{w.bg.close}</p>}</section>}
     {mag && how && <section aria-label="怎麼試玩" class="mg-sec"><h2>怎麼試玩<small>TRY IT</small></h2>
       <ol class="mg-steps">{(how.steps || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ol>
       {how.notice && <p class="mg-note">{how.notice}</p>}
@@ -284,6 +327,19 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       <h3 class="mg-sub">字體</h3>
       <ul class="mg-fonts">{(design.fonts || []).map((f: any) => <li><span class={`spec ${f.css || ''}`}>{f.sample}</span><div><b>{f.name}</b><p>{f.role}</p></div></li>)}</ul>
       {(design.notes || []).map((t: string) => <p class="mg-extra">{t}</p>)}</section>}
+    {mag && w.impact && <section aria-label="成效" class="mg-sec"><h2>成效<small>RESULT</small></h2>
+      <p class="mg-lead">{w.impact.lead}</p>
+      <ul class="mg-rows">{(w.impact.rows || []).map((r: any) => <li><b>{r.item}</b><span><small>以前</small>{r.before}</span><span><small>現在</small>{r.after}</span><em><small>省下</small>{r.saved}</em></li>)}</ul>
+      <p class="mg-total"><b>{w.impact.total}</b><span>{w.impact.cost}</span></p>
+      {w.impact.extra && <p class="mg-extra">{w.impact.extra}</p>}
+      {w.impact.joke && <p class="mg-joke">{w.impact.joke}</p>}</section>}
+    {mag && w.future && <section aria-label="未來規劃" class="mg-sec"><h2>未來規劃<small>NEXT</small></h2>
+      <p class="mg-lead">{w.future.lead}</p>
+      <div class="mg-fut"><div><h3 class="mg-sub">可以再新增的功能</h3><ul>{(w.future.add || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div>
+      <div><h3 class="mg-sub">想再優化的地方</h3><ul>{(w.future.improve || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div></div></section>}
+    {mag && w.cta && <section aria-label="下一步" class="mg-cta"><h2>{w.cta.title}</h2><p>{w.cta.body}</p>
+      <div class="acts">{/^\/[a-z0-9\/-]*$/.test(w.cta.href || '') && <a class="go-site mg-go" href={w.cta.href}><span><b>{w.cta.primary}</b></span><i aria-hidden="true">→</i></a>}
+      {link && <a class="go-log" href={link} target="_blank" rel="noopener">{w.cta.secondary} <span aria-hidden="true">↗</span></a>}</div></section>}
     {!mag && imgs.length > 0 && <section aria-label="畫面"><h2>畫面<small>SCREENS</small></h2>
       <div class={`gal${imgs.length === 1 ? ' one' : ''}`}>{imgs.map((src, i) => (
         <figure><button type="button" data-lb={src} data-cap={caps[i] || ''} aria-label={`放大第 ${i + 1} 張畫面`}><img src={src} alt={caps[i] || `${w.title} 畫面 ${i + 1}`} loading={i ? 'lazy' : 'eager'} decoding="async" /></button>{caps[i] && <figcaption>{caps[i]}</figcaption>}</figure>))}</div></section>}
