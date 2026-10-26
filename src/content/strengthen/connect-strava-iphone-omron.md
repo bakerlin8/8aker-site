@@ -3,7 +3,7 @@ title: "把 Strava、iPhone 和體脂計，接成一張身體儀表"
 date: 2026-10-03
 excerpt: "打造個人專屬身體儀表，將 Strava、OMRON 體脂計與小米手錶的數據整合至網站。透過 iPhone 捷徑作為搬運工，將散落在各處的運動與健康紀錄匯集，讓你不再被單一品牌 App 綁住，能更直觀地對照生活型態與身體變化，一眼看出每週的趨勢與累積成果。"
 tags: ["數據串接", "Strava", "體脂計", "儀表板"]
-draft: true
+draft: false
 also: "operate"
 work: "site"
 ---
