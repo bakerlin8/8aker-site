@@ -344,13 +344,6 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
       <ol class="mg-steps">{(how.steps || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ol>
       {how.notice && <p class="mg-note">{how.notice}</p>}
       {how.extra && <p class="mg-extra">{how.extra}</p>}</section>}
-    {mag && design && <section aria-label="設計" class="mg-sec"><h2>設計<small>DESIGN</small></h2>
-      {design.lead && <p class="mg-lead">{design.lead}</p>}
-      <h3 class="mg-sub">配色</h3>
-      <ul class="mg-pal">{(design.palette || []).map((c: any) => <li><span class="sw" style={`background:${c.hex};color:${lum(c.hex) > 0.4 ? '#211A1B' : '#F7F1F0'}`}>{c.hex}</span><div><b>{c.name}</b><p>{c.role}</p></div></li>)}</ul>
-      <h3 class="mg-sub">字體</h3>
-      <ul class="mg-fonts">{(design.fonts || []).map((f: any) => <li><span class={`spec ${f.css || ''}`}>{f.sample}</span><div><b>{f.name}</b><p>{f.role}</p></div></li>)}</ul>
-      {(design.notes || []).map((t: string) => <p class="mg-extra">{t}</p>)}</section>}
     {mag && w.impact && <section aria-label="成效" class="mg-sec"><h2>成效<small>RESULT</small></h2>
       {w.impact.live && <p class="mg-live"><i aria-hidden="true"></i>{w.impact.live}</p>}
       <p class="mg-lead">{w.impact.lead}</p>
