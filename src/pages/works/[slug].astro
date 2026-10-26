@@ -305,7 +305,6 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
         {w.deck && <p class="mg-deck">{w.deck}</p>}
         <div class="acts">
           {link && <a class="go-site mg-go" href={link} target="_blank" rel="noopener" data-play={engage ? '' : undefined}><span><b>{w.cta_label || '前往網站使用'}</b>{!w.cta_label && <small>{siteName}</small>}</span><i aria-hidden="true">↗</i></a>}
-          {engage && <button type="button" class="mg-heart" data-heart aria-pressed="false" aria-label="我有興趣"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z"/></svg><span class="t">我有興趣</span><b class="n" hidden></b></button>}
           <a class="go-log" href="#log">看作品日誌 <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -405,9 +404,10 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
     cap.innerHTML='<span class="no">Fig. '+(i+1)+'</span><span class="tt">'+esc(s.title)+'</span><p>'+esc(s.note||'')+'</p><ul>'+(s.points||[]).map(function(t:string){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>';
     toc.classList.toggle('auto',auto);
     clearTimeout(timer);if(auto)timer=setTimeout(function(){show((cur+1)%data.length);},DUR);}
-  btns.forEach(function(b){b.addEventListener('click',function(){auto=false;play.setAttribute('aria-pressed','false');show(+(b.getAttribute('data-i')||0));});});
+  btns.forEach(function(b){b.addEventListener('click',function(){auto=false;play.setAttribute('aria-pressed','false');play.textContent='自動導覽';show(+(b.getAttribute('data-i')||0));});});
   play.addEventListener('click',function(){auto=!auto;play.setAttribute('aria-pressed',String(auto));play.textContent=auto?'暫停':'自動導覽';show(cur);});
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches)DUR=7000;
+  var calm=matchMedia('(prefers-reduced-motion: reduce)').matches;if(calm)DUR=7000;
+  if(!calm){auto=true;play.setAttribute('aria-pressed','true');play.textContent='暫停';show(cur);}
   if('IntersectionObserver' in window){new IntersectionObserver(function(es){if(!es[0].isIntersecting)clearTimeout(timer);else if(auto)show(cur);},{threshold:.2}).observe(toc);}
 })();
 
