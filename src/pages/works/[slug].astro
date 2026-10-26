@@ -30,6 +30,7 @@ const mag = shots.length > 0;
 const gIdx = (x: any) => shots.indexOf(x);
 const lum = (hex: string) => { const n = parseInt(hex.slice(1), 16); const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255); };
 const how = w.how || null;
+const colsOk = groups.length > 1 && groups.every((g: any) => Number(g.cols) > 0);
 const engage = mag && !!link && w.engage !== 'off';
 const ask = (w.ask || '').trim() || '玩得還開心嗎？';
 const design = w.design || null;
@@ -42,7 +43,7 @@ const schema = [
     { '@type': 'ListItem', position: 3, name: w.title, item: url } ] },
 ];
 ---
-<BaseLayout title={`${w.title} — 有點樣子 — 8AKER零`} description={desc} schema={schema} type="article">
+<BaseLayout title={`${w.title} — 有點樣子 — 8AKER零`} description={desc} schema={schema} type="article" noindex={!!w.draft}>
 <style is:global>
 .wpage{--frame:340px;}
 .wh{position:relative;overflow:hidden;background:radial-gradient(80% 70% at 85% 0%,var(--wb) 0%,transparent 70%),radial-gradient(110% 90% at 85% 10%,#2A1520 0%,#1C0F14 65%);color:#EFE5D6;padding:150px 40px 64px;}
@@ -158,12 +159,14 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 .mg-toc-h .sp{flex:1;}
 .mg-play{border:1px solid rgba(239,229,214,.14);background:transparent;padding:2px 12px;font-size:12px;letter-spacing:.1em;color:#B9A89E;cursor:pointer;}
 .mg-play:hover,.mg-play[aria-pressed="true"]{color:#D4A24C;border-color:#D4A24C;}
+.mg-groups.cw{grid-template-columns:var(--gc);}
 .mg-groups{display:grid;grid-template-columns:4fr 2fr;gap:0 clamp(16px,3vw,40px);margin-top:14px;}
 .mg-grp h3{font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-weight:500;font-size:15px;letter-spacing:.06em;color:#86707A;margin-bottom:6px;}
 .mg-grp h3 b{font-family:var(--sans);font-style:normal;font-weight:400;font-size:12.5px;letter-spacing:.2em;color:#B9A89E;margin-right:10px;}
 .mg-items{display:grid;gap:0 14px;}
 .mg-grp.gF .mg-items{grid-template-columns:repeat(4,1fr);}
 .mg-grp.gO .mg-items{grid-template-columns:repeat(2,1fr);}
+.mg-grp .mg-items.ic{grid-template-columns:repeat(var(--ic),1fr);}
 .mg-items button{position:relative;text-align:left;border:0;border-top:1px solid rgba(239,229,214,.14);background:none;padding:10px 0 4px;display:grid;color:#B9A89E;cursor:pointer;font:inherit;}
 .mg-items .n{font-family:'Cormorant Garamond',var(--serif);font-style:italic;font-size:22px;line-height:1;color:#86707A;transition:color .3s;}
 .mg-items .t{font-family:var(--serif);font-size:14.5px;margin-top:4px;}
@@ -196,7 +199,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 .mg-fonts .spec.fraunces{font-family:'Fraunces','Cormorant Garamond',serif;font-style:italic;font-size:30px;}
 .mg-fonts .spec.sans{font-family:'Noto Sans TC',sans-serif;font-size:19px;}
 .mg-fonts .spec.mono{font-family:'JetBrains Mono',monospace;font-size:24px;}
-@media(max-width:860px){.mg-spread{grid-template-columns:1fr;margin-top:30px;row-gap:44px;}.mg-fig{margin-right:0;}.mg-fig::before{inset:10px -8px -10px 10px;}.mg-ph{left:auto;right:-6px;bottom:-24px;width:104px;}.mg-cap{padding-left:0;}.mg-groups{grid-template-columns:1fr;row-gap:20px;}.mg-grp.gF .mg-items{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:860px){.mg-spread{grid-template-columns:1fr;margin-top:30px;row-gap:44px;}.mg-fig{margin-right:0;}.mg-fig::before{inset:10px -8px -10px 10px;}.mg-ph{left:auto;right:-6px;bottom:-24px;width:104px;}.mg-cap{padding-left:0;}.mg-groups,.mg-groups.cw{grid-template-columns:1fr;row-gap:20px;}.mg-grp.gF .mg-items,.mg-grp .mg-items.ic{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:720px){.mg{padding:92px 20px 48px;}.mg-steps{grid-template-columns:1fr;gap:16px;}.mg-pal{grid-template-columns:1fr;}.mg-pal li{grid-template-columns:72px 1fr;}.mg-fonts li{grid-template-columns:1fr;}}
 @media(hover:hover) and (pointer:fine){
 .mg-cap p,.mg-cap ul{opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;}
@@ -333,7 +336,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
     </div>
     <nav class="mg-toc" id="mgToc" aria-label="畫面目次">
       <div class="mg-toc-h"><span>目次 ・ 試玩路線</span><span class="sp"></span><button type="button" class="mg-play" id="mgPlay" aria-pressed="false">自動導覽</button></div>
-      <div class="mg-groups">{groups.map((g: any) => <div class={`mg-grp g${g.key}`}><h3><b>{g.label}</b>{g.en}</h3><div class="mg-items">{g.shots.map((x: any) => { const i = gIdx(shots.find((y: any) => y.src === x.src)); return <button type="button" data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}><span class="n">{String(i + 1).padStart(2, '0')}</span><span class="t">{x.title}</span></button>; })}</div></div>)}</div>
+      <div class={`mg-groups${colsOk ? ' cw' : ''}`} style={colsOk ? `--gc:${groups.map((g: any) => g.cols + 'fr').join(' ')}` : undefined}>{groups.map((g: any) => <div class={`mg-grp g${g.key}`}><h3><b>{g.label}</b>{g.en}</h3><div class={`mg-items${g.cols ? ' ic' : ''}`} style={g.cols ? `--ic:${g.cols}` : undefined}>{g.shots.map((x: any) => { const i = gIdx(shots.find((y: any) => y.src === x.src)); return <button type="button" data-i={i} aria-pressed={i === 0 ? 'true' : 'false'}><span class="n">{String(i + 1).padStart(2, '0')}</span><span class="t">{x.title}</span></button>; })}</div></div>)}</div>
     </nav>
   </div>
 </header>}

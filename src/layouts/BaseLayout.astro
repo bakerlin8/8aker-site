@@ -1,6 +1,6 @@
 ---
 import copy from '../data/site-copy.json';
-export interface Props { title?: string; description?: string; schema?: any[]; type?: string; }
+export interface Props { title?: string; description?: string; schema?: any[]; type?: string; noindex?: boolean; }
 const { title = `${copy.site_name} — ${copy.motto_line1}，${copy.motto_line2}`, description = (copy as any).site_description || copy.hero_lede, schema = [], type = 'website' } = Astro.props;
 const SITE = (Astro.site ?? new URL('https://8aker0.com')).href.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, SITE + '/').href;
@@ -42,6 +42,7 @@ const nav = [
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content={description}>
+{Astro.props.noindex && <meta name="robots" content="noindex,nofollow">}
 <link rel="canonical" href={canonical}>
 <meta property="og:url" content={canonical}>
 <meta property="og:type" content={type}>

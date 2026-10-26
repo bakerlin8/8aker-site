@@ -1,0 +1,94 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>民宿線上入住系統 示範版</title><style>
+:root{--bg:#ECEBE7;--card:#F8F7F5;--line:#D9D6CE;--ink:#2B2926;--ink2:#6B675F;--gold:#8A7440;--soft:#EDEAE2;--red:#8A2B14}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.7 -apple-system,"Hiragino Sans","Noto Sans TC","Noto Sans CJK TC",sans-serif}
+.serif{font-family:"Noto Serif CJK TC","Noto Serif TC",Georgia,serif}
+.wrap{max-width:720px;margin:0 auto;padding:40px 20px}
+.brand{letter-spacing:.2em;font-weight:600;font-size:12px;margin-bottom:28px}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2);margin:0 0 4px}
+h1,h2{font-family:"Noto Serif CJK TC",Georgia,serif;font-weight:600;margin:0 0 10px}h1{font-size:26px}h2{font-size:18px}
+.sub{color:var(--ink2);margin:0 0 26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:24px;margin-bottom:18px}
+dl.meta{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin:10px 0 0}dt{color:var(--ink2);font-size:12px}dd{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.chips button{font:inherit;padding:11px 18px;border:1px solid var(--gold);background:var(--soft);color:var(--gold);border-radius:2px}
+.chips button.on{background:var(--gold);color:#fff}
+.lbl{font-size:11px;letter-spacing:.12em;color:var(--ink2);margin:14px 0 0;border-bottom:1px solid var(--line);padding-bottom:6px}
+.note{background:var(--soft);border-left:3px solid var(--gold);padding:12px 14px;font-size:13px;margin-top:12px}
+.field{margin-bottom:14px}.field label{display:block;font-size:12px;color:var(--ink2);margin-bottom:4px}
+.field div{border:1px solid var(--line);background:#fff;padding:10px 12px;border-radius:2px;min-height:42px}
+.sign{height:110px;border:1px dashed var(--line);background:#F1EFEA;display:flex;align-items:center;justify-content:center;color:var(--ink2);font-family:"Noto Serif CJK TC",serif;font-size:26px;font-style:italic}
+.btn{display:block;width:100%;text-align:center;background:var(--ink);color:#fff;padding:14px;border-radius:2px;letter-spacing:.1em}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}th{font-size:11px;letter-spacing:.1em;color:var(--ink2);font-weight:500}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--soft);color:var(--gold)}.tag.ok{background:#E3EBDD;color:#4B6B3A}.tag.wait{background:#F3E3D6;color:var(--red)}
+.nav{display:flex;gap:22px;font-size:13px;padding:16px 28px;border-bottom:1px solid var(--line);background:var(--card)}.nav b{letter-spacing:.14em}
+.admin{padding:28px}
+/* LINE */
+.line{background:#8FA7C4;min-height:100%;padding:28px 18px}
+.bub{max-width:340px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.bh{background:#8A6A3D;color:#fff;padding:16px 18px}.bh small{opacity:.85;display:block;font-size:12px}.bh b{font-size:17px}
+.bc{padding:14px}.mini{background:#F6F3EE;border-radius:10px;padding:12px;margin-bottom:10px}
+.mini .t{font-size:11px;color:#8A857E}.mini .n{font-weight:700;font-size:15px;margin:2px 0}.mini .r{display:flex;justify-content:space-between;font-size:12px;margin-top:8px;gap:8px}
+.mini .r span{color:#8A857E}.mini .r span.code{color:var(--red)}.red{color:var(--red);font-weight:700;font-size:12px;margin-top:6px}.code{font-size:20px;color:var(--red);font-weight:700}
+.who{font-size:11px;color:#fff;margin:0 0 6px 4px;opacity:.9}
+
+.top{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:6px;padding:10px 16px;align-items:center;flex-wrap:wrap}
+.top b{letter-spacing:.16em;font-size:12px;margin-right:10px}
+.tab{font:inherit;border:1px solid var(--line);background:transparent;padding:7px 14px;border-radius:2px;cursor:pointer;color:var(--ink2)}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.demo{background:#F3E8C9;color:#6b5a1f;font-size:12px;text-align:center;padding:7px 12px}
+.chips button{cursor:pointer}input.in{width:100%;font:inherit;border:1px solid var(--line);background:#fff;padding:10px 12px;border-radius:2px}
+canvas{width:100%;height:120px;border:1px dashed var(--line);background:#F1EFEA;touch-action:none;display:block}
+.btn{cursor:pointer;border:0;font:inherit}.btn[disabled]{opacity:.35;cursor:not-allowed}
+.sm{font:inherit;font-size:12px;border:1px solid var(--line);background:#fff;padding:4px 10px;border-radius:2px;cursor:pointer}
+tr.row{cursor:pointer}tr.row:hover{background:var(--soft)}
+.langs{display:flex;gap:6px;margin-bottom:18px}.langs button{font:inherit;font-size:12px;border:1px solid var(--line);background:transparent;padding:4px 12px;border-radius:12px;cursor:pointer}.langs button.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+.line{border-radius:6px}
+</style>
+<body>
+<div class="demo">示範版：所有姓名與資料皆為虛構，重新整理即還原，不會儲存到任何地方。</div>
+<div class="top"><b>OSAKA STAY</b>
+<button class="tab on" data-v="form">① 客人登記</button><button class="tab" data-v="admin">② 管理後台</button><button class="tab" data-v="line">③ LINE 通知</button></div>
+<div id="v-form"><div class="wrap">
+<div class="langs" id="langs"><button data-l="zh" class="on">繁體中文</button><button data-l="ja">日本語</button><button data-l="en">English</button></div>
+<p class="eyebrow">Pre-arrival registration</p><h1 id="t-title"></h1><p class="sub" id="t-sub"></p>
+<div class="card"><p class="eyebrow">Reservation</p><h2 id="t-resv"></h2><dl class="meta"><dt id="t-prop"></dt><dd>日本民宿 Osaka Stay（範例）</dd><dt id="t-code"></dt><dd>HMDEMO0001</dd><dt id="t-in"></dt><dd>2026-11-03</dd><dt id="t-out"></dt><dd>2026-11-05</dd></dl></div>
+<div class="card"><p class="eyebrow">Guest 1</p><h2 id="t-guest"></h2>
+<div class="field"><label id="l-name"></label><input class="in" id="f-name" placeholder="例：王 小明"></div>
+<div class="field"><label id="l-addr"></label><input class="in" id="f-addr" placeholder="例：範例市範例區 1-2-3"></div>
+<div class="field"><label>Email</label><input class="in" id="f-mail" placeholder="demo@example.com"></div></div>
+<div class="card"><p class="eyebrow">Signature</p><h2 id="t-sign"></h2><canvas id="pad"></canvas><p style="margin:8px 0 0"><button class="sm" id="clr"></button></p></div>
+<div class="card" id="arr"><p class="eyebrow">Arrival</p><h2 id="t-eta"></h2>
+<p class="lbl" id="t-lug"></p><div class="chips" id="lugs"></div><p class="note" id="lugnote" style="display:none;margin:12px 0 0"></p>
+<p class="lbl" style="margin-top:18px" id="t-ci"></p><div class="chips" id="cis"></div></div>
+<button class="btn" id="go" disabled></button>
+<div class="card" id="done" style="display:none;margin-top:18px"><p class="eyebrow">Completed</p><h2 id="t-done"></h2><p class="sub" style="margin:0" id="t-donemsg"></p></div>
+</div></div>
+<div id="v-admin" style="display:none"><div class="admin"><h2>預約一覽（點一列看詳情）</h2>
+<table id="tb"><thead><tr><th>入住</th><th>退房</th><th>物件</th><th>住宿者</th><th>登記</th><th>抵達</th></tr></thead><tbody></tbody></table>
+<div id="detail" style="margin-top:22px"></div></div></div>
+<div id="v-line" style="display:none"><div class="line"><label style="color:#fff;font-size:13px;display:block;margin:0 0 12px 4px"><input type="checkbox" id="same" checked> 隔天有同日入住（會出現紅字提醒）</label>
+<p class="who">通知機器人</p><div class="bub"><div class="bh"><b>明日の退房・檢查 2件</b><small>11/05（四）</small></div><div class="bc" id="cards"></div></div></div></div>
+<script>
+const L={
+zh:{title:'入住前線上登記',sub:'請在抵達前花約 2 分鐘填寫。',resv:'預約內容',prop:'住宿',code:'預約編號',in:'入住',out:'退房',guest:'入住者資料',name:'姓名（與護照相同）',addr:'住址',sign:'簽名',clr:'重簽',eta:'預計抵達時間',lug:'行李寄放',ci:'入住（15:00 起）',go:'送出登記',done:'登記完成',donemsg:'這是示範版，沒有儲存任何資料。到「② 管理後台」可以看到剛剛的登記。',note:'15:00 前抵達僅提供行李寄放，入住時間為 15:00 起。現場工作人員於 12:30〜15:00 在場協助。'},
+ja:{title:'事前オンラインチェックイン',sub:'ご到着前に2分ほどでご記入ください。',resv:'ご予約内容',prop:'施設',code:'予約番号',in:'チェックイン',out:'チェックアウト',guest:'ご宿泊者情報',name:'氏名（パスポート表記）',addr:'住所',sign:'署名',clr:'書き直す',eta:'到着予定時刻',lug:'荷物のお預かり',ci:'チェックイン（15:00〜）',go:'登録を送信',done:'登録が完了しました',donemsg:'これはデモ版のため、データは保存されません。「② 管理後台」で内容を確認できます。',note:'15:00より前のご到着は、お荷物のお預かりのみとなります（ご入室は15:00以降）。スタッフは12:30〜15:00に現地でお待ちしております。'},
+en:{title:'Online pre-arrival check-in',sub:'Please take about 2 minutes before you arrive.',resv:'Reservation',prop:'Property',code:'Reservation no.',in:'Check-in',out:'Check-out',guest:'Guest details',name:'Full name (as on passport)',addr:'Address',sign:'Signature',clr:'Clear',eta:'Estimated arrival time',lug:'Luggage drop-off',ci:'Check-in (from 15:00)',go:'Submit',done:'Registration complete',donemsg:'This is a demo; nothing is saved. Open “② Admin” to see your entry.',note:'If you arrive before 15:00, we can hold your luggage only; the room is available from 15:00. Our staff will be on site from 12:30 to 15:00.'}};
+let lang='zh',eta='',signed=false;
+const $=id=>document.getElementById(id);
+const rows=[['11/03','11/05','日本民宿 A 棟','王 小明（範例）',1,'13:00（荷物）'],['11/03','11/04','日本民宿 B 棟','Alex Demo',0,'－'],['11/04','11/07','日本民宿 A 棟','李 小華（範例）',1,'16:00'],['11/06','11/08','日本民宿 B 棟','Sam Sample',0,'－']];
+function T(){const t=L[lang];[['title'],['sub'],['resv'],['prop'],['code'],['in'],['out'],['guest'],['sign'],['clr'],['eta'],['lug'],['ci'],['go'],['done'],['donemsg']].forEach(([k])=>{const e=$('t-'+k)||$(k);if(e)e.textContent=t[k]});$('l-name').textContent=t.name;$('l-addr').textContent=t.addr;$('go').textContent=t.go;$('clr').textContent=t.clr;$('lugnote').textContent=t.note;}
+function chips(){const mk=(a,box)=>{$(box).innerHTML='';a.forEach(v=>{const b=document.createElement('button');b.textContent=v;if(v===eta)b.className='on';b.onclick=()=>{eta=v;chips();chk()};$(box).appendChild(b)})};mk(['12:30','13:00','13:30','14:00','14:30'],'lugs');mk(['15:00','16:00','17:00','18:00','19:00'],'cis');$('lugnote').style.display=['12:30','13:00','13:30','14:00','14:30'].includes(eta)?'block':'none'}
+function chk(){const ok=$('f-name').value.trim()&&$('f-addr').value.trim()&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('f-mail').value.trim())&&signed&&eta;$('go').disabled=!ok}
+['f-name','f-addr','f-mail'].forEach(i=>$(i).oninput=chk);
+document.querySelectorAll('#langs button').forEach(b=>b.onclick=()=>{lang=b.dataset.l;document.querySelectorAll('#langs button').forEach(x=>x.classList.toggle('on',x===b));T()});
+const cv=$('pad');function fit(){cv.width=cv.clientWidth*2;cv.height=240}fit();const cx=cv.getContext('2d');cx.lineWidth=4;cx.lineCap='round';cx.strokeStyle='#2B2926';let dr=false;
+const pos=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*2,(e.clientY-r.top)*2]};
+cv.onpointerdown=e=>{dr=true;cx.beginPath();cx.moveTo(...pos(e));cv.setPointerCapture(e.pointerId)};cv.onpointermove=e=>{if(!dr)return;cx.lineTo(...pos(e));cx.stroke();signed=true;chk()};cv.onpointerup=()=>dr=false;
+$('clr').onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);signed=false;chk()};
+$('go').onclick=()=>{rows.unshift(['11/03','11/05','日本民宿 A 棟',$('f-name').value.trim()+'（你剛填的）',1,eta+(['12:30','13:00','13:30','14:00','14:30'].includes(eta)?'（荷物）':'')]);$('done').style.display='block';$('go').style.display='none';$('done').scrollIntoView({behavior:'smooth'});render()};
+function render(){$('tb').tBodies[0].innerHTML=rows.map((r,i)=>`<tr class="row" data-i="${i}"><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td><span class="tag ${r[4]?'ok':'wait'}">${r[4]?'已完成':'未登記'}</span></td><td>${r[5]}</td></tr>`).join('');document.querySelectorAll('tr.row').forEach(tr=>tr.onclick=()=>{const r=rows[tr.dataset.i];$('detail').innerHTML=`<div class="card"><p class="eyebrow">Booking</p><h2>HMDEMO${String(1000+ +tr.dataset.i).slice(1)}　${r[2]}</h2><dl class="meta"><dt>入住 / 退房</dt><dd>${r[0]} → ${r[1]}</dd><dt>住宿者</dt><dd>${r[3]}</dd><dt>預計抵達</dt><dd>${r[5]}</dd><dt>登記狀態</dt><dd>${r[4]?'已完成（護照已加浮水印）':'尚未登記'}</dd></dl><p style="margin:14px 0 0"><span class="tag">編輯同行者</span> <span class="tag">列印名簿</span></p></div>`})}
+function cards(){const s=$('same').checked;$('cards').innerHTML=`<div class="mini"><div class="t">${s?'退房・同日入住':'退房'}</div><div class="n">日本民宿 A 棟</div><div class="r"><div><span>檢查擔當</span><br>範例同事 A</div><div style="text-align:right"><span>🔑 次回の暗証番号</span><br><span class="code">0000</span></div></div>${s?'<div class="red">⏰ 15:00 までに檢查を完了してください（同日入住）</div>':''}</div><div class="mini"><div class="t">退房</div><div class="n">日本民宿 B 棟</div><div class="r"><div><span>檢查擔當</span><br>範例同事 B</div><div style="text-align:right"><span>🔑 次回の暗証番号</span><br><span class="code" style="font-size:14px;color:#8A857E">－</span></div></div></div>`}
+$('same').onchange=cards;
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));['form','admin','line'].forEach(v=>$('v-'+v).style.display=v===b.dataset.v?'block':'none')});
+T();chips();render();cards();
+</script></html>

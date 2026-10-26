@@ -317,6 +317,231 @@
         "desktop": "/works/back-to-dance/03_daily_billing_desktop.png",
         "mobile": "/works/back-to-dance/09_daily_billing_mobile.png"
       }
+    },
+    {
+      "dir": "conjure",
+      "date": "2026.10",
+      "title": "民宿線上入住登記與通知系統",
+      "desc": "客人用手機完成入住登記與簽名，系統自動整理名單，並在前一晚把退房、打掃、門鎖資訊推送到 LINE 群組。",
+      "spent": "—",
+      "saved": "—",
+      "service": "owner",
+      "why": "小型民宿的登記、名簿與現場通知，原本靠人記、靠訊息一則一則傳，很容易漏。",
+      "result": "客人先在線上完成登記，系統自動整理名簿，前一晚自動通知現場人員。",
+      "slug": "checkin-system",
+      "intro": "",
+      "images": [
+        {
+          "src": "/works/checkin-system/01_checkin_form_desktop.png",
+          "caption": "客人登記表"
+        }
+      ],
+      "video": "",
+      "link": "https://8aker0.com/demos/checkin/",
+      "link_label": "範例網站",
+      "color": "",
+      "draft": true,
+      "title_en": "Stay Check-in",
+      "title_zh": "入住登記與通知系統",
+      "tag": "工具",
+      "kicker": "具現 ・ 作品",
+      "deck": "客人先在線上登記，前一晚自動通知現場人員。點開就能玩，所有資料都是虛構的。",
+      "cta_label": "試玩範例",
+      "groups": [
+        {
+          "key": "F",
+          "label": "客人端",
+          "en": "Guest",
+          "cols": 2,
+          "shots": [
+            {
+              "src": "/works/checkin-system/01_checkin_form_desktop.png",
+              "title": "客人登記表",
+              "url": "/checkin",
+              "note": "客人填寫姓名、地址、護照與簽名。",
+              "points": [
+                "護照照片自動加浮水印",
+                "可一次填全部人，也可只填自己",
+                "六種語言切換"
+              ],
+              "mobile": "/works/checkin-system/06_checkin_form_mobile.png"
+            },
+            {
+              "src": "/works/checkin-system/02_arrival_time_desktop.png",
+              "title": "抵達時間選擇",
+              "url": "/checkin/arrival",
+              "note": "客人選預計抵達時間。",
+              "points": [
+                "15:00 前自動顯示「僅能寄放行李」提示",
+                "寄放與入住時段分開"
+              ],
+              "mobile": "/works/checkin-system/07_arrival_time_mobile.png"
+            }
+          ]
+        },
+        {
+          "key": "O",
+          "label": "管理與通知",
+          "en": "Admin & Notice",
+          "cols": 3,
+          "shots": [
+            {
+              "src": "/works/checkin-system/03_admin_list_desktop.png",
+              "title": "預約一覽",
+              "url": "/admin",
+              "note": "看所有預約與登記狀態。",
+              "points": [
+                "一眼看出誰還沒登記",
+                "可複製客人連結"
+              ]
+            },
+            {
+              "src": "/works/checkin-system/04_admin_booking_desktop.png",
+              "title": "單筆預約詳情",
+              "url": "/admin/booking",
+              "note": "查看與修改客人資料。",
+              "points": [
+                "可編輯同行者",
+                "可列印住宿者名簿"
+              ]
+            },
+            {
+              "src": "/works/checkin-system/05_line_group_notice_desktop.png",
+              "title": "LINE 群組通知",
+              "url": "/notice",
+              "note": "前一晚推送隔天退房與檢查資訊。",
+              "points": [
+                "每筆一張卡片，顯示檢查擔當與下一位客人的門鎖末四碼",
+                "同日入住有紅字提醒"
+              ],
+              "mobile": "/works/checkin-system/08_line_group_notice_mobile.png"
+            }
+          ]
+        }
+      ],
+      "how": {
+        "steps": [
+          {
+            "t": "客人登記",
+            "d": "右上可切換繁中、日文、英文。"
+          },
+          {
+            "t": "填寫資料",
+            "d": "輸入任意虛構姓名、地址、Email，用手指或滑鼠簽名。"
+          },
+          {
+            "t": "選抵達時間",
+            "d": "選 13:00 會看到「15:00 前僅能寄放行李」；改選 16:00，提示就消失。"
+          },
+          {
+            "t": "看管理後台",
+            "d": "送出後，剛填的資料會出現在預約一覽的第一列，點一列可看詳情。"
+          },
+          {
+            "t": "看 LINE 通知",
+            "d": "看前一晚推送給現場人員的卡片；勾選「同日入住」會出現 15:00 紅字提醒。"
+          }
+        ],
+        "notice": "這是虛構的範例：所有姓名、住址、預約資料皆為假資料。範例站不會把任何資料存到雲端，重新整理就還原。"
+      },
+      "bg": {
+        "lead": "小型民宿一天要處理很多事：確認客人資料、備好門鎖密碼、通知打掃的人。這些事原本靠人記、靠訊息一則一則傳，很容易漏。我想用一套自己做的小系統，把這些固定流程交給電腦。",
+        "problems": [
+          {
+            "t": "登記資料要現場收",
+            "d": "客人到了才填，櫃台容易卡住，也容易填錯。"
+          },
+          {
+            "t": "住宿者名簿要保存",
+            "d": "護照影本、簽名、同意書要整理成可查的紀錄。"
+          },
+          {
+            "t": "打掃與檢查的人要先知道",
+            "d": "隔天誰退房、誰同日入住，現場人員常常到前一晚才被告知。"
+          },
+          {
+            "t": "早到客人容易誤會",
+            "d": "15:00 前到的客人以為可以進房，其實只能寄放行李。"
+          },
+          {
+            "t": "多語言客人",
+            "d": "客人來自不同國家，說明需要用他們看得懂的語言。"
+          }
+        ],
+        "close": "我做的不是一個表單，而是一條從「客人登記」到「現場人員收到通知」的完整流程。"
+      },
+      "impact": {
+        "lead": "以下以一間小型民宿、每月約 30 組入住估算；每項時間是我自己操作的粗略感受，不是精確量測，實際會因人而異。",
+        "rows": [
+          {
+            "item": "收集客人資料",
+            "before": "逐一訊息詢問，約 10 分鐘／組",
+            "after": "客人自行填寫，我只需確認，約 2 分鐘／組",
+            "saved": "約 8 分鐘／組"
+          },
+          {
+            "item": "整理住宿者名簿",
+            "before": "手動貼表格，約 5 分鐘／組",
+            "after": "自動整理、可直接列印",
+            "saved": "約 5 分鐘／組"
+          },
+          {
+            "item": "通知現場人員",
+            "before": "每晚手動傳訊息，約 5 分鐘／天",
+            "after": "自動推送 LINE 群組",
+            "saved": "約 5 分鐘／天"
+          },
+          {
+            "item": "早到客人的確認",
+            "before": "事後溝通，約 5 分鐘／組",
+            "after": "登記時就看到提示",
+            "saved": "少一次來回訊息"
+          }
+        ],
+        "live": "已實際用在營運中，並依現場回饋持續調整。"
+      },
+      "future": {
+        "lead": "接下來會照實際使用的需要，一項一項做。",
+        "add": [
+          {
+            "t": "無入住日的提醒",
+            "d": "前一天只有入住、沒有退房時，也能收到簡短通知。"
+          },
+          {
+            "t": "門鎖密碼自動寫入",
+            "d": "登記完成後，自動把密碼設定到智慧鎖。"
+          },
+          {
+            "t": "客人完成率統計",
+            "d": "看多少客人在入住前已完成登記。"
+          }
+        ],
+        "improve": [
+          {
+            "t": "登記表更簡短",
+            "d": "欄位再精簡，縮短填寫時間。"
+          },
+          {
+            "t": "通知文案更口語",
+            "d": "讓現場人員一眼看懂。"
+          },
+          {
+            "t": "程式碼整理",
+            "d": "讓之後維護更容易。"
+          }
+        ]
+      },
+      "cta": {
+        "title": "想讓你的民宿也有一套自己的入住系統嗎？",
+        "body": "流程可以依你的房型與習慣調整，從小地方開始也行。",
+        "primary": "聊聊你的需求",
+        "href": "/chat/",
+        "secondary": "再去玩一次範例"
+      },
+      "thumb": {
+        "desktop": "/works/checkin-system/01_checkin_form_desktop.png",
+        "mobile": "/works/checkin-system/06_checkin_form_mobile.png"
+      }
     }
   ]
 }

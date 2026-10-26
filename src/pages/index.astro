@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { pillars } from '../data/pillars';
 import copy from '../data/site-copy.json';
 import chapters from '../data/chapters.json';
-import worksData from '../data/works.json';
+import worksRaw from '../data/works.json';
+const worksData = { ...worksRaw, works: (worksRaw.works as any[]).filter((w) => !w.draft) } as typeof worksRaw;
 import { safeImg } from '../data/work-utils';
 const thumbOf = (w: any) => {
   const first = (w.images || [])[0];
