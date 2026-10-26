@@ -5,6 +5,11 @@ import copy from '../data/site-copy.json';
 import chapters from '../data/chapters.json';
 import worksData from '../data/works.json';
 import { safeImg } from '../data/work-utils';
+const thumbOf = (w: any) => {
+  const first = (w.images || [])[0];
+  const desk = safeImg(w.thumb?.desktop || first?.src || first || '');
+  return { desk, mob: desk ? safeImg(w.thumb?.mobile || '') : '' };
+};
 import dreams from '../data/dreams.json';
 import services from '../data/services.json';
 import { buildRing } from '../data/ring';
@@ -1157,9 +1162,17 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
 .deck-stage{position:absolute;inset:0;transform-style:preserve-3d;}
 .deck .work{position:absolute;left:50%;top:70px;width:min(380px,78vw);margin-left:calc(min(380px,78vw) / -2);min-height:420px;transition:transform .8s var(--ease),opacity .6s var(--ease),filter .6s var(--ease),box-shadow .6s;will-change:transform;}
 .deck .work:not(.on){cursor:pointer;}
-.deck .work .wthumb{aspect-ratio:16/6;}
-.deck:has(.wthumb){height:640px;}
-@media(max-width:640px){.deck:has(.wthumb){height:620px;}}
+.deck .work .wthumb{aspect-ratio:16/10;position:relative;background:linear-gradient(160deg,rgba(75,22,35,.9),rgba(28,15,20,.9));}
+.deck .work .wthumb .wt-d{display:block;position:absolute;overflow:hidden;background:var(--night-3);}
+.deck .work .wthumb .wt-d img{width:100%;height:100%;object-fit:cover;object-position:top left;}
+.deck .work .wthumb.wt-a .wt-d{left:6%;top:9%;width:80%;aspect-ratio:16/10;border:1px solid rgba(239,229,214,.22);box-shadow:0 10px 26px rgba(0,0,0,.45);}
+.deck .work .wthumb.wt-b .wt-d{left:6%;top:9%;right:6%;bottom:0;border:1px solid rgba(239,229,214,.25);border-bottom:0;}
+.deck .work .wthumb .wt-p{display:block;position:absolute;right:6%;bottom:-8%;width:25%;border:3px solid #0f080b;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 12px 28px rgba(0,0,0,.55);}
+.deck .work .wthumb .wt-p img{display:block;width:100%;height:auto;}
+.work:hover .wthumb img{transform:none;}
+.work:hover .wthumb .wt-d img{transform:scale(1.04);}
+.deck:has(.wthumb){height:740px;}
+@media(max-width:640px){.deck:has(.wthumb){height:700px;}}
 .deck .work:not(.on) .wmore{opacity:0;}
 .deck .work.on{box-shadow:0 30px 60px -30px rgba(0,0,0,.8);}
 .deck .work.on::before{transform:scaleX(1);}
@@ -1270,7 +1283,7 @@ html:has(.svc-dlg[open]){overflow:hidden;scrollbar-gutter:stable;}
       <div class="deck tint rv" style="--i:2" id="deck" tabindex="0" role="region" aria-roledescription="輪播" aria-label="作品唱盤：左右滑動或用方向鍵切換">
         <div class="deck-stage" id="deckStage">
         {worksData.works.map((w, i) => { return (
-          <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};${colorVars(workColor(w, i))}`} data-k={String(i + 1).padStart(2, '0')}>{safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0] ?? '') && <span class="wthumb"><img src={safeImg(((w as any).images || [])[0]?.src ?? ((w as any).images || [])[0])} alt="" loading="lazy" decoding="async" /></span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span>{(w as any).tag && <span class="wtag">{(w as any).tag}</span>}</div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品日誌<i aria-hidden="true">→</i></span>}</a>
+          <a class="work" data-w={i} href={/^[a-z0-9-]+$/.test((w as any).slug || '') ? `/works/${(w as any).slug}/` : undefined} style={`--i:${i + 2};${colorVars(workColor(w, i))}`} data-k={String(i + 1).padStart(2, '0')}>{thumbOf(w).desk && <span class={`wthumb${thumbOf(w).mob ? ' wt-a' : ' wt-b'}`}><span class="wt-d"><img src={thumbOf(w).desk} alt="" loading="lazy" decoding="async" /></span>{thumbOf(w).mob && <span class="wt-p"><img src={thumbOf(w).mob} alt="" loading="lazy" decoding="async" /></span>}</span>}<div class="meta"><span>No.{String(i + 1).padStart(2, '0')}</span><span>{w.date}</span>{(w as any).tag && <span class="wtag">{(w as any).tag}</span>}</div><h3>{w.title}</h3>{(w as any).why ? <><blockquote class="wq bf"><small>BEFORE</small>{(w as any).why}</blockquote>{(w as any).result && <blockquote class="wq af"><small>AFTER</small>{(w as any).result}</blockquote>}</> : <p>{w.desc}</p>}{/^[a-z0-9-]+$/.test((w as any).slug || '') && <span class="wmore">看作品日誌<i aria-hidden="true">→</i></span>}</a>
         ); })}
         </div>
       </div>

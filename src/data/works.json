@@ -328,6 +328,10 @@
         "primary": "填寫需求表",
         "href": "/chat/",
         "secondary": "再去玩一次範例網站"
+      },
+      "thumb": {
+        "desktop": "/works/back-to-dance/03_daily_billing_desktop.png",
+        "mobile": "/works/back-to-dance/09_daily_billing_mobile.png"
       }
     }
   ]
