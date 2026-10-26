@@ -460,7 +460,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
   }
   function maybeAsk() {
     var t = +ls.g('played:' + slug) || 0; if (!t) return;
-    var away = Date.now() - t; if (away < 15000 || away > 6 * 3600e3) return;
+    var away = Date.now() - t; if (away < 120000 || away > 6 * 3600e3) return;
     var last = +ls.g('asked:' + slug) || 0; if (last && Date.now() - last < 14 * 86400e3) return;
     showChip();
   }
