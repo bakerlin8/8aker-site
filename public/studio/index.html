@@ -126,6 +126,17 @@ input,textarea,select{font-family:inherit;}
 .gm-g{margin-top:12px;}.gm-g>span{display:block;font-size:11px;letter-spacing:.12em;color:var(--ink-ghost);margin-bottom:2px;}
 .gm-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
 .gm-r{margin-top:12px;display:grid;gap:8px;}
+.gd{border:1px solid var(--border);border-radius:3px;background:var(--warm-white);padding:0;}
+.gd>summary{cursor:pointer;padding:12px 14px;font-weight:600;font-size:14px;color:var(--ink);list-style:none;}
+.gd>summary::-webkit-details-marker{display:none;}
+.gd-in{padding:2px 14px 14px;display:grid;gap:14px;}
+.gd-s{border-top:1px dashed var(--border);padding-top:12px;}
+.gd-s h4{font-size:14px;margin:0 0 2px;color:var(--ink);font-family:'Noto Serif TC',serif;}
+.gd-s h4 em{font-style:normal;font-size:11px;color:var(--ink-ghost);margin-left:6px;letter-spacing:.04em;}
+.gd-s textarea{width:100%;margin-top:6px;}
+.gd-who{display:inline-block;font-size:11px;padding:1px 7px;border:1px solid var(--border);border-radius:10px;margin-left:6px;color:var(--ink-mute);}
+.md-pv{border:1px solid var(--border);border-radius:3px;background:#fff;padding:14px 18px;margin-top:8px;font-size:15px;line-height:1.9;color:var(--ink);}
+.md-pv h2{font-size:18px;margin:18px 0 6px;font-family:'Noto Serif TC',serif;}.md-pv h3{font-size:15.5px;margin:14px 0 4px;}.md-pv p{margin:0 0 10px;}.md-pv ul,.md-pv ol{margin:0 0 10px 1.3em;padding:0;}
 .gm-i{border:1px solid var(--border);border-radius:3px;background:#fff;padding:10px 12px;font-size:14px;color:var(--ink);white-space:pre-wrap;line-height:1.7;}
 .gm-i small{display:block;color:var(--ink-ghost);font-size:11px;margin-bottom:4px;}
 .gm-i .btn-row{margin-top:8px;}
@@ -2354,10 +2365,31 @@ function renderArticleForm(fm) {
         <button type="button" data-s="published"><b>已公開</b><small>顯示在網站上，搜尋引擎找得到</small></button>
         <button type="button" data-s="paused"><b>暫時關閉</b><small>先下架，內容保留，隨時可再公開</small></button>
       </div></div>
+    <details class="gd" id="gdBox" open>
+      <summary>🧭 起承轉合寫作引導（照順序填，最後一鍵帶入正文）</summary>
+      <div class="gd-in">
+        <div class="field-hint">文章不只是資訊，讀者要看到的是「你怎麼判斷、你覺得什麼對味、你的觀點」。所以：起因與觀點是你的，解決方法交給 AI 整理。AI 只會根據你寫的內容，不會替你編經歷。</div>
+        <div class="gd-s"><h4>① 起因<span class="gd-who">你來寫</span><em>現實生活中遇到了什麼問題</em></h4>
+          <textarea id="gd-cause" rows="3" placeholder="例如：這個月出差三趟，體重計的數字跟我的感覺對不起來，我不知道該相信哪個。（1–3 句，亂亂寫也行）"></textarea>
+          <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="cause">✨ 幫我順成一段</button></div><div class="gm-r" id="gd-r-cause"></div></div>
+        <div class="gd-s"><h4>② 解決方法<span class="gd-who">AI 整理</span><em>長話短說，只講重點</em></h4>
+          <textarea id="gd-solution" rows="5" placeholder="按下面的按鈕，AI 會依「起因」整理 3–5 個重點；你也可以自己直接寫或修改。"></textarea>
+          <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="solution">✨ 依起因整理重點</button></div><div class="gm-r" id="gd-r-solution"></div></div>
+        <div class="gd-s"><h4>③ 我的觀點<span class="gd-who">你的想法＋AI 幫你寫順</span><em>放在最後，這是整篇最值錢的一段</em></h4>
+          <textarea id="gd-view" rows="4" placeholder="寫你的判斷就好，不用漂亮。例如：我會選 A、不選 B，因為…／我覺得…看起來就是不對味／大家最容易搞錯的是…"></textarea>
+          <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="viewask">💡 不知道寫什麼？給我 5 個提問</button><button type="button" class="btn btn-ghost" data-gd="view">✨ 用我的話寫成收尾段</button></div><div class="gm-r" id="gd-r-view"></div></div>
+        <div class="gd-s"><h4>④ 常見問答（AEO）<span class="gd-who">AI 產生</span><em>讓搜尋與 AI 問答引用，建議保留</em></h4>
+          <textarea id="gd-faq" rows="5" placeholder="按下面的按鈕產生 3–5 組問答；不想要就留空，帶入時會略過。"></textarea>
+          <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="faq">✨ 依目前內容產生問答</button></div><div class="gm-r" id="gd-r-faq"></div></div>
+        <div class="btn-row"><button type="button" class="btn btn-primary" id="gd-go">📥 一鍵帶入正文</button><button type="button" class="btn btn-ghost" id="gd-from">⟲ 從目前正文讀回這四格</button></div>
+        <div class="field-hint">帶入後正文會是「## 我遇到的問題／## 我的做法／## 我的看法／## 常見問題」四段。下方「看成品預覽」可以用讀者看到的樣子檢查。</div>
+      </div>
+    </details>
     <div class="field">
       <label class="field-label">正文（Markdown）</label>
       <textarea id="f-body" class="mono" rows="16">${escapeHtml(fm.body)}</textarea>
-      <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等</div>
+      <div class="field-hint">支援 Markdown 語法：## 標題、**粗體**、清單等。看不懂符號沒關係，按下面「看成品預覽」就能看到讀者看到的樣子。</div>
+      <div class="gm-b"><button type="button" class="btn btn-ghost" id="bd-prev">👁 看成品預覽</button></div><div class="md-pv" id="bd-pv" style="display:none"></div>
       <div class="gm-g"><span>起稿與續寫</span><div class="gm-b" data-gm="outline,hooks,continue" data-r="gm-r-body"></div></div>
       <div class="gm-g"><span>改寫選取文字（先在正文框框選一段）</span><div class="gm-b" data-gm="rewrite:short,rewrite:casual,rewrite:vivid" data-r="gm-r-body"></div></div>
       <div class="gm-g"><span>整篇處理</span><div class="gm-b" data-gm="polish,dehuman,review,translate" data-r="gm-r-body"></div></div>
@@ -2428,6 +2460,7 @@ function renderArticleForm(fm) {
       [heads >= 2, `有 2 個以上的小標題（## ）`],
       [tags.length >= 2, `標籤 2 個以上`],
     ];
+    R.push([/^##\s*(我的看法|我的觀點|我怎麼看)/m.test(body), '有「## 我的看法」段落：只有資訊不夠，讀者要看到你的判斷與品味']);
     R.push([faq, 'AEO：有「## 常見問題」區塊，網站會自動產生 AI 問答能讀的結構（FAQ）']);
     const ok = R.filter(r => r[0]).length;
     $('seoBox').innerHTML = `<div class="seo-h"><span>搜尋與 AI 問答檢查</span><b>${ok} / ${R.length}</b></div><div class="seo-l">${R.map(([o, m]) => `<div class="${o ? 'ok' : 'no'}"><span>${o ? '✓' : '△'}</span><span>${m}</span></div>`).join('')}</div>${faq ? '' : '<div class="btn-row"><button type="button" class="btn btn-ghost" id="seo-faq">加入「常見問題」範本到正文最後</button></div>'}${k ? '' : '<div class="field-hint">在上方輸入關鍵字，會多出 4 項關鍵字檢查。</div>'}`;
@@ -2441,8 +2474,8 @@ function renderArticleForm(fm) {
   const GML = { titles: ['💡', '想標題'], angles: ['🧭', '切入角度'], tags: ['🏷', '建議標籤'], keywords: ['🔑', 'SEO 關鍵字'], outline: ['🧱', '文章大綱'], hooks: ['🎣', '開頭第一段'], continue: ['➡️', '接著往下寫'], 'rewrite:short': ['✂️', '精簡'], 'rewrite:casual': ['💬', '口語化'], 'rewrite:vivid': ['🖼', '更有畫面'], polish: ['✨', '順稿'], dehuman: ['🫧', '去 AI 化的口氣'], review: ['👀', '讀者視角'], translate: ['🌐', '三語版本'], proofread: ['🔍', '錯字與語病'], factcheck: ['⚠️', '待確認的事實'], faq: ['❓', '常見問題（AEO）'], social: ['📣', '社群文案'] };
   document.querySelectorAll('[data-gm]').forEach(g => { g.innerHTML = g.dataset.gm.split(',').map(k => `<button type="button" class="btn btn-ghost" data-k="${k}" data-r="${g.dataset.r}">${GML[k][0]} ${GML[k][1]}</button>`).join(''); });
   $('gm-hint').textContent = '會依照關鍵字、標題、摘要和正文來建議。內容會送到 Google Gemini（免費方案可能被 Google 用來改善產品），不要放客戶個資、價格等私密內容。AI 的建議請自己看過再用，尤其是數字和經歷。「選取文字」類的功能，請先在正文框框選一段文字。';
-  const gmCall = async (kind, mode, sel) => {
-    const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-suggest`, { method: 'POST', headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suggest', kind, mode, selection: sel, keyword: kwv(), pillar: currentPillar, title: $('f-title').value, excerpt: $('f-excerpt').value, body: $('f-body').value }) });
+  const gmCall = async (kind, mode, sel, extra) => {
+    const r = await fetch(`${HEALTH_BASE}/functions/v1/studio-suggest`, { method: 'POST', headers: { Authorization: await authHeader(), 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'suggest', kind, mode, selection: sel, ...(extra || {}), keyword: kwv(), pillar: currentPillar, title: $('f-title').value, excerpt: $('f-excerpt').value, body: $('f-body').value }) });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
     return d;
@@ -2491,6 +2524,59 @@ function renderArticleForm(fm) {
     try { const d = await gmCall('excerpt'); $('f-excerpt').value = d.items[0].text; checkSeo(); gmShow('excerpt', d, null, 'gm-r-ex'); toast('已填入第一個，下方還有其他版本可換'); } catch (e) { toast(e.message, 'err'); }
     b.disabled = false; b.textContent = old;
   });
+
+
+  /* 起承轉合寫作引導＋成品預覽 */
+  const mdHtml = (md) => {
+    const inl = (t) => escapeHtml(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\[([^\]]+)\]\((https?:[^)\s]+|\/[^)\s]*)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    const out = []; let list = null;
+    const close = () => { if (list) { out.push(`</${list}>`); list = null; } };
+    md.replace(/^---[\s\S]*?---\n/, '').split('\n').forEach(line => {
+      let m;
+      if ((m = line.match(/^(#{2,3})\s+(.*)$/))) { close(); out.push(`<h${m[1].length}>${inl(m[2])}</h${m[1].length}>`); }
+      else if ((m = line.match(/^\s*[-*]\s+(.*)$/))) { if (list !== 'ul') { close(); out.push('<ul>'); list = 'ul'; } out.push(`<li>${inl(m[1])}</li>`); }
+      else if ((m = line.match(/^\s*\d+\.\s+(.*)$/))) { if (list !== 'ol') { close(); out.push('<ol>'); list = 'ol'; } out.push(`<li>${inl(m[1])}</li>`); }
+      else if (!line.trim()) close();
+      else { close(); out.push(`<p>${inl(line)}</p>`); }
+    });
+    close(); return out.join('');
+  };
+  $('bd-prev').addEventListener('click', () => { const pv = $('bd-pv'); const show = pv.style.display === 'none'; pv.style.display = show ? 'block' : 'none'; if (show) pv.innerHTML = mdHtml($('f-body').value) || '<p style="color:#999">（正文還是空的）</p>'; $('bd-prev').textContent = show ? '🙈 收起預覽' : '👁 看成品預覽'; });
+  $('f-body').addEventListener('input', () => { const pv = $('bd-pv'); if (pv.style.display !== 'none') pv.innerHTML = mdHtml($('f-body').value); });
+
+  const GD = [['cause', '我遇到的問題', 'gd-cause'], ['solution', '我的做法', 'gd-solution'], ['view', '我的看法', 'gd-view'], ['faq', '常見問題', 'gd-faq']];
+  const gdRead = (md) => {
+    const parts = {}; let cur = null; const other = [];
+    md.split('\n').forEach(l => { const m = l.match(/^##\s+(.*)$/); if (m) { const g = GD.find(x => x[1] === m[1].trim() || (x[0] === 'view' && /^我的(觀點|看法)|我怎麼看/.test(m[1].trim()))); if (g) { cur = g[0]; parts[cur] = []; return; } cur = null; other.push(l); return; } if (cur) parts[cur].push(l); else other.push(l); });
+    return { parts, other: other.join('\n').trim() };
+  };
+  const gdFill = () => { const { parts } = gdRead($('f-body').value); GD.forEach(([k, , id]) => { if (parts[k]) { let t = parts[k].join('\n').trim(); if (k === 'faq') t = '## 常見問題\n\n' + t; $(id).value = t; } }); };
+  gdFill();
+  $('gd-from').addEventListener('click', () => { const { parts } = gdRead($('f-body').value); if (!Object.keys(parts).length) { toast('目前正文沒有這四段的標題，讀不回來（自由格式的文章不用管這個）'); return; } GD.forEach(([k, , id]) => { $(id).value = parts[k] ? (k === 'faq' ? '## 常見問題\n\n' : '') + parts[k].join('\n').trim() : ''; }); toast('已從正文讀回'); });
+  $('gd-go').addEventListener('click', () => {
+    const val = (id) => $(id).value.trim();
+    const blocks = [];
+    GD.forEach(([k, h, id]) => { let t = val(id); if (!t) return; if (k === 'faq') { t = t.replace(/^##\s*(常見問題|FAQ|Q&A)\s*\n+/i, ''); } blocks.push(`## ${h}\n\n${t}`); });
+    if (!blocks.length) { toast('四格都是空的，先填一格'); return; }
+    const out = blocks.join('\n\n') + '\n';
+    const cur = $('f-body').value.trim();
+    if (cur && cur + '\n' !== out && !confirm('用這四格的內容取代目前正文？（還沒儲存前，重新整理頁面可以還原）')) return;
+    $('f-body').value = out; checkSeo(); $('f-body').dispatchEvent(new Event('input')); toast('已帶入正文，記得按「儲存變更」');
+  });
+  const GD_USE = { cause: ['gd-cause', '用這一段'], solution: ['gd-solution', '用這個版本'], view: ['gd-view', '用這一段'], faq: ['gd-faq', '用這組問答'] };
+  document.querySelectorAll('[data-gd]').forEach(b => b.addEventListener('click', async () => {
+    const k = b.dataset.gd, tgt = k === 'viewask' ? 'view' : k, box = $('gd-r-' + tgt);
+    const extra = { notes: k === 'cause' ? $('gd-cause').value : k === 'solution' ? $('gd-solution').value : k === 'faq' ? $('gd-faq').value : $('gd-view').value, cause: $('gd-cause').value, solution: $('gd-solution').value };
+    if ((k === 'cause' || k === 'view') && extra.notes.trim().length < 4) { toast(k === 'cause' ? '先隨便寫幾個字，我才知道要順什麼' : '先寫一句你的看法；不知道寫什麼就按「給我 5 個提問」'); if (k === 'cause') return; if (k === 'view') return; }
+    if (k === 'solution' && extra.cause.trim().length < 4 && !$('f-title').value.trim()) { toast('先填「起因」或標題'); return; }
+    const old = b.textContent; b.disabled = true; b.textContent = '思考中…';
+    try {
+      const d = await gmCall(k, '', '', extra); $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
+      box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${k === 'viewask' ? '' : `<button type="button" class="btn btn-primary gm-use">${GD_USE[k][1]}</button>`}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
+      box.querySelectorAll('.gm-i').forEach(el => { const x = d.items[+el.dataset.i]; const u = el.querySelector('.gm-use'); if (u) u.addEventListener('click', () => { $(GD_USE[k][0]).value = x.text; toast('已填入這一格，確認後按「一鍵帶入正文」'); }); el.querySelector('.gm-copy').addEventListener('click', () => navigator.clipboard.writeText(x.text).then(() => toast('已複製')).catch(() => toast('複製失敗'))); });
+    } catch (e) { toast(e.message, 'err'); }
+    b.disabled = false; b.textContent = old;
+  }));
 
   document.getElementById('backToListBtn').addEventListener('click', () => loadPillar(currentPillar));
 
