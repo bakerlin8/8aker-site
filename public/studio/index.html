@@ -2379,11 +2379,14 @@ function renderArticleForm(fm) {
         <div class="gd-s"><h4>③ What・我的觀點<span class="gd-who">你的想法＋AI 幫你寫順</span><em>放在最後，這是整篇最值錢的一段</em></h4>
           <textarea id="gd-view" rows="4" placeholder="寫你的判斷就好，不用漂亮。例如：我會選 A、不選 B，因為…／我覺得…看起來就是不對味／大家最容易搞錯的是…"></textarea>
           <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="viewask">💡 不知道寫什麼？給我 5 個提問</button><button type="button" class="btn btn-ghost" data-gd="view">✨ 用我的話寫成收尾段</button></div><div class="gm-r" id="gd-r-view"></div></div>
-        <div class="gd-s"><h4>④ 常見問答（AEO）<span class="gd-who">AI 產生</span><em>讓搜尋與 AI 問答引用，建議保留</em></h4>
+        <div class="gd-s"><h4>④ Next・接下來<span class="gd-who">你的打算＋AI 幫你寫順</span><em>選填，1–3 句就好，只寫你真的打算做的</em></h4>
+          <textarea id="gd-next" rows="3" placeholder="例如：下個月想把 A 也接進來／想試試 B／這個做法我之後會改成…（沒有就留空，帶入時會略過）"></textarea>
+          <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="nextask">💡 給我 3 個提問</button><button type="button" class="btn btn-ghost" data-gd="next">✨ 用我的話寫順</button></div><div class="gm-r" id="gd-r-next"></div></div>
+        <div class="gd-s"><h4>⑤ 常見問答（AEO）<span class="gd-who">AI 產生</span><em>讓搜尋與 AI 問答引用，建議保留</em></h4>
           <textarea id="gd-faq" rows="5" placeholder="按下面的按鈕產生 3–5 組問答；不想要就留空，帶入時會略過。"></textarea>
           <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="faq">✨ 依目前內容產生問答</button></div><div class="gm-r" id="gd-r-faq"></div></div>
         <div class="btn-row"><button type="button" class="btn btn-primary" id="gd-go">📥 一鍵帶入正文</button><button type="button" class="btn btn-ghost" id="gd-from">⟲ 從目前正文讀回這四格</button></div>
-        <div class="field-hint">帶入後正文會是「## Why／## How／## What／## 常見問題」四段（舊文章用的中文標題也讀得回來）。下方「看成品預覽」可以用讀者看到的樣子檢查。</div>
+        <div class="field-hint">帶入後正文會是「## Why／## How／## What／## Next／## 常見問題」（沒填的格子會略過）（舊文章用的中文標題也讀得回來）。下方「看成品預覽」可以用讀者看到的樣子檢查。</div>
       </div>
     </details>
     <div class="field">
@@ -2545,7 +2548,7 @@ function renderArticleForm(fm) {
   $('bd-prev').addEventListener('click', () => { const pv = $('bd-pv'); const show = pv.style.display === 'none'; pv.style.display = show ? 'block' : 'none'; if (show) pv.innerHTML = mdHtml($('f-body').value) || '<p style="color:#999">（正文還是空的）</p>'; $('bd-prev').textContent = show ? '🙈 收起預覽' : '👁 看成品預覽'; });
   $('f-body').addEventListener('input', () => { const pv = $('bd-pv'); if (pv.style.display !== 'none') pv.innerHTML = mdHtml($('f-body').value); });
 
-  const GD = [['cause', 'Why', 'gd-cause', /^(Why|我遇到的問題)/i], ['solution', 'How', 'gd-solution', /^(How|我的做法)/i], ['view', 'What', 'gd-view', /^(What|我的看法|我的觀點|我怎麼看)/i], ['faq', '常見問題', 'gd-faq', /^(常見問題|FAQ|Q&A)/i]];
+  const GD = [['cause', 'Why', 'gd-cause', /^(Why|我遇到的問題)/i], ['solution', 'How', 'gd-solution', /^(How|我的做法)/i], ['view', 'What', 'gd-view', /^(What|我的看法|我的觀點|我怎麼看)/i], ['next', 'Next', 'gd-next', /^(Next|接下來)/i], ['faq', '常見問題', 'gd-faq', /^(常見問題|FAQ|Q&A)/i]];
   const gdRead = (md) => {
     const parts = {}; let cur = null; const other = [];
     md.split('\n').forEach(l => { const m = l.match(/^##\s+(.*)$/); if (m) { const g = GD.find(x => x[3].test(m[1].trim())); if (g) { cur = g[0]; parts[cur] = []; return; } cur = null; other.push(l); return; } if (cur) parts[cur].push(l); else other.push(l); });
@@ -2564,16 +2567,16 @@ function renderArticleForm(fm) {
     if (cur && cur + '\n' !== out && !confirm('用這四格的內容取代目前正文？（還沒儲存前，重新整理頁面可以還原）')) return;
     $('f-body').value = out; checkSeo(); $('f-body').dispatchEvent(new Event('input')); toast('已帶入正文，記得按「儲存變更」');
   });
-  const GD_USE = { cause: ['gd-cause', '用這一段'], solution: ['gd-solution', '用這個版本'], view: ['gd-view', '用這一段'], faq: ['gd-faq', '用這組問答'] };
+  const GD_USE = { next: ['gd-next', '用這一段'], cause: ['gd-cause', '用這一段'], solution: ['gd-solution', '用這個版本'], view: ['gd-view', '用這一段'], faq: ['gd-faq', '用這組問答'] };
   document.querySelectorAll('[data-gd]').forEach(b => b.addEventListener('click', async () => {
-    const k = b.dataset.gd, tgt = k === 'viewask' ? 'view' : k, box = $('gd-r-' + tgt);
-    const extra = { notes: k === 'cause' ? $('gd-cause').value : k === 'solution' ? $('gd-solution').value : k === 'faq' ? $('gd-faq').value : $('gd-view').value, cause: $('gd-cause').value, solution: $('gd-solution').value };
-    if ((k === 'cause' || k === 'view') && extra.notes.trim().length < 4) { toast(k === 'cause' ? '先隨便寫幾個字，我才知道要順什麼' : '先寫一句你的看法；不知道寫什麼就按「給我 5 個提問」'); if (k === 'cause') return; if (k === 'view') return; }
+    const k = b.dataset.gd, tgt = k === 'viewask' ? 'view' : k === 'nextask' ? 'next' : k, box = $('gd-r-' + tgt);
+    const extra = { notes: k === 'cause' ? $('gd-cause').value : k === 'solution' ? $('gd-solution').value : k === 'faq' ? $('gd-faq').value : (k === 'next' || k === 'nextask') ? $('gd-next').value : $('gd-view').value, cause: $('gd-cause').value, solution: $('gd-solution').value, view: $('gd-view').value };
+    if ((k === 'cause' || k === 'view' || k === 'next') && extra.notes.trim().length < 4) { toast(k === 'cause' ? '先隨便寫幾個字，我才知道要順什麼' : k === 'next' ? '先寫一句你接下來的打算；不知道寫什麼就按「給我 3 個提問」' : '先寫一句你的看法；不知道寫什麼就按「給我 5 個提問」'); return; }
     if (k === 'solution' && extra.cause.trim().length < 4 && !$('f-title').value.trim()) { toast('先填「起因」或標題'); return; }
     const old = b.textContent; b.disabled = true; b.textContent = '思考中…';
     try {
       const d = await gmCall(k, '', '', extra); $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
-      box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${k === 'viewask' ? '' : `<button type="button" class="btn btn-primary gm-use">${GD_USE[k][1]}</button>`}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
+      box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${k === 'viewask' || k === 'nextask' ? '' : `<button type="button" class="btn btn-primary gm-use">${GD_USE[k][1]}</button>`}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
       box.querySelectorAll('.gm-i').forEach(el => { const x = d.items[+el.dataset.i]; const u = el.querySelector('.gm-use'); if (u) u.addEventListener('click', () => { $(GD_USE[k][0]).value = x.text; toast('已填入這一格，確認後按「一鍵帶入正文」'); }); el.querySelector('.gm-copy').addEventListener('click', () => navigator.clipboard.writeText(x.text).then(() => toast('已複製')).catch(() => toast('複製失敗'))); });
     } catch (e) { toast(e.message, 'err'); }
     b.disabled = false; b.textContent = old;
