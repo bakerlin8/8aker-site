@@ -2370,20 +2370,20 @@ function renderArticleForm(fm) {
       <summary>🧭 起承轉合寫作引導（照順序填，最後一鍵帶入正文）</summary>
       <div class="gd-in">
         <div class="field-hint">文章不只是資訊，讀者要看到的是「你怎麼判斷、你覺得什麼對味、你的觀點」。所以：起因與觀點是你的，解決方法交給 AI 整理。AI 只會根據你寫的內容，不會替你編經歷。</div>
-        <div class="gd-s"><h4>① 起因<span class="gd-who">你來寫</span><em>現實生活中遇到了什麼問題</em></h4>
+        <div class="gd-s"><h4>① Why・起因<span class="gd-who">你來寫</span><em>現實生活中遇到了什麼問題</em></h4>
           <textarea id="gd-cause" rows="3" placeholder="例如：這個月出差三趟，體重計的數字跟我的感覺對不起來，我不知道該相信哪個。（1–3 句，亂亂寫也行）"></textarea>
           <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="cause">✨ 幫我順成一段</button></div><div class="gm-r" id="gd-r-cause"></div></div>
-        <div class="gd-s"><h4>② 解決方法<span class="gd-who">AI 整理</span><em>長話短說，只講重點</em></h4>
+        <div class="gd-s"><h4>② How・解決方法<span class="gd-who">AI 整理</span><em>長話短說，只講重點</em></h4>
           <textarea id="gd-solution" rows="5" placeholder="按下面的按鈕，AI 會依「起因」整理 3–5 個重點；你也可以自己直接寫或修改。"></textarea>
           <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="solution">✨ 依起因整理重點</button></div><div class="gm-r" id="gd-r-solution"></div></div>
-        <div class="gd-s"><h4>③ 我的觀點<span class="gd-who">你的想法＋AI 幫你寫順</span><em>放在最後，這是整篇最值錢的一段</em></h4>
+        <div class="gd-s"><h4>③ What・我的觀點<span class="gd-who">你的想法＋AI 幫你寫順</span><em>放在最後，這是整篇最值錢的一段</em></h4>
           <textarea id="gd-view" rows="4" placeholder="寫你的判斷就好，不用漂亮。例如：我會選 A、不選 B，因為…／我覺得…看起來就是不對味／大家最容易搞錯的是…"></textarea>
           <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="viewask">💡 不知道寫什麼？給我 5 個提問</button><button type="button" class="btn btn-ghost" data-gd="view">✨ 用我的話寫成收尾段</button></div><div class="gm-r" id="gd-r-view"></div></div>
         <div class="gd-s"><h4>④ 常見問答（AEO）<span class="gd-who">AI 產生</span><em>讓搜尋與 AI 問答引用，建議保留</em></h4>
           <textarea id="gd-faq" rows="5" placeholder="按下面的按鈕產生 3–5 組問答；不想要就留空，帶入時會略過。"></textarea>
           <div class="gm-b"><button type="button" class="btn btn-ghost" data-gd="faq">✨ 依目前內容產生問答</button></div><div class="gm-r" id="gd-r-faq"></div></div>
         <div class="btn-row"><button type="button" class="btn btn-primary" id="gd-go">📥 一鍵帶入正文</button><button type="button" class="btn btn-ghost" id="gd-from">⟲ 從目前正文讀回這四格</button></div>
-        <div class="field-hint">帶入後正文會是「## 我遇到的問題／## 我的做法／## 我的看法／## 常見問題」四段。下方「看成品預覽」可以用讀者看到的樣子檢查。</div>
+        <div class="field-hint">帶入後正文會是「## Why／## How／## What／## 常見問題」四段（舊文章用的中文標題也讀得回來）。下方「看成品預覽」可以用讀者看到的樣子檢查。</div>
       </div>
     </details>
     <div class="field">
@@ -2461,7 +2461,7 @@ function renderArticleForm(fm) {
       [heads >= 2, `有 2 個以上的小標題（## ）`],
       [tags.length >= 2, `標籤 2 個以上`],
     ];
-    R.push([/^##\s*(我的看法|我的觀點|我怎麼看)/m.test(body), '有「## 我的看法」段落：只有資訊不夠，讀者要看到你的判斷與品味']);
+    R.push([/^##\s*(What|我的看法|我的觀點|我怎麼看)/mi.test(body), '有「## What」（我的看法）段落：只有資訊不夠，讀者要看到你的判斷與品味']);
     R.push([faq, 'AEO：有「## 常見問題」區塊，網站會自動產生 AI 問答能讀的結構（FAQ）']);
     const ok = R.filter(r => r[0]).length;
     $('seoBox').innerHTML = `<div class="seo-h"><span>搜尋與 AI 問答檢查</span><b>${ok} / ${R.length}</b></div><div class="seo-l">${R.map(([o, m]) => `<div class="${o ? 'ok' : 'no'}"><span>${o ? '✓' : '△'}</span><span>${m}</span></div>`).join('')}</div>${faq ? '' : '<div class="btn-row"><button type="button" class="btn btn-ghost" id="seo-faq">加入「常見問題」範本到正文最後</button></div>'}${k ? '' : '<div class="field-hint">在上方輸入關鍵字，會多出 4 項關鍵字檢查。</div>'}`;
@@ -2545,10 +2545,10 @@ function renderArticleForm(fm) {
   $('bd-prev').addEventListener('click', () => { const pv = $('bd-pv'); const show = pv.style.display === 'none'; pv.style.display = show ? 'block' : 'none'; if (show) pv.innerHTML = mdHtml($('f-body').value) || '<p style="color:#999">（正文還是空的）</p>'; $('bd-prev').textContent = show ? '🙈 收起預覽' : '👁 看成品預覽'; });
   $('f-body').addEventListener('input', () => { const pv = $('bd-pv'); if (pv.style.display !== 'none') pv.innerHTML = mdHtml($('f-body').value); });
 
-  const GD = [['cause', '我遇到的問題', 'gd-cause'], ['solution', '我的做法', 'gd-solution'], ['view', '我的看法', 'gd-view'], ['faq', '常見問題', 'gd-faq']];
+  const GD = [['cause', 'Why', 'gd-cause', /^(Why|我遇到的問題)/i], ['solution', 'How', 'gd-solution', /^(How|我的做法)/i], ['view', 'What', 'gd-view', /^(What|我的看法|我的觀點|我怎麼看)/i], ['faq', '常見問題', 'gd-faq', /^(常見問題|FAQ|Q&A)/i]];
   const gdRead = (md) => {
     const parts = {}; let cur = null; const other = [];
-    md.split('\n').forEach(l => { const m = l.match(/^##\s+(.*)$/); if (m) { const g = GD.find(x => x[1] === m[1].trim() || (x[0] === 'view' && /^我的(觀點|看法)|我怎麼看/.test(m[1].trim()))); if (g) { cur = g[0]; parts[cur] = []; return; } cur = null; other.push(l); return; } if (cur) parts[cur].push(l); else other.push(l); });
+    md.split('\n').forEach(l => { const m = l.match(/^##\s+(.*)$/); if (m) { const g = GD.find(x => x[3].test(m[1].trim())); if (g) { cur = g[0]; parts[cur] = []; return; } cur = null; other.push(l); return; } if (cur) parts[cur].push(l); else other.push(l); });
     return { parts, other: other.join('\n').trim() };
   };
   const gdFill = () => { const { parts } = gdRead($('f-body').value); GD.forEach(([k, , id]) => { if (parts[k]) { let t = parts[k].join('\n').trim(); if (k === 'faq') t = '## 常見問題\n\n' + t; $(id).value = t; } }); };
