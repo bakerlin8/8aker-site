@@ -3,7 +3,7 @@ import { db, json, SITE } from './shared.ts';
 const STUDIO_EMAILS = ['nr.bater@gmail.com'];
 const CORS = { 'Access-Control-Allow-Origin': SITE, 'Access-Control-Allow-Headers': 'authorization, content-type', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', Vary: 'Origin' };
 const reply = (b: unknown, s = 200) => json(b, s, CORS);
-const DEFAULT_SETTINGS = { daily: { on: true, hour: 21, days: [1, 2, 3, 4, 5, 6] }, weekly: { on: true, day: 0, hour: 21 }, inquiry: { on: true } };
+const DEFAULT_SETTINGS = { daily: { on: true, hour: 21, minute: 0, days: [1, 2, 3, 4, 5, 6] }, weekly: { on: true, day: 0, hour: 21, minute: 0 }, inquiry: { on: true } };
 const int = (v: unknown, lo: number, hi: number, d: number) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= lo && n <= hi ? n : d; };
 async function owner(req: Request) {
   const t = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
@@ -50,8 +50,8 @@ Deno.serve(async (req) => {
       const x = b.settings || {};
       const days = Array.isArray(x.daily?.days) ? [...new Set(x.daily.days.map((n: unknown) => int(n, 0, 6, -1)).filter((n: number) => n >= 0))] : DEFAULT_SETTINGS.daily.days;
       const s = {
-        daily: { on: x.daily?.on !== false, hour: int(x.daily?.hour, 0, 23, 21), days },
-        weekly: { on: x.weekly?.on !== false, day: int(x.weekly?.day, 0, 6, 0), hour: int(x.weekly?.hour, 0, 23, 21) },
+        daily: { on: x.daily?.on !== false, hour: int(x.daily?.hour, 0, 23, 21), minute: Number(x.daily?.minute) === 30 ? 30 : 0, days },
+        weekly: { on: x.weekly?.on !== false, day: int(x.weekly?.day, 0, 6, 0), hour: int(x.weekly?.hour, 0, 23, 21), minute: Number(x.weekly?.minute) === 30 ? 30 : 0 },
         inquiry: { on: true },
       };
       await db('app_config?on_conflict=key', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify([{ key: 'notify_settings', value: JSON.stringify(s), updated_at: new Date().toISOString() }]) });

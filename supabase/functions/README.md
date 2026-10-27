@@ -17,7 +17,7 @@
 | `studio-ai` | Studio | AI 佇列（ai_jobs）、通知設定 | Studio token |
 | `lib-collect` | iPhone 捷徑（IG／Threads／YouTube 分享選單） | 素材庫收件：收連結、去重、盡力抓標題與縮圖，存進 `lib_items` | `x-8aker-key`（只存 SHA-256，app_config.lib_key_sha256） |
 | `lib-studio` | Studio「素材庫」 | 列出、新增、更新、刪除 `lib_items` | Studio token |
-| `notify` | pg_cron `notify_tick()` | LINE 每日提醒／週統整 | `x-notify-key`（app_config.notify_key） |
+| `notify` | pg_cron `notify_tick()`（每 30 分鐘跑一次，依 notify_settings 的 hour＋minute 決定發不發） | LINE 每日提醒／週統整 | `x-notify-key`（app_config.notify_key） |
 
 Studio token 的驗證都是回頭打 `https://8aker0.com/api/studio_verify`（Vercel）確認。
 

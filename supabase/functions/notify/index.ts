@@ -1,6 +1,6 @@
 // 8AKER零 通知：把訊息推到 Baker 的 LINE（和 TRS Check-in 同一個官方帳號、同一個對話視窗）。
 // 只有帶著正確內部金鑰（資料庫 app_config.notify_key）的請求才能發送。
-// daily  ：晚上 9 點，只有「今天沒有新增日常紀錄」才發提醒（有新增就不發）
+// daily  ：預設晚上 9 點（時間可在 Studio 設定，可選整點或半點，目前 23:30），只有「今天沒有新增日常紀錄」才發提醒（有新增就不發）
 // weekly：星期日晚上 9 點，這一週新增統整＋助理的話（資料庫 weekly_notes，由排程的 Claude 任務在当天晚上寫好）
 import { recordsFlex, reminderFlex, weeklyFlex, type Item } from './cards.ts';
 const SB_URL = Deno.env.get('SUPABASE_URL')!;

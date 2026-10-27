@@ -1640,19 +1640,20 @@ async function loadNotif() {
   const form = document.getElementById('notifForm');
   form.innerHTML = '<div class="loader-wrap"><div class="spinner"></div>讀取中…</div>';
   let S; try { S = (await aiApi({ action: 'settings_get' })).settings; } catch (e) { form.innerHTML = '<div class="empty-state">讀取失敗，請重新整理再試：' + escapeHtml(e.message) + '</div>'; return; }
-  const hours = Array.from({ length: 24 }, (_, h) => [String(h), String(h).padStart(2, '0') + ':00']);
+  const hours = Array.from({ length: 48 }, (_, i) => { const h = Math.floor(i / 2), m = i % 2 ? 30 : 0; return [h + ':' + m, String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0')]; });
+  const hm = (x) => document.getElementById(x).value.split(':').map(Number);
   const DOWS = ['日', '一', '二', '三', '四', '五', '六'];
   form.innerHTML = `
     <div class="hb-card"><h3>每日提醒</h3>
       <div class="field-hint" style="margin:-4px 0 12px">只有「這一天還沒有新增日常紀錄」才會提醒你；已經新增就不會打擾。</div>
       <div class="field field-checkbox"><input type="checkbox" id="nd-on" ${S.daily.on ? 'checked' : ''}><label for="nd-on">開啟每日提醒</label></div>
-      <div class="field"><label class="field-label">幾點提醒（日本時間）</label><select id="nd-hour" style="${SEL_STYLE}">${opt(hours, String(S.daily.hour))}</select></div>
+      <div class="field"><label class="field-label">幾點提醒（日本時間）</label><select id="nd-hour" style="${SEL_STYLE}">${opt(hours, S.daily.hour + ':' + (S.daily.minute || 0))}</select></div>
       <div class="field"><label class="field-label">哪幾天要提醒</label><div class="chips-row" id="nd-days" style="display:flex;flex-wrap:wrap;gap:8px">${[1, 2, 3, 4, 5, 6, 0].map(d => `<label class="field-checkbox" style="margin:0;padding:8px 12px;border:1px solid var(--border);display:flex;gap:6px;align-items:center;background:var(--warm-white)"><input type="checkbox" value="${d}" ${S.daily.days.includes(d) ? 'checked' : ''}>週${DOWS[d]}</label>`).join('')}</div></div>
     </div>
     <div class="hb-card"><h3>每週統整</h3>
       <div class="field-hint" style="margin:-4px 0 12px">這一週新增了什麼，加上助理的話。助理的話約在晚上 8:30 備好，所以時間建議設在 21:00 以後。</div>
       <div class="field field-checkbox"><input type="checkbox" id="nw-on" ${S.weekly.on ? 'checked' : ''}><label for="nw-on">開啟每週統整</label></div>
-      <div class="svc-two"><div class="field" style="margin:0"><label class="field-label">星期幾</label><select id="nw-day" style="${SEL_STYLE}">${opt(DOWS.map((n, i) => [String(i), '週' + n]), String(S.weekly.day))}</select></div><div class="field" style="margin:0"><label class="field-label">幾點</label><select id="nw-hour" style="${SEL_STYLE}">${opt(hours, String(S.weekly.hour))}</select></div></div>
+      <div class="svc-two"><div class="field" style="margin:0"><label class="field-label">星期幾</label><select id="nw-day" style="${SEL_STYLE}">${opt(DOWS.map((n, i) => [String(i), '週' + n]), String(S.weekly.day))}</select></div><div class="field" style="margin:0"><label class="field-label">幾點</label><select id="nw-hour" style="${SEL_STYLE}">${opt(hours, S.weekly.hour + ':' + (S.weekly.minute || 0))}</select></div></div>
     </div>
     <div class="hb-card"><h3>新需求通知</h3>
       <div class="field-hint" style="margin:-4px 0 0">客人送出需求填表時，會立刻通知你。這個一律開啟，不能關閉，以免漏掉客人。</div>
@@ -1661,10 +1662,10 @@ async function loadNotif() {
   form.querySelectorAll('input,select').forEach(el => el.addEventListener('input', () => { document.getElementById('notifDirty').textContent = '● 有尚未儲存的變更'; }));
   document.getElementById('saveNotif').addEventListener('click', async e => {
     const btn = e.currentTarget, days = [...document.querySelectorAll('#nd-days input:checked')].map(x => +x.value);
-    const next = { daily: { on: document.getElementById('nd-on').checked, hour: +document.getElementById('nd-hour').value, days }, weekly: { on: document.getElementById('nw-on').checked, day: +document.getElementById('nw-day').value, hour: +document.getElementById('nw-hour').value }, inquiry: { on: true } };
+    const next = { daily: { on: document.getElementById('nd-on').checked, hour: hm('nd-hour')[0], minute: hm('nd-hour')[1], days }, weekly: { on: document.getElementById('nw-on').checked, day: +document.getElementById('nw-day').value, hour: hm('nw-hour')[0], minute: hm('nw-hour')[1] }, inquiry: { on: true } };
     if (next.daily.on && !days.length) { toast('每日提醒至少要選一天，或把它關掉', 'err'); return; }
     btn.disabled = true; const t = btn.textContent; btn.textContent = '儲存中…';
-    try { await aiApi({ action: 'settings_set', settings: next }); toast('已儲存，下個整點開始生效'); document.getElementById('notifDirty').textContent = ''; }
+    try { await aiApi({ action: 'settings_set', settings: next }); toast('已儲存，下個半點（:00／:30）開始生效'); document.getElementById('notifDirty').textContent = ''; }
     catch (err) { toast('儲存失敗：' + err.message, 'err'); } finally { btn.disabled = false; btn.textContent = t; }
   });
 }
