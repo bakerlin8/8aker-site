@@ -126,6 +126,21 @@ input,textarea,select{font-family:inherit;}
 .gm-g{margin-top:12px;}.gm-g>span{display:block;font-size:11px;letter-spacing:.12em;color:var(--ink-ghost);margin-bottom:2px;}
 .gm-b{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
 .gm-r{margin-top:12px;display:grid;gap:8px;}
+.gr{border:1px solid var(--border);border-left:3px solid var(--gold,#c9a45c);border-radius:3px;background:#fff;margin-top:10px;overflow:hidden;}
+.gr-h{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--warm-white);border-bottom:1px solid var(--border);font-size:13px;}
+.gr-h b{font-family:'Noto Serif TC',serif;font-size:14px;color:var(--ink);}.gr-h span{color:var(--ink-ghost);font-size:11.5px;flex:1;}
+.gr-x{border:0;background:none;color:var(--ink-mute);cursor:pointer;font:inherit;font-size:12px;padding:2px 6px;}.gr-x:hover{color:var(--ink);}
+.gr-i{padding:12px 14px;border-top:1px solid var(--border);}.gr-i:first-of-type{border-top:0;}
+.gr-tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;background:var(--warm-white);border:1px solid var(--border);color:var(--ink-mute);margin-bottom:6px;}
+.gr-b{font-size:14.5px;line-height:1.85;color:var(--ink);}.gr-b p{margin:0 0 8px;}.gr-b h2,.gr-b h3{font-size:15px;margin:10px 0 4px;font-family:'Noto Serif TC',serif;}.gr-b ul,.gr-b ol{margin:0 0 8px 1.3em;padding:0;}
+.gr-b.clamp{max-height:11.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);}
+.gr-more{border:0;background:none;color:var(--emerald-deep,#3c5a46);cursor:pointer;font:inherit;font-size:12.5px;padding:2px 0;margin-bottom:4px;}
+.gr-a{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.gr-pair .o{font-size:13px;color:var(--ink-mute);padding-left:10px;border-left:2px solid var(--border);margin-bottom:5px;}.gr-pair .n{font-size:14.5px;color:var(--ink);font-weight:600;}.gr-pair .t{font-size:12.5px;color:var(--ink-mute);margin-top:4px;}
+.gr-chips{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px;}.gr-chip{border:1px solid var(--border);border-radius:16px;background:#fff;padding:5px 12px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink);}.gr-chip:hover{border-color:var(--emerald-deep,#3c5a46);}.gr-chip.on{background:var(--warm-white);color:var(--ink-ghost);text-decoration:line-through;}
+.gr-load{display:flex;align-items:center;gap:10px;padding:14px;color:var(--ink-mute);font-size:13.5px;border:1px dashed var(--border);border-radius:3px;margin-top:10px;background:var(--warm-white);}
+.gr-load i{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--ink-mute);border-radius:50%;animation:grs .8s linear infinite;flex:none;}@keyframes grs{to{transform:rotate(360deg)}}
+.gr-err{padding:12px 14px;margin-top:10px;border:1px solid #e2c3b8;background:#fbf1ee;color:#8a3a26;border-radius:3px;font-size:13.5px;}
 .gd{border:1px solid var(--border);border-radius:3px;background:var(--warm-white);padding:0;}
 .gd>summary{cursor:pointer;padding:12px 14px;font-weight:600;font-size:14px;color:var(--ink);list-style:none;}
 .gd>summary::-webkit-details-marker{display:none;}
@@ -1007,6 +1022,12 @@ function setSubtabs(view, tabs) {
 function markNav(page) { document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.toggle('active', n.dataset.page === page)); }
 const PILLAR_SHORT = { strengthen: '強化', emit: '放出', operate: '操作', conjure: '具現', transmute: '變化' };
 const PCNT = {};
+async function refreshPcnt() {
+  await Promise.all(Object.keys(PILLARS).map(async slug => { try { const files = await ghListDir(`src/content/${slug}`); PCNT[slug] = files.filter(f => f.name.endsWith('.md')).length; } catch (e) {} }));
+  if (document.getElementById('view-pillar').classList.contains('active')) pillarTabs();
+}
+setInterval(() => { if (!document.hidden && document.getElementById('view-pillar') && document.getElementById('view-pillar').classList.contains('active')) refreshPcnt(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && document.getElementById('view-pillar') && document.getElementById('view-pillar').classList.contains('active')) { refreshPcnt(); if (typeof currentPillar === 'string' && currentPillar) { try { loadPillar(currentPillar); } catch (e) {} } } });
 function pillarTabs() { setSubtabs('pillar', Object.keys(PILLAR_SHORT).map(k => ({ label: PILLAR_SHORT[k], n: PCNT[k], on: k === currentPillar, fn: () => loadPillar(k) }))); }
 document.querySelectorAll('#tabbar button').forEach(b => b.addEventListener('click', () => {
   const t = b.dataset.t;
@@ -2216,6 +2237,7 @@ async function loadPillar(slug) {
       return { ...fm, path: f.path, sha: f.sha };
     }));
     entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    PCNT[slug] = entries.length; pillarTabs(); refreshPcnt();
     const flt = document.createElement('div'); flt.className = 'flt';
     const cnt = (k) => k === 'all' ? entries.length : entries.filter(e => e.status === k).length;
     const FL = [['all', '全部'], ['published', '已公開'], ['draft', '草稿'], ['paused', '暫時關閉']];
@@ -2486,32 +2508,27 @@ function renderArticleForm(fm) {
   };
   const USE = { polish: '取代整篇正文', dehuman: '取代整篇正文', titles: '用這個標題', excerpt: '用這個摘要', tags: '加入標籤', keywords: '加入標籤', hooks: '放到正文最前面', outline: '放到正文最前面', continue: '接到正文最後', faq: '加到正文最後', rewrite: '取代選取的文字' };
   const gmShow = (kind, d, range, rid) => {
-    $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
     const box = $(rid || 'gm-r-body');
-    box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${USE[kind] ? `<button type="button" class="btn btn-primary gm-use">${USE[kind]}</button>` : ''}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
-    box.querySelectorAll('.gm-i').forEach(el => {
-      const x = d.items[+el.dataset.i], body = $('f-body');
-      const u = el.querySelector('.gm-use'); if (u) u.addEventListener('click', () => {
-        if (kind === 'polish' || kind === 'dehuman') { if (!confirm('用這個版本取代整篇正文？（還沒儲存前，重新整理頁面可以還原）')) return; body.value = x.text; }
-        else if (kind === 'titles') $('f-title').value = x.text;
-        else if (kind === 'excerpt') $('f-excerpt').value = x.text;
-        else if (kind === 'tags' || kind === 'keywords') { if (!tags.includes(x.text)) { tags.push(x.text); renderTags(); } }
-        else if (kind === 'hooks' || kind === 'outline') body.value = x.text + '\n\n' + body.value;
-        else if (kind === 'continue') body.value = body.value.replace(/\s+$/, '') + '\n\n' + x.text;
-        else if (kind === 'faq') body.value = body.value.replace(/\s+$/, '') + '\n\n' + x.text + '\n';
-        else if (kind === 'rewrite' && range) { const cur = body.value; if (cur.slice(range[0], range[1]) !== range[2]) { toast('正文在這之後被改過，請重新框選再試'); return; } body.value = cur.slice(0, range[0]) + x.text + cur.slice(range[1]); range[1] = range[0] + x.text.length; range[2] = x.text; }
-        checkSeo(); toast('已填入，記得按「儲存變更」');
-      });
-      el.querySelector('.gm-copy').addEventListener('click', () => navigator.clipboard.writeText(x.text).then(() => toast('已複製')).catch(() => toast('複製失敗')));
-    });
-    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const apply = (x) => {
+      const body = $('f-body');
+      if (kind === 'polish' || kind === 'dehuman') { if (!confirm('用這個版本取代整篇正文？（還沒儲存前，重新整理頁面可以還原）')) return; body.value = x.text; }
+      else if (kind === 'titles') $('f-title').value = x.text;
+      else if (kind === 'excerpt') $('f-excerpt').value = x.text;
+      else if (kind === 'tags' || kind === 'keywords') { if (!tags.includes(x.text)) { tags.push(x.text); renderTags(); } }
+      else if (kind === 'hooks' || kind === 'outline') body.value = x.text + '\n\n' + body.value;
+      else if (kind === 'continue') body.value = body.value.replace(/\s+$/, '') + '\n\n' + x.text;
+      else if (kind === 'faq') body.value = body.value.replace(/\s+$/, '') + '\n\n' + x.text + '\n';
+      else if (kind === 'rewrite' && range) { const cur = body.value; if (cur.slice(range[0], range[1]) !== range[2]) { toast('正文在這之後被改過，請重新框選再試'); return; } body.value = cur.slice(0, range[0]) + x.text + cur.slice(range[1]); range[1] = range[0] + x.text.length; range[2] = x.text; }
+      checkSeo(); $('f-body').dispatchEvent(new Event('input')); toast(CHIP.includes(kind) ? '已加入標籤' : '已填入，記得按「儲存變更」');
+    };
+    gmRes(box, kind, d, USE[kind], apply);
   };
   document.querySelectorAll('[data-gm] button').forEach(b => b.addEventListener('click', async () => {
     const [kind, mode] = b.dataset.k.split(':'); let sel = '', range = null;
     if (kind === 'rewrite') { const ta = $('f-body'), a = ta.selectionStart, z = ta.selectionEnd; sel = ta.value.slice(a, z); if (sel.trim().length < 5) { toast('先在正文框框選要修改的一段文字'); return; } range = [a, z, sel]; }
     if (kind === 'continue' && $('f-body').value.trim().length < 40) { toast('正文先寫幾句，才能接著往下寫'); return; }
-    b.disabled = true; const old = b.textContent; b.textContent = '思考中…';
-    try { gmShow(kind, await gmCall(kind === 'dehuman' ? 'dehuman' : kind, mode, sel), range, b.dataset.r); } catch (e) { toast(e.message, 'err'); }
+    b.disabled = true; const old = b.textContent; b.textContent = '思考中…'; const rb = $(b.dataset.r); gmLoading(rb, kind);
+    try { gmShow(kind, await gmCall(kind, mode, sel), range, b.dataset.r); } catch (e) { gmError(rb, e.message); }
     b.disabled = false; b.textContent = old;
   }));
   /* 摘要：自動擷取 */
@@ -2548,6 +2565,40 @@ function renderArticleForm(fm) {
   $('bd-prev').addEventListener('click', () => { const pv = $('bd-pv'); const show = pv.style.display === 'none'; pv.style.display = show ? 'block' : 'none'; if (show) pv.innerHTML = mdHtml($('f-body').value) || '<p style="color:#999">（正文還是空的）</p>'; $('bd-prev').textContent = show ? '🙈 收起預覽' : '👁 看成品預覽'; });
   $('f-body').addEventListener('input', () => { const pv = $('bd-pv'); if (pv.style.display !== 'none') pv.innerHTML = mdHtml($('f-body').value); });
 
+  /* AI 結果顯示：統一的樣式（白話標題、可讀的排版、長文可收合、一鍵套用） */
+  const RES_T = { titles: '標題靈感', angles: '切入角度', tags: '建議標籤', keywords: 'SEO 關鍵字', outline: '文章大綱', hooks: '開頭第一段', continue: '接著往下寫', rewrite: '改寫結果', polish: '順稿結果', dehuman: '去 AI 化的口氣', review: '讀者視角', translate: '三語版本（日・英）', proofread: '錯字與語病', factcheck: '待確認的事實', faq: '常見問題', social: '社群文案', excerpt: '摘要', cause: '整理後的起因', solution: '解決方法重點', viewask: '幫你想觀點的提問', view: '觀點段落', next: 'Next 段落', nextask: '幫你想 Next 的提問' };
+  const PAIR = ['proofread', 'factcheck', 'review'], CHIP = ['tags', 'keywords'], PLAIN = ['titles', 'angles', 'viewask', 'nextask', 'hooks', 'excerpt'];
+  const gmLoading = (box, kind) => { box.innerHTML = `<div class="gr-load"><i></i><span>AI 正在處理「${RES_T[kind] || '請求'}」…通常 5–15 秒，長文會久一點</span></div>`; box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); };
+  const gmError = (box, msg) => { box.innerHTML = `<div class="gr-err">⚠️ ${escapeHtml(msg)}<br><small>可以再按一次按鈕重試；如果一直失敗，稍等幾分鐘或看今天的次數是否用完。</small></div>`; };
+  const gmRes = (box, kind, d, useLabel, onUse) => {
+    $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
+    const cp = (t) => navigator.clipboard.writeText(t).then(() => toast('已複製')).catch(() => toast('複製失敗'));
+    let inner = '';
+    if (CHIP.includes(kind)) {
+      inner = `<div class="gr-chips">${d.items.map((x, i) => `<button type="button" class="gr-chip" data-i="${i}">＋ ${escapeHtml(x.text)}${x.note ? `<small style="color:#999"> ${escapeHtml(x.note)}</small>` : ''}</button>`).join('')}</div>`;
+    } else {
+      inner = d.items.map((x, i) => {
+        const long = x.text.length > 500;
+        let body;
+        if (PAIR.includes(kind)) { const [o, n] = x.text.split(/\s*→\s*/); body = n ? `<div class="gr-pair"><div class="o">${escapeHtml(o)}</div><div class="n">→ ${escapeHtml(n)}</div>${x.note ? `<div class="t">${escapeHtml(x.note)}</div>` : ''}</div>` : `<div class="gr-pair"><div class="n">${escapeHtml(x.text)}</div>${x.note ? `<div class="t">${escapeHtml(x.note)}</div>` : ''}</div>`; }
+        else body = `${x.note ? `<span class="gr-tag">${escapeHtml(x.note)}</span>` : ''}<div class="gr-b${long ? ' clamp' : ''}">${PLAIN.includes(kind) ? `<p>${escapeHtml(x.text)}</p>` : mdHtml(x.text)}</div>${long ? '<button type="button" class="gr-more">展開全文 ▾</button>' : ''}`;
+        const acts = PAIR.includes(kind) ? '' : `<div class="gr-a">${useLabel ? `<button type="button" class="btn btn-primary gr-use">${useLabel}</button>` : ''}<button type="button" class="btn btn-ghost gr-copy">複製</button></div>`;
+        return `<div class="gr-i" data-i="${i}">${body}${acts}</div>`;
+      }).join('');
+    }
+    const n = d.items.length;
+    box.innerHTML = `<div class="gr"><div class="gr-h"><b>${RES_T[kind] || 'AI 結果'}</b><span>${n > 1 && !PAIR.includes(kind) && !CHIP.includes(kind) ? n + ' 個版本，選一個用・' : ''}${CHIP.includes(kind) ? '點一下就加入・' : ''}今天已用 ${d.used}/${d.limit}</span><button type="button" class="gr-x">收起 ✕</button></div>${inner}</div>`;
+    box.querySelector('.gr-x').addEventListener('click', () => { box.innerHTML = ''; });
+    box.querySelectorAll('.gr-chip').forEach(c => c.addEventListener('click', () => { onUse(d.items[+c.dataset.i]); c.classList.add('on'); }));
+    box.querySelectorAll('.gr-i').forEach(el => {
+      const x = d.items[+el.dataset.i];
+      const u = el.querySelector('.gr-use'); if (u) u.addEventListener('click', () => onUse(x));
+      const c = el.querySelector('.gr-copy'); if (c) c.addEventListener('click', () => cp(x.text));
+      const m = el.querySelector('.gr-more'); if (m) m.addEventListener('click', () => { const b = el.querySelector('.gr-b'); const open = b.classList.toggle('clamp'); m.textContent = open ? '展開全文 ▾' : '收起 ▴'; });
+    });
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   const GD = [['cause', 'Why', 'gd-cause', /^(Why|我遇到的問題)/i], ['solution', 'How', 'gd-solution', /^(How|我的做法)/i], ['view', 'What', 'gd-view', /^(What|我的看法|我的觀點|我怎麼看)/i], ['next', 'Next', 'gd-next', /^(Next|接下來)/i], ['faq', '常見問題', 'gd-faq', /^(常見問題|FAQ|Q&A)/i]];
   const gdRead = (md) => {
     const parts = {}; let cur = null; const other = [];
@@ -2573,12 +2624,11 @@ function renderArticleForm(fm) {
     const extra = { notes: k === 'cause' ? $('gd-cause').value : k === 'solution' ? $('gd-solution').value : k === 'faq' ? $('gd-faq').value : (k === 'next' || k === 'nextask') ? $('gd-next').value : $('gd-view').value, cause: $('gd-cause').value, solution: $('gd-solution').value, view: $('gd-view').value };
     if ((k === 'cause' || k === 'view' || k === 'next') && extra.notes.trim().length < 4) { toast(k === 'cause' ? '先隨便寫幾個字，我才知道要順什麼' : k === 'next' ? '先寫一句你接下來的打算；不知道寫什麼就按「給我 3 個提問」' : '先寫一句你的看法；不知道寫什麼就按「給我 5 個提問」'); return; }
     if (k === 'solution' && extra.cause.trim().length < 4 && !$('f-title').value.trim()) { toast('先填「起因」或標題'); return; }
-    const old = b.textContent; b.disabled = true; b.textContent = '思考中…';
+    const old = b.textContent; b.disabled = true; b.textContent = '思考中…'; gmLoading(box, k);
     try {
-      const d = await gmCall(k, '', '', extra); $('gm-hint').textContent = `今天已用 ${d.used} / ${d.limit} 次`;
-      box.innerHTML = d.items.map((x, i) => `<div class="gm-i" data-i="${i}">${x.note ? `<small>${escapeHtml(x.note)}</small>` : ''}${escapeHtml(x.text)}<div class="btn-row">${k === 'viewask' || k === 'nextask' ? '' : `<button type="button" class="btn btn-primary gm-use">${GD_USE[k][1]}</button>`}<button type="button" class="btn btn-ghost gm-copy">複製</button></div></div>`).join('');
-      box.querySelectorAll('.gm-i').forEach(el => { const x = d.items[+el.dataset.i]; const u = el.querySelector('.gm-use'); if (u) u.addEventListener('click', () => { $(GD_USE[k][0]).value = x.text; toast('已填入這一格，確認後按「一鍵帶入正文」'); }); el.querySelector('.gm-copy').addEventListener('click', () => navigator.clipboard.writeText(x.text).then(() => toast('已複製')).catch(() => toast('複製失敗'))); });
-    } catch (e) { toast(e.message, 'err'); }
+      const d = await gmCall(k, '', '', extra);
+      gmRes(box, k, d, (k === 'viewask' || k === 'nextask') ? '' : GD_USE[k][1], (x) => { $(GD_USE[k][0]).value = x.text; toast('已填入這一格，確認後按「一鍵帶入正文」'); });
+    } catch (e) { gmError(box, e.message); }
     b.disabled = false; b.textContent = old;
   }));
 
@@ -2784,13 +2834,7 @@ async function boot() {
     document.getElementById('sidebarUser').textContent = `${user.login} 已登入`;
 
     // populate article counts in sidebar (best-effort, non-blocking)
-    Object.keys(PILLARS).forEach(async slug => {
-      try {
-        const files = await ghListDir(`src/content/${slug}`);
-        const n = files.filter(f => f.name.endsWith('.md')).length;
-        PCNT[slug] = n; if (document.getElementById('view-pillar').classList.contains('active')) pillarTabs();
-      } catch (e) {}
-    });
+    refreshPcnt();
 
     const qs = new URLSearchParams(location.search);
     if (qs.get('state') === 'strava') {
