@@ -32,7 +32,7 @@ async function modelName() {
 const VOICE = '你是「8AKER零」個人網站的編輯助手。網站主人 Baker 是住在大阪的台灣人、自由工作者。語氣：自然、真誠、白話的台灣繁體中文，像寫給朋友看，不浮誇、不用行銷口號、不編造事實或數字。只根據提供的內容寫，不要加入文中沒有的經歷。';
 const TASKS: Record<string, string> = {
   titles: '請給 6 個文章標題。規則：中文 12–28 字，絕對不要超過 28 字；主要關鍵字放在前段；混合不同類型（問句型、教學型、經驗型、清單型），其中至少 2 個適合被搜尋引擎與 AI 問答引用（直接回答一個問題）；不要誇大、不要標題黨；不得編造文中沒有的數字、次數或經歷（例如不要自己寫「3 件事」）。回傳 JSON：{"items":[{"text":"標題","note":"類型，例如 問句型"}]}',
-  excerpt: '請從文章正文擷取重點，給 3 個摘要（會當作搜尋結果的說明文字）。只能使用正文裡出現的資訊，不得編造數字或經歷。規則：每個 60–100 字；開頭就點出主題與關鍵字；說明讀者能得到什麼；不要用「本文」開頭。回傳 JSON：{"items":[{"text":"摘要","note":"風格，例如 直接型"}]}',
+  excerpt: '請從文章正文擷取重點，給 3 個摘要（會當作搜尋結果的說明文字）。只能使用正文裡出現的資訊，不得編造數字或經歷。規則：每個「嚴格」50–95 字（含標點，寫完自己數一次，超過就刪到符合，絕不可超過 105 字）；一到兩句話；開頭就點出主題與關鍵字；說明讀者能得到什麼；不要用「本文」開頭。回傳 JSON：{"items":[{"text":"摘要","note":"風格，例如 直接型"}]}',
   tags: '請給 6 個適合的標籤（繁體中文，每個 2–8 字，包含 1–2 個適合搜尋的關鍵字）。回傳 JSON：{"items":[{"text":"標籤","note":""}]}',
   angles: '請給 5 個不同的寫作切入角度（誰會想讀、這篇的獨特看點）。只能根據提供的內容，不得編造經歷。回傳 JSON：{"items":[{"text":"一句話描述這個角度","note":"適合的讀者"}]}',
   outline: '請根據關鍵字、標題與已有文字，給一份文章大綱（用 Markdown，## 小標題 加每段 1 行重點，4–6 段，最後一段是「## 常見問題」可選）。只給 1 個版本。不得編造事實，缺資料處用【待補：…】標示。回傳 JSON：{"items":[{"text":"大綱 Markdown","note":"大綱"}]}',
@@ -52,7 +52,7 @@ const TASKS: Record<string, string> = {
   dehuman: '請把整篇正文改成「去 AI 化的口氣」：讓它讀起來像作者本人坐下來跟朋友講話。要去掉的 AI 味：「總而言之」「值得一提的是」「不僅…更…」「讓我們」「在當今…的時代」「綜上所述」、過度工整的排比與三段式、每段都收尾升華、空泛的形容詞與行銷口號。改用短句、具體的細節、偶爾的口語停頓。保留所有事實、數字、Markdown 結構與【待補：…】標記，不得新增文中沒有的資訊或經歷。回傳 JSON：{"items":[{"text":"改好的完整正文","note":"主要去掉了哪些 AI 慣用說法（一句話）"}]}，只給 1 個版本。',
   review: '請站在「第一次來到這個網站的讀者」的視角讀這篇文章，指出：看不懂的地方（沒解釋的術語或前提）、會卡住或想離開的地方、讀完還想追問的問題、缺少的例子或畫面、標題與內容不符之處。最多 8 項，每項 text 寫「原句片段或段落位置 → 讀者會有的疑問」，note 寫建議怎麼補（一句話）。最後一項固定總結：整體讀起來順不順、讀者最可能帶走的一句話。不得替作者編造內容。回傳 JSON：{"items":[{"text":"…","note":"…"}]}',
   translate: '請把標題與整篇正文翻成「日文」與「英文」兩個版本（原文為繁體中文，所以三語 = 繁中原文＋日＋英）。語氣自然、像母語者會說的話，不要逐字直譯；保留 Markdown 結構、連結與【待補：…】標記，不得新增或刪減事實。日文用です・ます調，英文用自然的第一人稱口吻。回傳 JSON：{"items":[{"text":"第一行是譯後標題，空一行後是譯後完整正文","note":"日本語"},{"text":"…","note":"English"}]}，如果兩個語言之間有語感差異，請在對應 note 後面加一句說明。',
-  faq: '請根據正文，寫 3–5 組「常見問題」。只能用正文已有的資訊回答，不得編造；每個答案 1–3 句、直接回答。輸出一個 Markdown 區塊，格式：「## 常見問題」換行，然後每組「### 問題」換行「答案」。回傳 JSON：{"items":[{"text":"Markdown 區塊","note":"常見問題"}]}',
+  faq: '請根據正文，寫 3 組（最多 4 組）「常見問題」，要精簡、不廢話。只能用正文已有的資訊回答，不得編造。規則：問題像讀者會在搜尋框打的短句（20 字內）；答案只寫 1–2 句，每答案 60 字內，第一句直接給結論；不要寒暄、不要重複正文原句、不要「總之」「值得一提」「綜上所述」這類填充、不要條列。輸出一個 Markdown 區塊，格式：「## 常見問題」換行，然後每組「### 問題」換行「答案」。回傳 JSON：{"items":[{"text":"Markdown 區塊","note":"常見問題"}]}',
   social: '請根據文章產生社群文案。回傳 JSON：{"items":[{"text":"內容","note":"平台"}]}，共 4 筆，note 依序為：「Instagram 貼文」（150–250 字，分段、結尾 5 個 hashtag）、「Threads 短貼文」（80 字內，像隨口分享，不放 hashtag）、「Threads 串文」（3 則，用 --- 分隔每則）、「YouTube 短影音腳本」（30–45 秒口播，標出開場一句話、3 個重點、結尾；再附一行建議標題）。',
 };
 
@@ -83,6 +83,7 @@ Deno.serve(async (req) => {
     const text = d?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || '').join('') || '';
     let items: { text: string; note?: string }[] = [];
     try { const j = JSON.parse(text.replace(/^```json\s*|\s*```$/g, '')); items = (Array.isArray(j) ? j : j.items || []).map((x: any) => ({ text: String(x.text ?? '').trim(), note: String(x.note ?? '').trim() })).filter((x: any) => x.text); } catch (_) { /* 解析失敗 */ }
+    if (b.kind === 'excerpt') items = items.map(x => { let t = x.text.replace(/\s*\n\s*/g, ''); if (t.length > 110) { const cut = t.slice(0, 110); const i = Math.max(cut.lastIndexOf('。'), cut.lastIndexOf('！'), cut.lastIndexOf('？')); t = i >= 39 ? cut.slice(0, i + 1) : cut.slice(0, 109) + '…'; } return { ...x, text: t }; }).filter(x => x.text.length >= 30);
     if (!items.length) return reply(b.kind === 'proofread' || b.kind === 'factcheck' ? { ok: true, items: [{ text: '沒有發現需要處理的地方。', note: '看起來沒問題' }], used: u.n + 1, limit: DAILY_LIMIT } : { error: 'AI 這次沒有給出可用的結果，再按一次試試' }, b.kind === 'proofread' || b.kind === 'factcheck' ? 200 : 502);
     return reply({ ok: true, items, used: u.n + 1, limit: DAILY_LIMIT });
   } catch (_e) { return reply({ error: 'server_error' }, 500); }
