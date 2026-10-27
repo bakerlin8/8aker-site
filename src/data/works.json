@@ -805,6 +805,267 @@
       "cta_label": "",
       "engage": "",
       "ask": ""
+    },
+    {
+      "dir": "conjure",
+      "date": "2026.10",
+      "draft": true,
+      "title": "BJT 作戰進度表",
+      "desc": "為商務日文檢定 BJT 備考打造的練習網站：做題、錯題複習、敬語對照、聽力計時，全部用手機完成。",
+      "spent": "—",
+      "saved": "—",
+      "service": "owner",
+      "why": "備考的進度散在筆記、影片和題本，哪裡弱、哪裡該複習，全憑感覺。",
+      "result": "打開就知道今天該做什麼，做錯的題目會自己回來找我。",
+      "slug": "bjt-tracker",
+      "intro": "",
+      "images": [
+        {
+          "src": "/works/bjt-tracker/01_home_desktop.png",
+          "caption": "首頁"
+        }
+      ],
+      "video": "",
+      "link": "",
+      "link_label": "",
+      "color": "",
+      "title_en": "BJT Battle Tracker",
+      "title_zh": "BJT 作戰進度表",
+      "tag": "工具",
+      "kicker": "具現 ・ 作品",
+      "deck": "把商務日文考試的備考進度、錯題和聽力，收在一支手機就能用的小工具裡。",
+      "groups": [
+        {
+          "key": "A",
+          "label": "進度",
+          "en": "Progress",
+          "cols": 2,
+          "shots": [
+            {
+              "src": "/works/bjt-tracker/01_home_desktop.png",
+              "title": "首頁",
+              "url": "/",
+              "note": "倒數天數、八週進度與月曆一眼看完。",
+              "points": [
+                "距離考試天數",
+                "今日題數與連續天數",
+                "月曆標記練習過的日子"
+              ],
+              "mobile": "/works/bjt-tracker/08_home_mobile.png"
+            },
+            {
+              "src": "/works/bjt-tracker/02_today_desktop.png",
+              "title": "今日",
+              "url": "/today",
+              "note": "今天要做的事與完成量。",
+              "points": [
+                "今日題數只算答對",
+                "複習題優先，再接新題"
+              ],
+              "mobile": "/works/bjt-tracker/09_today_mobile.png"
+            }
+          ]
+        },
+        {
+          "key": "B",
+          "label": "題庫",
+          "en": "Practice",
+          "cols": 3,
+          "shots": [
+            {
+              "src": "/works/bjt-tracker/03_question_desktop.png",
+              "title": "作答",
+              "url": "/practice",
+              "note": "答完立刻看到解析與中文翻譯。",
+              "points": [
+                "「不確定，先標記」",
+                "日文語音",
+                "中文翻譯"
+              ],
+              "mobile": "/works/bjt-tracker/10_question_mobile.png"
+            },
+            {
+              "src": "/works/bjt-tracker/04_notebook_desktop.png",
+              "title": "錯題本",
+              "url": "/notebook",
+              "note": "答錯與猜對分開管理。",
+              "points": [
+                "依錯的次數排序",
+                "只重做猜對的",
+                "按易錯類型分類"
+              ],
+              "mobile": "/works/bjt-tracker/11_notebook_mobile.png"
+            },
+            {
+              "src": "/works/bjt-tracker/05_review_desktop.png",
+              "title": "單題回顧",
+              "url": "/notebook/review",
+              "note": "點錯題本任一題，查看正解與上次選擇。",
+              "points": [
+                "正解綠色、上次選錯紅色",
+                "只查看不計分",
+                "錯過幾次標籤"
+              ],
+              "mobile": "/works/bjt-tracker/12_review_mobile.png"
+            }
+          ]
+        },
+        {
+          "key": "C",
+          "label": "對照與聽力",
+          "en": "Compare & Listen",
+          "cols": 2,
+          "shots": [
+            {
+              "src": "/works/bjt-tracker/06_compare_desktop.png",
+              "title": "敬語對照",
+              "url": "/compare",
+              "note": "把四種敬語放在同一張表裡比較。",
+              "points": [
+                "先問「誰的動作」",
+                "常錯程度標籤",
+                "「練這 N 題」"
+              ],
+              "mobile": "/works/bjt-tracker/13_compare_mobile.png"
+            },
+            {
+              "src": "/works/bjt-tracker/07_listen_desktop.png",
+              "title": "聽力",
+              "url": "/listen",
+              "note": "推薦清單與聽力計時。",
+              "points": [
+                "一鍵加入清單",
+                "播放時自動累計時間",
+                "可手動補記"
+              ],
+              "mobile": "/works/bjt-tracker/14_listen_mobile.png"
+            }
+          ]
+        }
+      ],
+      "how": {
+        "steps": [
+          {
+            "t": "看首頁",
+            "d": "先看距離考試還有幾天，以及今天的目標題數。"
+          },
+          {
+            "t": "開始今天的練習",
+            "d": "系統先給到期複習的題目，再補新題，題型會混合搭配。"
+          },
+          {
+            "t": "作答",
+            "d": "不確定就先標「不確定」，答完會看到解析與中文翻譯。"
+          },
+          {
+            "t": "看錯題本與對照分頁",
+            "d": "回頭複習錯題，並查看敬語哪一類最常錯。"
+          },
+          {
+            "t": "聽力",
+            "d": "在清單中選影片播放，時間會自動計入；在別處聽的可以手動補記。"
+          }
+        ],
+        "notice": "目前沒有公開試玩版（網站需要密碼登入，只供自己使用）。本頁所有畫面皆為假資料示範，不含任何真實紀錄。"
+      },
+      "bg": {
+        "lead": "備考 BJT 時，我同時用筆記、影片和題本，進度散在各處，哪裡弱、哪裡該複習，全憑感覺。我想要一個地方，打開就知道今天該做什麼，做錯的題目還會自己回來找我。",
+        "problems": [
+          {
+            "t": "進度看不見",
+            "d": "離考試還有幾天、這週做了多少題，要自己算。"
+          },
+          {
+            "t": "錯題會被忘記",
+            "d": "做錯的題目沒有集中管理，也不知道哪一題反覆在錯。"
+          },
+          {
+            "t": "蒙對也被當成會了",
+            "d": "猜對的題目看起來是對的，其實沒有學會。"
+          },
+          {
+            "t": "敬語老是混淆",
+            "d": "尊敬語、謙讓語、丁重語分不清，也不知道自己最常錯哪一類。"
+          },
+          {
+            "t": "聽力時間算不清",
+            "d": "在不同地方聽，沒有統一的累計。"
+          }
+        ],
+        "close": "我做的不是又一個題庫，而是一個會根據「我自己做錯了什麼」來安排練習的備考工具。"
+      },
+      "impact": {
+        "lead": "以下是我自己的粗估：假設每天備考約 1 小時，並以個人使用經驗推算，不是正式統計。目前用於自己的 BJT 備考，並持續依使用狀況調整功能。",
+        "rows": [
+          {
+            "item": "記錄當天題數與進度",
+            "before": "手動記，約 5 分鐘",
+            "after": "作答時自動計入",
+            "saved": "約 5 分鐘／天"
+          },
+          {
+            "item": "整理錯題",
+            "before": "另外抄寫，約 10 分鐘",
+            "after": "自動進錯題本",
+            "saved": "約 10 分鐘／天"
+          },
+          {
+            "item": "決定今天做什麼",
+            "before": "憑感覺，約 5 分鐘",
+            "after": "系統排好",
+            "saved": "約 5 分鐘／天"
+          },
+          {
+            "item": "找出常錯的敬語類型",
+            "before": "靠記憶，難以判斷",
+            "after": "對照表直接標示",
+            "saved": "無法量化"
+          },
+          {
+            "item": "累計聽力時間",
+            "before": "沒有統一記錄",
+            "after": "自動或補記",
+            "saved": "無法量化"
+          }
+        ]
+      },
+      "future": {
+        "lead": "目前以自用為主，接下來想讓它更完整。",
+        "add": [
+          {
+            "t": "圖片聽力題",
+            "d": "模擬考試中看圖聽答的題型。"
+          },
+          {
+            "t": "聽力文字稿",
+            "d": "讓聽力內容可以對照文字複習。"
+          },
+          {
+            "t": "自動更新聽力推薦",
+            "d": "定期整理新的商務日文聽力素材。"
+          }
+        ],
+        "improve": [
+          {
+            "t": "敬語對照表",
+            "d": "持續補充考試常見的易錯說法與爭議用法。"
+          },
+          {
+            "t": "出題安排",
+            "d": "依錯誤率調整各題型的比例。"
+          }
+        ]
+      },
+      "cta": {
+        "title": "想一起打造自己的學習工具嗎？",
+        "body": "我用 AI 一步步做出自己需要的備考工具，如果你也有想解決的小問題，歡迎聊聊。",
+        "primary": "來信聊聊",
+        "href": "/chat/",
+        "secondary": "看更多作品"
+      },
+      "cta_label": "",
+      "engage": "",
+      "ask": ""
     }
   ]
 }

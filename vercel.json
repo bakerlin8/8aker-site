@@ -67,6 +67,17 @@
       "statusCode": 302
     },
     {
+      "source": "/bjt-tracker",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/bjt-tracker/",
+      "statusCode": 302
+    },
+    {
       "source": "/site",
       "has": [
         {
@@ -119,6 +130,17 @@
         }
       ],
       "destination": "https://8aker0.com/works/spec-sheet/",
+      "statusCode": 302
+    },
+    {
+      "source": "/bjt-tracker",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/bjt-tracker/",
       "statusCode": 302
     },
     {
