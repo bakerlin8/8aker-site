@@ -21,12 +21,18 @@ for (const [c, to] of Object.entries(custom)) {
 const cfgUrl = new URL('../vercel.json', import.meta.url);
 const cfg = JSON.parse(fs.readFileSync(cfgUrl, 'utf8'));
 const isShort = (r) => (r.has || []).some((h) => h.type === 'host' && HOSTS.includes(h.value));
-const rest = (cfg.redirects || []).filter((r) => !isShort(r));
+// 搬過方向的文章：舊網址轉到新網址（src/data/moved.json，Studio 搬文章時自動寫入）
+let moved = {};
+try { moved = read('../src/data/moved.json'); } catch (_) { /* 沒搬過就沒有這個檔 */ }
+const isMoved = (r) => !(r.has || []).length && /^\/pillars\/[a-z]+\/[^/]+\/?$/.test(r.source) && r.statusCode === 301;
+const rest = (cfg.redirects || []).filter((r) => !isShort(r) && !isMoved(r));
+const mv = [];
+for (const [from, to] of Object.entries(moved)) for (const sl of ['', '/']) mv.push({ source: `/pillars/${from}${sl}`, destination: `/pillars/${to}/`, statusCode: 301 });
 const gen = [];
 for (const host of HOSTS) {
   for (const [code, to] of map) gen.push({ source: `/${code}`, has: [{ type: 'host', value: host }], destination: to, statusCode: 302 });
 }
 for (const host of HOSTS) gen.push({ source: '/:path*', has: [{ type: 'host', value: host }], destination: MAIN, statusCode: 302 });
-cfg.redirects = [...rest, ...gen];
+cfg.redirects = [...rest, ...mv, ...gen];
 fs.writeFileSync(cfgUrl, JSON.stringify(cfg, null, 2) + '\n');
 console.log(`短網址：${map.size} 條（${[...map.keys()].join(', ')}）`);

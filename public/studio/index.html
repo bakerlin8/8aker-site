@@ -2381,6 +2381,7 @@ function renderArticleForm(fm) {
       <div class="gm-b" data-gm="tags,keywords" data-r="gm-r-tags"></div><div class="gm-r" id="gm-r-tags"></div>
     </div>
     <div class="field"><label class="field-label">也屬於哪個方向（選填，最多一個）</label><select id="f-also" style="${SEL_STYLE}"><option value="">（只屬於「${PILLARS[currentPillar].jp}」）</option>${Object.keys(PILLARS).filter(k => k !== currentPillar).map(k => `<option value="${k}" ${fm.also === k ? 'selected' : ''}>${PILLARS[k].jp}・${PILLARS[k].title}</option>`).join('')}</select><div class="field-hint">網址和分類顏色仍以「${PILLARS[currentPillar].jp}」為主；選了之後，這篇也會列在另一個方向的清單裡，並標示「來自・${PILLARS[currentPillar].jp}」。</div></div>
+    ${currentArticle ? `<div class="field"><label class="field-label">${currentArticle.isNew ? '放在哪個方向（選錯了可在這裡改）' : '搬到其他方向（選填）'}</label><select id="f-move" style="${SEL_STYLE}"><option value="">（不搬，留在「${PILLARS[currentPillar].jp}」）</option>${Object.keys(PILLARS).filter(k => k !== currentPillar).map(k => `<option value="${k}">${PILLARS[k].jp}・${PILLARS[k].title}</option>`).join('')}</select><div class="field-hint">${currentArticle.isNew ? '還沒存檔，直接選正確的方向，再按「儲存」就會建在那裡。' : '選了再按「儲存變更」，這篇會正式換到另一個方向（網址也跟著變）。舊網址會自動轉到新網址，內容不會遺失。'}</div></div>` : ''}
     <div class="field"><label class="field-label">屬於哪個作品（選填：選了會自動出現在該作品頁的「製作紀錄」）</label><select id="f-work" style="${SEL_STYLE}"><option value="">（不屬於任何作品）</option></select></div>
     <div class="field"><label class="field-label">文章狀態</label>
       <div class="st-seg" id="f-status">
@@ -2648,10 +2649,31 @@ function renderArticleForm(fm) {
         work: (document.getElementById('f-work') || {}).value || '',
         body: document.getElementById('f-body').value,
       };
+      if (currentArticle.isNew) { const nmv = (document.getElementById('f-move') || {}).value || ''; if (nmv && PILLARS[nmv]) { currentPillar = nmv; if (newFm.also === nmv) newFm.also = ''; } }
       const content = serializeFrontmatter(newFm);
       const path = currentArticle.isNew
         ? `src/content/${currentPillar}/${slugify(newFm.title)}.md`
         : currentArticle.path;
+      const mv = (document.getElementById('f-move') || {}).value || '';
+      if (mv && PILLARS[mv] && !currentArticle.isNew) {
+        const fromP = currentPillar, file = currentArticle.path.split('/').pop(), slug = file.replace(/\.md$/, '');
+        if (!confirm(`要把這篇從「${PILLARS[fromP].jp}」搬到「${PILLARS[mv].jp}」嗎？\n\n・會在「${PILLARS[mv].jp}」建立新檔，再移除「${PILLARS[fromP].jp}」的舊檔（同一篇文章，只是換位置）\n・舊網址會自動轉到新網址\n・原本選的「也屬於」若和新方向相同會自動取消`)) { btn.disabled = false; btn.textContent = '儲存變更'; return; }
+        const newPath = `src/content/${mv}/${file}`;
+        if (await ghGetFile(newPath)) throw new Error(`「${PILLARS[mv].jp}」裡已經有同名檔案（${file}），請先把這篇的標題改一下再搬`);
+        if (newFm.also === mv) newFm.also = '';
+        await ghPutFile(newPath, serializeFrontmatter(newFm), null, `Move article to ${mv} via Studio: ${newFm.title}`);
+        await ghDeleteFile(currentArticle.path, currentArticle.sha, `Move article out of ${fromP} via Studio`);
+        try {
+          const mf = await ghGetFile('src/data/moved.json');
+          const data = mf ? JSON.parse(mf.content) : {};
+          data[`${fromP}/${slug}`] = `${mv}/${slug}`;
+          for (const k of Object.keys(data)) if (data[k] === `${fromP}/${slug}`) data[k] = `${mv}/${slug}`;
+          await ghPutFile('src/data/moved.json', JSON.stringify(data, null, 2) + '\n', mf ? mf.sha : null, `Record moved article ${slug}`);
+        } catch (e) { toast('文章已搬好，但舊網址轉址沒記錄成功，請告訴 Claude', 'err'); }
+        toast(`已搬到「${PILLARS[mv].jp}」，網站約一分鐘後更新`);
+        currentPillar = mv; loadPillar(mv); refreshPcnt();
+        return;
+      }
       const result = await ghPutFile(path, content, currentArticle.sha, currentArticle.isNew ? `Create article via Studio: ${newFm.title}` : `Update article via Studio: ${newFm.title}`);
       currentArticle.sha = result.content.sha;
       currentArticle.path = path;
