@@ -45,6 +45,28 @@
       "statusCode": 302
     },
     {
+      "source": "/renovation-budget",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/renovation-budget/",
+      "statusCode": 302
+    },
+    {
+      "source": "/spec-sheet",
+      "has": [
+        {
+          "type": "host",
+          "value": "8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/spec-sheet/",
+      "statusCode": 302
+    },
+    {
       "source": "/site",
       "has": [
         {
@@ -75,6 +97,28 @@
         }
       ],
       "destination": "https://8aker0.com/works/checkin-system/",
+      "statusCode": 302
+    },
+    {
+      "source": "/renovation-budget",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/renovation-budget/",
+      "statusCode": 302
+    },
+    {
+      "source": "/spec-sheet",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.8aker.com"
+        }
+      ],
+      "destination": "https://8aker0.com/works/spec-sheet/",
       "statusCode": 302
     },
     {
