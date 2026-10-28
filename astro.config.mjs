@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config';
 import fs from 'node:fs';
+import remarkEmbed from './src/plugins/embed.mjs';
 
 /* 短網址：8aker0.com/<code> → 目標
    自訂短碼放在 src/data/shortlinks.json（可在 Studio「短網址」管理）
@@ -64,5 +65,6 @@ export default defineConfig({
   site: 'https://8aker0.com',
   output: 'static',
   redirects: REDIRECTS,
+  markdown: { remarkPlugins: [remarkEmbed] },
   integrations: [silentRedirects(REDIRECTS)],
 });

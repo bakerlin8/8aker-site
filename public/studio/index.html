@@ -2355,6 +2355,7 @@ async function editArticle(slug, path) {
   renderArticleForm(parseFrontmatter(file.content));
 }
 
+const embedKind = (u) => { try { const x = new URL(u), h = x.hostname.replace(/^(www|m)\./, ''); if (/^(youtu\.be|youtube\.com|music\.youtube\.com)$/.test(h)) return { icon: '🎬', name: 'YouTube 影片' }; if (h === 'open.spotify.com') return { icon: '🎧', name: 'Spotify' }; if (h === 'podcasts.apple.com') return { icon: '🎧', name: 'Apple Podcasts' }; return { icon: '🔗', name: '一般連結（只顯示連結卡，不嵌入播放器）' }; } catch (_) { return { icon: '⚠️', name: '看不懂這個網址' }; } };
 function renderArticleForm(fm) {
   showView('article');
   document.getElementById('articleEyebrow').textContent = `Pillar · ${PILLARS[currentPillar].jp}`;
@@ -2389,7 +2390,24 @@ function renderArticleForm(fm) {
         <button type="button" data-s="published"><b>已公開</b><small>顯示在網站上，搜尋引擎找得到</small></button>
         <button type="button" data-s="paused"><b>暫時關閉</b><small>先下架，內容保留，隨時可再公開</small></button>
       </div></div>
-    <details class="gd" id="gdBox" open>
+    ${currentPillar === 'transmute' ? `<details class="gd" id="liteBox" open>
+      <summary>🌿 生活感觸・簡單寫法（聽到、看到、有感覺就記一下）</summary>
+      <div class="gd-in">
+        <div class="field-hint">這個方向不用起承轉合。三步就好：貼上你聽到／看到的來源，寫一句打動你的話，再寫幾句你的感觸。來源會自動標註，讀者可以點回原始頁面。</div>
+        <div class="gd-s"><h4>① 聽到／看到什麼<span class="gd-who">貼連結就好</span><em>YouTube、Spotify、Apple Podcasts 會直接嵌入播放器</em></h4>
+          <input type="text" id="lt-url" placeholder="貼上連結（例如 https://youtu.be/…）">
+          <input type="text" id="lt-src" placeholder="來源名稱（頻道／節目名，貼上連結後會自動嘗試帶入，也可以自己改）" style="margin-top:8px">
+          <div class="field-hint" id="lt-hint"></div>
+          <div class="gm-b"><button type="button" class="btn btn-primary" id="lt-paste">📋 一鍵貼上並插入正文</button><button type="button" class="btn btn-ghost" id="lt-add">➕ 把上面的連結插入正文（游標位置）</button></div></div>
+        <div class="gd-s"><h4>② 打動我的一句<span class="gd-who">選填</span><em>對方說的話、或你記下的重點</em></h4>
+          <textarea id="lt-quote" rows="2" placeholder="例如：「不是變強才開始，是開始了才會變強。」（沒有就留空）"></textarea></div>
+        <div class="gd-s"><h4>③ 我的感觸<span class="gd-who">你來寫</span><em>2–5 句，像寫日記就好</em></h4>
+          <textarea id="lt-view" rows="4" placeholder="聽完／看完的當下想到什麼？跟自己的生活有什麼連結？亂亂寫也行，之後可以用下方「整篇處理」順稿。"></textarea></div>
+        <div class="btn-row"><button type="button" class="btn btn-primary" id="lt-go">📥 組成文章放進正文</button></div>
+        <div class="field-hint">正文裡的嵌入只是一行：<code>::embed 網址 | 來源名稱</code>，想搬位置或刪掉，直接剪下那一行就好。</div>
+      </div>
+    </details>` : ''}
+    <details class="gd" id="gdBox" ${currentPillar === 'transmute' ? 'hidden' : 'open'}>
       <summary>🧭 起承轉合寫作引導（照順序填，最後一鍵帶入正文）</summary>
       <div class="gd-in">
         <div class="field-hint">文章不只是資訊，讀者要看到的是「你怎麼判斷、你覺得什麼對味、你的觀點」。所以：起因與觀點是你的，解決方法交給 AI 整理。AI 只會根據你寫的內容，不會替你編經歷。</div>
@@ -2420,7 +2438,7 @@ function renderArticleForm(fm) {
       <div class="gm-g"><span>起稿與續寫</span><div class="gm-b" data-gm="outline,hooks,continue" data-r="gm-r-body"></div></div>
       <div class="gm-g"><span>改寫選取文字（先在正文框框選一段）</span><div class="gm-b" data-gm="rewrite:short,rewrite:casual,rewrite:vivid" data-r="gm-r-body"></div></div>
       <div class="gm-g"><span>整篇處理</span><div class="gm-b" data-gm="polish,dehuman,review,translate" data-r="gm-r-body"></div></div>
-      <div class="gm-g"><span>檢查與發布</span><div class="gm-b" data-gm="proofread,factcheck,faq,social" data-r="gm-r-body"></div></div>
+      <div class="gm-g"><span>檢查與發布</span><div class="gm-b" data-gm="${currentPillar === 'transmute' ? 'proofread,factcheck,social' : 'proofread,factcheck,faq,social'}" data-r="gm-r-body"></div></div>
       <div class="gm-r" id="gm-r-body"></div>
     </div>
     <div class="btn-row">
@@ -2477,20 +2495,22 @@ function renderArticleForm(fm) {
     $('f-tg').innerHTML = T.map(([t, tag]) => `<button type="button" class="tg-i" data-t="${escapeAttr(t)}"><span>${escapeHtml(t)}</span><small>${tag}・${w(t) <= 60 ? '長度 OK' : '偏長'}</small></button>`).join('');
     $('f-tg').querySelectorAll('.tg-i').forEach(b => b.addEventListener('click', () => { $('f-title').value = b.dataset.t; if (!tags.includes(k)) { tags.push(k); renderTags(); } checkSeo(); toast('已填入標題，並把關鍵字加進標籤'); }));
   });
+  const LITE = currentPillar === 'transmute', LITE_MIN = LITE ? 80 : 300;
   const checkSeo = () => {
     const t = $('f-title').value.trim(), ex = $('f-excerpt').value.trim(), body = $('f-body').value, k = kwv();
     const heads = (body.match(/^##\s+/gm) || []).length, faq = /^##\s*(常見問題|FAQ|Q&A)/mi.test(body);
     const R = [
       [w(t) >= 20 && w(t) <= 60, `標題長度（${Math.ceil(w(t) / 2)} 個字，建議 10–30）`],
       [ex.length >= 40 && ex.length <= 110, `摘要長度（${ex.length} 字，建議 40–110；它會成為搜尋結果的說明文字）`],
-      [body.replace(/\s/g, '').length >= 300, `正文夠完整（${body.replace(/\s/g, '').length} 字，建議至少 300）`],
-      [heads >= 2, `有 2 個以上的小標題（## ）`],
+      [body.replace(/\s/g, '').length >= LITE_MIN, `正文夠完整（${body.replace(/\s/g, '').length} 字，建議至少 ${LITE_MIN}）`],
+      ...(LITE ? [] : [[heads >= 2, `有 2 個以上的小標題（## ）`]]),
       [tags.length >= 2, `標籤 2 個以上`],
     ];
-    R.push([/^##\s*(What|我的看法|我的觀點|我怎麼看)/mi.test(body), '有「## What」（我的看法）段落：只有資訊不夠，讀者要看到你的判斷與品味']);
-    R.push([faq, 'AEO：有「## 常見問題」區塊，網站會自動產生 AI 問答能讀的結構（FAQ）']);
+    if (!LITE) { R.push([/^##\s*(What|我的看法|我的觀點|我怎麼看)/mi.test(body), '有「## What」（我的看法）段落：只有資訊不夠，讀者要看到你的判斷與品味']);
+    R.push([faq, 'AEO：有「## 常見問題」區塊，網站會自動產生 AI 問答能讀的結構（FAQ）']); }
+    if (LITE) R.push([!/::embed\s/.test(body) || /::embed\s+\S+\s*\|\s*\S/.test(body), '嵌入的影片／Podcast 有填「來源名稱」（讀者會看到「來源：…」）']);
     const ok = R.filter(r => r[0]).length;
-    $('seoBox').innerHTML = `<div class="seo-h"><span>搜尋與 AI 問答檢查</span><b>${ok} / ${R.length}</b></div><div class="seo-l">${R.map(([o, m]) => `<div class="${o ? 'ok' : 'no'}"><span>${o ? '✓' : '△'}</span><span>${m}</span></div>`).join('')}</div>${faq ? '' : '<div class="btn-row"><button type="button" class="btn btn-ghost" id="seo-faq">加入「常見問題」範本到正文最後</button></div>'}${k ? '' : '<div class="field-hint">在上方輸入關鍵字，會多出 4 項關鍵字檢查。</div>'}`;
+    $('seoBox').innerHTML = `<div class="seo-h"><span>搜尋與 AI 問答檢查</span><b>${ok} / ${R.length}</b></div><div class="seo-l">${R.map(([o, m]) => `<div class="${o ? 'ok' : 'no'}"><span>${o ? '✓' : '△'}</span><span>${m}</span></div>`).join('')}</div>${faq || LITE ? '' : '<div class="btn-row"><button type="button" class="btn btn-ghost" id="seo-faq">加入「常見問題」範本到正文最後</button></div>'}${k ? '' : '<div class="field-hint">在上方輸入關鍵字，會多出 4 項關鍵字檢查。</div>'}`;
     const fb = $('seo-faq'); if (fb) fb.addEventListener('click', () => { const b = $('f-body'); b.value = b.value.replace(/\s+$/, '') + '\n\n## 常見問題\n\n### 問題一：（寫讀者最常問的一句話）\n\n（用 1–3 句直接回答）\n\n### 問題二：\n\n（回答）\n'; checkSeo(); toast('已加入範本，改成你自己的問題與答案'); });
   };
   ['f-title', 'f-excerpt', 'f-body', 'f-kw'].forEach(id => $(id).addEventListener('input', checkSeo));
@@ -2555,7 +2575,9 @@ function renderArticleForm(fm) {
     const close = () => { if (list) { out.push(`</${list}>`); list = null; } };
     md.replace(/^---[\s\S]*?---\n/, '').split('\n').forEach(line => {
       let m;
-      if ((m = line.match(/^(#{2,3})\s+(.*)$/))) { close(); out.push(`<h${m[1].length}>${inl(m[2])}</h${m[1].length}>`); }
+      if ((m = line.match(/^::embed\s+(\S+)(?:\s*\|\s*(.*))?$/))) { close(); const k = embedKind(m[1]); out.push(`<div style="margin:10px 0;padding:14px;border:1px dashed #b99;background:#faf5f2">${k.icon} 嵌入：${k.name}<br><small>來源：${escapeHtml((m[2] || '').trim() || '（還沒填來源名稱）')}　<span style="color:#999">${escapeHtml(m[1])}</span></small></div>`); }
+      else if ((m = line.match(/^(#{2,3})\s+(.*)$/))) { close(); out.push(`<h${m[1].length}>${inl(m[2])}</h${m[1].length}>`); }
+      else if ((m = line.match(/^>\s?(.*)$/))) { close(); out.push(`<blockquote style="margin:8px 0;padding-left:12px;border-left:3px solid #c9a15a;color:#555">${inl(m[1])}</blockquote>`); }
       else if ((m = line.match(/^\s*[-*]\s+(.*)$/))) { if (list !== 'ul') { close(); out.push('<ul>'); list = 'ul'; } out.push(`<li>${inl(m[1])}</li>`); }
       else if ((m = line.match(/^\s*\d+\.\s+(.*)$/))) { if (list !== 'ol') { close(); out.push('<ol>'); list = 'ol'; } out.push(`<li>${inl(m[1])}</li>`); }
       else if (!line.trim()) close();
@@ -2600,6 +2622,41 @@ function renderArticleForm(fm) {
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
+  if ($('lt-url')) {
+    let bodyTouched = false; $('f-body').addEventListener('focus', () => { bodyTouched = true; });
+    const ltHint = (m) => { $('lt-hint').textContent = m; };
+    const ltLine = (url, src) => `::embed ${url}${src ? ` | ${src}` : ''}`;
+    const ltInsert = (url, src) => {
+      const b = $('f-body'), pos = bodyTouched ? b.selectionStart : b.value.length;
+      const before = b.value.slice(0, pos).replace(/\s+$/, ''), after = b.value.slice(pos).replace(/^\s+/, '');
+      b.value = (before ? before + '\n\n' : '') + ltLine(url, src) + '\n\n' + after; b.value = b.value.replace(/\s+$/, '') + '\n';
+      b.dispatchEvent(new Event('input'));
+    };
+    const ltAuto = async (u) => {
+      if ($('lt-src').value.trim()) return;
+      const k = embedKind(u);
+      const ep = k.name.startsWith('YouTube') ? `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(u)}` : k.name === 'Spotify' ? `https://open.spotify.com/oembed?url=${encodeURIComponent(u)}` : '';
+      if (!ep) { if (k.name === 'Apple Podcasts') ltHint(`${k.icon} 偵測到：${k.name}。請自己填節目名稱當來源`); return; }
+      try { const r = await fetch(ep); if (!r.ok) return; const d = await r.json(); const nm = d.author_name ? `${d.author_name}《${d.title}》` : (d.title || ''); if (nm && !$('lt-src').value.trim()) { $('lt-src').value = nm; ltHint(`${k.icon} 偵測到：${k.name}。來源名稱已自動帶入，記得確認一下`); } } catch (_) { /* 抓不到名稱就請他自己填 */ }
+    };
+    $('lt-url').addEventListener('input', () => { const u = $('lt-url').value.trim(); if (!/^https?:\/\/\S+$/.test(u)) { ltHint(''); return; } const k = embedKind(u); ltHint(`${k.icon} 偵測到：${k.name}`); ltAuto(u); });
+    $('lt-paste').addEventListener('click', async () => {
+      let u = ''; try { u = (await navigator.clipboard.readText()).trim(); } catch (_) { toast('瀏覽器不讓我讀剪貼簿，請手動貼在上面的欄位，再按「插入正文」'); $('lt-url').focus(); return; }
+      if (!/^https?:\/\/\S+$/.test(u)) { toast('剪貼簿裡不是網址，先複製影片或 Podcast 的連結'); return; }
+      $('lt-url').value = u; const k = embedKind(u); ltHint(`${k.icon} 偵測到：${k.name}`); await ltAuto(u);
+      ltInsert(u, $('lt-src').value.trim()); toast($('lt-src').value.trim() ? '已插入，來源也標好了' : '已插入，請到正文那一行補上「｜來源名稱」');
+    });
+    $('lt-add').addEventListener('click', () => { const u = $('lt-url').value.trim(); if (!/^https?:\/\/\S+$/.test(u)) { toast('先貼上連結'); return; } ltInsert(u, $('lt-src').value.trim()); toast('已插入正文'); });
+    $('lt-go').addEventListener('click', () => {
+      const u = $('lt-url').value.trim(), src = $('lt-src').value.trim(), q = $('lt-quote').value.trim(), v = $('lt-view').value.trim(), parts = [];
+      if (u) { if (!/^https?:\/\/\S+$/.test(u)) { toast('連結格式不對，要以 https:// 開頭'); return; } parts.push(ltLine(u, src)); }
+      if (q) parts.push(q.split('\n').map(l => '> ' + l.replace(/^>\s*/, '')).join('\n'));
+      if (v) parts.push(v);
+      if (!parts.length) { toast('三格都是空的，至少寫一格'); return; }
+      const b = $('f-body'); if (b.value.trim() && !confirm('正文已經有內容，要用這三格取代嗎？\n（想保留現有內容請按取消，改用「插入正文」）')) return;
+      b.value = parts.join('\n\n') + '\n'; b.dispatchEvent(new Event('input')); toast('已放進正文，可以用「看成品預覽」確認');
+    });
+  }
   const GD = [['cause', 'Why', 'gd-cause', /^(Why|我遇到的問題)/i], ['solution', 'How', 'gd-solution', /^(How|我的做法)/i], ['view', 'What', 'gd-view', /^(What|我的看法|我的觀點|我怎麼看)/i], ['next', 'Next', 'gd-next', /^(Next|接下來)/i], ['faq', '常見問題', 'gd-faq', /^(常見問題|FAQ|Q&A)/i]];
   const gdRead = (md) => {
     const parts = {}; let cur = null; const other = [];
