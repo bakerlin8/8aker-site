@@ -350,6 +350,35 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
   .log li{padding-bottom:18px;}
   .back{margin-top:40px;}
 }
+
+/* ───── 手機版 B 方案：分頁籤（≤720px）。網頁版維持雜誌式長頁。作品資料不用另外填，手機版自動套用 ───── */
+.mm{display:none;}
+.mm-cta{display:none;}
+@media(max-width:720px){
+  .mm{display:block;}
+  .mg{overflow:clip;padding-bottom:20px;}
+  .mm-tabs{position:sticky;top:var(--navh,60px);z-index:30;display:flex;gap:2px;overflow-x:auto;padding:0 12px;background:var(--night);border-bottom:1px solid var(--line);scrollbar-width:none;}
+  .mm-tabs::-webkit-scrollbar{display:none;}
+  .mm-tabs button{flex:none;appearance:none;background:none;border:0;border-bottom:2px solid transparent;color:var(--ash);font:inherit;font-size:14.5px;min-height:48px;padding:0 13px;cursor:pointer;}
+  .mm-tabs button[aria-selected="true"]{color:#EBD3A8;border-bottom-color:var(--gold);}
+  .mm-tabs button:focus-visible{outline:2px solid var(--gold);outline-offset:-4px;}
+  .mm-p{padding:24px 20px 0;background:var(--night);color:var(--bone);}
+  .mm-p[hidden]{display:none;}
+  .mm-p.scr{padding-top:20px;}
+  .mm-p .mg-plate{margin:0;}
+  .mm-p .mg-toc{margin-top:22px;}
+  .mm-p>section>h2:not(summary h2){display:none;}
+  .mm-p>section#log>h2{display:none;}
+  .mm-p .mg-fold{margin-top:30px;}
+  .mm-p .mg-cta{margin-top:36px;}
+  .mm-pad{height:96px;background:var(--night);}
+  .mm-cta{position:fixed;left:0;right:0;bottom:0;z-index:40;display:block;padding:10px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 12px) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(to top,var(--night) 72%,transparent);transform:translateY(110%);transition:transform .35s var(--ease,ease);pointer-events:none;}
+  .mm-cta.on{transform:none;pointer-events:auto;}
+  .mm-cta a{display:flex;width:100%;}
+  .mm-cta .go-site::after,.mm-cta .mg-go::after{display:none;}
+  .mg-chip{bottom:calc(env(safe-area-inset-bottom,0px) + 84px);}
+}
+@media(prefers-reduced-motion:reduce){.mm-cta{transition:none;}}
 </style>
 <div class="wpage" style={colorVars(C)}>
 {!mag && <header class="wh" data-layout={layout}>
@@ -419,37 +448,39 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
     </nav>
   </div>
 </header>}
+{mag && <div class="mm" id="mm" hidden></div>}
+{mag && <div class="mm-cta" id="mmCta" aria-hidden="true"></div>}
 {layout === 'h' && vid && <div class="cinema" aria-label="介紹影片"><div class="frame">{vid.kind === 'file'
   ? <video src={vid.src} controls preload="metadata" playsinline data-auto></video>
   : <iframe src={vid.src} title={`${w.title} 介紹影片`} loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>}</div></div>}
 <main class="wb">
   <div class="wb-in">
-    {mag && w.bg && <section aria-label="背景原因" class="mg-sec"><h2>背景原因<small>BACKGROUND</small></h2>
+    {mag && w.bg && <section aria-label="背景原因" class="mg-sec" data-mm="bg" data-mm-t="背景"><h2>背景原因<small>BACKGROUND</small></h2>
       <p class="mg-lead">{w.bg.lead}</p>
       <ol class="mg-prob">{(w.bg.problems || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ol>
       {w.bg.close && <p class="mg-extra">{w.bg.close}</p>}</section>}
-    {mag && how && <section aria-label="怎麼試玩" class="mg-sec"><h2>怎麼試玩<small>TRY IT</small></h2>
+    {mag && how && <section aria-label="怎麼試玩" class="mg-sec" data-mm="how" data-mm-t="怎麼試玩"><h2>怎麼試玩<small>TRY IT</small></h2>
       <ol class="mg-steps">{(how.steps || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ol>
       {how.notice && <p class="mg-note">{how.notice}</p>}
       {how.extra && <p class="mg-extra">{how.extra}</p>}</section>}
-    {mag && w.impact && <section aria-label="成效" class="mg-sec"><h2>成效<small>RESULT</small></h2>
+    {mag && w.impact && <section aria-label="成效" class="mg-sec" data-mm="impact" data-mm-t="成效"><h2>成效<small>RESULT</small></h2>
       {w.impact.live && <p class="mg-live"><i aria-hidden="true"></i>{w.impact.live}</p>}
       <p class="mg-lead">{w.impact.lead}</p>
       <ul class="mg-rows">{(w.impact.rows || []).map((r: any) => <li><b>{r.item}</b><span class="ba"><span class="bf"><small>以前</small>{r.before}</span><span class="af"><small>現在</small>{r.after}</span></span><em><small>省下</small>{r.saved}</em></li>)}</ul>
       {w.impact.total && <p class="mg-total"><b>{w.impact.total}</b><span>{w.impact.cost}</span></p>}
       {w.impact.extra && <p class="mg-extra">{w.impact.extra}</p>}
       {w.impact.joke && <p class="mg-joke">{w.impact.joke}</p>}</section>}
-    {mag && w.future && <section aria-label="未來規劃" class="mg-sec mg-fold"><details open id="mgFut"><summary><h2>未來規劃<small>NEXT</small></h2></summary>
+    {mag && w.future && <section aria-label="未來規劃" class="mg-sec mg-fold" data-mm="future"><details open id="mgFut"><summary><h2>未來規劃<small>NEXT</small></h2></summary>
       <p class="mg-lead">{w.future.lead}</p>
       <div class="mg-fut"><div><h3 class="mg-sub">可以再新增的功能</h3><ul>{(w.future.add || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div>
       <div><h3 class="mg-sub">想再優化的地方</h3><ul>{(w.future.improve || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div></div></details></section>}
-    {mag && w.cta && <section aria-label="下一步" class="mg-cta"><h2>{w.cta.title}</h2><p>{w.cta.body}</p>
+    {mag && w.cta && <section aria-label="下一步" class="mg-cta" data-mm="cta"><h2>{w.cta.title}</h2><p>{w.cta.body}</p>
       <div class="acts">{/^\/[a-z0-9\/-]*$/.test(w.cta.href || '') && <a class="go-site mg-go" href={w.cta.href} data-want={engage ? '' : undefined}><span><b>{w.cta.primary}</b></span><i aria-hidden="true">→</i></a>}
       {link && <a class="go-log" href={link} target="_blank" rel="noopener" data-play={engage ? '' : undefined}>{w.cta.secondary} <span aria-hidden="true">↗</span></a>}</div></section>}
     {!mag && imgs.length > 0 && <section aria-label="畫面"><h2>畫面<small>SCREENS</small></h2>
       <div class={`gal${imgs.length === 1 ? ' one' : ''}`}>{imgs.map((src, i) => (
         <figure><button type="button" data-lb={src} data-cap={caps[i] || ''} aria-label={`放大第 ${i + 1} 張畫面`}><img src={src} alt={caps[i] || `${w.title} 畫面 ${i + 1}`} loading={i ? 'lazy' : 'eager'} decoding="async" /></button>{caps[i] && <figcaption>{caps[i]}</figcaption>}</figure>))}</div></section>}
-    <section aria-label="作品日誌" id="log"><h2>作品日誌<small>LOG</small></h2>
+    <section aria-label="作品日誌" id="log" data-mm="log" data-mm-t="日誌"><h2>作品日誌<small>LOG</small></h2>
       {log.length > 0
         ? <ol class="log">{log.map((e) => <li><time datetime={e.date.toISOString().slice(0, 10)}>{dot(e.date)}</time><a href={e.url}>{e.title}</a>{e.excerpt && <p>{e.excerpt}</p>}</li>)}</ol>
         : <p class="empty">做這個作品時寫下的日常紀錄，會自動整理在這裡。</p>}
@@ -465,6 +496,55 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 (function(){var d=document.getElementById('lb') as HTMLDialogElement|null;if(!d||!d.showModal)return;var im=d.querySelector('img') as HTMLImageElement,cp=d.querySelector('p') as HTMLElement;
   document.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('[data-lb]') as HTMLElement|null;if(!b)return;im.src=b.dataset.lb||'';im.alt=b.dataset.cap||'';cp.textContent=b.dataset.cap||'';d.showModal();});
   d.addEventListener('click',function(e){if(e.target===d||(e.target as HTMLElement).closest('.x'))d.close();});})();
+
+
+/* 手機版：把畫面、怎麼試玩、成效、背景、日誌排成分頁籤；回到寬螢幕時自動還原。內容沒有複製，只是搬位置 */
+(function(){var mm=document.getElementById('mm') as HTMLElement|null,bar=document.getElementById('mmCta') as HTMLElement|null;if(!mm||!bar)return;
+  var hdr=document.querySelector('header.mg') as HTMLElement,mq=matchMedia('(max-width:720px)');
+  var moved:{n:HTMLElement,p:Node,s:Node|null}[]=[],io:IntersectionObserver|null=null,navh=0;
+  function mv(n:HTMLElement|null,to:HTMLElement){if(!n)return;moved.push({n:n,p:n.parentNode as Node,s:n.nextSibling});to.appendChild(n);}
+  function q(s:string){return document.querySelector(s) as HTMLElement|null;}
+  function build(){
+    var top=document.getElementById('top');navh=top?Math.round(top.getBoundingClientRect().height):60;document.documentElement.style.setProperty('--navh',navh+'px');
+    var defs:{k:string,t:string,els:(HTMLElement|null)[]}[]=[
+      {k:'scr',t:'畫面',els:[q('.mg-plate'),q('.mg-toc')]},
+      {k:'how',t:'怎麼試玩',els:[q('[data-mm=how]')]},
+      {k:'impact',t:'成效',els:[q('[data-mm=impact]'),q('[data-mm=future]')]},
+      {k:'bg',t:'背景',els:[q('[data-mm=bg]')]},
+      {k:'log',t:'日誌',els:[q('[data-mm=log]'),q('[data-mm=cta]')]}
+    ].filter(function(d){return d.els.some(Boolean);});
+    var tabs=document.createElement('div');tabs.className='mm-tabs';tabs.setAttribute('role','tablist');
+    var panels:HTMLElement[]=[];
+    defs.forEach(function(d,i){
+      var b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.textContent=d.t;b.setAttribute('aria-selected',String(i===0));b.dataset.k=d.k;tabs.appendChild(b);
+      var p=document.createElement('div');p.className='mm-p'+(d.k==='scr'?' scr':'');p.hidden=i!==0;p.setAttribute('role','tabpanel');p.dataset.k=d.k;d.els.forEach(function(e){mv(e,p);});mm!.appendChild(p);panels.push(p);
+    });
+    mm!.insertBefore(tabs,mm!.firstChild);
+    var pad=document.createElement('div');pad.className='mm-pad';mm!.appendChild(pad);
+    function pick(k:string,scroll:boolean){
+      tabs.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-selected',String((b as HTMLElement).dataset.k===k));});
+      panels.forEach(function(p){p.hidden=p.dataset.k!==k;});
+      if(scroll){var y=tabs.getBoundingClientRect().top+scrollY-navh+1;if(scrollY>y)window.scrollTo({top:y});}
+    }
+    tabs.addEventListener('click',function(e){var b=(e.target as HTMLElement).closest('button') as HTMLElement|null;if(b)pick(b.dataset.k||'scr',true);});
+    // 「看作品日誌」連結：切到日誌分頁
+    document.querySelectorAll('a[href="#log"]').forEach(function(a){(a as any)._mm=function(e:Event){if(!mq.matches)return;e.preventDefault();pick('log',false);var y=tabs.getBoundingClientRect().top+scrollY-navh+1;window.scrollTo({top:y,behavior:'smooth'});};a.addEventListener('click',(a as any)._mm);});
+    if(location.hash==='#log')pick('log',false);
+    // 底部固定的行動按鈕：主要按鈕捲出畫面之後才出現
+    var src=hdr.querySelector('.acts > .go-site') as HTMLElement|null||q('[data-mm=cta] .go-site');
+    if(src){var c=src.cloneNode(true) as HTMLElement;c.classList.remove('mg-go');c.removeAttribute('id');bar!.appendChild(c);
+      if('IntersectionObserver' in window){var ac=hdr.querySelector('.acts') as HTMLElement||src;io=new IntersectionObserver(function(es){bar!.classList.toggle('on',!es[0].isIntersecting);},{rootMargin:'-'+navh+'px 0px 0px 0px'});io.observe(ac);}}
+    mm!.hidden=false;
+  }
+  function destroy(){
+    if(io){io.disconnect();io=null;}
+    while(moved.length){var m=moved.pop()!;m.p.insertBefore(m.n,m.s);}
+    mm!.innerHTML='';mm!.hidden=true;bar!.innerHTML='';bar!.classList.remove('on');
+    document.querySelectorAll('a[href="#log"]').forEach(function(a){if((a as any)._mm){a.removeEventListener('click',(a as any)._mm);(a as any)._mm=null;}});
+  }
+  function sync(){if(mq.matches){if(!moved.length)build();}else if(moved.length)destroy();}
+  sync();(mq.addEventListener?mq.addEventListener('change',sync):mq.addListener(sync));
+})();
 
 /* 雜誌版：目次切換畫面、手機同步、自動導覽（預設關閉） */
 (function(){var shot=document.getElementById('mgShot') as HTMLElement|null;if(!shot)return;
