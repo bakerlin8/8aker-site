@@ -218,6 +218,7 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 .mg-rows{list-style:none;margin:24px 0 0;padding:0;}
 .mg-rows li{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:6px 20px;align-items:baseline;padding:14px 0;border-top:1px solid rgba(239,229,214,.12);font-size:14px;color:var(--bone-2);}
 .mg-rows li:last-child{border-bottom:1px solid rgba(239,229,214,.12);}
+.mg-rows .ba{display:contents;}
 .mg-rows b{font-family:var(--serif);font-weight:500;font-size:15px;color:var(--bone);}
 .mg-rows small{display:none;font-size:11.5px;letter-spacing:.18em;color:var(--ash);margin-right:8px;}
 .mg-rows em{font-style:normal;color:var(--gold-hi,#EBD3A8);}
@@ -271,6 +272,84 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
 @media(prefers-reduced-motion:reduce){.mg-go::after,.mg-go b,.mg-go i{animation:none!important;}.mg-go b{background:none;color:#1C0F14;-webkit-text-fill-color:#1C0F14;}}
 @media(max-width:900px){.wh[data-layout="v"] .wh-in{grid-template-columns:1fr;gap:40px;}.wpage{--frame:300px;}}
 @media(max-width:720px){.wh{padding:96px 20px 48px;}.wh .ba{grid-template-columns:1fr;gap:18px;}.wb{padding:44px 20px 80px;}.wh .wq{font-size:16px;}.cinema{padding:0;margin-top:0;}.cinema .frame{border-left:0;border-right:0;}.acts>a{flex:1 1 100%;justify-content:space-between;}}
+
+/* ───── 手機版整理（≤720px）：資訊分層、少一點線條、目次改成橫滑 ───── */
+.mg-fold summary{list-style:none;cursor:default;}
+.mg-fold summary::-webkit-details-marker{display:none;}
+@media(max-width:720px){
+  /* 開頭：標題區更緊湊，主要按鈕突出，次要連結變成文字 */
+  .mg{padding:84px 20px 36px;}
+  .mg-spread{margin-top:22px;row-gap:30px;}
+  .mg-h1 .en{font-size:clamp(46px,15vw,64px);}
+  .mg-h1 .zh{margin-top:10px;font-size:19px;letter-spacing:.1em;}
+  .mg-tags{margin-top:14px;}
+  .mg-deck{margin-top:18px;font-size:16px;line-height:1.9;}
+  .mg .acts{margin-top:20px;gap:6px;}
+  .mg .acts>.go-site{flex:1 1 100%;}
+  .go-log{border:0;min-height:40px;padding:0;justify-content:center;color:#B9A89E;font-size:13.5px;border-bottom:0;}
+  .mg .acts>.go-log{flex:1 1 100%;}
+  .mg-cta .acts>.go-log{border:1px solid rgba(239,229,214,.2);min-height:48px;padding:0 16px;}
+  /* 這是手機工具：有手機截圖的畫面，直接放大顯示手機版；沒有才顯示電腦版 */
+  .mg-fig:has(.mg-ph:not(.off)) .mg-desk,.mg-fig:has(.mg-ph:not(.off))::before{display:none;}
+  .mg-fig:has(.mg-ph:not(.off)) .mg-ph{position:relative;left:auto;right:auto;bottom:auto;width:min(64%,250px);margin:0 auto;cursor:zoom-in;}
+  .mg-cap{margin-top:20px;}
+  .mg-cap ul{display:none;}
+  .mg-cap .tt{font-size:17px;}
+  .mg-cap p{font-size:13.5px;}
+  /* 目次：一排可橫滑的小標籤，不再佔掉半個畫面 */
+  .mg-toc{margin-top:26px;padding-top:12px;}
+  .mg-toc-h{letter-spacing:.2em;}
+  .mg-groups,.mg-groups.cw{display:flex;gap:6px 22px;margin:12px -20px 0;padding:0 20px 8px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding-left:20px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .mg-groups::-webkit-scrollbar{display:none;}
+  .mg-grp{flex:none;scroll-snap-align:start;}
+  .mg-grp h3{margin-bottom:8px;font-size:12.5px;white-space:nowrap;}
+  .mg-grp h3 b{margin-right:6px;font-size:12px;letter-spacing:.14em;}
+  .mg-grp .mg-items,.mg-grp.gF .mg-items,.mg-grp.gO .mg-items,.mg-grp .mg-items.ic{display:flex;gap:8px;}
+  .mg-items button{flex:none;display:flex;align-items:baseline;gap:7px;padding:7px 14px;border:1px solid rgba(239,229,214,.2);border-radius:999px;white-space:nowrap;min-height:40px;align-items:center;}
+  .mg-items button::before{display:none;}
+  .mg-items .n{font-size:15px;}
+  .mg-items .t{margin-top:0;font-size:14px;}
+  .mg-items button[aria-pressed="true"]{border-color:#D4A24C;background:rgba(75,22,35,.6);}
+  /* 內文：區塊間距小一點、編號跟標題同一排 */
+  .wb{padding:36px 20px 72px;}
+  .wb section+section{margin-top:40px;}
+  .wb h2{font-size:20px;margin-bottom:14px;}
+  .mg-lead{font-size:16px;line-height:1.9;}
+  .mg-prob,.mg-steps{margin-top:18px;gap:0;}
+  .mg-prob li,.mg-steps li{grid-template-columns:26px 1fr;column-gap:6px;row-gap:2px;padding:12px 0;}
+  .mg-prob li::before,.mg-steps li::before{grid-row:1 / span 2;font-size:22px;line-height:1.3;}
+  .mg-prob li:first-child,.mg-steps li:first-child{border-top-color:rgba(212,162,76,.38);}
+  .mg-prob li,.mg-steps li{border-top-color:rgba(239,229,214,.1);}
+  .mg-prob b,.mg-steps b{font-size:15.5px;}
+  .mg-prob span,.mg-steps span{font-size:13.5px;line-height:1.75;}
+  .mg-extra{font-size:14px;line-height:1.85;}
+  .mg-note{margin-top:16px;font-size:13.5px;}
+  /* 成效：每項「項目＋省下」一行、「以前→現在」一行 */
+  .mg-rows{margin-top:16px;}
+  .mg-rows li{grid-template-columns:1fr auto;gap:2px 12px;padding:12px 0;align-items:baseline;}
+  .mg-rows b{grid-column:1;margin:0;font-size:15px;}
+  .mg-rows em{grid-column:2;grid-row:1;font-size:13.5px;white-space:nowrap;}
+  .mg-rows em small{display:none;}
+  .mg-rows .ba{display:block;grid-column:1 / -1;grid-row:2;font-size:13px;line-height:1.7;color:var(--ash);}
+  .mg-rows .ba>span{display:inline;}
+  .mg-rows .bf::after{content:' → ';color:var(--gold);}
+  .mg-rows .ba small{display:inline;margin-right:5px;font-size:11px;letter-spacing:.1em;}
+  .mg-rows .af{color:var(--bone-2);}
+  .mg-total{margin-top:18px;}
+  .mg-joke{font-size:15px;}
+  /* 未來規劃：手機預設收合，點標題展開 */
+  .mg-fold summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;}
+  .mg-fold summary h2{margin:0;}
+  .mg-fold summary::after{content:'＋';font-size:18px;color:var(--gold);}
+  .mg-fold details[open] summary::after{content:'－';}
+  .mg-fold details[open] summary h2{margin-bottom:14px;}
+  .mg-fut{gap:8px;}
+  .mg-sub{margin:18px 0 6px;}
+  .mg-cta{margin-top:48px;padding-top:32px;}
+  .mg-cta p{font-size:15px;line-height:1.9;}
+  .log li{padding-bottom:18px;}
+  .back{margin-top:40px;}
+}
 </style>
 <div class="wpage" style={colorVars(C)}>
 {!mag && <header class="wh" data-layout={layout}>
@@ -356,14 +435,14 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
     {mag && w.impact && <section aria-label="成效" class="mg-sec"><h2>成效<small>RESULT</small></h2>
       {w.impact.live && <p class="mg-live"><i aria-hidden="true"></i>{w.impact.live}</p>}
       <p class="mg-lead">{w.impact.lead}</p>
-      <ul class="mg-rows">{(w.impact.rows || []).map((r: any) => <li><b>{r.item}</b><span><small>以前</small>{r.before}</span><span><small>現在</small>{r.after}</span><em><small>省下</small>{r.saved}</em></li>)}</ul>
+      <ul class="mg-rows">{(w.impact.rows || []).map((r: any) => <li><b>{r.item}</b><span class="ba"><span class="bf"><small>以前</small>{r.before}</span><span class="af"><small>現在</small>{r.after}</span></span><em><small>省下</small>{r.saved}</em></li>)}</ul>
       {w.impact.total && <p class="mg-total"><b>{w.impact.total}</b><span>{w.impact.cost}</span></p>}
       {w.impact.extra && <p class="mg-extra">{w.impact.extra}</p>}
       {w.impact.joke && <p class="mg-joke">{w.impact.joke}</p>}</section>}
-    {mag && w.future && <section aria-label="未來規劃" class="mg-sec"><h2>未來規劃<small>NEXT</small></h2>
+    {mag && w.future && <section aria-label="未來規劃" class="mg-sec mg-fold"><details open id="mgFut"><summary><h2>未來規劃<small>NEXT</small></h2></summary>
       <p class="mg-lead">{w.future.lead}</p>
       <div class="mg-fut"><div><h3 class="mg-sub">可以再新增的功能</h3><ul>{(w.future.add || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div>
-      <div><h3 class="mg-sub">想再優化的地方</h3><ul>{(w.future.improve || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div></div></section>}
+      <div><h3 class="mg-sub">想再優化的地方</h3><ul>{(w.future.improve || []).map((x: any) => <li><b>{x.t}</b><span>{x.d}</span></li>)}</ul></div></div></details></section>}
     {mag && w.cta && <section aria-label="下一步" class="mg-cta"><h2>{w.cta.title}</h2><p>{w.cta.body}</p>
       <div class="acts">{/^\/[a-z0-9\/-]*$/.test(w.cta.href || '') && <a class="go-site mg-go" href={w.cta.href} data-want={engage ? '' : undefined}><span><b>{w.cta.primary}</b></span><i aria-hidden="true">→</i></a>}
       {link && <a class="go-log" href={link} target="_blank" rel="noopener" data-play={engage ? '' : undefined}>{w.cta.secondary} <span aria-hidden="true">↗</span></a>}</div></section>}
@@ -394,24 +473,31 @@ dialog.lb .x{position:fixed;top:14px;right:16px;width:44px;height:44px;border:0;
   var btns=Array.prototype.slice.call(document.querySelectorAll('.mg-items button')) as HTMLElement[];
   var toc=document.getElementById('mgToc') as HTMLElement,play=document.getElementById('mgPlay') as HTMLElement,cap=document.getElementById('mgCap') as HTMLElement,url=document.getElementById('mgUrl') as HTMLElement;
   var data:any[]=JSON.parse((document.getElementById('mgData') as HTMLElement).textContent||'[]');
-  var cur=0,auto=false,timer:any=0,DUR=4500;
+  var cur=0,auto=false,timer:any=0,DUR=4500,small=matchMedia('(max-width:720px)').matches;
   function esc(t:string){return t.replace(/[&<>]/g,function(c){return c==='&'?'&amp;':c==='<'?'&lt;':'&gt;';});}
   function show(i:number){cur=i;var s=data[i];
     imgs.forEach(function(im,k){im.classList.toggle('on',k===i);});
     var hasPh=false;phImgs.forEach(function(im){var on=im.getAttribute('data-for')===String(i);im.classList.toggle('on',on);if(on)hasPh=true;});
     ph.classList.toggle('off',!hasPh);
+    var on=phImgs.filter(function(im){return im.classList.contains('on');})[0] as HTMLImageElement|undefined;if(on){ph.setAttribute('data-lb',on.getAttribute('src')||'');ph.setAttribute('data-cap',s.title);}else{ph.removeAttribute('data-lb');}
     btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-i')===String(i)));});
     if(url)url.textContent=s.url||'';
     shot!.setAttribute('data-lb',s.src);shot!.setAttribute('data-cap',s.title);
     cap.innerHTML='<span class="no">Fig. '+(i+1)+'</span><span class="tt">'+esc(s.title)+'</span><p>'+esc(s.note||'')+'</p><ul>'+(s.points||[]).map(function(t:string){return '<li>'+esc(t)+'</li>';}).join('')+'</ul>';
     toc.classList.toggle('auto',auto);
+    if(small){var cb=btns[i],bx=cb&&cb.closest('.mg-groups') as HTMLElement|null;if(cb&&bx)bx.scrollTo({left:cb.offsetLeft+(cb.offsetParent===bx?0:(cb.offsetParent as HTMLElement).offsetLeft)-bx.clientWidth/2+cb.offsetWidth/2,behavior:'smooth'});}
     clearTimeout(timer);if(auto)timer=setTimeout(function(){show((cur+1)%data.length);},DUR);}
   btns.forEach(function(b){b.addEventListener('click',function(){auto=false;play.setAttribute('aria-pressed','false');play.textContent='自動導覽';show(+(b.getAttribute('data-i')||0));});});
   play.addEventListener('click',function(){auto=!auto;play.setAttribute('aria-pressed',String(auto));play.textContent=auto?'暫停':'自動導覽';show(cur);});
+  var sx=0,sy=0;(document.querySelector('.mg-fig') as HTMLElement).addEventListener('touchstart',function(e:any){sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  (document.querySelector('.mg-fig') as HTMLElement).addEventListener('touchend',function(e:any){var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.5){auto=false;play.setAttribute('aria-pressed','false');play.textContent='自動導覽';show((cur+(dx<0?1:data.length-1))%data.length);}},{passive:true});
   var calm=matchMedia('(prefers-reduced-motion: reduce)').matches;if(calm)DUR=7000;
-  if(!calm){auto=true;play.setAttribute('aria-pressed','true');play.textContent='暫停';show(cur);}
+  if(!calm&&!small){auto=true;play.setAttribute('aria-pressed','true');play.textContent='暫停';show(cur);}
   if('IntersectionObserver' in window){new IntersectionObserver(function(es){if(!es[0].isIntersecting)clearTimeout(timer);else if(auto)show(cur);},{threshold:.2}).observe(toc);}
 })();
+
+/* 手機：未來規劃預設收合 */
+(function(){var d=document.getElementById('mgFut') as HTMLDetailsElement|null;if(d&&matchMedia('(max-width:720px)').matches)d.open=false;})();
 
 /* Instagram 嵌入：依 Instagram 回傳的實際高度調整，不會被裁切或留白 */
 (function(){var f=document.querySelector('iframe[data-ig]') as HTMLIFrameElement|null;if(!f)return;
