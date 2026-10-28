@@ -12,6 +12,16 @@
       "permanent": true
     },
     {
+      "source": "/pillars/conjure/bjt-tracker-making",
+      "destination": "/pillars/operate/bjt-tracker-making/",
+      "statusCode": 301
+    },
+    {
+      "source": "/pillars/conjure/bjt-tracker-making/",
+      "destination": "/pillars/operate/bjt-tracker-making/",
+      "statusCode": 301
+    },
+    {
       "source": "/site",
       "has": [
         {
