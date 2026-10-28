@@ -23,6 +23,7 @@
   - 公開與否只看 `draft`（`true` = 網站看不到）。`status` 是給後台區分「草稿」與「暫時關閉」用：`paused` = 暫時關閉。
   - 正文有「## 常見問題」＋「### 問題」時，文章頁會自動輸出 FAQ 結構化資料。
 - `src/pages/`：頁面。`src/components/`：元件（`BodyPanel.astro` 是強化頁的身體儀表板）。`src/data/`：站上文案與資料（works、pillars、site-copy 等）。
+- 作品單頁 `src/pages/works/[slug].astro`：**網頁版**（>720px）是雜誌式長頁；**手機版**（≤720px）自動變成「分頁籤」（畫面／怎麼試玩／成效／背景／日誌）加底部固定行動按鈕。新增作品不用另外做手機版，作品資料（works.json 的 groups／bg／how／impact／future／cta）填好就自動套用；每張畫面建議附 `mobile` 手機截圖，手機版會優先顯示。改版面時兩種都要檢查。
 - `public/studio/index.html`：**Studio 後台**（單一大檔案，寫文章、收件匣、AI 佇列、身體資料）。大改時再考慮拆檔。
 - `api/`：Vercel 函式——Google 登入（只有站長帳號）、`/api/gh`（以 GitHub App 代為讀寫 repo）、`studio_verify` 等。
 - `supabase/functions/`：9 支後端函式的**唯一原始碼**（見該資料夾的 README）。改完要再部署到 Supabase；不要只在後台改。
