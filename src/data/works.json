@@ -8,6 +8,7 @@
       "spent": "—",
       "saved": "—",
       "service": "ai",
+      "tag": "本站",
       "why": "想有一個地方，把做過的事好好留下來，而不是散落在各個社群裡。",
       "result": "現在打開 Studio 就能自己發文、改內容，不用再找人幫忙。",
       "slug": "site",
@@ -329,7 +330,7 @@
       "color": "",
       "title_en": "Stay Check-in",
       "title_zh": "入住登記與通知系統",
-      "tag": "工具",
+      "tag": "範例站",
       "kicker": "具現 ・ 作品",
       "deck": "客人先在線上登記，登記完成就自動通知現場人員。點開就能玩，所有資料都是虛構的。",
       "cta_label": "試玩範例",
@@ -564,7 +565,7 @@
       "color": "",
       "title_en": "Renovation Budget & Cash Flow Tracker",
       "title_zh": "報價與資金追蹤",
-      "tag": "工具",
+      "tag": "範例站",
       "kicker": "具現 ・ 作品",
       "deck": "一頁看懂報價、匯率、現金餘額跟工程進度。",
       "how": {
@@ -697,7 +698,7 @@
       "color": "",
       "title_en": "Renovation Material Spec Sheet (ZH–JA)",
       "title_zh": "選材規格書",
-      "tag": "工具",
+      "tag": "範例站",
       "kicker": "具現 ・ 作品",
       "deck": "一份網頁，兩種語言，裝修廠商跟屋主都看得懂。",
       "how": {
@@ -830,7 +831,7 @@
       "color": "",
       "title_en": "BJT Battle Tracker",
       "title_zh": "BJT 作戰進度表",
-      "tag": "工具",
+      "tag": "範例站",
       "kicker": "具現 ・ 作品",
       "deck": "把商務日文考試的備考進度、錯題和聽力，收在一支手機就能用的小工具裡。",
       "groups": [
