@@ -20,7 +20,7 @@ const endRing = buildRing(copy.birth_date);
 // 結尾區塊的文字：都可以在 Studio「首頁文案 → 結尾」修改；沒填就用這裡的預設
 const C0: Record<string, string> = {
   end_cd_before: '第 {n} 圈，還有', end_cd_after: '長完這一圈',
-  subscribe_unit: '', pay1_name: '', pay1_sub: '', pay1_amt: '', pay1_url: '', pay2_name: '', pay2_sub: '', pay2_amt: '', pay2_url: '', pay3_name: '', pay3_sub: '', pay3_amt: '', pay3_url: '', subscribe_btn: 'Stripe 支持澆個水', subscribe_note: '單次支持・金額由你決定',
+  subscribe_unit: '', stripe_on: 'off', pay1_nt: '', pay2_nt: '', pay3_nt: '', pay1_name: '', pay1_sub: '', pay1_amt: '', pay1_url: '', pay2_name: '', pay2_sub: '', pay2_amt: '', pay2_url: '', pay3_name: '', pay3_sub: '', pay3_amt: '', pay3_url: '', subscribe_btn: 'Stripe 支持澆個水', subscribe_note: '單次支持・金額由你決定',
   tw_bank_on: 'on', tw_bank_msg: '轉好了之後，我會用您留下的聯絡方式與您聯繫。', tw_bank_sub: '留下稱呼，就能看到轉帳帳號',
   tw_show: 'on', tw_text: '在台灣？也可以轉帳**單筆支持**。',
   tw_link: '請我喝杯咖啡・私訊 @{ig}',
@@ -84,7 +84,10 @@ const pageData = {
   start: copy.countdown_start, target: copy.countdown_target, birth: copy.birth_date, ringLabel: copy.ring_label,
 };
 const safeHref = (u: string) => (/^(\/(?!\/)|https:\/\/)/.test(u || '') ? u : '');
-const payTiers = [1, 2, 3].map((n) => ({ name: C[`pay${n}_name`], sub: C[`pay${n}_sub`], amt: C[`pay${n}_amt`], url: safeHref(C[`pay${n}_url`]) })).filter((t) => t.name && t.url);
+const stripeOn = C.stripe_on === 'on'; // Stripe 暫停：先隱藏付款按鈕，連結仍保留在 site-copy，之後改成 on 就會回來
+const allTiers = [1, 2, 3].map((n) => ({ n, name: C[`pay${n}_name`], sub: C[`pay${n}_sub`], amt: C[`pay${n}_amt`], nt: String(C[`pay${n}_nt`] || '').replace(/[^\d]/g, ''), url: safeHref(C[`pay${n}_url`]) })).filter((t) => t.name);
+const payTiers = stripeOn ? allTiers.filter((t) => t.url) : [];
+const bankMorph = !stripeOn && bankOn && allTiers.length > 0 && C.tw_show !== 'off';
 const stays = (services.stays as any[]).filter((st) => /^https:\/\/(www\.)?airbnb\.[a-z.]+\//i.test(st.url || '') && st.name).map((st) => ({ ...st, img: /^https:\/\//.test(st.img || '') ? st.img : '' }));
 // 祈願所：「我可以幫忙」連到需求填表，並帶入是哪個願望、需要什麼
 // 祈願所：四種燈籠（Goal／Habit／Fun／Idea），不用百分比，亮度由「階段」決定
@@ -927,6 +930,10 @@ dialog.wp-dlg::backdrop{background:rgba(10,4,6,.72);backdrop-filter:blur(3px);}
 .twb-f .twb-opts input{position:absolute;inset:0;width:100%;min-height:0;height:100%;opacity:0;margin:0;cursor:pointer;}
 .twb-opts label:has(input:checked){border-color:#A07A3A;background:#F3E3C4;box-shadow:inset 0 0 0 1px #A07A3A;}
 .twb-opts label:has(input:focus-visible){outline:2px solid #D4A24C;outline-offset:2px;}
+.twb-tiers{grid-template-columns:repeat(2,minmax(0,1fr));}
+.twb-tiers label{flex-direction:column;gap:2px;padding:8px 4px;min-height:58px;}
+.twb-tiers small{font-size:12px;color:#7A6A6C;letter-spacing:.04em;}
+.twb-trow dd{font-size:16px;}
 .twb-cin{display:block;margin-top:12px;}
 .twb-cin[hidden]{display:none;}
 .twb-cin em{display:block;font-style:normal;font-size:12px;letter-spacing:.12em;color:#7A6A6C;margin-bottom:6px;}
@@ -1389,7 +1396,7 @@ document.addEventListener('DOMContentLoaded',function(){var S=document.querySele
           <h3>{copy.subscribe_title}</h3>{copy.subscribe_desc && <p class="sdesc">{copy.subscribe_desc}</p>}
           {copy.subscribe_price && <div class="r"><b>{copy.subscribe_price}</b>{C.subscribe_unit && <span>{C.subscribe_unit}</span>}</div>}
           <div class="cta-pair">
-          {payTiers.length > 0 ? <div class="pay-morph" id="payMorph">
+          {stripeOn && payTiers.length > 0 ? <div class="pay-morph" id="payMorph">
             <button type="button" class="give-cta pm-face" aria-expanded="false" aria-controls="pmTiers">
               <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
               <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
@@ -1402,12 +1409,26 @@ document.addEventListener('DOMContentLoaded',function(){var S=document.querySele
                 {t.amt && <em class="pay-a num">{t.amt}</em>}
               </a>)}
             </div>
-          </div> : (safeHref(copy.subscribe_url) && <a class="give-cta" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">
+          </div> : (stripeOn && safeHref(copy.subscribe_url) && <a class="give-cta" href={safeHref(copy.subscribe_url)} target="_blank" rel="noopener">
   <span class="gc-ic" aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 1C14 9 18 13 18 18.5A8 8 0 0 1 2 18.5C2 13 6 9 10 1Z"/><ellipse cx="7" cy="17.5" rx="1.8" ry="3" fill="#fff" opacity=".7"/></svg><i></i></span>
             <span class="gc-t"><b>{C.subscribe_btn}</b>{C.subscribe_note && <small>{C.subscribe_note}</small>}</span>
             <span class="gc-ar" aria-hidden="true">↗</span>
           </a>)}
-          {(igUrl || bankOn) && C.tw_show !== 'off' && <div class="tw-wrap">
+          {bankMorph && <div class="pay-morph" id="payMorph">
+            <button type="button" class="give-cta tw-cta pm-face" aria-expanded="false" aria-controls="pmTiers" data-ig={igUrl || undefined}>
+              <span class="gc-ic" aria-hidden="true"><svg class="cup" viewBox="0 0 28 28"><path class="stm" d="M10 3c-1.5 1.6 1.5 2.8 0 4.6M15 2.5c-1.5 1.6 1.5 2.8 0 4.6"/><path class="body" d="M5 11h15v6.5a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6Z"/><path class="hd" d="M20 13.2h1.6a2.6 2.6 0 0 1 0 5.2H19.6"/></svg></span>
+              <span class="gc-t"><b>{fillIg(C.tw_link)}</b><small>{C.tw_bank_sub}</small></span>
+              <span class="gc-ar" aria-hidden="true">＋</span>
+            </button>
+            <div class="pm-tiers" id="pmTiers" role="group" aria-label="台灣轉帳，選一個支持項目">
+              {allTiers.map((t, i) => <button type="button" class={`give-cta pay-t t${i + 1}`} data-bank="1" data-tier={t.n} aria-haspopup="dialog" aria-label={`${t.name} ${t.nt ? 'NT$' + t.nt : (t.amt || '')}`}>
+                <img class="pt-ic" src={`/img/pay-${t.n}.webp`} alt="" width="34" height="34" loading="lazy" />
+                <span class="pt-n">{t.name}</span>
+                {(t.nt || t.amt) && <em class="pay-a num">{t.nt ? 'NT$' + Number(t.nt).toLocaleString('en-US') : t.amt}</em>}
+              </button>)}
+            </div>
+          </div>}
+          {!bankMorph && (igUrl || bankOn) && C.tw_show !== 'off' && <div class="tw-wrap">
             <a class="give-cta tw-cta" href={bankOn ? '#tw-bank' : igUrl} target={bankOn ? undefined : '_blank'} rel="noopener" data-bank={bankOn ? '1' : undefined} data-ig={igUrl || undefined} aria-haspopup={bankOn ? 'dialog' : undefined}>
               <span class="gc-ic" aria-hidden="true"><svg class="cup" viewBox="0 0 28 28"><path class="stm" d="M10 3c-1.5 1.6 1.5 2.8 0 4.6M15 2.5c-1.5 1.6 1.5 2.8 0 4.6"/><path class="body" d="M5 11h15v6.5a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6Z"/><path class="hd" d="M20 13.2h1.6a2.6 2.6 0 0 1 0 5.2H19.6"/></svg></span>
               <span class="gc-t"><b>{fillIg(C.tw_link)}</b>{bankOn ? <small>{C.tw_bank_sub}</small> : C.tw_text && <small>{fillIg(C.tw_text).replace(/\*\*/g, '')}</small>}</span>
@@ -1436,6 +1457,11 @@ document.addEventListener('DOMContentLoaded',function(){var S=document.querySele
             <h3 id="twb-h">{fillIg(C.tw_link)}</h3>
             <form class="twb-form" data-step="ask" novalidate>
               <p class="twb-lead">留下稱呼和聯絡方式，就會顯示轉帳帳號。<br>收到後我會親自跟你說謝謝。</p>
+              {allTiers.length > 0 && <div class="twb-f twb-tier" role="group" aria-labelledby="twb-tr-l"><span id="twb-tr-l">支持項目（可不選）</span>
+                <div class="twb-opts twb-tiers">
+                  {allTiers.map((t) => <label><input type="radio" name="tier" value={t.n} data-nm={t.name} data-nt={t.nt}><b>{t.name}</b><small>{t.sub}{t.nt ? '・NT$' + Number(t.nt).toLocaleString('en-US') : ''}</small></label>)}
+                  <label><input type="radio" name="tier" value="0" data-nm="" data-nt=""><b>自訂</b><small>金額自己決定</small></label>
+                </div></div>}
               <label class="twb-f"><span>稱呼</span><input name="name" autocomplete="nickname" maxlength="60" required placeholder="怎麼稱呼你"></label>
               <div class="twb-f twb-ct" role="group" aria-labelledby="twb-ct-l"><span id="twb-ct-l">聯絡方式</span>
                 <div class="twb-opts">
@@ -1452,6 +1478,7 @@ document.addEventListener('DOMContentLoaded',function(){var S=document.querySele
             </form>
             <div class="twb-show" data-step="show" hidden>
               <dl class="twb-dl">
+                <div class="twb-trow" hidden><dt>項目</dt><dd data-tier-line></dd></div>
                 <div><dt>銀行</dt><dd data-f="name"></dd></div>
 
                 <div><dt>戶名</dt><dd data-f="holder"></dd></div>
@@ -1775,13 +1802,15 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
       .then(function(){btn.disabled=false;});});})();
 
 /* 台灣轉帳：留下稱呼＋聯絡方式 → 由 Supabase tw-bank 回傳帳號 → 轉好後回報末五碼＋金額（帳號不在網頁原始碼裡） */
-(function(){var D=document.getElementById('twBank'),B=document.querySelector('[data-bank]');if(!D||!B)return;
-  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/tw-bank',KEY='twb1',ig=B.dataset.ig||'',t0=0,cur=null;
+(function(){var D=document.getElementById('twBank'),Bs=[].slice.call(document.querySelectorAll('[data-bank]')),B=Bs[0];if(!D||!B)return;
+  var API='https://gsaqrjovipnfiedvjaeb.supabase.co/functions/v1/tw-bank',KEY='twb1',ig=((document.querySelector('[data-ig]')||B).dataset.ig)||'',t0=0,cur=null,pend='';
   var F=D.querySelector('[data-step=ask]'),S=D.querySelector('[data-step=show]'),R=D.querySelector('[data-step=report]'),K=D.querySelector('[data-step=done]');
   function step(x){[F,S,R,K].forEach(function(el){el.hidden=el!==x;});var i=x.querySelector('input');if(i&&x!==S)setTimeout(function(){i.focus();},60);}
   function load(){try{var v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&Date.now()-v.ts<14*864e5)return v;}catch(e){}return null;}
   function save(v){try{localStorage.setItem(KEY,JSON.stringify(v));}catch(e){}}
-  function fillBank(k){D.querySelectorAll('[data-f]').forEach(function(el){el.textContent=k[el.dataset.f]||'';});}
+  function fillBank(k){D.querySelectorAll('[data-f]').forEach(function(el){el.textContent=k[el.dataset.f]||'';});showTier();}
+  function tierEl(id){return id?F.querySelector('input[name=tier][value="'+id+'"]'):null;}
+  function showTier(){var row=D.querySelector('.twb-trow'),el=cur&&tierEl(cur.tier);if(!row)return;if(el&&el.dataset.nm){row.hidden=false;row.querySelector('[data-tier-line]').textContent=el.dataset.nm+(el.dataset.nt?'・NT$'+Number(el.dataset.nt).toLocaleString('en-US'):'');}else row.hidden=true;}
   function err(form,m){var e=form.querySelector('.twb-err');e.textContent=m;e.hidden=!m;}
   function post(body){return fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(d){return {s:r.status,d:d};});});}
   var T={ig:{l:'Instagram 帳號',ph:'例：baker_tw',pre:'Instagram @'},line:{l:'LINE ID',ph:'你的 LINE ID',pre:'LINE '},email:{l:'Email',ph:'例：name@example.com',pre:'Email '}};
@@ -1791,10 +1820,11 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
   function fill(c){F.name.value=(c&&c.name)||'';var t=c&&c.ctype,v=c&&c.cval;
     if(!t&&c&&c.contact){var m=String(c.contact).match(/^(Instagram @|LINE |Email )(.*)$/);if(m){t=m[1].charAt(0)==='I'?'ig':m[1].charAt(0)==='L'?'line':'email';v=m[2];}}
     var r=t&&F.querySelector('input[name=ctype][value='+t+']');if(r){r.checked=true;pick(t);F.contact.value=v||'';}}
-  B.addEventListener('click',function(e){e.preventDefault();t0=Date.now();cur=load();
-    if(cur&&cur.bank&&!cur.done){fillBank(cur.bank);step(S);}else{if(cur&&cur.done)fill(cur);step(F);}
-    if(D.showModal)D.showModal();else D.setAttribute('open','');});
-  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-edit]')){fill(cur||load());step(F);}if(e.target.closest('[data-paid]')){step(R);}});
+  Bs.forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();t0=Date.now();cur=load();pend=b.dataset.tier||'';
+    var tr=pend&&tierEl(pend);if(tr)tr.checked=true;
+    if(cur&&cur.bank&&!cur.done){if(pend){cur.tier=pend;save(cur);}fillBank(cur.bank);step(S);}else{if(cur&&cur.done)fill(cur);step(F);}
+    if(D.showModal)D.showModal();else D.setAttribute('open','');});});
+  D.addEventListener('click',function(e){if(e.target===D||e.target.closest('[data-close]'))D.close();if(e.target.closest('[data-back]'))step(S);if(e.target.closest('[data-edit]')){fill(cur||load());step(F);}if(e.target.closest('[data-paid]')){var te=cur&&tierEl(cur.tier);if(te&&te.dataset.nt&&!R.amount.value)R.amount.value=te.dataset.nt;step(R);}});
   var G=F.querySelector('.twb-go');
   F.addEventListener('submit',function(e){e.preventDefault();err(F,'');
     var name=F.name.value.trim(),cv=F.contact.value.trim(),rc=F.querySelector('input[name=ctype]:checked'),ct=rc?rc.value:'';
@@ -1803,11 +1833,11 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     if(ct==='ig'){cv=cv.replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/[\/?#].*$/,'').replace(/^@+/,'');if(!/^[A-Za-z0-9._]{1,30}$/.test(cv)){err(F,'Instagram 帳號只會有英文、數字、底線和點');F.contact.focus();return;}}
     else if(ct==='line'){if(cv.length<2||/\s/.test(cv)){err(F,'請填寫 LINE ID（不含空格）');F.contact.focus();return;}}
     else{if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cv)){err(F,'Email 格式好像不太對，請再確認');F.contact.focus();return;}}
-    F.contact.value=cv;var contact=T[ct].pre+cv;
-    if(cur&&cur.bank&&!cur.done&&cur.name===name&&cur.contact===contact){fillBank(cur.bank);step(S);return;}
+    F.contact.value=cv;var contact=T[ct].pre+cv;var trc=F.querySelector('input[name=tier]:checked'),tid=trc?trc.value:'';
+    if(cur&&cur.bank&&!cur.done&&cur.name===name&&cur.contact===contact){cur.tier=tid;save(cur);fillBank(cur.bank);step(S);return;}
     G.disabled=true;G.textContent='讀取中…';
     post({name:name,contact:contact,website:F.website.value,t:Date.now()-t0,lang:navigator.language||''}).then(function(x){
-      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,ctype:ct,cval:cv,ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
+      if(x.d&&x.d.ok&&x.d.bank){cur={id:x.d.id,bank:x.d.bank,name:name,contact:contact,ctype:ct,cval:cv,tier:tid,ts:Date.now()};save(cur);fillBank(x.d.bank);step(S);G.disabled=false;G.textContent='顯示轉帳帳號';return;}
       if(x.d&&x.d.error==='not_ready'){err(F,'轉帳帳號準備中，先請您 IG 私訊我，謝謝！');if(ig){G.textContent='改用 IG 私訊';G.disabled=false;G.onclick=function(ev){ev.preventDefault();window.open(ig,'_blank','noopener');};return;}}
       else err(F,(x.d&&x.d.error)||'暫時無法顯示，請稍後再試');G.disabled=false;G.textContent='顯示轉帳帳號';})
       .catch(function(){err(F,'網路好像不太穩，請再試一次');G.disabled=false;G.textContent='顯示轉帳帳號';});});
@@ -1819,7 +1849,7 @@ requestAnimationFrame(function(){requestAnimationFrame(function(){hero.classList
     if(!/^\d{5}$/.test(l5)){err(R,'末五碼請填 5 個數字');R.last5.focus();return;}if(!(+am>=1)){err(R,'請填寫轉帳金額');R.amount.focus();return;}
     if(!cur||!cur.id){err(R,'找不到剛剛的紀錄，請重新索取帳號');return;}
     H.disabled=true;H.textContent='送出中…';
-    post({action:'report',id:cur.id,last5:l5,amount:am,msg:R.msg.value,website:''}).then(function(x){H.disabled=false;H.textContent='送出';
+    var te2=tierEl(cur.tier),tp=te2&&te2.dataset.nm?'【'+te2.dataset.nm+'】':'';post({action:'report',id:cur.id,last5:l5,amount:am,msg:(tp+R.msg.value).slice(0,300),website:''}).then(function(x){H.disabled=false;H.textContent='送出';
       if(x.d&&x.d.ok){cur.done=true;cur.ts=Date.now();save(cur);step(K);return;}
       if(x.s===404||x.s===400&&/紀錄/.test(x.d.error||'')){try{localStorage.removeItem(KEY);}catch(e){}}
       err(R,(x.d&&x.d.error)||'暫時無法送出，請稍後再試');})

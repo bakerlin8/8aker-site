@@ -81,5 +81,9 @@
   "pay3_name": "及時雨",
   "pay3_sub": "長一尺",
   "pay3_amt": "¥10,000",
-  "pay3_url": "https://buy.stripe.com/4gM14m57rcUpbe66vO1Jm04"
+  "pay3_url": "https://buy.stripe.com/4gM14m57rcUpbe66vO1Jm04",
+  "stripe_on": "off",
+  "pay1_nt": "200",
+  "pay2_nt": "1000",
+  "pay3_nt": "2000"
 }
