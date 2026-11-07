@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>不動產改建全流程工作法・試玩｜8AKER零</title>
+<meta name="description" content="買地到軟裝進場，每個階段該準備什麼文件。屋主、顧問、仲介各自要交什麼，點一下就看得到，也能自己改數字試算。">
+<meta name="theme-color" content="#3A0B17">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+TC:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* 設計方向：施工現場。混凝土灰的底、墨黑的線、安全黃只用在「現在在哪」的地方。
+   版面：頂部黃黑警示帶、現場看板當首屏、階段像工程表一樣橫排，文件區是兩欄的操作台。 */
+:root{
+  --concrete:#EADFCB;
+  --paper:#F8F2E6;
+  --ink:#3A0B17;
+  --haz:#C9A24D;
+  --ok:#3F6B4F;
+  --bad:#B0402C;
+  --mute:#7A6354;
+  --rule:#3A0B17;
+  --display:'Cormorant Garamond','Noto Serif TC','Songti TC',serif;
+  --body:'Noto Sans TC','Hiragino Sans','Yu Gothic',sans-serif;
+  --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{background:var(--concrete);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;box-shadow:0 0 0 6px var(--haz)}
+.tape{height:10px;background:var(--ink);border-bottom:3px solid var(--haz)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:20;background:var(--ink);color:var(--paper)}
+.nav .wrap{display:flex;align-items:center;gap:20px;height:48px}
+.brand{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.04em;white-space:nowrap}
+.brand span{color:var(--haz)}
+.nav ul{display:flex;gap:4px;list-style:none;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav ul::-webkit-scrollbar{display:none}
+.nav li a{display:block;padding:6px 12px;font-size:13.5px;font-weight:500;text-decoration:none;white-space:nowrap;border-radius:2px}
+.nav li a:hover{background:var(--haz);color:var(--ink)}
+
+/* hero */
+.hero{padding:44px 0 48px}
+.hero .wrap{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+h1{font-family:'Noto Serif TC','Cormorant Garamond',serif;font-weight:700;font-size:clamp(38px,6.4vw,72px);line-height:1.12;letter-spacing:.02em;margin:14px 0 18px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--haz);background:var(--ink);padding:0 .14em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.deck{max-width:34em;font-size:17px;color:#3a2328}
+.hero .go{display:inline-flex;gap:10px;align-items:center;margin-top:24px;background:var(--ink);color:var(--paper);padding:12px 20px;font-weight:700;text-decoration:none;border-radius:2px}
+.hero .go:hover{background:var(--haz);color:var(--ink)}
+.sign{background:var(--ink);color:var(--paper);border:1px solid var(--haz);outline:1px solid var(--haz);outline-offset:-7px;padding:18px 20px 20px;box-shadow:0 18px 40px rgba(58,11,23,.25)}
+.sign h2{font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.14em;text-align:center;border-bottom:1px solid var(--haz);padding-bottom:8px;margin-bottom:6px}
+.sign dl{display:grid;grid-template-columns:auto 1fr;gap:0}
+.sign dt,.sign dd{padding:8px 0;border-bottom:1px solid rgba(245,244,239,.22);font-size:14px}
+.sign dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--haz);display:flex;align-items:center;padding-right:18px}
+.sign dd{font-weight:500}
+.sign dl>*:nth-last-child(-n+2){border-bottom:0}
+.sign .fict{margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:rgba(245,244,239,.7)}
+
+/* section scaffolding */
+section.blk{padding:56px 0;border-top:3px solid var(--ink);background:var(--paper)}
+section.blk.alt{background:var(--concrete)}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+.sec-head h2{font-family:"Noto Serif TC","Cormorant Garamond",serif;font-weight:700;letter-spacing:.02em;font-size:clamp(32px,5.4vw,54px);line-height:1.05}
+.sec-head h2 small{display:block;font-family:var(--mono);font-weight:400;font-size:12px;letter-spacing:.14em;color:var(--mute);margin-bottom:6px}
+.sec-head p{max-width:30em;color:#3a2328;font-size:15px}
+
+/* role switch */
+.roles{display:inline-flex;border:1px solid var(--ink);background:var(--paper);flex-wrap:wrap}
+.roles button{padding:9px 18px;font-weight:700;font-size:14.5px;border-right:1px solid var(--ink)}
+.roles button:last-child{border-right:0}
+.roles button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.roles button:not([aria-pressed="true"]):hover{background:var(--haz)}
+.rolebar{display:flex;gap:16px 24px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.rolebar .lab{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--mute)}
+.meter{font-size:14px;color:#3a2328}
+.meter b{font-family:var(--mono);font-size:15px}
+
+/* stage rail */
+.rail{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--ink);background:var(--paper);overflow-x:auto;scroll-snap-type:x mandatory}
+.stg{position:relative;text-align:left;padding:12px 14px 14px;border-right:1px solid var(--ink);min-width:136px;scroll-snap-align:start;transition:background .15s}
+.stg:last-child{border-right:0}
+.stg:hover{background:#EFE4CE}
+.stg[aria-selected="true"]{background:var(--haz)}
+.stg .n{display:block;font-family:var(--display);font-weight:600;font-size:50px;line-height:1;font-style:italic}
+.stg .t{display:block;font-weight:700;font-size:15px;line-height:1.35;margin-top:4px}
+.stg .c{display:block;font-family:var(--mono);font-size:11.5px;margin-top:8px;color:var(--mute)}
+.stg[aria-selected="true"] .c{color:var(--ink)}
+.stg .bar{position:absolute;left:0;bottom:0;height:5px;background:var(--ink);transition:width .3s}
+
+.panel{margin-top:-2px;border:1px solid var(--ink);background:var(--paper);display:grid;grid-template-columns:minmax(220px,.8fr) 2fr}
+.panel .lhs{padding:24px;border-right:1px solid var(--ink);background:var(--ink);color:var(--paper);display:flex;flex-direction:column;gap:10px}
+.panel .lhs .big{font-family:var(--display);font-weight:700;font-size:88px;line-height:.9;color:var(--haz)}
+.panel .lhs h3{font-size:24px;font-weight:700;line-height:1.3}
+.panel .lhs .en{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:rgba(245,244,239,.7)}
+.panel .lhs .doc{margin-top:auto;display:inline-block;align-self:flex-start;background:var(--haz);color:var(--ink);font-weight:700;font-size:14px;padding:8px 14px;text-decoration:none;border-radius:2px}
+.panel .lhs .doc:hover{background:var(--paper)}
+.panel .lhs .nodoc{margin-top:auto;font-size:13px;color:rgba(245,244,239,.65)}
+.rows{display:grid;grid-template-columns:repeat(3,1fr)}
+.role-col{padding:22px 22px 24px;border-right:1px solid var(--ink);transition:opacity .2s}
+.role-col:last-child{border-right:0}
+.role-col.dim{opacity:.3}
+.chip{display:inline-block;font-weight:700;font-size:14px;letter-spacing:.06em;padding:3px 12px;border:1px solid var(--ink)}
+.chip.owner{background:var(--ink);color:var(--paper)}
+.chip.consultant{background:var(--haz)}
+.chip.agent{background:var(--paper)}
+.role-col .sub{font-size:12.5px;color:var(--mute);margin:8px 0 14px}
+.todo{list-style:none;display:grid;gap:8px}
+.todo button{display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--ink);background:var(--paper);font-weight:500;font-size:15px;line-height:1.45}
+.todo button:hover{background:#EFE4CE}
+.todo .box{flex:none;width:20px;height:20px;border:1px solid var(--ink);margin-top:1px;display:grid;place-items:center;background:var(--paper)}
+.todo button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.todo button[aria-pressed="true"] .box{background:var(--haz);border-color:var(--haz)}
+.todo button[aria-pressed="true"] .box::after{content:"";width:9px;height:5px;border-left:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:rotate(-45deg) translate(1px,-1px)}
+.todo button[aria-pressed="true"] span.tx{text-decoration:line-through;text-decoration-color:var(--haz);text-decoration-thickness:2px}
+.none{font-size:15px;color:var(--mute);padding:10px 12px;border:2px dashed #A8937F}
+
+/* funding */
+.dock{display:grid;grid-template-columns:1.6fr 1fr;gap:28px;align-items:start}
+.sheet{background:var(--paper);border:1px solid var(--ink)}
+.sheet-head{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ink)}
+.sheet-head div{padding:12px 14px;border-right:1px solid var(--ink)}
+.sheet-head div:last-child{border-right:0}
+.sheet-head .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--mute);display:block}
+.sheet-head .v{font-weight:700;font-size:14px;line-height:1.4}
+.sheet-head .v.mono{font-size:12.5px;font-weight:500}
+.item{display:grid;grid-template-columns:44px 1fr auto;gap:2px 14px;padding:16px 16px 14px;border-bottom:1px solid var(--ink);align-items:center}
+.item:last-child{border-bottom:0}
+.item .no{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;grid-row:span 2}
+.item h3{font-size:18px;font-weight:700;line-height:1.35}
+.item .amt{font-family:var(--mono);font-weight:500;font-size:19px;text-align:right}
+.item .note{grid-column:2/4;font-size:13.5px;color:#47292f;display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.pill{display:inline-flex;align-items:center;font-weight:700;font-size:12.5px;padding:2px 10px;border:1px solid var(--ink);letter-spacing:.04em}
+.pill.paid{background:var(--ok);color:#fff;border-color:var(--ok)}
+.pill.part{background:var(--haz);color:var(--ink)}
+.pill.unpaid{background:var(--bad);color:#fff;border-color:var(--bad)}
+.tog{font-weight:700;font-size:13px;padding:3px 12px;border:1px solid var(--ink);background:var(--paper)}
+.tog:hover{background:var(--haz)}
+.sheet-foot{border-top:1px solid var(--ink);padding:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;background:#EFE4CE}
+.sheet-foot .lab{font-weight:700;font-size:16px;letter-spacing:.2em}
+.sheet-foot .lab small{display:block;font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.1em;color:var(--mute)}
+.sheet-foot .big{font-family:var(--display);font-weight:700;font-size:clamp(40px,6vw,60px);line-height:1}
+.meta2{display:flex;gap:6px 22px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--ink);font-size:13px;color:#3a2328}
+.meta2 b{font-family:var(--mono);font-weight:500}
+
+.desk{background:var(--ink);color:var(--paper);border:1px solid var(--ink);padding:20px;position:sticky;top:64px}
+.desk h3{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.04em;color:var(--haz)}
+.desk .hint{font-size:13px;color:rgba(245,244,239,.7);margin:2px 0 14px}
+.cash{display:grid;grid-template-columns:44px 1fr 44px;gap:0;border:2px solid var(--haz)}
+.cash button{background:var(--haz);color:var(--ink);font-weight:700;font-size:22px;line-height:1;padding:8px 0}
+.cash button:hover{background:var(--paper)}
+.cash input{width:100%;min-width:0;background:transparent;border:0;color:var(--paper);font-family:var(--mono);font-size:22px;text-align:center;padding:8px 4px}
+.cash input:focus-visible{outline:none;box-shadow:none;background:rgba(242,188,14,.15)}
+.cashlab{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:rgba(245,244,239,.7);display:block;margin-bottom:6px}
+input[type=range]{width:100%;margin:14px 0 4px;accent-color:var(--haz)}
+.stack{display:flex;height:22px;border:2px solid var(--paper);margin-top:16px;background:var(--ink)}
+.stack i{display:block;height:100%;transition:width .3s}
+.stack .p{background:var(--ok)}
+.stack .n{background:repeating-linear-gradient(-45deg,var(--haz) 0 5px,#8a6a2a 5px 10px)}
+.stack .l{background:#8a6f5a}
+.legend{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12px;margin-top:8px;color:rgba(245,244,239,.85)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px;border:1px solid var(--paper)}
+.legend .p::before{background:var(--ok)}
+.legend .n::before{background:repeating-linear-gradient(-45deg,var(--haz) 0 3px,#8a6a2a 3px 6px)}
+.legend .l::before{background:#8a6f5a}
+.calc{margin-top:16px;border-top:1px solid rgba(245,244,239,.3);padding-top:10px;display:grid;gap:4px}
+.calc div{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.calc b{font-family:var(--mono);font-weight:500}
+.verdict{margin-top:14px;padding:12px 14px;font-weight:700;font-size:15px;line-height:1.55;border:2px solid var(--haz);background:rgba(242,188,14,.12)}
+.verdict.good{border-color:#6fd3a3;background:rgba(111,211,163,.12)}
+.reset{margin-top:14px;font-size:13px;text-decoration:underline;text-underline-offset:3px;color:rgba(245,244,239,.8)}
+.reset:hover{color:var(--haz)}
+
+/* quote */
+.qrow{border-bottom:1px solid var(--ink)}
+.qrow:last-of-type{border-bottom:0}
+.qhead{display:grid;grid-template-columns:44px 30px 1fr auto auto;gap:12px;align-items:center;padding:14px 16px}
+.qhead .no{font-family:var(--display);font-weight:700;font-size:30px;line-height:1}
+.qhead h3{font-size:17px;font-weight:700}
+.qhead .amt{font-family:var(--mono);font-weight:500;font-size:18px}
+.chk{width:26px;height:26px;border:1px solid var(--ink);background:var(--paper);display:grid;place-items:center}
+.chk[aria-pressed="true"]{background:var(--haz)}
+.chk[aria-pressed="true"]::after{content:"";width:11px;height:6px;border-left:3px solid var(--ink);border-bottom:3px solid var(--ink);transform:rotate(-45deg) translate(1px,-1px)}
+.exp{font-family:var(--mono);font-size:13px;border:1px solid var(--ink);padding:2px 10px;background:var(--paper)}
+.exp:hover{background:var(--haz)}
+.qrow.off .qhead h3,.qrow.off .qhead .amt,.qrow.off .qhead .no{opacity:.35;text-decoration:line-through}
+.items{display:none;flex-wrap:wrap;gap:8px;padding:0 16px 16px 102px}
+.qrow.open .items{display:flex}
+.items span{border:1.5px solid var(--ink);background:#fff;padding:2px 10px;font-size:14px}
+.qrow.off .items span{opacity:.4}
+.cmp{margin-top:16px}
+.cmp .row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;color:rgba(245,244,239,.85)}
+.cmp .row b{font-family:var(--mono);font-weight:500;color:var(--paper)}
+.gauge{height:22px;border:2px solid var(--paper);position:relative;background:repeating-linear-gradient(90deg,transparent 0 calc(20% - 1px),rgba(245,244,239,.35) calc(20% - 1px) 20%)}
+.gauge i{position:absolute;inset:0 auto 0 0;background:var(--haz);transition:width .3s}
+
+/* journal */
+.jgrid{display:grid;grid-template-columns:1.5fr 1fr;gap:28px;align-items:start}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters button{border:1px solid var(--ink);padding:3px 14px;font-weight:700;font-size:14px;background:var(--paper)}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.filters button:not([aria-pressed="true"]):hover{background:var(--haz)}
+.posts{display:grid;gap:14px;list-style:none}
+.post{background:var(--paper);border:1px solid var(--ink);border-left-width:12px;padding:16px 18px}
+.post[data-c="資金"]{border-left-color:var(--ok)}
+.post[data-c="規格"]{border-left-color:var(--ink)}
+.post[data-c="軟裝"]{border-left-color:var(--haz)}
+.post[data-c="工班"]{border-left-color:var(--bad)}
+.post .m{display:flex;gap:12px;align-items:center;font-size:13px;color:var(--mute)}
+.post .m b{font-size:12.5px;color:var(--ink);border:1.5px solid var(--ink);padding:0 10px}
+.post .m time{font-family:var(--mono)}
+.post .m .mine{margin-left:auto;font-family:var(--mono);font-size:11px;background:var(--haz);color:var(--ink);padding:0 8px}
+.post h3{font-size:18px;font-weight:700;line-height:1.4;margin:8px 0 4px}
+.post p{font-size:15px;color:#3a2328}
+.empty{padding:20px;border:2px dashed #A8937F;color:var(--mute)}
+.form{background:var(--ink);color:var(--paper);padding:20px;border:1px solid var(--ink);position:sticky;top:64px}
+.form h3{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:.04em;color:var(--haz)}
+.form p.hint{font-size:13px;color:rgba(245,244,239,.7);margin:2px 0 14px}
+.form label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:rgba(245,244,239,.75);margin:12px 0 5px}
+.form input,.form select,.form textarea{width:100%;background:var(--paper);color:var(--ink);border:2px solid var(--paper);padding:9px 10px;font:inherit;font-size:15px;border-radius:0}
+.form textarea{min-height:92px;resize:vertical}
+.form input:focus-visible,.form select:focus-visible,.form textarea:focus-visible{box-shadow:0 0 0 3px var(--haz);outline:none}
+.form .row{display:flex;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap}
+.form .add{background:var(--haz);color:var(--ink);font-weight:700;padding:10px 18px;border:2px solid var(--haz)}
+.form .add:hover{background:var(--paper);border-color:var(--paper)}
+.form .err{color:#ffb4a5;font-size:13.5px;min-height:1.4em;margin-top:8px}
+
+/* closing */
+.cta{padding:56px 0;background:var(--haz);border-top:3px solid var(--ink)}
+.cta .wrap{display:flex;gap:24px 40px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.cta h2{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,52px);line-height:1.1;max-width:14em;text-wrap:balance}
+.cta p{max-width:32em;margin-top:10px}
+.cta a.btn{background:var(--ink);color:var(--paper);font-weight:700;padding:14px 24px;text-decoration:none;display:inline-block;white-space:nowrap}
+.cta a.btn:hover{background:var(--paper);color:var(--ink)}
+footer{background:var(--ink);color:rgba(245,244,239,.78);padding:24px 0 34px;font-size:13.5px}
+footer b{color:var(--haz);font-family:var(--mono);font-weight:500;letter-spacing:.06em}
+
+
+/* editing */
+.tog.danger{background:var(--bad);color:#fff;border-color:var(--bad)}
+.tog.danger:hover{background:#8d2f1f;color:#fff}
+.tog.ghost{border-style:dashed}
+.confirm{display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:13px}
+.addbar{padding:14px 16px;border-top:1px solid var(--ink);background:#EFE4CE}
+.addbtn{font-weight:700;font-size:14.5px;padding:8px 16px;border:1px dashed var(--ink);background:var(--paper)}
+.addbtn:hover{background:var(--haz)}
+.emptyrow{padding:22px 16px;color:var(--mute);border-bottom:1px solid var(--ink)}
+.eform{padding:16px;background:#EFE4CE;border-top:1px solid var(--ink)}
+.item.editing{display:block;padding:0}
+.item.editing .eform{border-top:0}
+.eform h4{font-size:15px;font-weight:700;margin-bottom:10px;font-family:'Noto Serif TC',serif}
+.eg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+.eg .wide{grid-column:1/3}
+.eform label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--mute)}
+.eform input,.eform select,.eform textarea{display:block;width:100%;margin-top:4px;background:#fff;color:var(--ink);border:1px solid var(--ink);padding:8px 10px;font:inherit;font-size:15px;border-radius:0}
+.eform textarea{min-height:70px;resize:vertical}
+.eform input.num{font-family:var(--mono)}
+.ebtns{display:flex;gap:10px;margin-top:14px;align-items:center;flex-wrap:wrap}
+.ebtns .save{background:var(--ink);color:var(--haz);font-weight:700;padding:8px 20px;border:1px solid var(--ink)}
+.ebtns .save:hover{background:var(--haz);color:var(--ink)}
+.ebtns .cancel{font-weight:700;padding:8px 16px;border:1px solid var(--ink);background:var(--paper)}
+.ebtns .cancel:hover{background:#EFE4CE}
+.ferr{color:var(--bad);font-weight:700;font-size:13.5px}
+.qact{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:0 16px 12px;align-items:center}
+.qrow.off .qact{opacity:1}
+.mini{display:flex;gap:6px;align-items:center}
+.mini input{width:9.5em;background:transparent;border:1px solid var(--haz);color:var(--paper);font-family:var(--mono);padding:3px 8px;font-size:14px;border-radius:0}
+.mini button{font-size:12.5px;font-weight:700;padding:3px 10px;background:var(--haz);color:var(--ink);border:1px solid var(--haz)}
+.mini button.c{background:transparent;color:var(--paper);border-color:rgba(248,242,230,.5)}
+.desk .editlink,.meta2 .editlink{font-size:12.5px;font-weight:700;padding:1px 10px;border:1px solid currentColor;margin-left:8px}
+.desk .editlink{color:var(--haz)}
+.desk .editlink:hover{background:var(--haz);color:var(--ink)}
+.meta2 .editlink:hover{background:var(--haz)}
+.over{color:var(--bad);font-weight:700}
+@media (max-width:560px){.eg{grid-template-columns:1fr}.eg .wide{grid-column:1}}
+
+/* readability */
+body{font-size:17px;line-height:1.85;letter-spacing:.01em}
+.wrap{padding:0 24px}
+.nav .wrap{height:54px}
+.brand{font-size:21px}
+.nav li a{font-size:15px;padding:8px 14px}
+.eyebrow{font-size:13px;letter-spacing:.1em}
+.deck{font-size:18.5px;line-height:1.9;max-width:31em}
+.hero{padding:56px 0 64px}
+section.blk{padding:80px 0}
+.sec-head{margin-bottom:36px}
+.sec-head h2 small{font-size:13px;letter-spacing:.1em;margin-bottom:8px}
+.sec-head p{font-size:16.5px;line-height:1.85;max-width:28em}
+.sign dt{font-size:13px;letter-spacing:.04em;font-family:var(--body)}
+.sign dt,.sign dd{padding:11px 0;font-size:16px}
+.sign .fict{font-size:12.5px}
+.rolebar .lab{font-size:13.5px;letter-spacing:.04em;font-family:var(--body)}
+.roles button{font-size:16px;padding:11px 20px;min-height:44px}
+.meter{font-size:16px}
+.stg{padding:16px 16px 18px;min-width:150px}
+.stg .t{font-size:16.5px;line-height:1.45;margin-top:6px}
+.stg .c{font-size:13.5px;margin-top:10px;font-family:var(--body)}
+.panel .lhs{padding:28px}
+.panel .lhs .en{font-size:12.5px}
+.panel .lhs .doc{font-size:15.5px;padding:10px 16px}
+.role-col{padding:26px 24px 28px}
+.chip{font-size:15.5px;padding:4px 14px}
+.role-col .sub{font-size:14.5px;margin:10px 0 16px}
+.todo{gap:10px}
+.todo button{font-size:16.5px;padding:13px 14px;min-height:48px;align-items:center}
+.none{font-size:16px;padding:13px 14px}
+/* sheet */
+.sheet-head{grid-template-columns:1fr 1fr}
+.sheet-head div{padding:14px 18px;border-bottom:1px solid var(--ink)}
+.sheet-head div:nth-child(2n){border-right:0}
+.sheet-head div:nth-last-child(-n+2){border-bottom:0}
+.sheet-head .k{font-size:12px;letter-spacing:.04em;font-family:var(--body);margin-bottom:3px}
+.sheet-head .v{font-size:16.5px;line-height:1.5}
+.sheet-head .v.mono{font-size:15px}
+.item{padding:18px 20px 16px;grid-template-columns:48px 1fr auto;gap:6px 16px;align-items:start}
+.item .no{font-size:36px;grid-row:span 3}
+.item h3{font-size:20px;line-height:1.45}
+.item .amt{font-size:21px}
+.item .note{grid-column:2/4;margin-top:2px;font-size:15.5px;gap:8px 14px}
+.item .nt{color:#47292f;line-height:1.7}
+.item .acts{grid-column:2/4;display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.pill{font-size:14px;padding:3px 12px}
+.tog{font-size:14.5px;padding:7px 16px;min-height:38px}
+.confirm{font-size:15px;gap:10px}
+.addbar{padding:18px 20px}
+.addbtn{font-size:16px;padding:11px 20px;min-height:44px}
+.sheet-foot{padding:22px 20px}
+.sheet-foot .lab{font-size:17px}
+.sheet-foot .lab small{font-size:12px;letter-spacing:.06em;font-family:var(--body)}
+.meta2{padding:14px 20px;font-size:15.5px;gap:8px 26px}
+.meta2 b{font-size:15.5px}
+/* desk */
+.desk{padding:26px 24px}
+.desk h3{font-size:28px}
+.desk .hint{font-size:15px;color:rgba(248,242,230,.85);margin:4px 0 18px}
+.cashlab{font-size:13px;letter-spacing:.04em;font-family:var(--body);color:rgba(248,242,230,.85)}
+.cash input{font-size:24px;padding:10px 4px}
+.cash button{font-size:24px;min-height:48px}
+.legend{font-size:14px;color:rgba(248,242,230,.9);gap:8px 16px}
+.calc{gap:8px;margin-top:20px;padding-top:14px}
+.calc div{font-size:15.5px;gap:14px;line-height:1.6}
+.verdict{font-size:16.5px;line-height:1.7;padding:14px 16px}
+.reset{font-size:14.5px;margin-top:16px;min-height:36px}
+.cmp .row{font-size:15.5px;margin-bottom:10px;align-items:center}
+.desk .editlink,.meta2 .editlink{font-size:14px;padding:4px 12px;min-height:32px}
+/* quote */
+.qhead{padding:18px 20px;gap:14px;grid-template-columns:48px 32px 1fr auto auto}
+.qhead .no{font-size:34px}
+.qhead h3{font-size:19px}
+.qhead .amt{font-size:20px}
+.chk{width:32px;height:32px}
+.exp{font-size:14.5px;padding:5px 14px;min-height:36px;font-family:var(--body)}
+.items{padding:0 20px 14px 114px;gap:10px}
+.items span{font-size:15.5px;padding:4px 12px}
+.qact{padding:0 20px 18px}
+/* forms */
+.eform{padding:20px}
+.eform h4{font-size:17px;margin-bottom:14px}
+.eform label{font-size:13.5px;letter-spacing:.02em;font-family:var(--body);color:#5b3f45}
+.eform input,.eform select,.eform textarea{font-size:16.5px;padding:11px 12px;margin-top:6px}
+.ebtns .save,.ebtns .cancel{font-size:16px;padding:10px 22px;min-height:44px}
+.ferr{font-size:15px}
+/* journal */
+.filters button{font-size:15.5px;padding:7px 18px;min-height:40px}
+.post{padding:20px 22px}
+.post .m{font-size:14.5px}
+.post .m b{font-size:14px;padding:1px 12px}
+.post h3{font-size:20px;margin:10px 0 6px}
+.post p{font-size:16.5px;line-height:1.85}
+.form{padding:24px}
+.form h3{font-size:28px}
+.form p.hint{font-size:15px;color:rgba(248,242,230,.85)}
+.form label{font-size:13.5px;letter-spacing:.02em;font-family:var(--body);color:rgba(248,242,230,.9)}
+.form input,.form select,.form textarea{font-size:16.5px;padding:11px 12px}
+.form .add{font-size:16px;min-height:46px;padding:10px 24px}
+.form .err{font-size:15px}
+.cta p{font-size:17.5px}
+.cta a.btn{font-size:17px;padding:16px 28px}
+footer{font-size:15px;line-height:1.8;padding:30px 0 40px}
+.sheet-bar{display:flex;justify-content:flex-end;align-items:center;gap:14px;padding:10px 14px;border-bottom:1px solid var(--ink);background:#EFE4CE}
+.hintline{margin-right:auto;font-size:14.5px;color:var(--mute)}
+.modebtn{font-weight:700;font-size:15px;padding:7px 18px;min-height:40px;border:1px solid var(--ink);background:var(--paper)}
+.modebtn:hover{background:var(--haz)}
+.modebtn[aria-pressed="true"]{background:var(--ink);color:var(--haz)}
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:1fr}
+  .dock,.jgrid{grid-template-columns:1fr}
+  .desk,.form{position:static}
+  .panel{grid-template-columns:1fr}
+  .panel .lhs{border-right:0;border-bottom:1px solid var(--ink);flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 16px}
+  .panel .lhs .big{font-size:64px}
+  .panel .lhs .doc,.panel .lhs .nodoc{margin-top:0;margin-left:auto}
+  .rows{grid-template-columns:1fr}
+  .role-col{border-right:0;border-bottom:1px solid var(--ink)}
+  .role-col:last-child{border-bottom:0}
+}
+@media (max-width:560px){
+  body{font-size:15.5px}
+  .nav .wrap{gap:10px}
+  .brand{font-size:16px}
+  .sheet-head{grid-template-columns:1fr 1fr}
+  .sheet-head div:nth-child(2){border-right:0}
+  .sheet-head div:nth-child(-n+2){border-bottom:1px solid var(--ink)}
+  .item{grid-template-columns:34px 1fr;padding:14px 12px}
+  .item .no{font-size:28px}
+  .item .amt{grid-column:2;text-align:left;font-size:18px}
+  .item .note{grid-column:1/3}
+  .qhead{grid-template-columns:34px 26px 1fr auto;gap:8px;padding:12px}
+  .qhead .exp{grid-column:2/5;justify-self:start}
+  .qhead .amt{font-size:16px}
+  .items{padding:0 12px 14px}
+  .sec-head{margin-bottom:20px}
+  section.blk{padding:40px 0}
+  .roles button{padding:8px 13px}
+}
+
+@media (max-width:560px){
+  body{font-size:16.5px}
+  .wrap{padding:0 18px}
+  .sheet-head{grid-template-columns:1fr}
+  .sheet-head div{border-right:0!important;border-bottom:1px solid var(--ink)!important}
+  .sheet-head div:last-child{border-bottom:0!important}
+  .item{grid-template-columns:36px 1fr;padding:18px 16px}
+  .item .no{font-size:30px;grid-row:span 4}
+  .item h3{font-size:19px}
+  .item .amt{grid-column:2;text-align:left;font-size:20px}
+  .item .note,.item .acts{grid-column:2}
+  .qhead{grid-template-columns:36px 32px 1fr auto;padding:16px}
+  .qhead .exp{grid-column:2/5;justify-self:start}
+  .items{padding:0 16px 14px}
+  .qact{padding:0 16px 16px;justify-content:flex-start}
+  .stg{min-width:140px}
+  .desk,.form{padding:22px 18px}
+  section.blk{padding:56px 0}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="tape" aria-hidden="true"></div>
+<nav class="nav" aria-label="頁面章節">
+  <div class="wrap">
+    <a class="brand" href="/" style="text-decoration:none;color:inherit">8AKER<span>零</span> ・ 改建全流程</a>
+    <ul>
+      <li><a href="#map">流程地圖</a></li>
+      <li><a href="#fund">資金總覽</a></li>
+      <li><a href="#quote">軟裝報價單</a></li>
+      <li><a href="#journal">進度日誌</a></li>
+      <li><a href="/works/renovation-workflow-playbook/">作品說明</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Renovation Project Workflow Playbook</div>
+      <h1>不動產改建<br><em>全流程</em><span style="white-space:nowrap">工作法</span></h1>
+      <p class="deck">買地到軟裝進場，每個階段該準備什麼文件，一次說清楚。屋主、顧問、仲介各自要交什麼，點一下就看得到。</p>
+      <a class="go" href="#map">開始試玩 <span aria-hidden="true">↓</span></a>
+    </div>
+    <aside class="sign" aria-label="範例案件看板">
+      <h2>案件資訊 ・ CASE SHEET</h2>
+      <dl>
+        <dt>工事名稱</dt><dd>一戶建 改建工事</dd>
+        <dt>物件</dt><dd>Osaka City, Naniwa Ward</dd>
+        <dt>施主</dt><dd>Emma Whitfield</dd>
+        <dt>報價日</dt><dd class="mono">2026/8/20</dd>
+        <dt>文件編號</dt><dd class="mono">8aker0-001 ／ 002 ／ 003</dd>
+        <dt>目前階段</dt><dd>軟裝進場採購</dd>
+      </dl>
+      <div class="fict">改編範例 ／ ADAPTED FROM A REAL CASE</div>
+    </aside>
+  </div>
+</header>
+
+<!-- 流程地圖 -->
+<section class="blk" id="map">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2><small>01 / WORKFLOW MAP</small>六個階段，三種角色</h2>
+      <p>點階段看清單，點項目打勾。切換身份，只留下跟你有關的那一欄。</p>
+    </div>
+    <div class="rolebar">
+      <span class="lab">身份視角</span>
+      <div class="roles" id="roles" role="group" aria-label="身份視角">
+        <button type="button" data-r="all" aria-pressed="true">全部</button>
+        <button type="button" data-r="owner" aria-pressed="false">我是屋主</button>
+        <button type="button" data-r="consultant" aria-pressed="false">我是顧問</button>
+        <button type="button" data-r="agent" aria-pressed="false">我是仲介</button>
+      </div>
+      <div class="meter" id="meter" aria-live="polite"></div>
+    </div>
+    <div class="rail" id="rail" role="tablist" aria-label="改建階段"></div>
+    <div class="panel" id="panel" role="tabpanel"></div>
+  </div>
+</section>
+
+<!-- 資金總覽 -->
+<section class="blk alt" id="fund">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2><small>02 / FUNDING OVERVIEW</small>資金總覽</h2>
+      <p>按右上角「編輯」，就能修改、刪除或新增款項。標成已付後，右邊會重算現金夠不夠。</p>
+    </div>
+    <div class="dock">
+      <div class="sheet">
+        <div class="sheet-bar"><span class="hintline" id="fundHint"></span><button type="button" class="modebtn" id="fundMode" aria-pressed="false">✎ 編輯</button></div>
+        <div class="sheet-head">
+          <div><span class="k">OWNER ・ 屋主</span><span class="v">Emma Whitfield</span></div>
+          <div><span class="k">PROPERTY ・ 物件</span><span class="v">Osaka City, Naniwa Ward</span></div>
+          <div><span class="k">QUOTE DATE ・ 報價日</span><span class="v mono">2026/8/20</span></div>
+          <div><span class="k">DOC NO. ・ 編號</span><span class="v mono">8aker0-001 ／ 002 ／ 003</span></div>
+        </div>
+        <div id="items"></div>
+        <div class="addbar" id="fundAdd"></div>
+        <div class="sheet-foot">
+          <div class="lab">報價總額<small>TOTAL ESTIMATED OUTLAY</small></div>
+          <div class="big num" id="total"></div>
+        </div>
+        <div class="meta2"><span id="capRow"></span><span id="savedRow"></span></div>
+      </div>
+      <aside class="desk" aria-label="現金試算">
+        <h3>現金試算</h3>
+        <p class="hint">輸入你手上有多少現金，看近期要付的錢夠不夠。</p>
+        <span class="cashlab">手上現金 CASH ON HAND</span>
+        <div class="cash">
+          <button type="button" id="cashDown" aria-label="現金減少十萬日圓">−</button>
+          <input id="cashIn" type="text" inputmode="numeric" aria-label="手上現金（日圓）" value="0">
+          <button type="button" id="cashUp" aria-label="現金增加十萬日圓">＋</button>
+        </div>
+        <input id="cashRange" type="range" min="0" max="8000000" step="100000" value="0" aria-label="手上現金滑桿">
+        <div class="stack" aria-hidden="true"><i class="p" id="sp"></i><i class="n" id="sn"></i><i class="l" id="sl"></i></div>
+        <div class="legend"><span class="p">已付</span><span class="n">近期待付</span><span class="l">後續待付</span></div>
+        <div class="calc">
+          <div><span>已付</span><b id="cPaid"></b></div>
+          <div><span>近期待付（改建尾款、冷氣）</span><b id="cNear"></b></div>
+          <div><span>後續待付（預留款、預備金）</span><b id="cLater"></b></div>
+        </div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+        <button class="reset" type="button" id="fundReset">還原範例數字</button>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 軟裝報價單 -->
+<section class="blk" id="quote">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2><small>03 / FURNISHING QUOTE</small>軟裝採購報價單</h2>
+      <p>勾掉某一類，總額就跟著變，再對照預留款。想改內容，按右上角「編輯」。</p>
+    </div>
+    <div class="dock">
+      <div class="sheet">
+        <div class="sheet-bar"><span class="hintline" id="qHint"></span><button type="button" class="modebtn" id="qMode" aria-pressed="false">✎ 編輯</button></div>
+        <div class="sheet-head">
+          <div><span class="k">OWNER ・ 屋主</span><span class="v">Emma Whitfield</span></div>
+          <div><span class="k">PROPERTY ・ 物件</span><span class="v">Osaka City, Naniwa Ward ・ 一戶建</span></div>
+          <div><span class="k">QUOTE DATE ・ 報價日</span><span class="v mono">2026/11/07</span></div>
+          <div><span class="k">DOC NO. ・ 編號</span><span class="v mono">—</span></div>
+        </div>
+        <div id="qrows"></div>
+        <div class="addbar" id="qAdd"></div>
+        <div class="sheet-foot">
+          <div class="lab">報價總額<small>TOTAL ESTIMATE</small></div>
+          <div class="big num" id="qtotal"></div>
+        </div>
+        <div class="meta2"><span>金額單位為日圓（JPY）。冰箱、洗衣機為近全新之二手機（新古機）。</span><span>窗簾含 3 個房間；床組為雙人 1 張、單人 2 張（含床架與床墊）。搬家費用不含於本報價。</span></div>
+      </div>
+      <aside class="desk" aria-label="與預留款對照">
+        <h3>對照預留款</h3>
+        <p class="hint">資金總覽的「傢俱家電預留款」。</p>
+        <div class="cmp">
+          <div class="row"><span>預留款</span><span id="resRow"></span></div>
+          <div class="row"><span>目前計入</span><b id="qsum"></b></div>
+          <div class="gauge" aria-hidden="true"><i id="qgauge"></i></div>
+        </div>
+        <div class="verdict" id="qverdict" aria-live="polite"></div>
+        <button class="reset" type="button" id="qReset">還原範例數字</button>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 進度日誌 -->
+<section class="blk alt" id="journal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2><small>04 / CASE JOURNAL ・ 功能構想</small>案件進度日誌</h2>
+      <p>每次有新文件或新進度，就寫成一篇短文。這是功能構想的示意，範例紀錄為改編；你新增的內容只留在這個頁面。</p>
+    </div>
+    <div class="jgrid">
+      <div>
+        <div class="filters" id="filters" role="group" aria-label="分類篩選"></div>
+        <ol class="posts" id="posts"></ol>
+      </div>
+      <form class="form" id="jform" novalidate>
+        <h3>寫一則進度</h3>
+        <p class="hint">重新整理頁面後會清空。</p>
+        <label for="jc">分類</label>
+        <select id="jc"><option>資金</option><option>規格</option><option>軟裝</option><option>工班</option></select>
+        <label for="jt">標題</label>
+        <input id="jt" type="text" maxlength="40" autocomplete="off" placeholder="例如：冷氣新調工程報價確認">
+        <label for="jb">內文</label>
+        <textarea id="jb" maxlength="300" placeholder="發生了什麼事、接下來要做什麼"></textarea>
+        <div class="err" id="jerr" role="alert"></div>
+        <div class="row">
+          <button class="add" type="submit">發布</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div>
+      <h2>你的改建案，現在卡在哪個階段？</h2>
+      <p>不管你是屋主、仲介，還是跟我一樣要同時應付工程、資金、溝通的顧問角色，都歡迎聊聊你目前需要整理哪些文件。</p>
+    </div>
+    <a class="btn" href="/chat/">預約聊聊 →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <b>改編範例 ADAPTED SAMPLE</b> 這個試玩頁改編自我實際處理的改建案，並用 AI 工具整理製作。物件地點（僅標示到大阪市區）、屋主姓名、金額與文件編號均已改編調整，不代表真實案件細節。你改的數字只留在這個畫面、不會上傳，重新整理就還原。
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var yen=function(n){return '¥'+Math.round(n).toLocaleString('en-US')};
+  var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+
+  /* ---------- 流程地圖 ---------- */
+  var ROLE_NAME={owner:'屋主',consultant:'顧問',agent:'仲介'};
+  var ROLE_SUB={owner:'需要準備／確認',consultant:'負責整理',agent:'需要提供'};
+  var STAGES=[
+    {n:'01',t:'買地選址',en:'Site selection',owner:['土地條件','預算範圍'],consultant:['物件評估','法規確認'],agent:['物件資料','土地謄本']},
+    {n:'02',t:'簽約交屋',en:'Contract & handover',owner:['購屋預算','付款時程'],consultant:['買賣費用明細','稅費試算'],agent:['交屋時程','物件現況']},
+    {n:'03',t:'工程報價比較',en:'Quote comparison',owner:['改建方向','預算上限'],consultant:['多版本報價比對'],agent:[],agentNote:'通常不涉及'},
+    {n:'04',t:'建材規格確認',en:'Spec check',owner:['款式與顏色喜好'],consultant:['中日對照規格書','型號核對'],agent:[],agentNote:'無'},
+    {n:'05',t:'資金與付款追蹤',en:'Funding tracking',owner:['核對已付／未付'],consultant:['資金總覽','換匯紀錄'],agent:[],agentNote:'無',doc:{href:'#fund',label:'看資金總覽範例 ↓'}},
+    {n:'06',t:'軟裝進場採購',en:'Furnishing & move-in',owner:['家具清單','驗收時間'],consultant:['軟裝報價單','進場排程'],agent:['協助確認交屋條件'],doc:{href:'#quote',label:'看軟裝報價單範例 ↓'}}
+  ];
+  var state={role:'all',stage:4,done:{}};
+  var ROLES=['owner','consultant','agent'];
+  function key(si,r,i){return si+'-'+r+'-'+i}
+  function scoped(){return state.role==='all'?ROLES:[state.role]}
+  function count(si){var tot=0,dn=0;scoped().forEach(function(r){STAGES[si][r].forEach(function(_,i){tot++;if(state.done[key(si,r,i)])dn++})});return [dn,tot]}
+  function renderMap(){
+    var rail=$('#rail');rail.innerHTML='';
+    STAGES.forEach(function(s,si){
+      var c=count(si);var b=document.createElement('button');
+      b.type='button';b.className='stg';b.setAttribute('role','tab');b.id='stg'+si;
+      b.setAttribute('aria-selected',si===state.stage?'true':'false');
+      b.innerHTML='<span class="n">'+s.n+'</span><span class="t">'+esc(s.t)+'</span><span class="c">'+(c[1]?c[0]+' / '+c[1]+' 項':'不需準備')+'</span><span class="bar" style="width:'+(c[1]?Math.round(c[0]/c[1]*100):0)+'%"></span>';
+      b.addEventListener('click',function(){state.stage=si;renderMap()});
+      rail.appendChild(b);
+    });
+    var sel=rail.children[state.stage];if(sel&&rail.scrollWidth>rail.clientWidth){rail.scrollLeft=sel.offsetLeft-(rail.clientWidth-sel.offsetWidth)/2}
+    var s=STAGES[state.stage];var p=$('#panel');p.setAttribute('aria-labelledby','stg'+state.stage);
+    var lhs='<div class="lhs"><div class="big">'+s.n+'</div><div><h3>'+esc(s.t)+'</h3><div class="en">'+esc(s.en.toUpperCase())+'</div></div>'+
+      (s.doc?'<a class="doc" href="'+s.doc.href+'">'+esc(s.doc.label)+'</a>':'<span class="nodoc">這個階段沒有附範例文件</span>')+'</div>';
+    var cols='<div class="rows">';
+    ROLES.forEach(function(r){
+      var dim=state.role!=='all'&&state.role!==r;
+      cols+='<div class="role-col'+(dim?' dim':'')+'"><span class="chip '+r+'">'+ROLE_NAME[r]+'</span><div class="sub">'+ROLE_SUB[r]+'</div>';
+      var list=s[r];
+      if(!list.length){cols+='<div class="none">'+esc(s.agentNote||'無')+'</div>'}
+      else{cols+='<ul class="todo">';list.forEach(function(t,i){var k=key(state.stage,r,i);var on=!!state.done[k];
+        cols+='<li><button type="button" data-k="'+k+'" aria-pressed="'+on+'"'+(dim?' tabindex="-1"':'')+'><span class="box" aria-hidden="true"></span><span class="tx">'+esc(t)+'</span></button></li>'});cols+='</ul>'}
+      cols+='</div>';
+    });
+    cols+='</div>';
+    p.innerHTML=lhs+cols;
+    p.querySelectorAll('.todo button').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.k;state.done[k]=!state.done[k];renderMap()})});
+    // 總覽
+    var tot=0,dn=0;STAGES.forEach(function(_,si){var c=count(si);tot+=c[1];dn+=c[0]});
+    var who=state.role==='all'?'三個角色合計':ROLE_NAME[state.role]+'的清單';
+    $('#meter').innerHTML=who+'，已準備 <b>'+dn+' / '+tot+'</b> 項';
+  }
+  $('#roles').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;state.role=b.dataset.r;
+    this.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});renderMap()});
+
+  /* ---------- 共用 ---------- */
+  var parseAmt=function(v){var d=String(v==null?'':v).replace(/[^\d]/g,'');var n=parseInt(d,10);return isNaN(n)?0:Math.min(n,99999999999)};
+  var fmtIn=function(n){return n?Number(n).toLocaleString('en-US'):''};
+  function focusFirst(host){var el=host.querySelector('input,textarea,select');if(el)el.focus()}
+  function numInput(name,val,label){return '<label>'+label+'<input class="num" name="'+name+'" inputmode="numeric" autocomplete="off" value="'+esc(fmtIn(val))+'" placeholder="0"></label>'}
+
+  /* ---------- 資金總覽 ---------- */
+  var BASE=[
+    {id:1,t:'買賣費用',amt:12980000,paid:12980000,note:'已確定・交屋時已全額支付',when:'near'},
+    {id:2,t:'改建費用（現行版）',amt:7650000,paid:4000000,note:'已確定・含稅未含監工費・已付簽約金＋開工金 ¥4,000,000',when:'near'},
+    {id:3,t:'不動產取得稅',amt:142300,paid:142300,note:'已確定（稅單金額）・已繳納完成',when:'near'},
+    {id:4,t:'冷氣新調工程（追加）',amt:356000,paid:0,note:'已確定・追加見積書 No.8aker0-004・含稅',when:'near'},
+    {id:5,t:'傢俱家電預留款',amt:1100000,paid:0,note:'概算・含冰箱、洗衣機、電視收納櫃組、床架組等・預計完工前安排購買',when:'later'},
+    {id:6,t:'其他費用・預備金',amt:3000000,paid:0,note:'概算・每個案件總額另外加列的預備費用',when:'later'}
+  ];
+  var CASH0=0,CAP0=26000000;
+  var cloneF=function(){return BASE.map(function(x){return Object.assign({},x)})};
+  var fMode=false,qMode=false;
+  var fund=cloneF(),cash=CASH0,CAP=CAP0,capEdit=false,fEdit=null,fDel=null,nextId=100;
+  function fstate(x){return x.paid>=x.amt&&x.amt>0?'paid':(x.paid>0?'part':'unpaid')}
+  var PILL={paid:'已付',part:'部分已付',unpaid:'未付'};
+  function fForm(x,isNew){
+    return '<form class="eform" data-f="fund" novalidate><h4>'+(isNew?'新增款項':'編輯款項')+'</h4><div class="eg">'+
+      '<label class="wide">款項名稱<input name="t" maxlength="40" autocomplete="off" value="'+esc(x.t)+'" placeholder="例如：解體工程追加費"></label>'+
+      numInput('amt',x.amt,'總金額（日圓）')+numInput('paid',x.paid,'已付金額（日圓）')+
+      '<label>付款時點<select name="when"><option value="near"'+(x.when==='near'?' selected':'')+'>近期要付</option><option value="later"'+(x.when==='later'?' selected':'')+'>後續再付</option></select></label>'+
+      '<label class="wide">備註<input name="note" maxlength="80" autocomplete="off" value="'+esc(x.note)+'" placeholder="例如：已確定・含稅"></label>'+
+      '</div><div class="ebtns"><button class="save" type="submit">儲存</button><button class="cancel" type="button" data-a="cancel">取消</button><span class="ferr" role="alert"></span></div></form>';
+  }
+  function renderFund(){
+    var host=$('#items'),h='';
+    fund.forEach(function(x,i){
+      var no=String(i+1).padStart(2,'0');
+      if(fEdit===x.id){h+='<div class="item editing">'+fForm(x,false)+'</div>';return}
+      var st=fstate(x),left=x.amt-x.paid;
+      var extra=st==='part'?'<span>尚餘 <b class="mono">'+yen(left)+'</b></span>':(st==='unpaid'?'<span>尚未支付</span>':'');
+      var pay=st==='paid'?'<button type="button" class="tog" data-a="undo">還原</button>':'<button type="button" class="tog" data-a="pay">標記已付</button>';
+      var ed=!fMode?'':fDel===x.id?'<span class="confirm">確定刪除？<button type="button" class="tog danger" data-a="delok">刪除</button><button type="button" class="tog" data-a="delno">取消</button></span>':'<button type="button" class="tog" data-a="edit" aria-label="編輯「'+esc(x.t)+'」">編輯</button><button type="button" class="tog" data-a="del" aria-label="刪除「'+esc(x.t)+'」">刪除</button>';
+      h+='<div class="item" data-id="'+x.id+'"><div class="no">'+no+'</div><h3>'+esc(x.t)+'</h3><div class="amt num">'+yen(x.amt)+'</div>'+
+        '<div class="note"><span class="pill '+st+'">'+PILL[st]+'</span><span class="nt">'+esc(x.note)+'</span>'+extra+'</div><div class="acts">'+pay+ed+'</div></div>';
+    });
+    if(!fund.length)h+='<div class="emptyrow">目前沒有款項。用下方「新增款項」開始。</div>';
+    host.innerHTML=h;
+    $('#fundAdd').innerHTML=fEdit==='new'?fForm({t:'',amt:0,paid:0,note:'',when:'near'},true):'<button type="button" class="addbtn" data-a="new">＋ 新增款項</button>';
+    var total=fund.reduce(function(a,x){return a+x.amt},0);
+    var paid=fund.reduce(function(a,x){return a+x.paid},0);
+    var near=fund.filter(function(x){return x.when==='near'}).reduce(function(a,x){return a+(x.amt-x.paid)},0);
+    var later=fund.filter(function(x){return x.when==='later'}).reduce(function(a,x){return a+(x.amt-x.paid)},0);
+    $('#total').textContent=yen(total);
+    $('#fundAdd').style.display=fMode?'':'none';
+    $('#fundMode').textContent=fMode?'完成編輯':'✎ 編輯';$('#fundMode').setAttribute('aria-pressed',fMode);
+    $('#fundHint').textContent=fMode?'編輯中：可修改、刪除款項，或在下方新增':'';
+    $('#capRow').innerHTML=capEdit?
+      '<span class="mini" style="color:var(--ink)">預算上限 <input id="capIn" inputmode="numeric" aria-label="預算上限" value="'+fmtIn(CAP)+'" style="width:9.5em;border:1px solid var(--ink);background:#fff;color:var(--ink);padding:2px 8px;font-family:var(--mono)"><button type="button" data-a="capok" style="background:var(--ink);color:var(--haz);border-color:var(--ink)">儲存</button><button type="button" data-a="capno" class="c" style="color:var(--ink);border-color:var(--ink)">取消</button></span>':
+      '預算上限 <b>'+yen(CAP)+'</b>'+(fMode?'<button type="button" class="editlink" data-a="capedit">編輯</button>':'');
+    var diff=CAP-total;
+    $('#savedRow').innerHTML=diff>=0?'實際節省 <b>'+yen(diff)+'</b>':'<span class="over">超出預算 <b>'+yen(-diff)+'</b></span>';
+    $('#cPaid').textContent=yen(paid);$('#cNear').textContent=yen(near);$('#cLater').textContent=yen(later);
+    var base=total||1;
+    $('#sp').style.width=(paid/base*100)+'%';$('#sn').style.width=(near/base*100)+'%';$('#sl').style.width=(later/base*100)+'%';
+    var gap=cash-near,v=$('#verdict');
+    if(!fund.length){v.className='verdict';v.textContent='還沒有款項可以試算。'}
+    else if(near===0&&later===0){v.className='verdict good';v.textContent='款項全部付清，手上現金還有 '+yen(cash)+'。'}
+    else if(gap>=0){v.className='verdict good';v.textContent='現金夠付近期款項，付完還剩 '+yen(gap)+'。'+(later>0?(gap>=later?'連後續款項也夠。':'後續款項還差 '+yen(later-gap)+'。'):'')}
+    else{v.className='verdict';v.textContent='近期款項還差 '+yen(-gap)+'，建議先安排換匯。'}
+  }
+  function fundById(id){return fund.filter(function(x){return x.id===id})[0]}
+  function handleFund(e){
+    var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;var row=b.closest('.item');var id=row?+row.dataset.id:null;var x=id?fundById(id):null;
+    if(a==='new'){fEdit='new';fDel=null;renderFund();focusFirst($('#fundAdd'))}
+    else if(a==='edit'){fEdit=id;fDel=null;renderFund();var f=$('#items .editing');if(f)focusFirst(f)}
+    else if(a==='cancel'){fEdit=null;renderFund()}
+    else if(a==='del'){fDel=id;renderFund()}
+    else if(a==='delno'){fDel=null;renderFund()}
+    else if(a==='delok'){fund=fund.filter(function(y){return y.id!==id});fDel=null;renderFund()}
+    else if(a==='pay'&&x){x.prev=x.paid;x.paid=x.amt;renderFund()}
+    else if(a==='undo'&&x){x.paid=Math.min(x.prev||0,x.amt);if(x.paid>=x.amt)x.paid=0;renderFund()}
+    else if(a==='capedit'){capEdit=true;renderFund();var c=$('#capIn');if(c){c.focus();c.select()}}
+    else if(a==='capno'){capEdit=false;renderFund()}
+    else if(a==='capok'){CAP=parseAmt($('#capIn').value);capEdit=false;renderFund()}
+  }
+  function submitFund(e){
+    e.preventDefault();var f=e.target;var d=new FormData(f);
+    var t=(d.get('t')||'').trim(),amt=parseAmt(d.get('amt')),paid=parseAmt(d.get('paid')),note=(d.get('note')||'').trim(),when=d.get('when');
+    var err=f.querySelector('.ferr');
+    if(!t){err.textContent='請填款項名稱。';f.elements.t.focus();return}
+    if(!amt){err.textContent='總金額要大於 0。';f.elements.amt.focus();return}
+    if(paid>amt){err.textContent='已付金額不能超過總金額。';f.elements.paid.focus();return}
+    if(fEdit==='new'){fund.push({id:nextId++,t:t,amt:amt,paid:paid,note:note,when:when})}
+    else{var x=fundById(fEdit);if(x){x.t=t;x.amt=amt;x.paid=paid;x.note=note;x.when=when;x.prev=0}}
+    fEdit=null;renderFund();
+  }
+  $('#items').addEventListener('click',handleFund);$('#items').addEventListener('submit',submitFund);
+  $('#fundAdd').addEventListener('click',handleFund);$('#fundAdd').addEventListener('submit',submitFund);
+  $('#capRow').addEventListener('click',handleFund);
+  function setCash(n){cash=Math.max(0,Math.min(99999999,Math.round(n)||0));$('#cashRange').value=Math.min(cash,8000000);$('#cashIn').value=cash.toLocaleString('en-US');renderFund()}
+  $('#cashDown').addEventListener('click',function(){setCash(cash-100000)});
+  $('#cashUp').addEventListener('click',function(){setCash(cash+100000)});
+  $('#cashRange').addEventListener('input',function(){setCash(+this.value)});
+  $('#cashIn').addEventListener('input',function(){cash=Math.min(99999999,parseAmt(this.value));$('#cashRange').value=Math.min(cash,8000000);renderFund()});
+  $('#cashIn').addEventListener('blur',function(){this.value=cash.toLocaleString('en-US')});
+  $('#fundReset').addEventListener('click',function(){fund=cloneF();CAP=CAP0;fEdit=null;fDel=null;capEdit=false;setCash(CASH0)});
+
+  $('#fundMode').addEventListener('click',function(){fMode=!fMode;if(!fMode){fEdit=null;fDel=null;capEdit=false}renderFund()});
+
+  /* ---------- 軟裝報價單 ---------- */
+  var QBASE=[
+    {id:1,t:'家電',amt:285000,items:['冰箱（新古機）','洗衣機（新古機）','微波爐','烤箱','電鍋／炊飯器','電熱水壺','吸塵機','吹風機']},
+    {id:2,t:'家具',amt:198000,items:['地毯','電視櫃','餐桌椅組','沙發','矮桌','書桌','全身鏡','床頭櫃']},
+    {id:3,t:'寢具與窗簾',amt:312000,items:['單人床架 ×2','雙人床架','單人床墊 ×2','雙人床墊','枕頭','棉被','窗簾（3 房・落地長款）','被單・被套']},
+    {id:4,t:'廚房與生活用品',amt:176000,items:['鍋具','廚房收納櫃','電燈','盥洗用品','碗盤・餐具・杯子','菜刀・砧板','垃圾桶','門牌・信箱']},
+    {id:5,t:'服務費與安裝費',amt:129000,items:['軟裝規劃與採購協調服務費','家具組裝・家電安裝費']}
+  ];
+  var RES0=1100000;
+  var cloneQ=function(){return QBASE.map(function(q,i){return {id:q.id,t:q.t,amt:q.amt,items:q.items.slice(),on:true,open:i===0}})};
+  var Q=cloneQ(),RES=RES0,resEdit=false,qEdit=null,qDel=null,qNext=100;
+  function qForm(q,isNew){
+    return '<form class="eform" data-f="q" novalidate><h4>'+(isNew?'新增類別':'編輯類別')+'</h4><div class="eg">'+
+      '<label>類別名稱<input name="t" maxlength="30" autocomplete="off" value="'+esc(q.t)+'" placeholder="例如：燈具與照明"></label>'+
+      numInput('amt',q.amt,'此類別金額（日圓）')+
+      '<label class="wide">品項（用頓號、逗號或換行分開）<textarea name="items" placeholder="例如：吊燈、檯燈、落地燈">'+esc(q.items.join('、'))+'</textarea></label>'+
+      '</div><div class="ebtns"><button class="save" type="submit">儲存</button><button class="cancel" type="button" data-a="cancel">取消</button><span class="ferr" role="alert"></span></div></form>';
+  }
+  function renderQuote(){
+    var host=$('#qrows'),h='',sum=0;
+    Q.forEach(function(q,i){
+      if(q.on)sum+=q.amt;
+      var no=String(i+1).padStart(2,'0');
+      if(qEdit===q.id){h+='<div class="qrow editing">'+qForm(q,false)+'</div>';return}
+      var ed=!qMode?'':qDel===q.id?'<span class="confirm">確定刪除「'+esc(q.t)+'」？<button type="button" class="tog danger" data-a="delok">刪除</button><button type="button" class="tog" data-a="delno">取消</button></span>':'<button type="button" class="tog" data-a="edit" aria-label="編輯「'+esc(q.t)+'」">編輯</button><button type="button" class="tog" data-a="del" aria-label="刪除「'+esc(q.t)+'」">刪除</button>';
+      h+='<div class="qrow'+(q.on?'':' off')+(q.open?' open':'')+'" data-id="'+q.id+'"><div class="qhead"><div class="no">'+no+'</div><button type="button" class="chk" data-a="chk" aria-pressed="'+q.on+'" aria-label="計入「'+esc(q.t)+'」"></button><h3>'+esc(q.t)+'</h3><div class="amt num">'+yen(q.amt)+'</div><button type="button" class="exp" data-a="exp" aria-expanded="'+q.open+'">'+(q.open?'收合':'展開')+'</button></div>'+
+        '<div class="items">'+(q.items.length?q.items.map(function(t){return '<span>'+esc(t)+'</span>'}).join(''):'<span>（尚無品項）</span>')+'</div>'+(qMode?'<div class="qact">'+ed+'</div>':'')+'</div>';
+    });
+    if(!Q.length)h+='<div class="emptyrow">目前沒有類別。用下方「新增類別」開始。</div>';
+    host.innerHTML=h;
+    $('#qAdd').innerHTML=qEdit==='new'?qForm({t:'',amt:0,items:[]},true):'<button type="button" class="addbtn" data-a="new">＋ 新增類別</button>';
+    $('#qAdd').style.display=qMode?'':'none';
+    $('#qMode').textContent=qMode?'完成編輯':'✎ 編輯';$('#qMode').setAttribute('aria-pressed',qMode);
+    $('#qHint').textContent=qMode?'編輯中：可修改、刪除類別，或在下方新增':'';
+    $('#qtotal').textContent=yen(sum);$('#qsum').textContent=yen(sum);
+    $('#resRow').innerHTML=resEdit?'<span class="mini"><input id="resIn" inputmode="numeric" aria-label="預留款" value="'+fmtIn(RES)+'"><button type="button" data-a="resok">儲存</button><button type="button" class="c" data-a="resno">取消</button></span>':'<b>'+yen(RES)+'</b>'+(qMode?'<button type="button" class="editlink" data-a="resedit">編輯</button>':'');
+    $('#qgauge').style.width=(RES>0?Math.min(100,sum/RES*100):(sum>0?100:0))+'%';
+    var v=$('#qverdict'),d=RES-sum;
+    if(!Q.length||sum===0){v.className='verdict';v.textContent='目前沒有計入任何項目。'}
+    else if(d===0){v.className='verdict good';v.textContent='加總剛好對上預留款，完工前不用臨時追加。'}
+    else if(d>0){v.className='verdict';v.textContent='比預留款少 '+yen(d)+'，這筆可以留給其他採購或保留。'}
+    else{v.className='verdict';v.textContent='比預留款多 '+yen(-d)+'，需要追加預算或刪減項目。'}
+  }
+  function qById(id){return Q.filter(function(x){return x.id===id})[0]}
+  function handleQ(e){
+    var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a;var row=b.closest('.qrow');var id=row?+row.dataset.id:null;var q=id?qById(id):null;
+    if(a==='new'){qEdit='new';qDel=null;renderQuote();focusFirst($('#qAdd'))}
+    else if(a==='edit'){qEdit=id;qDel=null;renderQuote();var f=$('#qrows .editing');if(f)focusFirst(f)}
+    else if(a==='cancel'){qEdit=null;renderQuote()}
+    else if(a==='del'){qDel=id;renderQuote()}
+    else if(a==='delno'){qDel=null;renderQuote()}
+    else if(a==='delok'){Q=Q.filter(function(y){return y.id!==id});qDel=null;renderQuote()}
+    else if(a==='chk'&&q){q.on=!q.on;renderQuote()}
+    else if(a==='exp'&&q){q.open=!q.open;renderQuote()}
+    else if(a==='resedit'){resEdit=true;renderQuote();var c=$('#resIn');if(c){c.focus();c.select()}}
+    else if(a==='resno'){resEdit=false;renderQuote()}
+    else if(a==='resok'){RES=parseAmt($('#resIn').value);resEdit=false;renderQuote()}
+  }
+  function submitQ(e){
+    e.preventDefault();var f=e.target,d=new FormData(f),err=f.querySelector('.ferr');
+    var t=(d.get('t')||'').trim(),amt=parseAmt(d.get('amt')),items=String(d.get('items')||'').split(/[、,，\n]/).map(function(x){return x.trim()}).filter(Boolean);
+    if(!t){err.textContent='請填類別名稱。';f.elements.t.focus();return}
+    if(!amt){err.textContent='金額要大於 0。';f.elements.amt.focus();return}
+    if(qEdit==='new'){Q.push({id:qNext++,t:t,amt:amt,items:items,on:true,open:true})}
+    else{var q=qById(qEdit);if(q){q.t=t;q.amt=amt;q.items=items}}
+    qEdit=null;renderQuote();
+  }
+  ['#qrows','#qAdd','#resRow'].forEach(function(sel){$(sel).addEventListener('click',handleQ)});
+  $('#qrows').addEventListener('submit',submitQ);$('#qAdd').addEventListener('submit',submitQ);
+  $('#qReset').addEventListener('click',function(){Q=cloneQ();RES=RES0;qEdit=null;qDel=null;resEdit=false;renderQuote()});
+
+  $('#qMode').addEventListener('click',function(){qMode=!qMode;if(!qMode){qEdit=null;qDel=null;resEdit=false}renderQuote()});
+
+  /* ---------- 進度日誌 ---------- */
+  var CATS=['全部','資金','規格','軟裝','工班'];
+  var posts=[
+    {c:'軟裝',d:'2026.11.07',t:'軟裝採購報價出爐，預留款金額對上了',b:'這幾天收到軟裝採購的完整報價，家電、家具、寢具窗簾、廚房用品，加上安裝服務費，五大項加總後剛好對上先前抓的預留款金額，代表當初抓的預算算得準，完工前不用臨時再追加。接下來會跟屋主確認每一項的款式細節，預計在工程完工前陸續安排採購與進場。'},
+    {c:'資金',d:'2026.10.16',t:'不動產取得稅完成繳納，資金總覽同步更新',b:'稅單金額已確認並完成繳納，資金總覽的「已付」狀態同步更新，總額另外加列了 ¥3,000,000 的預備費用。接下來會對照近期款項的付款時點，評估是否需要再換匯。'},
+    {c:'規格',d:'2026.09.28',t:'門把型號重新核對，規格書已更正',b:'比對現場照片與型錄後，發現規格書上登記的門把型號跟實際確認的款式不一致，已請工務店確認正確型號並更新規格書，中日文版本同步修正，避免後續安裝時裝錯款式。'}
+  ];
+  var filter='全部';
+  function renderJournal(){
+    var f=$('#filters');f.innerHTML='';
+    CATS.forEach(function(c){var b=document.createElement('button');b.type='button';b.textContent=c;b.setAttribute('aria-pressed',c===filter?'true':'false');
+      b.addEventListener('click',function(){filter=c;renderJournal()});f.appendChild(b)});
+    var host=$('#posts');host.innerHTML='';
+    var list=posts.filter(function(p){return filter==='全部'||p.c===filter});
+    if(!list.length){host.innerHTML='<li class="empty">這個分類還沒有紀錄。從右邊寫第一則。</li>';return}
+    list.forEach(function(p){var li=document.createElement('li');li.className='post';li.dataset.c=p.c;
+      li.innerHTML='<div class="m"><b>'+esc(p.c)+'</b><time>'+esc(p.d)+'</time>'+(p.mine?'<span class="mine">你新增的</span>':'')+'</div><h3>'+esc(p.t)+'</h3><p>'+esc(p.b)+'</p>';host.appendChild(li)});
+  }
+  $('#jform').addEventListener('submit',function(e){
+    e.preventDefault();var t=$('#jt').value.trim(),b=$('#jb').value.trim(),c=$('#jc').value;var err=$('#jerr');
+    if(!t){err.textContent='請先寫標題。';$('#jt').focus();return}
+    if(!b){err.textContent='請寫一兩句內文，讓屋主看得懂發生什麼事。';$('#jb').focus();return}
+    err.textContent='';var n=new Date();var pad=function(x){return String(x).padStart(2,'0')};
+    posts.unshift({c:c,d:n.getFullYear()+'.'+pad(n.getMonth()+1)+'.'+pad(n.getDate()),t:t,b:b,mine:true});
+    $('#jt').value='';$('#jb').value='';filter='全部';renderJournal();
+  });
+
+  renderMap();renderFund();renderQuote();renderJournal();
+})();
+</script>
+</body>
+</html>
