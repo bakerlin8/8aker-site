@@ -34,7 +34,7 @@ async function maybeSyncStrava(c: Record<string, string>) {
     if (!(Number(c.strava_expires_at || 0) > Date.now() / 1000 + 300)) {
       const r = await fetch('https://www.strava.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ client_id: c.strava_client_id, client_secret: c.strava_client_secret, grant_type: 'refresh_token', refresh_token: c.strava_refresh_token }) });
-      if (!r.ok) return;
+      if (!r.ok) { await cfgSet({ strava_last_status: `refresh ${r.status}` }); return; }
       const d = await r.json(); token = d.access_token;
       await cfgSet({ strava_access_token: d.access_token, strava_refresh_token: d.refresh_token, strava_expires_at: String(d.expires_at) });
     }
@@ -44,8 +44,9 @@ async function maybeSyncStrava(c: Record<string, string>) {
     const acts: any[] = [];
     for (let page = 1; page <= 8; page++) {
       const r = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${after}&per_page=200&page=${page}`, { headers: H });
-      if (!r.ok) break;
+      if (!r.ok) { await cfgSet({ strava_last_status: `activities ${r.status}` }); break; }
       const part: any[] = await r.json();
+      await cfgSet({ strava_last_status: `ok ${part.length}` });
       acts.push(...part);
       if (part.length < 200) { if (full) await cfgSet({ strava_full_sync: 'done' }); break; }
     }
