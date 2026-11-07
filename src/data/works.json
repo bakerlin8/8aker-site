@@ -1065,6 +1065,241 @@
       "cta_label": "",
       "engage": "",
       "ask": ""
+    },
+    {
+      "dir": "conjure",
+      "date": "2026.11",
+      "draft": true,
+      "title": "不動產改建全流程工作法",
+      "desc": "把改建全流程拆成階段，列出屋主、顧問、仲介各自該準備的文件",
+      "spent": "—",
+      "saved": "—",
+      "service": "owner",
+      "why": "改建每個階段要準備的文件都不一樣，牽涉的角色也不只一個人；顧問得同時準備屋主、工班、仲介各自看得懂的版本。",
+      "result": "把改建全流程拆成六個階段，列出屋主、顧問、仲介各自該準備的文件，再加上一套看得懂的文件範本。",
+      "slug": "renovation-workflow-playbook",
+      "intro": "",
+      "images": [
+        {
+          "src": "/works/renovation-workflow-playbook/00_workflow_overview_desktop.png",
+          "caption": "全流程地圖"
+        },
+        {
+          "src": "/works/renovation-workflow-playbook/01_funding_overview_desktop.png",
+          "caption": "資金總覽"
+        },
+        {
+          "src": "/works/renovation-workflow-playbook/02_furnishing_quote_desktop.png",
+          "caption": "軟裝採購報價單"
+        },
+        {
+          "src": "/works/renovation-workflow-playbook/03_case_journal_desktop.png",
+          "caption": "案件進度日誌（功能構想）"
+        }
+      ],
+      "video": "",
+      "link": "",
+      "link_label": "",
+      "color": "",
+      "title_en": "Renovation Project Workflow Playbook",
+      "title_zh": "不動產改建全流程工作法",
+      "tag": "內容",
+      "kicker": "具現 ・ 作品",
+      "deck": "買地到軟裝進場，每個階段該準備什麼文件，一次說清楚。",
+      "groups": [
+        {
+          "key": "P",
+          "label": "流程",
+          "en": "Workflow",
+          "shots": [
+            {
+              "src": "/works/renovation-workflow-playbook/00_workflow_overview_desktop.png",
+              "title": "全流程地圖",
+              "url": "流程地圖",
+              "note": "一張圖呈現買地、簽約、工程報價、規格確認、資金追蹤、軟裝進場六個階段，以及每階段屋主、顧問、仲介各自的角色。",
+              "points": [
+                "六個階段，從買地選址到軟裝進場採購",
+                "每個階段分屋主、顧問、仲介三種角色",
+                "工程報價、規格確認、資金追蹤階段，仲介通常不涉及"
+              ],
+              "mobile": "/works/renovation-workflow-playbook/04_workflow_overview_mobile.png"
+            }
+          ]
+        },
+        {
+          "key": "D",
+          "label": "文件範本",
+          "en": "Documents",
+          "shots": [
+            {
+              "src": "/works/renovation-workflow-playbook/01_funding_overview_desktop.png",
+              "title": "資金總覽",
+              "url": "資金總覽",
+              "note": "一份文件看懂已付、部分已付、未付，以及預算上限與手上現金。",
+              "points": [
+                "已付、部分已付、未付，用顏色標籤一眼分辨",
+                "報價總額、預算上限、實際節省與手上現金並列",
+                "所有金額與現金均為虛構範例"
+              ],
+              "mobile": "/works/renovation-workflow-playbook/05_funding_overview_mobile.png"
+            },
+            {
+              "src": "/works/renovation-workflow-playbook/02_furnishing_quote_desktop.png",
+              "title": "軟裝採購報價單",
+              "url": "軟裝採購報價單",
+              "note": "家電、家具、寢具窗簾、廚房生活用品與服務費，五大類分類報價。",
+              "points": [
+                "每一類列出品項，總額一眼可見",
+                "報價總額與資金總覽裡的預留款對照",
+                "新古機、窗簾房數等備註寫在文末"
+              ],
+              "mobile": "/works/renovation-workflow-playbook/06_furnishing_quote_mobile.png"
+            }
+          ]
+        },
+        {
+          "key": "J",
+          "label": "追蹤",
+          "en": "Tracking",
+          "shots": [
+            {
+              "src": "/works/renovation-workflow-playbook/03_case_journal_desktop.png",
+              "title": "案件進度日誌（構想）",
+              "url": "案件進度日誌",
+              "note": "以時間排序呈現進度短文，每篇對應一次文件更新或里程碑。目前是功能構想的示意畫面。",
+              "points": [
+                "依日期排序",
+                "每篇一段短文摘要",
+                "分類標籤：資金、規格、軟裝"
+              ],
+              "mobile": "/works/renovation-workflow-playbook/07_case_journal_mobile.png"
+            }
+          ]
+        }
+      ],
+      "how": {
+        "steps": [
+          {
+            "t": "先看全流程地圖",
+            "d": "一進頁面先看到六個階段的時間軸，知道一個改建案通常會經過哪些步驟。"
+          },
+          {
+            "t": "點進某個階段看範例文件",
+            "d": "例如點「資金追蹤」，就能看到資金總覽的範例畫面長什麼樣子。"
+          },
+          {
+            "t": "切換身份視角（構想中）",
+            "d": "之後想做成可以選「我是屋主」「我是仲介」，只顯示跟自己有關的準備清單。"
+          },
+          {
+            "t": "捲到案件日誌",
+            "d": "看最新幾篇進度短文，了解最近案子發生了什麼事。"
+          },
+          {
+            "t": "連到個別工具範例",
+            "d": "從對應階段點進去，可以連到規格書、報價追蹤等更完整的範例頁面。"
+          }
+        ],
+        "notice": "以上畫面與流程皆為示意規劃：物件地點、屋主與工班姓名、金額、現金餘額與文件編號均為虛構範例，資料不會存到雲端，也不代表真實案件細節。",
+        "extra": "這份流程串起的個別工具，包含「選材規格書」與「報價與資金追蹤網頁」，各自的作品頁整理中。"
+      },
+      "bg": {
+        "lead": "不動產改建從買地、簽約、工程報價、建材選定，到資金控管、工班溝通、軟裝進場，每個階段要準備的文件都不一樣，牽涉的角色也不只一個人。身為中間協調的顧問，常常得同時準備屋主看得懂的版本、工班聽得懂的版本，還有讓仲介掌握進度的版本。",
+        "problems": [
+          {
+            "t": "文件散落各處",
+            "d": "合約、報價單、規格書、對帳紀錄分別存在不同地方，沒有人能一次看到全貌。"
+          },
+          {
+            "t": "三方立場不同",
+            "d": "屋主在意剩多少預算、工班在意規格對不對、仲介在意進度跟交屋條件，同一份資料要能讓三方各自看懂。"
+          },
+          {
+            "t": "跨國語言落差",
+            "d": "找日本工班溝通常常中文日文來回翻譯，細節講不清楚容易產生誤會。"
+          },
+          {
+            "t": "金額版本容易搞混",
+            "d": "報價改版、追加工程、分期付款混在一起，很難一眼看出「現在到底花了多少、還剩多少」。"
+          },
+          {
+            "t": "進度沒人即時同步",
+            "d": "屋主不在現場，只能被動等顧問口頭回報，無法隨時掌握案件狀態。"
+          }
+        ],
+        "close": "我做的不是幫這個案子多生出幾份報表，而是把每個階段原本分散、只有我自己看得懂的工作方式，整理成一套屋主、顧問、仲介都能照著走的流程，加上一套看得懂的文件範本。"
+      },
+      "impact": {
+        "lead": "以下是以這次實際跑完一個改建案、從買地到軟裝採購階段的經驗粗估，不是精確量測。",
+        "live": "這套流程從 2026 年 9 月陸續發展到現在（11 月），跟著一個實際改建案從簽約一路做到軟裝採購階段，持續依案件進度調整。",
+        "rows": [
+          {
+            "item": "跟屋主說明進度",
+            "before": "要口頭解釋或臨時整理多份檔案",
+            "after": "一份資金總覽直接看懂已付／未付／結餘",
+            "saved": "明顯減少口頭說明時間"
+          },
+          {
+            "item": "核對軟裝預算",
+            "before": "軟裝採購到了才發現預留款不夠或抓太多",
+            "after": "提前用報價單核對預留款，誤差能及早發現",
+            "saved": "降低最後臨時追加預算的風險"
+          },
+          {
+            "item": "各方要準備什麼資料",
+            "before": "每個案子都要重新想一次、口頭交代",
+            "after": "有固定的流程地圖跟清單，照著走就好",
+            "saved": "減少漏掉文件的機率"
+          },
+          {
+            "item": "工班溝通往返",
+            "before": "中日文來回確認規格，常要 3–4 次訊息",
+            "after": "規格書＋翻譯好的訊息一次附上",
+            "saved": "粗估省下約一半往返次數"
+          }
+        ]
+      },
+      "future": {
+        "lead": "這套流程目前主要靠我手動整理，接下來想讓屋主跟仲介也能更主動參與。",
+        "add": [
+          {
+            "t": "案件進度日誌",
+            "d": "文件更新時整理成一篇進度短文，讓屋主隨時能看最新狀態。"
+          },
+          {
+            "t": "身份視角切換",
+            "d": "讓屋主、仲介各自登入後，只看到跟自己相關的待辦與文件。"
+          },
+          {
+            "t": "多案件總覽",
+            "d": "同時管理好幾個改建案，而不是一次只整理一份。"
+          }
+        ],
+        "improve": [
+          {
+            "t": "把個別工具串起來",
+            "d": "把規格書、資金總覽、軟裝報價單這些個別工具，跟這份流程地圖真正串接起來，而不是各自獨立存在。"
+          },
+          {
+            "t": "行動裝置閱讀體驗",
+            "d": "尤其是流程地圖在小螢幕上的呈現方式。"
+          }
+        ]
+      },
+      "cta": {
+        "title": "你的改建案，現在卡在哪個階段？",
+        "body": "不管你是屋主、仲介，還是跟我一樣要同時應付工程、資金、溝通的顧問角色，都歡迎聊聊你目前需要整理哪些文件。",
+        "primary": "預約聊聊",
+        "href": "/chat/",
+        "secondary": "看更多作品"
+      },
+      "cta_label": "",
+      "thumb": {
+        "desktop": "/works/renovation-workflow-playbook/00_workflow_overview_desktop.png",
+        "mobile": "/works/renovation-workflow-playbook/04_workflow_overview_mobile.png"
+      },
+      "engage": "",
+      "ask": ""
     }
   ]
 }
