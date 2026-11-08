@@ -128,7 +128,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 .top{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);background:linear-gradient(#1C0F14 30%,rgba(28,15,20,0));transition:background .35s,border-color .35s;border-bottom:1px solid transparent;}
 .top.solid{background:rgba(28,15,20,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-color:rgba(239,229,214,.08);}
 .top-in{max-width:1240px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;gap:36px;color:#EFE5D6;}
-.mark{font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.2em;display:inline-flex;gap:.02em;}
+.mark{font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.2em;display:inline-flex;align-items:center;gap:.02em;}
+.mark .mk{width:30px;height:30px;margin-right:12px;flex:none;transition:transform .6s var(--ease);}
+.mark:hover .mk{transform:rotate(12deg);}
 .mark span{display:inline-block;transition:transform .5s var(--ease),color .3s;}
 .mark:hover span{transform:translateY(-3px);}
 .mark:hover span:last-child{color:#D4A24C;}
@@ -193,6 +195,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;}
 
 footer.site-foot{padding:32px max(40px,calc((100% - 1160px)/2)) 44px;background:#1C0F14;border-top:1px solid rgba(239,229,214,.08);display:flex;gap:24px;flex-wrap:wrap;font-size:12.5px;color:#86707A;}
 footer.site-foot .sf-l{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;}
+footer.site-foot .sf-mk{width:24px;height:24px;align-self:center;opacity:.9;}
 footer.site-foot .sf-name{font-family:var(--latin),var(--serif);letter-spacing:.2em;color:#B9A89E;}
 footer.site-foot .sf-links{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto;margin-right:56px;}
 footer.site-foot .sf-motto{margin-left:auto;font-family:var(--serif);color:#B9A89E;}
@@ -214,7 +217,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
 <button class="pring" id="pring" type="button" aria-label="回到頂端"><svg viewBox="-22 -22 44 44" aria-hidden="true"><g id="pringG"></g><circle class="pr-arc" id="pringArc" r="19" transform="rotate(-90)"/><path class="pr-up" d="M-4 2 L0 -2.5 L4 2"/></svg></button>
 <header class="top" id="top">
   <div class="top-in">
-    <a href="/" class="mark vt-mark" aria-label={`${copy.site_name} 首頁`}>{[...copy.site_name].map((ch) => <span>{ch}</span>)}</a>
+    <a href="/" class="mark vt-mark" aria-label={`${copy.site_name} 首頁`}><img class="mk" src="/icons/logo-mark.svg" alt="" width="30" height="30" />{[...copy.site_name].map((ch) => <span>{ch}</span>)}</a>
     <nav class="nav" aria-label="主要導覽">{nav.map((n) => <a href={n.href}>{n.label}</a>)}</nav>
     <a class="btn-gold" href="/chat/">需求填表</a>
     <a class="btn-gold btn-gold2nd" href="/#support">支持贊助</a>
@@ -226,7 +229,7 @@ footer.site-foot a:hover{color:#EFE5D6;}
 
 <main><slot /></main>
 
-<footer class="site-foot"><div class="sf-l"><span class="sf-name">{copy.site_name}</span><span>© 2026 {copy.site_name}. All rights reserved.</span></div><nav class="sf-links" aria-label="頁尾"><a href="/chat/">需求填表</a><a href="/#support">支持贊助</a>{copy.instagram_handle && <a href={`https://www.instagram.com/${copy.instagram_handle}/`} target="_blank" rel="noopener">Instagram</a>}<a href="/privacy/">隱私權政策</a></nav></footer>
+<footer class="site-foot"><div class="sf-l"><img class="sf-mk" src="/icons/logo-mark.svg" alt="" width="24" height="24" /><span class="sf-name">{copy.site_name}</span><span>© 2026 {copy.site_name}. All rights reserved.</span></div><nav class="sf-links" aria-label="頁尾"><a href="/chat/">需求填表</a><a href="/#support">支持贊助</a>{copy.instagram_handle && <a href={`https://www.instagram.com/${copy.instagram_handle}/`} target="_blank" rel="noopener">Instagram</a>}<a href="/privacy/">隱私權政策</a></nav></footer>
 
 <script is:inline>
 /* 介面音效：全部用 Web Audio 即時合成（不用下載音檔）。滑過＝輕點、按下＝木頭聲、切換＝鈴聲、換頁＝風聲、成功＝和弦。右上角喇叭可關閉，會記住。 */
